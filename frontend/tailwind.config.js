@@ -7,50 +7,46 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Healthcare Cyan (Primary) - #54ACBF
-        primary: {
-          50: '#f0f9fa',
-          100: '#d9f0f3',
-          200: '#bce1e7',
-          300: '#8fccd6',
-          400: '#54acbf', // Base
-          500: '#54acbf', // Brand
-          600: '#438a99',
-          700: '#326773',
-          800: '#22454d',
-          900: '#112226',
-          950: '#081113',
-        },
-        // Electric Cyan (Secondary) - high contrast accent
-        secondary: {
-          50: '#ecfeff',
-          100: '#cffafe',
-          200: '#a5f3fc',
-          300: '#67e8f9',
-          400: '#22d3ee',
-          500: '#06b6d4',
-          600: '#0891b2',
-          700: '#0e7490',
-          800: '#155e75',
-          900: '#164e63',
-          950: '#083344',
-        },
-        // Modern Dark Theme Backgrounds
-        dark: {
-          bg: '#0f172a',    // Slate 900
-          card: '#1e293b',  // Slate 800
-          text: '#f8fafc',  // Slate 50
-          muted: '#94a3b8', // Slate 400
-          border: '#334155',// Slate 700
-        },
-        success: '#10b981',
-        danger: '#ef4444',
-        warning: '#f59e0b',
-        info: '#3b82f6',
+        // Shared Medicare identity. Legacy hue names intentionally resolve to this ramp.
+        ...Object.fromEntries(['primary', 'secondary', 'indigo', 'violet', 'purple', 'blue', 'sky', 'cyan', 'teal'].map(name => [name, {
+          50: '#edf5f2', 100: '#e5f3ef', 200: '#c4e5d9', 300: '#a8e5cc',
+          400: '#4dc4b5', 500: '#087f78', 600: '#087f78', 700: '#066b65',
+          800: '#23574e', 900: '#193a33', 950: '#102b27',
+        }])),
+        ...Object.fromEntries(['slate', 'gray', 'zinc', 'neutral'].map(name => [name, {
+          50: '#f5f8f7', 100: '#edf5f2', 200: '#d9e3e3', 300: '#b6cbc7',
+          400: '#a0b4b1', 500: '#5e7275', 600: '#4a6261', 700: '#2d4843',
+          800: '#1c3837', 900: '#142b2b', 950: '#102322',
+        }])),
+        ...Object.fromEntries(['green', 'emerald'].map(name => [name, {
+          50: '#edf8f1', 100: '#e2f2e8', 200: '#c8e7d3', 300: '#a8dbc1', 400: '#5fa883',
+          500: '#28734f', 600: '#28734f', 700: '#216245', 800: '#214b35', 900: '#213f33', 950: '#132c23',
+        }])),
+        ...Object.fromEntries(['red', 'rose'].map(name => [name, {
+          50: '#fff2f2', 100: '#fbe4e6', 200: '#f2ccd0', 300: '#ffc7cc', 400: '#d8737e',
+          500: '#b23843', 600: '#b23843', 700: '#a12e36', 800: '#74343c', 900: '#482d33', 950: '#321f24',
+        }])),
+        ...Object.fromEntries(['amber', 'orange', 'yellow'].map(name => [name, {
+          50: '#fff7e8', 100: '#f9ecd6', 200: '#e9d5ae', 300: '#f5ce8c', 400: '#ce9838',
+          500: '#86530a', 600: '#86530a', 700: '#74480b', 800: '#594424', 900: '#40351f', 950: '#2d2519',
+        }])),
+        canvas: 'var(--mc-canvas)', surface: 'var(--mc-surface)',
+        ink: 'var(--mc-text)', muted: 'var(--mc-text-muted)',
+        line: 'var(--mc-border)', accent: 'var(--mc-accent)',
+        dark: { bg: '#102322', card: '#142b2b', text: '#e1eeeb', muted: '#a0b4b1', border: '#34504d' },
+        success: '#28734f', danger: '#b23843', warning: '#86530a', info: '#256374',
       },
-      fontFamily: {
-        sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', 'sans-serif'],
+      fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'] },
+      // Text aliases resolve semantically so muted/accent text stays readable in both themes.
+      textColor: {
+        ...Object.fromEntries([['green','success'],['emerald','success'],['red','danger'],['rose','danger'],['amber','warning'],['orange','warning'],['yellow','warning']].map(([name,kind]) => [name, Object.fromEntries([300,400,500,600,700,800,900,950].map(tone => [tone, `var(--mc-${kind})`]))])),
+        ...Object.fromEntries(['primary', 'secondary', 'indigo', 'violet', 'purple', 'blue', 'sky', 'cyan', 'teal'].map(name => [name, Object.fromEntries([300, 400, 500, 600, 700, 800, 900, 950].map(tone => [tone, 'var(--mc-accent)']))])),
+        ...Object.fromEntries(['slate', 'gray', 'zinc', 'neutral'].map(name => [name, {
+          400: 'var(--mc-text-subtle)', 500: 'var(--mc-text-muted)', 600: 'var(--mc-text-muted)',
+          700: 'var(--mc-text)', 800: 'var(--mc-text)', 900: 'var(--mc-text)', 950: 'var(--mc-text)',
+        }])),
       },
+      borderRadius: { lg: '9px', xl: '9px', '2xl': '16px', '3xl': '16px' },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out forwards',
         'slide-up': 'slideUp 0.5s ease-out forwards',
@@ -79,7 +75,7 @@ module.exports = {
       boxShadow: {
         'soft': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
         'card': '0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025)',
-        'glow': '0 0 20px rgba(84, 172, 191, 0.5)', // #54ACBF glow
+        'glow': '0 4px 18px rgb(23 59 59 / 5%)',
       },
     },
   },
