@@ -36,9 +36,9 @@ function TriageQueue() {
                 <ThemeToggle />
             </div>
 
-            <div className="aq-topbar border-b border-slate-200 dark:border-slate-800/50 bg-white/40 dark:bg-slate-900/40 backdrop-blur-md px-8 py-6 flex justify-between items-center z-10">
+            <div className="aq-topbar border-b border-slate-200 dark:border-slate-800/50 bg-surface dark:bg-slate-900/40 px-8 py-6 flex justify-between items-center z-10">
                 <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center text-white shadow-lg shadow-primary-500/30 bg-primary-600">
                         <span className="material-symbols-outlined text-2xl">smart_toy</span>
                     </div>
                     <div>
@@ -47,11 +47,11 @@ function TriageQueue() {
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
-                    <button onClick={fetchSessions} className="doctor-glass-button px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 hover:bg-white/50 dark:hover:bg-slate-800/50 transition border border-slate-200 dark:border-slate-700">
+                    <button onClick={fetchSessions} className="doctor-glass-button px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-surface dark:hover:bg-slate-800/50 transition border border-slate-200 dark:border-slate-700">
                         <span className="material-symbols-outlined text-sm">refresh</span>
                         Refresh
                     </button>
-                    <button onClick={() => navigate('/doctor/dashboard')} className="doctor-glass-button px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 border border-slate-200 dark:border-slate-700 hover:bg-white/50 dark:hover:bg-slate-800/50 transition">
+                    <button onClick={() => navigate('/doctor/dashboard')} className="doctor-glass-button px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 border border-slate-200 dark:border-slate-700 hover:bg-surface dark:hover:bg-slate-800/50 transition">
                         <span className="material-symbols-outlined text-sm">arrow_back</span>
                         Back to Dashboard
                     </button>
@@ -61,7 +61,7 @@ function TriageQueue() {
             <div className="flex-grow overflow-y-auto p-8">
                 {loading ? (
                     <div className="flex items-center justify-center h-full">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
                     </div>
                 ) : sessions.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full text-center p-8">
@@ -74,7 +74,7 @@ function TriageQueue() {
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {sessions.map(session => (
-                            <div key={session.id} className="glass-card rounded-3xl p-6 transition-transform hover:-translate-y-1 hover:shadow-xl border border-white/20 dark:border-slate-700/50 relative overflow-hidden group border-l-4" style={{ borderLeftColor: session.priority === 'high' ? '#f43f5e' : session.priority === 'low' ? '#eab308' : '#6366f1' }}>
+                            <div key={session.id} className="glass-card rounded-3xl p-6 transition-transform hover:shadow-sm border border-line dark:border-slate-700/50 relative overflow-hidden group" style={{ borderColor: session.priority === 'high' ? "var(--mc-danger)" : session.priority === 'low' ? "var(--mc-warning)" : "var(--mc-accent)" }}>
                                 <div className="absolute top-0 right-0 p-4">
                                     <span className={`text-[10px] font-bold uppercase px-2 py-1 rounded-full ${session.status === 'completed' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'}`}>
                                         {session.status}
@@ -94,7 +94,7 @@ function TriageQueue() {
                                         <div className="flex gap-2">
                                             <div className="flex-1 bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-100 dark:border-slate-700/50">
                                                 <span className="text-[10px] uppercase font-bold text-slate-400">Recommendation</span>
-                                                <p className="text-sm font-semibold text-indigo-600 dark:text-indigo-400 mt-1 line-clamp-1 truncate">{session.recommended_department}</p>
+                                                <p className="text-sm font-semibold text-primary-600 dark:text-primary-400 mt-1 line-clamp-1 truncate">{session.recommended_department}</p>
                                             </div>
                                             <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-100 dark:border-slate-700/50 flex flex-col items-center justify-center min-w-[80px]">
                                                 <span className="text-[10px] uppercase font-bold text-slate-400 text-center">Confidence</span>
@@ -113,7 +113,7 @@ function TriageQueue() {
 
                                 <button
                                     onClick={() => alert('Detailed view and conversion to Clinical Note coming soon!')}
-                                    className="w-full py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 dark:bg-indigo-900/20 dark:hover:bg-indigo-900/40 dark:text-indigo-400 rounded-xl font-bold text-sm transition-colors border border-indigo-100 dark:border-indigo-500/20 flex items-center justify-center gap-2"
+                                    className="w-full py-2.5 bg-primary-50 hover:bg-primary-100 text-primary-600 dark:bg-primary-900/20 dark:hover:bg-primary-900/40 dark:text-primary-400 rounded-lg font-bold text-sm transition-colors border border-primary-100 dark:border-primary-500/20 flex items-center justify-center gap-2"
                                     disabled={!session.soap_summary}
                                 >
                                     <span className="material-symbols-outlined text-lg">medical_information</span>

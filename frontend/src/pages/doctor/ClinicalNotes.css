@@ -1,34 +1,28 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
-
 /* ── Wrapper ── */
 .cn-wrapper {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    background-color: #f0f2f5;
-    background-image: radial-gradient(circle at 0% 0%, #dbeafe 0%, transparent 50%),
-        radial-gradient(circle at 100% 100%, #fef3c7 0%, transparent 50%);
+    font-family: var(--mc-font);
+    background-color: var(--mc-canvas);
+    background-image: none;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
 }
 
 .dark .cn-wrapper {
-    background-color: #0f172a;
-    background-image: radial-gradient(circle at 0% 0%, #1e1b4b 0%, transparent 50%),
-        radial-gradient(circle at 100% 100%, #451a03 0%, transparent 50%);
+    background-color: var(--mc-canvas);
+    background-image: none;
 }
 
 /* ── Glass helpers ── */
 .cn-glass-card {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    border-radius: 20px;
+    background: var(--mc-surface);
+    border: 1px solid var(--mc-border);
+    border-radius: var(--mc-radius-panel);
 }
 
 .dark .cn-glass-card {
-    background: rgba(30, 41, 59, 0.7);
-    border-color: rgba(255, 255, 255, 0.06);
+    background: var(--mc-surface);
+    border-color: var(--mc-border);
 }
 
 /* ── Top bar ── */
@@ -37,18 +31,16 @@
     align-items: center;
     justify-content: space-between;
     padding: 20px 32px;
-    background: rgba(255, 255, 255, 0.55);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+    background: var(--mc-surface);
+    border-bottom: 1px solid var(--mc-border);
     position: sticky;
     top: 0;
     z-index: 20;
 }
 
 .dark .cn-topbar {
-    background: rgba(15, 23, 42, 0.7);
-    border-bottom-color: rgba(255, 255, 255, 0.08);
+    background: var(--mc-surface);
+    border-bottom-color: var(--mc-border);
 }
 
 .cn-topbar-left {
@@ -60,13 +52,13 @@
 .cn-topbar-icon {
     width: 44px;
     height: 44px;
-    border-radius: 14px;
-    background: #4f46e5;
+    border-radius: var(--mc-radius-control);
+    background: var(--mc-brand);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
-    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+    color: var(--mc-on-brand);
+    box-shadow: var(--mc-shadow-sm);
     flex-shrink: 0;
 }
 
@@ -74,21 +66,21 @@
     margin: 0 0 2px;
     font-size: 20px;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--mc-text);
 }
 
 .dark .cn-topbar-title {
-    color: #f1f5f9;
+    color: var(--mc-text);
 }
 
 .cn-topbar-subtitle {
     margin: 0;
     font-size: 12px;
-    color: #64748b;
+    color: var(--mc-text-muted);
 }
 
 .dark .cn-topbar-subtitle {
-    color: #94a3b8;
+    color: var(--mc-text-muted);
 }
 
 .cn-topbar-actions {
@@ -102,10 +94,10 @@
     align-items: center;
     gap: 6px;
     padding: 8px 16px;
-    border-radius: 12px;
-    border: 1.5px solid rgba(79, 70, 229, 0.25);
-    background: rgba(79, 70, 229, 0.08);
-    color: #4f46e5;
+    border-radius: var(--mc-radius-control);
+    border: 1px solid var(--mc-border-strong);
+    background: var(--mc-brand-soft);
+    color: var(--mc-accent);
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
@@ -113,13 +105,13 @@
 }
 
 .dark .cn-btn-outline {
-    border-color: rgba(165, 180, 252, 0.2);
-    color: #a5b4fc;
-    background: rgba(79, 70, 229, 0.12);
+    border-color: var(--mc-border-strong);
+    color: var(--mc-accent);
+    background: var(--mc-brand-soft);
 }
 
 .cn-btn-outline:hover {
-    background: rgba(79, 70, 229, 0.15);
+    background: var(--mc-brand-soft);
     transform: translateX(-2px);
 }
 
@@ -128,21 +120,21 @@
     align-items: center;
     gap: 6px;
     padding: 9px 18px;
-    border-radius: 12px;
+    border-radius: var(--mc-radius-control);
     border: none;
-    background: #4f46e5;
-    color: white;
+    background: var(--mc-brand);
+    color: var(--mc-on-brand);
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
-    box-shadow: 0 2px 8px rgba(79, 70, 229, 0.35);
+    box-shadow: var(--mc-shadow-sm);
 }
 
 .cn-btn-primary:hover {
-    background: #4338ca;
+    background: var(--mc-brand-hover);
     transform: translateY(-1px);
-    box-shadow: 0 4px 14px rgba(79, 70, 229, 0.45);
+    box-shadow: var(--mc-shadow-sm);
 }
 
 /* ── Body ── */
@@ -162,12 +154,12 @@
 .cn-selection-header h2 {
     font-size: 20px;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--mc-text);
     margin: 0 0 6px;
 }
 
 .dark .cn-selection-header h2 {
-    color: #f1f5f9;
+    color: var(--mc-text);
 }
 
 .cn-selection-list {
@@ -193,8 +185,8 @@
     top: 0;
     bottom: 0;
     width: 4px;
-    background: linear-gradient(180deg, #4f46e5, #818cf8);
-    border-radius: 20px 0 0 20px;
+    background: var(--mc-brand);
+    border-radius: var(--mc-radius-control);
     opacity: 0;
     transform: scaleY(0);
     transition: all 0.3s;
@@ -202,7 +194,7 @@
 
 .cn-patient-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--mc-shadow-sm);
 }
 
 .cn-patient-btn:hover::before {
@@ -219,62 +211,62 @@
 .cn-patient-avatar {
     width: 48px;
     height: 48px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #818cf8, #4f46e5);
+    border-radius: var(--mc-radius-control);
+    background: var(--mc-brand);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: var(--mc-on-brand);
     font-weight: 700;
     font-size: 18px;
     flex-shrink: 0;
-    box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
+    box-shadow: var(--mc-shadow-sm);
 }
 
 .cn-patient-name {
     margin: 0 0 4px;
     font-size: 16px;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--mc-text);
 }
 
 .dark .cn-patient-name {
-    color: #f1f5f9;
+    color: var(--mc-text);
 }
 
 .cn-patient-meta {
     font-size: 12px;
-    color: #64748b;
-    font-family: monospace;
+    color: var(--mc-text-muted);
+    font-family: var(--mc-font);
 }
 
 .dark .cn-patient-meta {
-    color: #94a3b8;
+    color: var(--mc-text-muted);
 }
 
 .cn-patient-reason {
     font-size: 12px;
-    color: #94a3b8;
+    color: var(--mc-text-muted);
     margin-top: 4px;
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: var(--mc-font);
 }
 
 /* Badges */
 .cn-badge {
     padding: 4px 10px;
-    border-radius: 8px;
+    border-radius: var(--mc-radius-control);
     font-size: 10px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    background: rgba(79, 70, 229, 0.1);
-    color: #4f46e5;
-    border: 1px solid rgba(79, 70, 229, 0.2);
+    background: var(--mc-brand-soft);
+    color: var(--mc-accent);
+    border: 1px solid var(--mc-border-strong);
 }
 
 .dark .cn-badge {
-    background: rgba(79, 70, 229, 0.2);
-    color: #a5b4fc;
+    background: var(--mc-brand-soft);
+    color: var(--mc-accent);
 }
 
 /* Selected patient banner */
@@ -290,12 +282,12 @@
 .cn-tabs-container {
     display: flex;
     gap: 8px;
-    border-bottom: 1px solid rgba(79, 70, 229, 0.15);
+    border-bottom: 1px solid var(--mc-border-strong);
     margin-bottom: 24px;
 }
 
 .dark .cn-tabs-container {
-    border-bottom-color: rgba(255, 255, 255, 0.06);
+    border-bottom-color: var(--mc-border);
 }
 
 .cn-tab {
@@ -307,46 +299,46 @@
     background: transparent;
     font-size: 14px;
     font-weight: 600;
-    color: #64748b;
-    border-bottom: 2px solid transparent;
+    color: var(--mc-text-muted);
+    border-bottom: 1px solid transparent;
     cursor: pointer;
     transition: all 0.2s;
     margin-bottom: -1px;
 }
 
 .dark .cn-tab {
-    color: #94a3b8;
+    color: var(--mc-text-muted);
 }
 
 .cn-tab:hover {
-    color: #334155;
+    color: var(--mc-text);
 }
 
 .dark .cn-tab:hover {
-    color: #e2e8f0;
+    color: var(--mc-text);
 }
 
 .cn-tab.active {
-    color: #4f46e5;
-    border-bottom-color: #4f46e5;
+    color: var(--mc-accent);
+    border-bottom-color: var(--mc-border-strong);
 }
 
 .dark .cn-tab.active {
-    color: #a5b4fc;
-    border-bottom-color: #a5b4fc;
+    color: var(--mc-accent);
+    border-bottom-color: var(--mc-border-strong);
 }
 
 .cn-tab-badge {
-    background: #4f46e5;
-    color: white;
+    background: var(--mc-brand);
+    color: var(--mc-on-brand);
     font-size: 11px;
     font-weight: 700;
     padding: 2px 8px;
-    border-radius: 12px;
+    border-radius: var(--mc-radius-control);
 }
 
 .dark .cn-tab-badge {
-    background: #6366f1;
+    background: var(--mc-brand);
 }
 
 /* Sub-tab sections */
@@ -377,11 +369,11 @@
     margin: 0;
     font-size: 18px;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--mc-text);
 }
 
 .dark .cn-section-header h3 {
-    color: #f1f5f9;
+    color: var(--mc-text);
 }
 
 /* Details Cards */
@@ -398,7 +390,7 @@
 
 .cn-detail-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--mc-shadow-panel);
 }
 
 .cn-detail-header {
@@ -412,18 +404,18 @@
     margin: 0;
     font-size: 17px;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--mc-text);
 }
 
 .dark .cn-detail-title {
-    color: #f1f5f9;
+    color: var(--mc-text);
 }
 
 .cn-btn-icon {
-    background: rgba(239, 68, 68, 0.08);
-    color: #dc2626;
+    background: var(--mc-danger-bg);
+    color: var(--mc-danger);
     border: none;
-    border-radius: 8px;
+    border-radius: var(--mc-radius-control);
     width: 32px;
     height: 32px;
     display: flex;
@@ -434,7 +426,7 @@
 }
 
 .cn-btn-icon:hover {
-    background: rgba(239, 68, 68, 0.15);
+    background: var(--mc-danger-bg);
 }
 
 .cn-detail-grid {
@@ -447,25 +439,25 @@
     display: block;
     font-size: 11px;
     font-weight: 700;
-    color: #64748b;
+    color: var(--mc-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin-bottom: 4px;
 }
 
 .dark .cn-detail-item label {
-    color: #94a3b8;
+    color: var(--mc-text-muted);
 }
 
 .cn-detail-item p {
     margin: 0;
     font-size: 14px;
     font-weight: 500;
-    color: #334155;
+    color: var(--mc-text);
 }
 
 .dark .cn-detail-item p {
-    color: #cbd5e1;
+    color: var(--mc-text);
 }
 
 .cn-detail-item.full {
@@ -476,28 +468,28 @@
 .cn-dx-code {
     display: inline-block;
     padding: 3px 8px;
-    border-radius: 6px;
-    background: #4f46e5;
-    color: white;
+    border-radius: var(--mc-radius-control);
+    background: var(--mc-brand);
+    color: var(--mc-on-brand);
     font-size: 12px;
     font-weight: 700;
-    font-family: monospace;
+    font-family: var(--mc-font);
     margin-bottom: 6px;
 }
 
 .cn-notes-box {
     margin-top: 16px;
     padding: 12px 16px;
-    background: rgba(79, 70, 229, 0.05);
-    border-radius: 12px;
+    background: var(--mc-brand-soft);
+    border-radius: var(--mc-radius-control);
     font-size: 13px;
-    color: #475569;
+    color: var(--mc-text-muted);
     line-height: 1.6;
 }
 
 .dark .cn-notes-box {
-    background: rgba(255, 255, 255, 0.03);
-    color: #cbd5e1;
+    background: var(--mc-surface);
+    color: var(--mc-text);
 }
 
 /* Error/Empty/Loading */
@@ -513,8 +505,8 @@
 .cn-spinner {
     width: 36px;
     height: 36px;
-    border: 3px solid rgba(79, 70, 229, 0.2);
-    border-top-color: #4f46e5;
+    border: 3px solid var(--mc-border-strong);
+    border-top-color: var(--mc-brand);
     border-radius: 50%;
     animation: cn-spin 0.8s linear infinite;
 }
@@ -527,7 +519,7 @@
 
 .cn-loading p {
     font-size: 14px;
-    color: #64748b;
+    color: var(--mc-text-muted);
 }
 
 .cn-empty-state {
@@ -543,29 +535,29 @@
 .cn-empty-state h3 {
     font-size: 17px;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--mc-text);
     margin: 0;
 }
 
 .dark .cn-empty-state h3 {
-    color: #f1f5f9;
+    color: var(--mc-text);
 }
 
 .cn-empty-state p {
     font-size: 14px;
-    color: #64748b;
+    color: var(--mc-text-muted);
     margin: 0 0 8px;
 }
 
 .cn-error-box {
     padding: 16px 20px;
-    border-radius: 14px;
-    background: rgba(239, 68, 68, 0.08);
-    border: 1px solid rgba(239, 68, 68, 0.2);
-    color: #dc2626;
+    border-radius: var(--mc-radius-control);
+    background: var(--mc-danger-bg);
+    border: 1px solid var(--mc-danger-border);
+    color: var(--mc-danger);
     text-align: center;
 }
 
 .dark .cn-error-box {
-    color: #fca5a5;
+    color: var(--mc-danger);
 }

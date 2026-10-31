@@ -7,22 +7,22 @@
 }
 
 .dashboard-header {
-    background: var(--gradient-primary);
+    background: var(--mc-brand);
     padding: 32px;
-    border-radius: var(--radius-lg);
+    border-radius: var(--mc-radius-control);
     margin-bottom: 24px;
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--mc-shadow-panel);
 }
 
 .header-content h2 {
     margin: 0 0 8px 0;
-    color: var(--white);
+    color: var(--mc-on-brand);
     font-size: 28px;
 }
 
 .header-subtitle {
     margin: 0;
-    color: #FFFFFF;
+    color: var(--mc-on-brand);
     font-size: 14px;
     opacity: 1;
 }
@@ -40,28 +40,28 @@
     align-items: center;
     gap: 8px;
     padding: 12px 20px;
-    background: var(--white);
-    border: 2px solid var(--gray-300);
-    border-radius: var(--radius-lg);
+    background: var(--mc-surface);
+    border: 1px solid var(--mc-border-strong);
+    border-radius: var(--mc-radius-control);
     font-size: 14px;
     font-weight: 600;
-    color: var(--gray-700);
+    color: var(--mc-text);
     cursor: pointer;
     transition: all var(--transition-base);
 }
 
 .filter-tab:hover {
-    border-color: var(--primary-blue);
-    color: var(--primary-blue);
+    border-color: var(--mc-accent);
+    color: var(--mc-accent);
     transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--mc-shadow-sm);
 }
 
 .filter-tab.active {
-    background: var(--gradient-primary);
-    border-color: var(--primary-blue);
-    color: var(--white);
-    box-shadow: var(--shadow-blue);
+    background: var(--mc-brand);
+    border-color: var(--mc-accent);
+    color: var(--mc-on-brand);
+    box-shadow: var(--mc-shadow-sm);
 }
 
 .tab-icon {
@@ -70,10 +70,11 @@
 
 .tab-count {
     padding: 2px 8px;
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--mc-surface);
     border-radius: var(--radius-full);
     font-size: 12px;
     font-weight: 700;
+    color: var(--mc-accent);
 }
 
 /* Prescriptions Container */
@@ -89,18 +90,18 @@
 
 /* Prescription Card */
 .prescription-card {
-    background: var(--white);
-    border-radius: var(--radius-lg);
+    background: var(--mc-surface);
+    border-radius: var(--mc-radius-panel);
     padding: 24px;
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--mc-shadow-panel);
     transition: all var(--transition-base);
-    border: 2px solid var(--gray-200);
+    border: 1px solid var(--mc-border);
 }
 
 .prescription-card:hover {
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--mc-shadow-panel);
     transform: translateY(-4px);
-    border-color: var(--primary-blue);
+    border-color: var(--mc-accent);
 }
 
 /* Card Header */
@@ -110,7 +111,7 @@
     align-items: center;
     margin-bottom: 16px;
     padding-bottom: 12px;
-    border-bottom: 2px solid var(--gray-200);
+    border-bottom: 1px solid var(--mc-border);
 }
 
 .prescription-id {
@@ -121,7 +122,7 @@
 
 .id-label {
     font-size: 11px;
-    color: var(--gray-500);
+    color: var(--mc-text-muted);
     text-transform: uppercase;
     font-weight: 500;
     letter-spacing: 0.5px;
@@ -130,7 +131,7 @@
 .id-value {
     font-size: 14px;
     font-weight: 700;
-    color: var(--primary-blue);
+    color: var(--mc-accent);
 }
 
 /* Status Badge */
@@ -144,21 +145,21 @@
 }
 
 .status-pending {
-    background: linear-gradient(135deg, #FFF4E6 0%, #FFE8CC 100%);
-    color: var(--warning-amber);
-    border: 2px solid var(--warning-amber);
+    background: var(--mc-warning-bg);
+    color: var(--mc-warning);
+    border: 1px solid var(--mc-warning);
 }
 
 .status-dispensed {
-    background: linear-gradient(135deg, #E8F5F3 0%, #D4F1E8 100%);
-    color: var(--success-green);
-    border: 2px solid var(--success-green);
+    background: var(--mc-success-bg);
+    color: var(--mc-success);
+    border: 1px solid var(--mc-success);
 }
 
 .status-cancelled {
-    background: linear-gradient(135deg, #FFE8E8 0%, #FFD6D6 100%);
-    color: var(--error-red);
-    border: 2px solid var(--error-red);
+    background: var(--mc-danger-bg);
+    color: var(--mc-danger);
+    border: 1px solid var(--mc-danger);
 }
 
 /* Patient Info */
@@ -185,21 +186,21 @@
     margin: 0;
     font-size: 14px;
     font-weight: 600;
-    color: var(--gray-900);
+    color: var(--mc-text);
 }
 
 .patient-id,
 .prescribed-date {
     margin: 0;
     font-size: 12px;
-    color: var(--gray-600);
+    color: var(--mc-text-muted);
 }
 
 /* Medication Details */
 .medication-details {
-    background: var(--gray-50);
+    background: var(--mc-canvas);
     padding: 16px;
-    border-radius: var(--radius-md);
+    border-radius: var(--mc-radius-control);
     margin-bottom: 16px;
 }
 
@@ -207,7 +208,7 @@
     margin: 0 0 12px 0;
     font-size: 16px;
     font-weight: 700;
-    color: var(--primary-blue);
+    color: var(--mc-accent);
 }
 
 .detail-row {
@@ -218,28 +219,28 @@
 
 .detail-label {
     font-size: 13px;
-    color: var(--gray-600);
+    color: var(--mc-text-muted);
     font-weight: 500;
 }
 
 .detail-value {
     font-size: 13px;
-    color: var(--gray-900);
+    color: var(--mc-text);
     font-weight: 600;
 }
 
 .instructions-box {
     margin-top: 12px;
     padding: 12px;
-    background: var(--white);
-    border-radius: var(--radius-md);
-    border: 1px solid var(--gray-300);
+    background: var(--mc-surface);
+    border-radius: var(--mc-radius-control);
+    border: 1px solid var(--mc-border-strong);
 }
 
 .instructions-label {
     margin: 0 0 4px 0;
     font-size: 12px;
-    color: var(--gray-600);
+    color: var(--mc-text-muted);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -248,7 +249,7 @@
 .instructions-text {
     margin: 0;
     font-size: 13px;
-    color: var(--gray-900);
+    color: var(--mc-text);
     line-height: 1.5;
 }
 
@@ -270,7 +271,7 @@
 }
 
 .loading-state p {
-    color: var(--gray-600);
+    color: var(--mc-text-muted);
     font-size: 14px;
 }
 
@@ -292,13 +293,13 @@
 
 .empty-state h3 {
     margin: 0;
-    color: var(--gray-700);
+    color: var(--mc-text);
     font-size: 18px;
 }
 
 .empty-state p {
     margin: 0;
-    color: var(--gray-500);
+    color: var(--mc-text-muted);
     font-size: 14px;
 }
 

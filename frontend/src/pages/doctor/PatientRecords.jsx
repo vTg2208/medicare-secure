@@ -62,7 +62,7 @@ function PatientRecords() {
                     <div className="pr-error-banner">{error}</div>
                 ) : patients.length === 0 ? (
                     <div className="pr-empty-state pr-glass-card">
-                        <svg width="56" height="56" fill="none" stroke="#a5b4fc" strokeWidth="1.5" viewBox="0 0 24 24">
+                        <svg width="56" height="56" fill="none" stroke="var(--mc-accent)" strokeWidth="1.5" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
                         <p>No patients have granted you access yet.</p>

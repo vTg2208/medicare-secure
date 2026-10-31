@@ -153,7 +153,7 @@ function PatientMedicalRecords() {
                         <div className="pr-quick-actions">
                             <button
                                 className="pr-action-btn"
-                                style={{ borderColor: '#e5e7eb', color: '#374151', background: '#f9fafb' }}
+                                style={{ borderColor: "var(--mc-border)", color: "var(--mc-text)", background: "var(--mc-surface-muted)" }}
                                 onClick={() => setShowAddForm(false)}
                             >
                                 <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -163,7 +163,7 @@ function PatientMedicalRecords() {
                             </button>
                             <button
                                 className="pr-action-btn"
-                                style={{ borderColor: '#bfdbfe', color: '#2563eb', background: '#eff6ff' }}
+                                style={{ borderColor: "var(--mc-border)", color: "var(--mc-accent)", background: "var(--mc-brand-soft)" }}
                                 onClick={() => navigate(`/doctor/notes?patientId=${patientId}`)}
                             >
                                 <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -173,7 +173,7 @@ function PatientMedicalRecords() {
                             </button>
                             <button
                                 className="pr-action-btn"
-                                style={{ borderColor: '#bbf7d0', color: '#16a34a', background: '#f0fdf4' }}
+                                style={{ borderColor: "var(--mc-success-border)", color: "var(--mc-success)", background: "var(--mc-success-bg)" }}
                                 onClick={() => setOrderModalTab('lab')}
                             >
                                 <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -183,7 +183,7 @@ function PatientMedicalRecords() {
                             </button>
                             <button
                                 className="pr-action-btn"
-                                style={{ borderColor: '#e9d5ff', color: '#9333ea', background: '#fdf4ff' }}
+                                style={{ borderColor: "var(--mc-border)", color: "var(--mc-accent)", background: "var(--mc-brand-soft)" }}
                                 onClick={() => setOrderModalTab('imaging')}
                             >
                                 <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -227,7 +227,7 @@ function PatientMedicalRecords() {
                     </div>
                 ) : records.length === 0 ? (
                     <div className="pr-empty-state pr-glass-card">
-                        <svg width="52" height="52" fill="none" stroke="#a5b4fc" strokeWidth="1.5" viewBox="0 0 24 24">
+                        <svg width="52" height="52" fill="none" stroke="var(--mc-accent)" strokeWidth="1.5" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                         <p>No medical records found for this patient.</p>

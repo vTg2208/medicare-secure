@@ -159,10 +159,10 @@ function ClinicalNotes() {
             {saveSuccess && (
                 <div style={{
                     position: 'fixed', bottom: 24, right: 24, zIndex: 999,
-                    background: '#10b981', color: '#fff',
-                    padding: '12px 20px', borderRadius: 12,
+                    background: "var(--mc-success-solid)", color: "var(--mc-on-brand)",
+                    padding: '12px 20px', borderRadius: 'var(--mc-radius-panel)',
                     fontWeight: 600, fontSize: 14,
-                    boxShadow: '0 4px 20px rgba(16,185,129,0.4)',
+                    boxShadow: 'var(--mc-shadow-panel)',
                     display: 'flex', alignItems: 'center', gap: 8
                 }}>
                     ✓ Clinical notes saved successfully!
@@ -212,7 +212,7 @@ function ClinicalNotes() {
                     <div className="cn-glass-card" style={{ padding: '32px' }}>
                         <div className="cn-selection-header">
                             <h2>Select a Patient</h2>
-                            <p style={{ margin: 0, fontSize: 13, color: '#64748b' }}>Choose an active visit to populate the Visit and Patient details.</p>
+                            <p style={{ margin: 0, fontSize: 13, color: "var(--mc-text-muted)" }}>Choose an active visit to populate the Visit and Patient details.</p>
                         </div>
 
                         {visitsLoading && (
@@ -231,7 +231,7 @@ function ClinicalNotes() {
 
                         {!visitsLoading && !visitsError && visits.length === 0 && (
                             <div className="cn-empty-state">
-                                <svg width="56" height="56" fill="none" stroke="#a5b4fc" strokeWidth="1.5" viewBox="0 0 24 24">
+                                <svg width="56" height="56" fill="none" stroke="var(--mc-accent)" strokeWidth="1.5" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round"
                                         d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                                 </svg>
@@ -268,7 +268,7 @@ function ClinicalNotes() {
                                                 {visit.status && (
                                                     <span className="cn-badge">{visit.status?.replace('_', ' ')}</span>
                                                 )}
-                                                <svg width="20" height="20" fill="none" stroke="#94a3b8" viewBox="0 0 24 24">
+                                                <svg width="20" height="20" fill="none" stroke="var(--mc-text-subtle)" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                                                 </svg>
                                             </div>
@@ -293,9 +293,9 @@ function ClinicalNotes() {
                                 <div>
                                     <p className="cn-patient-name" style={{ fontSize: 15 }}>{getPatientName(selectedVisit)}</p>
                                     <p className="cn-patient-meta">
-                                        Visit ID: <strong style={{ color: '#4f46e5' }}>{visitId}</strong>
+                                        Visit ID: <strong style={{ color: "var(--mc-accent)" }}>{visitId}</strong>
                                         &nbsp;·&nbsp;
-                                        Patient ID: <strong style={{ color: '#4f46e5' }}>{patientId}</strong>
+                                        Patient ID: <strong style={{ color: "var(--mc-accent)" }}>{patientId}</strong>
                                         {selectedVisit.reason && <>&nbsp;·&nbsp;{selectedVisit.reason}</>}
                                     </p>
                                 </div>
@@ -351,7 +351,7 @@ function ClinicalNotes() {
                                             </div>
                                             {prescriptions.length === 0 ? (
                                                 <div className="cn-empty-state">
-                                                    <svg width="48" height="48" fill="none" stroke="#a5b4fc" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-3-3v6M3 6l3-3 3 3m6 0l3-3 3 3M5 20h14a2 2 0 002-2V7H3v11a2 2 0 002 2z" /></svg>
+                                                    <svg width="48" height="48" fill="none" stroke="var(--mc-accent)" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-3-3v6M3 6l3-3 3 3m6 0l3-3 3 3M5 20h14a2 2 0 002-2V7H3v11a2 2 0 002 2z" /></svg>
                                                     <p>No prescriptions added yet.</p>
                                                 </div>
                                             ) : (
@@ -393,7 +393,7 @@ function ClinicalNotes() {
                                             </div>
                                             {diagnoses.length === 0 ? (
                                                 <div className="cn-empty-state">
-                                                    <svg width="48" height="48" fill="none" stroke="#a5b4fc" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M22 12h-4l-3 9L9 3l-3 9H2" /></svg>
+                                                    <svg width="48" height="48" fill="none" stroke="var(--mc-accent)" strokeWidth="1.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M22 12h-4l-3 9L9 3l-3 9H2" /></svg>
                                                     <p>No diagnoses added yet.</p>
                                                 </div>
                                             ) : (
@@ -406,7 +406,7 @@ function ClinicalNotes() {
                                                                     <h4 className="cn-detail-title">{dx.description}</h4>
                                                                     <div style={{ marginTop: 8, display: 'flex', gap: 6 }}>
                                                                         <span className="cn-badge">{dx.type}</span>
-                                                                        <span className="cn-badge" style={{ background: 'rgba(16,185,129,0.1)', color: '#059669', borderColor: 'rgba(16,185,129,0.2)' }}>{dx.status}</span>
+                                                                        <span className="cn-badge" style={{ background: "var(--mc-success-bg)", color: "var(--mc-success)", borderColor: "var(--mc-success-border)" }}>{dx.status}</span>
                                                                     </div>
                                                                 </div>
                                                                 <button className="cn-btn-icon" onClick={() => handleRemoveDiagnosis(dx.id)}>

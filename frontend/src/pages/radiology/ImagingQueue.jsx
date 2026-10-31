@@ -1,3 +1,4 @@
+import Brand from '../../components/common/Brand';
 import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
@@ -81,41 +82,33 @@ function ImagingQueue() {
     };
 
     return (
-        <div className="radiology-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-800 dark:text-slate-100 flex h-screen w-full overflow-hidden">
-            <div className="absolute top-4 right-4 z-50">
+        <div className="radiology-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-800 dark:text-slate-100 flex h-screen w-full overflow-hidden mc-workspace">
+            <div className="mc-workspace-theme">
                 <ThemeToggle />
             </div>
 
-            <aside className="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800/50 p-6 flex flex-col h-full overflow-y-auto z-20 bg-[var(--background-light)] dark:bg-[var(--background-dark)] relative">
-                <div className="flex items-center gap-3 mb-10 px-2 cursor-pointer group" onClick={() => navigate('/radiology/dashboard')}>
-                    <div className="relative">
-                        <div className="absolute inset-0 bg-indigo-500 blur-lg opacity-0 group-hover:opacity-60 transition-opacity duration-500 rounded-full"></div>
-                        <div className="relative w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center text-white shadow-lg transform transition-all duration-500 group-hover:scale-110 group-hover:-rotate-3 group-hover:shadow-[0_0_15px_rgba(99,102,241,0.5)]">
-                            <span className="material-symbols-outlined text-xl transition-transform duration-500 group-hover:scale-110">local_hospital</span>
-                        </div>
-                    </div>
-                    <h1 className="text-xl font-bold tracking-tight text-slate-800 dark:text-white transition-all duration-500 drop-shadow-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-hover:drop-shadow-[0_0_10px_rgba(99,102,241,0.4)]">Medicare</h1>
-                </div>
+            <aside className="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800/50 p-6 flex flex-col h-full overflow-y-auto z-20 bg-[var(--background-light)] dark:bg-[var(--background-dark)] relative mc-sidebar">
+                <Brand to={'/radiology/dashboard'} />
                 <nav className="space-y-2 flex-grow">
-                    <Link to="/radiology/dashboard" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl">
+                    <Link to="/radiology/dashboard" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
                         <span className="material-symbols-outlined text-[20px]">grid_view</span>
                         Dashboard
                     </Link>
-                    <Link to="/radiology/queue" className="flex items-center gap-3 px-4 py-3 bg-indigo-50/80 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800/50 shadow-sm rounded-xl font-medium">
+                    <Link to="/radiology/queue" className="flex items-center gap-3 px-4 py-3 bg-primary-50/80 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 border border-primary-100 dark:border-primary-800/50 shadow-sm rounded-xl font-medium">
                         <span className="material-symbols-outlined text-[20px]">view_list</span>
                         Imaging Queue
                     </Link>
-                    <Link to="/radiology/audit-logs" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl">
+                    <Link to="/radiology/audit-logs" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
                         <span className="material-symbols-outlined text-[20px]">history_edu</span>
                         Audit Logs
                     </Link>
                 </nav>
                 <div className="space-y-2 mt-auto pt-6 border-t border-slate-200 dark:border-slate-800/50">
-                    <Link to="/radiology/profile" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl">
+                    <Link to="/radiology/profile" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
                         <span className="material-symbols-outlined text-[20px]">manage_accounts</span>
                         Profile
                     </Link>
-                    <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition rounded-xl font-medium">
+                    <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition rounded-lg font-medium">
                         <span className="material-symbols-outlined text-[20px]">logout</span>
                         Sign Out
                     </button>
@@ -125,11 +118,11 @@ function ImagingQueue() {
             {/* Main Content */}
             <main className="flex-1 flex flex-col h-full overflow-hidden relative">
                 {/* Decorative background element */}
-                <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/5 dark:bg-indigo-400/5 rounded-full blur-3xl -z-10 transform translate-x-1/3 -translate-y-1/3 pointer-events-none"></div>
 
-                <header className="px-8 py-6 flex items-center justify-between flex-shrink-0 z-10 sticky top-0 bg-[var(--background-light)]/80 dark:bg-[var(--background-dark)]/80 backdrop-blur-md border-b border-transparent transition-all pr-[80px]">
+
+                <header className="px-8 py-6 flex items-center justify-between flex-shrink-0 z-10 sticky top-0 bg-[var(--background-light)]/80 dark:bg-[var(--background-dark)]/80 border-b border-transparent transition-all pr-[80px]">
                     <div>
-                        <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-slate-300">
+                        <h2 className="text-2xl font-bold text-accent">
                             {statOnly ? 'STAT Imaging Orders' : 'Imaging Queue'}
                         </h2>
                         <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Assigned cases to be reviewed and reported</p>
@@ -147,7 +140,7 @@ function ImagingQueue() {
                                 placeholder="Search exact order..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2 bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-shadow dark:text-white"
+                                className="w-full pl-10 pr-4 py-2 bg-surface dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/50 transition-shadow dark:text-white"
                             />
                         </div>
 
@@ -156,7 +149,7 @@ function ImagingQueue() {
                                 <button
                                     key={f}
                                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeFilter === f
-                                        ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20'
+                                        ? "bg-primary-600 text-white shadow-md shadow-primary-500/20"
                                         : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700/50'
                                         }`}
                                     onClick={() => setActiveFilter(f)}
@@ -179,7 +172,7 @@ function ImagingQueue() {
                         {/* Queue List */}
                         {loading ? (
                             <div className="flex flex-col items-center justify-center py-20">
-                                <div className="w-12 h-12 border-4 border-slate-200 dark:border-slate-700 border-t-indigo-500 rounded-full animate-spin"></div>
+                                <div className="w-12 h-12 border-4 border-slate-200 dark:border-slate-700 border-t-primary-500 rounded-full animate-spin"></div>
                                 <p className="text-slate-500 dark:text-slate-400 mt-4 font-medium">Loading imaging queue...</p>
                             </div>
                         ) : filteredAndSearchedOrders.length === 0 ? (
@@ -193,9 +186,9 @@ function ImagingQueue() {
                         ) : (
                             <div className="grid gap-4">
                                 {filteredAndSearchedOrders.map((order) => (
-                                    <div key={order.id} className="glass-card p-6 rounded-2xl hover:bg-white/80 dark:hover:bg-slate-800/80 transition-all group flex flex-col lg:flex-row lg:items-center justify-between gap-6 cursor-pointer">
+                                    <div key={order.id} className="glass-card p-6 rounded-2xl hover:bg-surface dark:hover:bg-slate-800/80 transition-all group flex flex-col lg:flex-row lg:items-center justify-between gap-6 cursor-pointer">
                                         <div className="flex items-start gap-4">
-                                            <div className="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center flex-shrink-0 text-indigo-500 dark:text-indigo-400 group-hover:bg-indigo-500 group-hover:text-white transition-colors">
+                                            <div className="w-12 h-12 rounded-xl bg-primary-50 dark:bg-primary-500/10 flex items-center justify-center flex-shrink-0 text-primary-500 dark:text-primary-400 group-hover:bg-primary-500 group-hover:text-white transition-colors">
                                                 <span className="material-symbols-outlined text-[28px]">{getImagingIcon(order.imagingType)}</span>
                                             </div>
                                             <div>
@@ -237,7 +230,7 @@ function ImagingQueue() {
                                             {order.status !== 'completed' && (
                                                 <button
                                                     onClick={() => navigate(`/radiology/upload?orderId=${order.id}&visitId=${order.visitId}&patient=${encodeURIComponent(order.patientName)}&type=${encodeURIComponent(order.imagingType)}`)}
-                                                    className="w-full sm:w-auto px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium transition-colors shadow-sm shadow-indigo-600/20 flex items-center justify-center gap-2"
+                                                    className="w-full sm:w-auto px-5 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors shadow-sm shadow-primary-600/20 flex items-center justify-center gap-2"
                                                 >
                                                     Upload Report
                                                     <span className="material-symbols-outlined text-[18px]">cloud_upload</span>

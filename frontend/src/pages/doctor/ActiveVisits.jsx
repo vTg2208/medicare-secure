@@ -117,7 +117,7 @@ function ActiveVisits() {
                 </div>
                 <div className="aq-topbar-actions">
                     <button
-                        className={`aq-btn-refresh${refreshing ? ' spinning' : ''}`}
+                        className={`aq-btn-refresh${refreshing ? "spinning" : ''}`}
                         onClick={() => fetchVisits(true)}
                     >
                         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -144,7 +144,7 @@ function ActiveVisits() {
                         <div className="aq-stat-label">Active Consultations</div>
                     </div>
                     {visits.length > 0 && (
-                        <div className="aq-stat-card" style={{ background: 'linear-gradient(135deg, #10b981, #059669)' }}>
+                        <div className="aq-stat-card" style={{ background: "var(--mc-brand)" }}>
                             <div className="aq-stat-number">
                                 {visits.filter(v => v.status?.toLowerCase() === 'in_progress').length}
                             </div>
@@ -171,7 +171,7 @@ function ActiveVisits() {
                     </div>
                 ) : visits.length === 0 ? (
                     <div className="aq-empty-state aq-glass">
-                        <svg width="52" height="52" fill="none" stroke="#a5b4fc" strokeWidth="1.5" viewBox="0 0 24 24">
+                        <svg width="52" height="52" fill="none" stroke="var(--mc-accent)" strokeWidth="1.5" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                         <h3>No Active Visits</h3>

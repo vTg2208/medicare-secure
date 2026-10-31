@@ -1,3 +1,4 @@
+import Brand from '../../components/common/Brand';
 import React, { useState, useRef, useContext, useCallback } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
@@ -118,41 +119,33 @@ function ReportUpload() {
     };
 
     return (
-        <div className="radiology-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-800 dark:text-slate-100 flex h-screen w-full overflow-hidden">
-            <div className="absolute top-4 right-4 z-50">
+        <div className="radiology-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-800 dark:text-slate-100 flex h-screen w-full overflow-hidden mc-workspace">
+            <div className="mc-workspace-theme">
                 <ThemeToggle />
             </div>
 
-            <aside className="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800/50 p-6 flex flex-col h-full overflow-y-auto z-20 bg-[var(--background-light)] dark:bg-[var(--background-dark)] relative">
-                <div className="flex items-center gap-3 mb-10 px-2 cursor-pointer group" onClick={() => navigate('/radiology/dashboard')}>
-                    <div className="relative">
-                        <div className="absolute inset-0 bg-indigo-500 blur-lg opacity-0 group-hover:opacity-60 transition-opacity duration-500 rounded-full"></div>
-                        <div className="relative w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center text-white shadow-lg transform transition-all duration-500 group-hover:scale-110 group-hover:-rotate-3 group-hover:shadow-[0_0_15px_rgba(99,102,241,0.5)]">
-                            <span className="material-symbols-outlined text-xl transition-transform duration-500 group-hover:scale-110">local_hospital</span>
-                        </div>
-                    </div>
-                    <h1 className="text-xl font-bold tracking-tight text-slate-800 dark:text-white transition-all duration-500 drop-shadow-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-hover:drop-shadow-[0_0_10px_rgba(99,102,241,0.4)]">Medicare</h1>
-                </div>
+            <aside className="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800/50 p-6 flex flex-col h-full overflow-y-auto z-20 bg-[var(--background-light)] dark:bg-[var(--background-dark)] relative mc-sidebar">
+                <Brand to={'/radiology/dashboard'} />
                 <nav className="space-y-2 flex-grow">
-                    <Link to="/radiology/dashboard" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl">
+                    <Link to="/radiology/dashboard" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
                         <span className="material-symbols-outlined text-[20px]">grid_view</span>
                         Dashboard
                     </Link>
-                    <Link to="/radiology/queue" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl">
+                    <Link to="/radiology/queue" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
                         <span className="material-symbols-outlined text-[20px]">view_list</span>
                         Imaging Queue
                     </Link>
-                    <Link to="/radiology/audit-logs" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl">
+                    <Link to="/radiology/audit-logs" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
                         <span className="material-symbols-outlined text-[20px]">history_edu</span>
                         Audit Logs
                     </Link>
                 </nav>
                 <div className="space-y-2 mt-auto pt-6 border-t border-slate-200 dark:border-slate-800/50">
-                    <Link to="/radiology/profile" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl">
+                    <Link to="/radiology/profile" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
                         <span className="material-symbols-outlined text-[20px]">manage_accounts</span>
                         Profile
                     </Link>
-                    <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition rounded-xl font-medium">
+                    <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition rounded-lg font-medium">
                         <span className="material-symbols-outlined text-[20px]">logout</span>
                         Sign Out
                     </button>
@@ -162,18 +155,18 @@ function ReportUpload() {
             {/* Main Content */}
             <main className="flex-1 flex flex-col h-full overflow-hidden relative">
                 {/* Decorative background element */}
-                <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/5 dark:bg-indigo-400/5 rounded-full blur-3xl -z-10 transform translate-x-1/3 -translate-y-1/3 pointer-events-none"></div>
 
-                <header className="px-8 py-6 flex items-center justify-between flex-shrink-0 z-10 sticky top-0 bg-[var(--background-light)]/80 dark:bg-[var(--background-dark)]/80 backdrop-blur-md border-b border-transparent transition-all pr-[80px]">
+
+                <header className="px-8 py-6 flex items-center justify-between flex-shrink-0 z-10 sticky top-0 bg-[var(--background-light)]/80 dark:bg-[var(--background-dark)]/80 border-b border-transparent transition-all pr-[80px]">
                     <div className="flex items-center gap-4">
                         <button
                             onClick={() => navigate('/radiology/queue')}
-                            className="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl p-2 transition-colors flex items-center justify-center"
+                            className="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-lg p-2 transition-colors flex items-center justify-center"
                         >
                             <span className="material-symbols-outlined text-[20px]">arrow_back</span>
                         </button>
                         <div>
-                            <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-slate-300">
+                            <h2 className="text-2xl font-bold text-accent">
                                 Upload Imaging Report
                             </h2>
                             <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Reports are securely stored and linked to the patient visit</p>
@@ -185,9 +178,9 @@ function ReportUpload() {
 
                     <div className="max-w-4xl">
                         {/* Audit Log / Crypto Notice */}
-                        <div className="flex items-center gap-3 p-4 bg-indigo-50/50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 rounded-2xl mb-6">
-                            <span className="material-symbols-outlined text-indigo-500 text-[24px]">verified_user</span>
-                            <p className="text-sm text-indigo-900 dark:text-indigo-200 leading-relaxed">
+                        <div className="flex items-center gap-3 p-4 bg-primary-50/50 dark:bg-primary-500/10 border border-primary-100 dark:border-primary-500/20 rounded-2xl mb-6">
+                            <span className="material-symbols-outlined text-primary-500 text-[24px]">verified_user</span>
+                            <p className="text-sm text-primary-900 dark:text-primary-200 leading-relaxed">
                                 <strong>Secure Upload:</strong> This report will be cryptographically linked to the patient visit
                                 and your radiologist ID. Uploads are immutable and fully audited.
                             </p>
@@ -229,7 +222,7 @@ function ReportUpload() {
                                         value={form.visitId}
                                         onChange={handleChange}
                                         placeholder="e.g. VST-001"
-                                        className={`w-full px-4 py-3 rounded-xl bg-white/50 dark:bg-slate-900/50 border ${errors.visitId ? 'border-rose-500 shadow-sm shadow-rose-500/20' : 'border-slate-200 dark:border-slate-700'} text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50`}
+                                        className={`w-full px-4 py-3 rounded-xl bg-surface dark:bg-slate-900/50 border ${errors.visitId ? 'border-rose-500 shadow-sm shadow-rose-500/20' : 'border-slate-200 dark:border-slate-700'} text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500/50`}
                                     />
                                     {errors.visitId && <p className="text-rose-500 text-xs mt-1.5 ml-1">{errors.visitId}</p>}
                                 </div>
@@ -264,7 +257,7 @@ function ReportUpload() {
                                         name="studyDate"
                                         value={form.studyDate}
                                         onChange={handleChange}
-                                        className="w-full px-4 py-3 rounded-xl bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                                        className="w-full px-4 py-3 rounded-xl bg-surface dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500/50"
                                     />
                                 </div>
                             </div>
@@ -277,7 +270,7 @@ function ReportUpload() {
                                         name="imagingType"
                                         value={form.imagingType}
                                         onChange={handleChange}
-                                        className={`w-full px-4 py-3 rounded-xl bg-white/50 dark:bg-slate-900/50 border ${errors.imagingType ? 'border-rose-500 shadow-sm shadow-rose-500/20' : 'border-slate-200 dark:border-slate-700'} text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 appearance-none`}
+                                        className={`w-full px-4 py-3 rounded-xl bg-surface dark:bg-slate-900/50 border ${errors.imagingType ? 'border-rose-500 shadow-sm shadow-rose-500/20' : 'border-slate-200 dark:border-slate-700'} text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500/50 appearance-none`}
                                     >
                                         <option value="">— Select type —</option>
                                         {IMAGING_TYPES.map(t => (<option key={t} value={t}>{t}</option>))}
@@ -292,7 +285,7 @@ function ReportUpload() {
                                         value={form.bodyPart}
                                         onChange={handleChange}
                                         placeholder="e.g. Chest, Brain, Abdomen"
-                                        className="w-full px-4 py-3 rounded-xl bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                                        className="w-full px-4 py-3 rounded-xl bg-surface dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500/50"
                                     />
                                 </div>
                             </div>
@@ -306,7 +299,7 @@ function ReportUpload() {
                                         onChange={handleChange}
                                         rows={4}
                                         placeholder="Describe the radiological findings in detail…"
-                                        className={`w-full px-4 py-3 rounded-xl bg-white/50 dark:bg-slate-900/50 border ${errors.findings ? 'border-rose-500 shadow-sm shadow-rose-500/20' : 'border-slate-200 dark:border-slate-700'} text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 resize-y`}
+                                        className={`w-full px-4 py-3 rounded-xl bg-surface dark:bg-slate-900/50 border ${errors.findings ? 'border-rose-500 shadow-sm shadow-rose-500/20' : 'border-slate-200 dark:border-slate-700'} text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500/50 resize-y`}
                                     />
                                     {errors.findings && <p className="text-rose-500 text-xs mt-1.5 ml-1">{errors.findings}</p>}
                                 </div>
@@ -319,7 +312,7 @@ function ReportUpload() {
                                         onChange={handleChange}
                                         rows={3}
                                         placeholder="Clinical impression / diagnosis summary…"
-                                        className={`w-full px-4 py-3 rounded-xl bg-white/50 dark:bg-slate-900/50 border ${errors.impression ? 'border-rose-500 shadow-sm shadow-rose-500/20' : 'border-slate-200 dark:border-slate-700'} text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 resize-y`}
+                                        className={`w-full px-4 py-3 rounded-xl bg-surface dark:bg-slate-900/50 border ${errors.impression ? 'border-rose-500 shadow-sm shadow-rose-500/20' : 'border-slate-200 dark:border-slate-700'} text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500/50 resize-y`}
                                     />
                                     {errors.impression && <p className="text-rose-500 text-xs mt-1.5 ml-1">{errors.impression}</p>}
                                 </div>
@@ -332,7 +325,7 @@ function ReportUpload() {
                                         onChange={handleChange}
                                         rows={2}
                                         placeholder="Optional: follow-up recommendations, technical notes…"
-                                        className="w-full px-4 py-3 rounded-xl bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 resize-y"
+                                        className="w-full px-4 py-3 rounded-xl bg-surface dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500/50 resize-y"
                                     />
                                 </div>
                             </div>
@@ -340,10 +333,10 @@ function ReportUpload() {
                             <div className="mt-8">
                                 <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Attachment <span className="text-rose-500">*</span></label>
                                 <div
-                                    className={`w-full p-8 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center transition-colors cursor-pointer ${dragOver ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10' :
+                                    className={`w-full p-8 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center transition-colors cursor-pointer ${dragOver ? "border-primary-500 bg-primary-50 dark:bg-primary-500/10" :
                                         errors.file ? 'border-rose-500 bg-rose-50 dark:bg-rose-500/10' :
                                             file ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10' :
-                                                'border-slate-300 dark:border-slate-700 bg-white/30 hover:bg-white/60 dark:bg-slate-900/30 dark:hover:bg-slate-800/80'
+                                                'border-slate-300 dark:border-slate-700 bg-surface hover:bg-surface dark:bg-slate-900/30 dark:hover:bg-slate-800/80'
                                         }`}
                                     onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
                                     onDragLeave={() => setDragOver(false)}
@@ -368,14 +361,14 @@ function ReportUpload() {
                                             <button
                                                 type="button"
                                                 onClick={(e) => { e.stopPropagation(); setFile(null); }}
-                                                className="px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-medium hover:text-rose-500 hover:border-rose-200"
+                                                className="px-4 py-2 bg-surface dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm font-medium hover:text-rose-500 hover:border-rose-200"
                                             >
                                                 Remove File
                                             </button>
                                         </div>
                                     ) : (
                                         <div className="flex flex-col items-center text-center">
-                                            <div className="w-16 h-16 rounded-full bg-indigo-50 dark:bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 flex items-center justify-center mb-3">
+                                            <div className="w-16 h-16 rounded-full bg-primary-50 dark:bg-primary-500/10 text-primary-500 dark:text-primary-400 flex items-center justify-center mb-3">
                                                 <span className="material-symbols-outlined text-[32px]">cloud_upload</span>
                                             </div>
                                             <p className="font-bold text-slate-800 dark:text-white text-lg">Click to upload or drag & drop</p>
@@ -390,14 +383,14 @@ function ReportUpload() {
                                 <button
                                     type="button"
                                     onClick={() => navigate('/radiology/queue')}
-                                    className="px-6 py-3 rounded-xl font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                                    className="px-6 py-3 rounded-lg font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={submitting}
-                                    className="min-w-[160px] px-6 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-70 disabled:hover:bg-indigo-600 text-white rounded-xl font-medium shadow-sm shadow-indigo-600/20 transition-colors flex items-center justify-center gap-2"
+                                    className="min-w-[160px] px-6 py-3 bg-primary-600 hover:bg-primary-700 disabled:opacity-70 disabled:hover:bg-primary-600 text-white rounded-lg font-medium shadow-sm shadow-primary-600/20 transition-colors flex items-center justify-center gap-2"
                                 >
                                     {submitting ? (
                                         <>

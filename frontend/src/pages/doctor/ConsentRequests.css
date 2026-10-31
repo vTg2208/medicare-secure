@@ -1,34 +1,28 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
-
 /* ── Wrapper ── */
 .cr-wrapper {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    background-color: #f0f2f5;
-    background-image: radial-gradient(circle at 0% 0%, #ede9fe 0%, transparent 50%),
-        radial-gradient(circle at 100% 100%, #fce7f3 0%, transparent 50%);
+    font-family: var(--mc-font);
+    background-color: var(--mc-canvas);
+    background-image: none;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
 }
 
 .dark .cr-wrapper {
-    background-color: #0f172a;
-    background-image: radial-gradient(circle at 0% 0%, #1e1b4b 0%, transparent 50%),
-        radial-gradient(circle at 100% 100%, #2d1b4e 0%, transparent 50%);
+    background-color: var(--mc-canvas);
+    background-image: none;
 }
 
 /* ── Glass helper ── */
 .cr-glass {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    border-radius: 20px;
+    background: var(--mc-surface);
+    border: 1px solid var(--mc-border);
+    border-radius: var(--mc-radius-panel);
 }
 
 .dark .cr-glass {
-    background: rgba(30, 41, 59, 0.7);
-    border-color: rgba(255, 255, 255, 0.06);
+    background: var(--mc-surface);
+    border-color: var(--mc-border);
 }
 
 /* ── Top bar ── */
@@ -37,18 +31,16 @@
     align-items: center;
     justify-content: space-between;
     padding: 20px 32px;
-    background: rgba(255, 255, 255, 0.55);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+    background: var(--mc-surface);
+    border-bottom: 1px solid var(--mc-border);
     position: sticky;
     top: 0;
     z-index: 20;
 }
 
 .dark .cr-topbar {
-    background: rgba(15, 23, 42, 0.7);
-    border-bottom-color: rgba(255, 255, 255, 0.08);
+    background: var(--mc-surface);
+    border-bottom-color: var(--mc-border);
 }
 
 .cr-topbar-left {
@@ -60,13 +52,13 @@
 .cr-topbar-icon {
     width: 44px;
     height: 44px;
-    border-radius: 14px;
-    background: linear-gradient(135deg, #8b5cf6, #6366f1);
+    border-radius: var(--mc-radius-control);
+    background: var(--mc-brand);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
-    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+    color: var(--mc-on-brand);
+    box-shadow: var(--mc-shadow-sm);
     flex-shrink: 0;
 }
 
@@ -74,21 +66,21 @@
     margin: 0 0 2px;
     font-size: 20px;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--mc-text);
 }
 
 .dark .cr-topbar-title {
-    color: #f1f5f9;
+    color: var(--mc-text);
 }
 
 .cr-topbar-subtitle {
     margin: 0;
     font-size: 12px;
-    color: #64748b;
+    color: var(--mc-text-muted);
 }
 
 .dark .cr-topbar-subtitle {
-    color: #94a3b8;
+    color: var(--mc-text-muted);
 }
 
 /* ── Back button ── */
@@ -97,10 +89,10 @@
     align-items: center;
     gap: 6px;
     padding: 8px 16px;
-    border-radius: 12px;
-    border: 1.5px solid rgba(139, 92, 246, 0.25);
-    background: rgba(139, 92, 246, 0.08);
-    color: #7c3aed;
+    border-radius: var(--mc-radius-control);
+    border: 1px solid var(--mc-border-strong);
+    background: var(--mc-brand-soft);
+    color: var(--mc-accent);
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
@@ -108,13 +100,13 @@
 }
 
 .dark .cr-btn-back {
-    border-color: rgba(196, 181, 253, 0.2);
-    color: #c4b5fd;
-    background: rgba(139, 92, 246, 0.12);
+    border-color: var(--mc-border-strong);
+    color: var(--mc-accent);
+    background: var(--mc-brand-soft);
 }
 
 .cr-btn-back:hover {
-    background: rgba(139, 92, 246, 0.15);
+    background: var(--mc-brand-soft);
     transform: translateX(-2px);
 }
 
@@ -136,19 +128,19 @@
     align-items: flex-start;
     gap: 10px;
     padding: 14px 18px;
-    border-radius: 14px;
-    background: rgba(139, 92, 246, 0.07);
-    border: 1px solid rgba(139, 92, 246, 0.2);
-    color: #6d28d9;
+    border-radius: var(--mc-radius-control);
+    background: var(--mc-info-bg);
+    border: 1px solid var(--mc-info-border);
+    color: var(--mc-info);
     font-size: 13px;
     font-weight: 500;
     line-height: 1.5;
 }
 
 .dark .cr-info-banner {
-    background: rgba(139, 92, 246, 0.12);
-    color: #c4b5fd;
-    border-color: rgba(139, 92, 246, 0.25);
+    background: var(--mc-info-bg);
+    color: var(--mc-info);
+    border-color: var(--mc-info-border);
 }
 
 .cr-info-banner svg {
@@ -171,50 +163,50 @@
     width: 72px;
     height: 72px;
     border-radius: 50%;
-    background: rgba(139, 92, 246, 0.1);
+    background: var(--mc-brand-soft);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #8b5cf6;
+    color: var(--mc-accent);
     margin-bottom: 4px;
 }
 
 .dark .cr-empty-icon {
-    background: rgba(139, 92, 246, 0.15);
-    color: #c4b5fd;
+    background: var(--mc-brand-soft);
+    color: var(--mc-accent);
 }
 
 .cr-empty-state h3 {
     margin: 0;
     font-size: 17px;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--mc-text);
 }
 
 .dark .cr-empty-state h3 {
-    color: #f1f5f9;
+    color: var(--mc-text);
 }
 
 .cr-empty-state p {
     margin: 0;
     font-size: 13px;
-    color: #64748b;
+    color: var(--mc-text-muted);
     max-width: 360px;
     line-height: 1.6;
 }
 
 .dark .cr-empty-state p {
-    color: #94a3b8;
+    color: var(--mc-text-muted);
 }
 
 /* ── Secondary button ── */
 .cr-btn-secondary {
     margin-top: 8px;
     padding: 9px 20px;
-    border-radius: 12px;
-    border: 1.5px solid rgba(139, 92, 246, 0.3);
-    background: rgba(139, 92, 246, 0.08);
-    color: #7c3aed;
+    border-radius: var(--mc-radius-control);
+    border: 1px solid var(--mc-border-strong);
+    background: var(--mc-brand-soft);
+    color: var(--mc-accent);
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
@@ -222,12 +214,12 @@
 }
 
 .dark .cr-btn-secondary {
-    color: #c4b5fd;
-    border-color: rgba(139, 92, 246, 0.25);
-    background: rgba(139, 92, 246, 0.12);
+    color: var(--mc-accent);
+    border-color: var(--mc-border-strong);
+    background: var(--mc-brand-soft);
 }
 
 .cr-btn-secondary:hover {
-    background: rgba(139, 92, 246, 0.15);
+    background: var(--mc-brand-soft);
     transform: translateY(-1px);
 }
