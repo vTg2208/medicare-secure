@@ -1,6 +1,6 @@
 # Free demonstration deployment
 
-The synthetic-data demonstration is live at **https://medicare-ebon-seven.vercel.app**. Deployment began on 2026-10-31; final verification continued on 2026-11-01 (Asia/Calcutta).
+The synthetic-data demonstration is live at **https://medicare-vtg.vercel.app**. Deployment began on 2026-10-31; final verification continued on 2026-11-01 (Asia/Calcutta).
 
 | Component | Deployment |
 | --- | --- |
@@ -33,3 +33,11 @@ Render's Free service sleeps when inactive; its dashboard warns that requests ca
 - Local follow-up checks passed: 120 backend unit tests, 57 frontend tests, 33 actual HTTP/PostgreSQL integration checks, and 4 browser schema/seed export checks. Frontend lint/build and backend syntax checks passed. Scoped independent review found no remaining confirmed medium-or-higher issue in the queue fix and Vercel configuration.
 
 The initial production-readiness report records the earlier full dependency audits, three local container image smokes, database provisioning checks and 23 offline AI tests. This clean deployment repository does not include the original remote CI workflows; the hosted platforms built the deployed application, and the automated regression suites were run locally. Actual SMTP delivery, ClamAV signatures, passkey hardware, AI-provider calls, load/recovery tests and clinical/compliance validation remain outside this demo's enabled scope.
+
+## Medicare identity and sign-in refresh — 2026-11-01
+
+The canonical frontend address is https://medicare-vtg.vercel.app. The originally requested medicare.vercel.app was already assigned to another project. The previous medicare-ebon-seven.vercel.app address now redirects to the new address (307); no domain purchase was needed. Render's CORS_ORIGIN, FRONTEND_URL, WEBAUTHN_ORIGIN and WEBAUTHN_RP_ID were updated to match. The backend environment deployment reported live successfully.
+
+The custom Medicare mark is original vector artwork in frontend/public/medicare-icon.svg, with matching favicon, Apple touch icon and manifest image assets. Browser and installed-app metadata now use Medicare. The login page replaces animated particles and translucent panels with a restrained teal healthcare layout, labelled fields, an accessible password visibility control, active-form-only rendering, and mobile and dark themes. Existing password and passkey authentication flows are retained. Demo visitors are directed to assigned accounts rather than unavailable registration.
+
+Validation: 61 frontend tests across 10 files, frontend lint and production build. Browser visual checks covered desktop, 390px and 320px frames without horizontal overflow, and dark theme. Four new behavioral checks cover patient routing, recoverable authentication errors, passkey sign-in and demo registration guidance. Hardware passkey enrollment remains disabled in the synthetic demo.
