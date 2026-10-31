@@ -1,11 +1,11 @@
 import React, { useState, useContext } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { authApi } from '../../api/authApi';
 import { startAuthentication } from '@simplewebauthn/browser';
 import ThemeToggle from '../../components/common/ThemeToggle';
-import ParticleBackground from '../../components/common/ParticleBackground';
-import '../patient/Dashboard.css';
+import { isDemoMode } from '../../config/demoMode';
+import './Login.css';
 
 function Login() {
     const navigate = useNavigate();
@@ -16,6 +16,7 @@ function Login() {
         email: '',
         password: '',
     });
+    const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [passkeyLoading, setPasskeyLoading] = useState(false);
     const [error, setError] = useState('');
@@ -124,171 +125,72 @@ function Login() {
         }
     };
 
+    const busy = loading || passkeyLoading;
+    const brand = <><img src="/medicare-icon.svg" alt="" width="42" height="42" /><span>medicare</span></>;
+
     return (
-        <div className="patient-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8 transition-colors duration-300 relative overflow-hidden">
-            {/* Dynamic Background Elements */}
-            <ParticleBackground />
-
-            {/* Theme Toggle styling */}
-            <div className="absolute top-4 right-4 z-50">
-                <ThemeToggle />
-            </div>
-
-            <div className="w-full max-w-lg glass-card rounded-3xl shadow-2xl relative z-10 animate-fade-in p-8 sm:p-10 border border-white/40 dark:border-white/10">
-                {/* Logo and App Name (Interactive Hover) */}
-                <div className="flex flex-col items-center justify-center mb-8 group cursor-default">
-                    <div className="relative">
-                        <div className="absolute inset-0 bg-indigo-500 blur-xl opacity-0 group-hover:opacity-60 transition-opacity duration-500 rounded-full"></div>
-                        <div className="relative w-16 h-16 bg-indigo-500 rounded-2xl flex items-center justify-center text-white shadow-lg mb-4 transform transition-all duration-500 group-hover:scale-110 group-hover:-rotate-3 group-hover:shadow-[0_0_20px_rgba(99,102,241,0.5)]">
-                            <span className="material-symbols-outlined text-3xl transition-transform duration-500 group-hover:scale-110">local_hospital</span>
-                        </div>
+        <main className="medicare-login">
+            <section className="login-story" aria-label="About Medicare">
+                <Link to="/" className="login-brand" aria-label="Medicare home">{brand}</Link>
+                <div className="login-story-content">
+                    <p className="login-eyebrow">Your connected care space</p>
+                    <h1>Better care.<br /><span>Closer together.</span></h1>
+                    <p className="login-story-description">One place for your health records, care team, and the decisions that matter to you.</p>
+                    <div className="login-care-visual" aria-label="Records, visits, and sharing in one place">
+                        <div className="login-care-header"><img src="/medicare-icon.svg" alt="" width="40" height="40" /><div>Care, connected.<small>Built around you</small></div></div>
+                        <div className="login-care-rule" />
+                        {[['description', 'Your health records'], ['calendar_month', 'Your upcoming visits'], ['shield', 'Your sharing preferences']].map(([icon, text]) => (
+                            <div className="login-care-item" key={icon}><span className="material-symbols-outlined" aria-hidden="true">{icon}</span><span>{text}</span><span className="material-symbols-outlined" aria-hidden="true">check_circle</span></div>
+                        ))}
                     </div>
-                    <h1 className="text-3xl font-extrabold tracking-tight text-slate-800 dark:text-white transition-all duration-500 drop-shadow-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-hover:drop-shadow-[0_0_15px_rgba(99,102,241,0.4)]">
-                        {process.env.REACT_APP_APP_NAME || 'MediCare'}
-                    </h1>
+                    <p className="login-story-foot">For patients. For care teams.<br />For a more connected healthcare experience.</p>
                 </div>
-
-                <div className="text-center mb-8">
-                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Welcome Back</h2>
-                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Sign in to access your dashboard</p>
+            </section>
+            <section className="login-form-side" aria-label="Sign in">
+                <div className="login-topbar">
+                    <Link to="/" className="login-back"><span className="material-symbols-outlined" aria-hidden="true">arrow_back</span>Back to home</Link>
+                    <ThemeToggle />
                 </div>
-
-                {successMessage && (
-                    <div className="mb-6 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/50 flex items-center shadow-sm text-sm">
-                        <span className="material-symbols-outlined text-[20px] mr-2">check_circle</span>
-                        {successMessage}
+                <div className="login-form-content">
+                    <Link to="/" className="login-brand login-mobile-brand" aria-label="Medicare home">{brand}</Link>
+                    <div className="login-form-heading"><h2>Welcome back</h2><p>Sign in to your Medicare account.</p></div>
+                    {successMessage && <div role="status" className="login-notice login-success">{successMessage}</div>}
+                    {error && <div id="login-error" role="alert" className="login-notice login-error">{error}</div>}
+                    <div className="login-methods" role="group" aria-label="Sign-in method">
+                        <button type="button" disabled={busy} aria-pressed={activeTab === 'password'} onClick={() => { setActiveTab('password'); setError(''); }}>Password</button>
+                        <button type="button" disabled={busy} aria-pressed={activeTab === 'passkey'} onClick={() => { setActiveTab('passkey'); setError(''); }}><span className="material-symbols-outlined" aria-hidden="true">fingerprint</span>Passkey</button>
                     </div>
-                )}
-
-                {error && (
-                    <div className="mb-6 p-4 rounded-xl bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 border border-rose-200 dark:border-rose-800/50 flex items-center shadow-sm text-sm">
-                        <span className="material-symbols-outlined text-[20px] mr-2">error</span>
-                        {error}
-                    </div>
-                )}
-
-                {/* Tabs */}
-                <div className="flex p-1 mb-6 bg-white/40 dark:bg-slate-800/40 backdrop-blur-md rounded-2xl border border-white/20 dark:border-slate-700/50">
-                    <button
-                        type="button"
-                        onClick={() => { setActiveTab('password'); setError(''); }}
-                        className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all duration-300 ${activeTab === 'password' ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
-                    >
-                        Password
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => { setActiveTab('passkey'); setError(''); }}
-                        className={`flex-1 py-2.5 text-sm font-bold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 ${activeTab === 'passkey' ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
-                    >
-                        <span className="material-symbols-outlined text-[18px]">fingerprint</span>
-                        Passkey
-                    </button>
-                </div>
-
-                <div className="relative overflow-hidden w-full transition-all duration-500" style={{ minHeight: '260px' }}>
-                    {/* Password Tab Content */}
-                    <div className={`absolute top-0 left-0 w-full transition-all duration-500 transform ${activeTab === 'password' ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0 pointer-events-none'}`}>
-                        <form onSubmit={handleSubmit} className="space-y-5">
-                            <div>
-                                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5 ml-1">Email or Phone</label>
-                                <div className="relative">
-                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 z-10">
-                                        <span className="material-symbols-outlined text-[20px]">alternate_email</span>
-                                    </div>
-                                    <input
-                                        type="text"
-                                        name="email"
-                                        value={formData.email}
-                                        onChange={handleChange}
-                                        required={activeTab === 'password'}
-                                        className="block w-full pl-12 pr-4 py-3.5 border-none rounded-2xl bg-white/60 dark:bg-slate-800/60 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 transition-all duration-200 text-sm shadow-inner backdrop-blur-sm"
-                                        placeholder="email@example.com or +91..."
-                                    />
+                    {activeTab === 'password' ? (
+                        <form onSubmit={handleSubmit} className="login-fields" aria-busy={loading}>
+                            <div className="login-field">
+                                <label htmlFor="login-email">Email or phone</label>
+                                <input id="login-email" type="text" name="email" value={formData.email} onChange={handleChange} autoComplete="username" autoCapitalize="none" spellCheck={false} required disabled={busy} aria-describedby={error ? 'login-error' : undefined} placeholder="Enter your email or phone" />
+                            </div>
+                            <div className="login-field">
+                                <label htmlFor="login-password">Password</label>
+                                <div className="login-input-wrap">
+                                    <input id="login-password" type={showPassword ? 'text' : 'password'} name="password" value={formData.password} onChange={handleChange} autoComplete="current-password" required disabled={busy} aria-describedby={error ? 'login-error' : undefined} placeholder="Enter your password" />
+                                    <button type="button" className="login-password-toggle" aria-label={showPassword ? 'Hide password' : 'Show password'} aria-pressed={showPassword} onClick={() => setShowPassword(!showPassword)}><span className="material-symbols-outlined" aria-hidden="true">{showPassword ? 'visibility_off' : 'visibility'}</span></button>
                                 </div>
                             </div>
-
-                            <div>
-                                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5 ml-1">Password</label>
-                                <div className="relative">
-                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 z-10">
-                                        <span className="material-symbols-outlined text-[20px]">lock</span>
-                                    </div>
-                                    <input
-                                        type="password"
-                                        name="password"
-                                        value={formData.password}
-                                        onChange={handleChange}
-                                        required={activeTab === 'password'}
-                                        className="block w-full pl-12 pr-4 py-3.5 border-none rounded-2xl bg-white/60 dark:bg-slate-800/60 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 transition-all duration-200 text-sm shadow-inner backdrop-blur-sm"
-                                        placeholder="••••••••"
-                                    />
-                                </div>
-                            </div>
-
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className={`mt-6 w-full flex justify-center py-4 px-4 rounded-2xl shadow-xl shadow-indigo-500/20 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300 transform hover:scale-[1.02] ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
-                            >
-                                {loading ? 'Signing In...' : 'Sign In'}
-                            </button>
+                            <button type="submit" className="login-submit" disabled={busy}>{loading ? 'Signing in…' : 'Sign in'}<span className="material-symbols-outlined" aria-hidden="true">arrow_forward</span></button>
                         </form>
-                    </div>
-
-                    {/* Passkey Tab Content */}
-                    <div className={`absolute top-0 left-0 w-full transition-all duration-500 transform ${activeTab === 'passkey' ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0 pointer-events-none'}`}>
-                        <div className="space-y-6">
-                            <div className="text-center mb-2">
-                                <span className="material-symbols-outlined text-5xl text-indigo-500/50 mb-2">passkey</span>
-                                <p className="text-sm text-slate-500 dark:text-slate-400">Sign in securely without a password using your device's biometric authentication.</p>
+                    ) : (
+                        <form className="login-fields" aria-busy={passkeyLoading} onSubmit={(e) => { e.preventDefault(); handlePasskeyLogin(); }}>
+                            <p className="login-passkey-help">Use a passkey already linked to your account. Your device may ask for your fingerprint, face, or PIN.</p>
+                            <div className="login-field">
+                                <label htmlFor="passkey-email">Email or phone</label>
+                                <input id="passkey-email" type="text" name="email" value={formData.email} onChange={handleChange} autoComplete="username webauthn" autoCapitalize="none" spellCheck={false} required disabled={busy} placeholder="Enter your email or phone" aria-describedby={error ? 'login-error' : undefined} />
                             </div>
-
-                            <div>
-                                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5 ml-1">Email Address</label>
-                                <div className="relative">
-                                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 z-10">
-                                        <span className="material-symbols-outlined text-[20px]">mail</span>
-                                    </div>
-                                    <input
-                                        type="email"
-                                        name="email"
-                                        value={formData.email}
-                                        onChange={handleChange}
-                                        required={activeTab === 'passkey'}
-                                        className="block w-full pl-12 pr-4 py-3.5 border-none rounded-2xl bg-white/60 dark:bg-slate-800/60 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 transition-all duration-200 text-sm shadow-inner backdrop-blur-sm"
-                                        placeholder="Enter your email"
-                                    />
-                                </div>
-                            </div>
-
-                            <button
-                                type="button"
-                                onClick={handlePasskeyLogin}
-                                disabled={passkeyLoading || !formData.email}
-                                className={`w-full inline-flex justify-center items-center px-4 py-4 shadow-xl shadow-indigo-500/20 text-sm font-bold rounded-2xl text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300 transform hover:scale-[1.02] ${passkeyLoading || !formData.email ? 'opacity-70 cursor-not-allowed' : ''}`}
-                            >
-                                <span className="material-symbols-outlined text-[20px] mr-2">fingerprint</span>
-                                {passkeyLoading ? 'Authenticating...' : 'Sign in with Passkey'}
-                            </button>
-                        </div>
-                    </div>
+                            <button type="submit" className="login-submit" disabled={busy}>{passkeyLoading ? 'Authenticating…' : 'Sign in with passkey'}<span className="material-symbols-outlined" aria-hidden="true">fingerprint</span></button>
+                        </form>
+                    )}
+                    <p className="login-access-note"><span className="material-symbols-outlined" aria-hidden="true">lock</span>{isDemoMode ? 'Use an assigned demo account. This space contains synthetic patient data only.' : 'Your records are available according to your role and sharing permissions.'}</p>
+                    {!isDemoMode && <p className="login-signup">New to Medicare? <Link to="/register">Create a patient account</Link></p>}
                 </div>
-
-                <p className="mt-8 text-center text-sm text-slate-500 dark:text-slate-400">
-                    Don't have an account?{' '}
-                    <a href="/register" className="font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 hover:underline transition-colors">
-                        Sign Up as Patient
-                    </a>
-                </p>
-            </div>
-
-            <div className="absolute bottom-6 w-full text-center z-10">
-                <p className="text-xs font-medium text-slate-400 dark:text-slate-500">
-                    &copy; {new Date().getFullYear()} {process.env.REACT_APP_APP_NAME || 'MediCare'}. All rights reserved.
-                </p>
-            </div>
-        </div>
+                <footer className="login-footer">© {new Date().getFullYear()} Medicare. Your care, connected.</footer>
+            </section>
+        </main>
     );
 }
 

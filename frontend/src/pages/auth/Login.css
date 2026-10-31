@@ -1,0 +1,97 @@
+.medicare-login {
+    --login-ink: #173b3b;
+    --login-muted: #5e7275;
+    --login-accent: #087f78;
+    --login-border: #d9e3e3;
+    --login-surface: #ffffff;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    background: var(--login-surface);
+    color: var(--login-ink);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.demo-content > .medicare-login { min-height: 100%; }
+.login-story { background: #edf5f2; padding: 44px clamp(32px, 5vw, 84px); display: flex; flex-direction: column; position: relative; overflow: hidden; }
+.login-brand { display: inline-flex; align-items: center; gap: 12px; font-size: 25px; font-weight: 700; letter-spacing: -1px; color: inherit; width: fit-content; text-decoration: none; }
+.login-brand img { width: 42px; height: 42px; }
+.login-story-content { margin: auto 0; padding: 56px 0 36px; max-width: 470px; }
+.login-eyebrow { display: flex; align-items: center; gap: 9px; text-transform: uppercase; letter-spacing: 2px; font-size: 11px; font-weight: 700; color: #386b61; margin: 0 0 23px; }
+.login-eyebrow::before { content: ''; width: 22px; height: 2px; background: #087f78; }
+.login-story h1 { color: var(--login-ink); font-size: clamp(36px, 3.7vw, 56px); line-height: 1.16; font-weight: 600; letter-spacing: -2.2px; margin: 0 0 22px; }
+.login-story h1 span { color: #087f78; }
+.login-story-description { max-width: 365px; line-height: 1.8; font-size: 14px; color: #526e68; }
+.login-care-visual { position: relative; margin: 42px 0 34px; padding: 22px; max-width: 365px; border: 1px solid #d2e4dc; border-radius: 18px; background: #f9fcfa; box-shadow: 0 12px 35px #234d3b08; }
+.login-care-header { display: flex; align-items: center; gap: 12px; font-size: 13px; font-weight: 700; }
+.login-care-header img { width: 40px; height: 40px; }
+.login-care-header small { display: block; color: #647c73; font-size: 11px; font-weight: 400; margin-top: 4px; }
+.login-care-rule { height: 1px; background: #e3ebe6; margin: 19px 0; }
+.login-care-item { display: flex; align-items: center; gap: 12px; font-size: 12px; margin-top: 15px; color: #426559; }
+.login-care-item > span:first-child { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 9px; background: #e8f2ed; color: #087f78; font-size: 18px; }
+.login-care-item > span:last-child { margin-left: auto; font-size: 17px; color: #087f78; }
+.login-story-foot { font-size: 11px; color: #607b71; line-height: 1.7; margin: 0; }
+.login-form-side { display: flex; flex-direction: column; padding: 36px clamp(28px, 5vw, 80px) 24px; }
+.login-topbar { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.login-back { display: inline-flex; align-items: center; gap: 6px; color: var(--login-muted); font-size: 12px; text-decoration: none; }
+.login-back:hover { color: var(--login-accent); }
+.login-topbar > button { background: transparent; color: var(--login-muted); border: 1px solid var(--login-border); border-radius: 10px; padding: 8px; }
+.login-topbar > button svg { width: 18px; height: 18px; }
+.login-form-content { width: 100%; max-width: 380px; margin: auto; padding: 48px 0; }
+.login-mobile-brand { display: none; }
+.login-form-heading { margin-bottom: 30px; }
+.login-form-heading h2 { color: var(--login-ink); margin: 0 0 10px; font-size: 29px; line-height: 1.3; font-weight: 600; letter-spacing: -1px; }
+.login-form-heading p { color: var(--login-muted); font-size: 13px; line-height: 1.7; margin: 0; }
+.login-methods { display: flex; background: #f3f6f6; border: 1px solid #eaf0ef; padding: 4px; border-radius: 10px; margin-bottom: 25px; gap: 4px; }
+.login-methods button { flex: 1; display: flex; align-items: center; justify-content: center; gap: 7px; padding: 10px 6px; font: inherit; font-size: 12px; font-weight: 600; color: var(--login-muted); border: 1px solid transparent; border-radius: 7px; }
+.login-methods button[aria-pressed='true'] { background: var(--login-surface); color: var(--login-accent); box-shadow: 0 1px 4px #173b3b0d; border-color: var(--login-border); }
+.login-methods .material-symbols-outlined { font-size: 17px; }
+.login-fields { display: grid; gap: 21px; }
+.login-field label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 9px; }
+.login-input-wrap { position: relative; }
+.login-field input { display: block; width: 100%; min-width: 0; height: 49px; border: 1px solid var(--login-border); border-radius: 9px; padding: 0 14px; background: var(--login-surface); color: var(--login-ink); font: inherit; font-size: 13px; transition: border-color 150ms; }
+.login-field input::placeholder { color: #869597; opacity: 1; }
+.login-field input:focus { outline: 3px solid #087f7820; border-color: var(--login-accent); }
+.login-input-wrap input { padding-right: 48px; }
+.login-password-toggle { position: absolute; top: 3px; right: 3px; height: 43px; width: 43px; display: grid; place-items: center; border-radius: 7px; color: var(--login-muted); }
+.login-password-toggle span { font-size: 20px; }
+.login-submit { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; min-height: 49px; border: 1px solid transparent; border-radius: 9px; background: var(--login-accent); color: white; font: inherit; font-weight: 600; font-size: 13px; margin-top: 5px; transition: background 150ms; }
+.login-submit:hover { background: #066b65; }
+.login-submit:disabled { cursor: wait; opacity: .65; }
+.login-submit .material-symbols-outlined { font-size: 19px; }
+.medicare-login button:focus-visible, .medicare-login a:focus-visible { outline: 3px solid #50b5a5; outline-offset: 3px; }
+.login-notice { padding: 12px 14px; border-radius: 9px; font-size: 12px; line-height: 1.7; margin-bottom: 20px; overflow-wrap: anywhere; }
+.login-error { color: #a12e36; background: #fff2f2; border: 1px solid #f2ccd0; }
+.login-success { color: #216245; background: #edf8f1; border: 1px solid #c8e7d3; }
+.login-passkey-help { color: var(--login-muted); font-size: 12px; line-height: 1.8; margin: 0 0 20px; }
+.login-access-note { display: flex; align-items: flex-start; gap: 8px; color: var(--login-muted); font-size: 11px; line-height: 1.8; border-top: 1px solid var(--login-border); padding-top: 22px; margin: 27px 0 0; }
+.login-access-note .material-symbols-outlined { flex: none; font-size: 16px; margin-top: 2px; }
+.login-signup { text-align: center; font-size: 12px; color: var(--login-muted); margin: 22px 0 0; line-height: 1.8; }
+.login-signup a { color: var(--login-accent); font-weight: 600; text-underline-offset: 3px; }
+.login-footer { color: var(--login-muted); font-size: 10px; text-align: center; line-height: 1.8; }
+.dark .medicare-login { --login-ink: #e1eeeb; --login-muted: #a0b4b1; --login-accent: #4dc4b5; --login-border: #34504d; --login-surface: #142b2b; }
+.dark .login-story { background: #193a33; }
+.dark .login-story h1 span, .dark .login-eyebrow { color: #8bdbc2; }
+.dark .login-story-description, .dark .login-story-foot { color: #adc8bd; }
+.dark .login-care-visual { background: #20443a; border-color: #3c5e50; }
+.dark .login-care-header small, .dark .login-care-item { color: #bdd6ca; }
+.dark .login-care-rule { background: #3c5e50; }
+.dark .login-care-item > span:first-child { background: #2d5548; color: #a8e5cc; }
+.dark .login-care-item > span:last-child { color: #a8e5cc; }
+.dark .login-methods { background: #1c3837; border-color: #34504d; }
+.dark .login-submit { background: #087f78; }
+.dark .login-submit:hover { background: #096f69; }
+.dark .login-error { color: #ffc7cc; background: #482d33; border-color: #74414b; }
+.dark .login-success { color: #c0e7cf; background: #254236; border-color: #3f6753; }
+@media (min-width: 1600px) { .login-story-content { align-self: center; } }
+@media (max-width: 1000px) { .login-story { padding: 32px; } .login-story h1 { font-size: 39px; } .login-form-side { padding: 28px; } }
+@media (max-width: 760px) {
+    .medicare-login { display: block; }
+    .login-story { display: none; }
+    .login-form-side { min-height: 100vh; min-height: 100dvh; padding: 24px; }
+    .demo-content .login-form-side { min-height: 100%; }
+    .login-form-content { padding: 38px 0; }
+    .login-mobile-brand { display: inline-flex; margin-bottom: 40px; }
+    .login-form-heading h2 { font-size: 28px; }
+}
+@media (prefers-reduced-motion: reduce) { .medicare-login *, .medicare-login *::before { transition: none; } }
