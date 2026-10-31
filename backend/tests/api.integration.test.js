@@ -281,6 +281,17 @@ test('real API: registration, sessions, patient boundaries, administration, and 
                 VALUES($1,$2,$3,'approved','QUEUE-AHEAD','2026-01-01 00:00:00.000500')`,[users.patient,org,doctor]);
             assert.deepEqual(await Visit.getQueuePosition(target,doctor), { position:2,total:2,status:'approved',eta_minutes:15 });
         });
+
+        await t.test('authorized medical-record lists include the patient identity used by the clinician header', async () => {
+            const result = await send('get',`/api/emr/patients/${users.patient}/medical-records`,tokens.patient);
+            expectStatus(result,200);
+            const identity = (await db.query(`SELECT u.first_name,u.last_name,p.unique_health_id FROM users u
+                LEFT JOIN patient_profiles p ON p.user_id=u.id WHERE u.id=$1`,[users.patient])).rows[0];
+            const item = result.body.data.records.find(item=>item.id===record);
+            assert.equal(item.patient_first_name,identity.first_name);
+            assert.equal(item.patient_last_name,identity.last_name);
+            assert.equal(item.patient_health_id,identity.unique_health_id);
+        });
     } finally {
         await new Promise(resolve => setImmediate(resolve));
         if (db) await db.pool.end();

@@ -72,10 +72,15 @@ class MedicalRecordModel {
             SELECT 
                 mr.*,
                 u.first_name || ' ' || u.last_name as created_by_name,
-                r.name as created_by_role
+                r.name as created_by_role,
+                patient_user.first_name AS patient_first_name,
+                patient_user.last_name AS patient_last_name,
+                patient_profile.unique_health_id AS patient_health_id
             FROM medical_records mr
             JOIN users u ON mr.created_by = u.id
             JOIN roles r ON u.role_id = r.id
+            JOIN users patient_user ON mr.patient_id = patient_user.id
+            LEFT JOIN patient_profiles patient_profile ON patient_profile.user_id = patient_user.id
             WHERE mr.patient_id = $1
         `;
 

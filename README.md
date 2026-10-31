@@ -2,6 +2,8 @@
 
 Private source snapshot of the repaired healthcare management application, configured for a synthetic-data demonstration on free hosting.
 
+**Live demo:** https://medicare-ebon-seven.vercel.app. See [deployment details and verification](DEPLOYMENT.md).
+
 The React frontend, Express API, role and consent controls, audit trail, immutable migrations, and automated tests are included as ordinary source files. Legacy Git history, uploaded identity documents, runtime credentials, patient snapshots, logs, and local databases are excluded.
 
 ## Hosting
