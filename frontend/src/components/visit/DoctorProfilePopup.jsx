@@ -102,9 +102,9 @@ const DoctorProfilePopup = ({ doctor, onBack, onBook }) => {
     };
 
     return (
-        <div className="fixed inset-0 z-[70] flex flex-col w-full h-full bg-slate-50 dark:bg-[#102219] overflow-hidden backdrop-blur-md">
+        <div className="fixed inset-0 z-[70] flex flex-col w-full h-full bg-canvas overflow-hidden">
             {/* Top Navigation */}
-            <div className="sticky top-0 z-50 flex items-center bg-slate-50/80 dark:bg-[#102219]/80 backdrop-blur-md px-4 py-3 justify-between">
+            <div className="sticky top-0 z-50 flex items-center bg-canvas px-4 py-3 justify-between">
                 <button
                     onClick={onBack}
                     className="text-slate-900 dark:text-slate-100 flex h-10 w-10 shrink-0 items-center justify-center cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800 rounded-full transition"
@@ -125,11 +125,11 @@ const DoctorProfilePopup = ({ doctor, onBack, onBook }) => {
                 <div className="flex p-6">
                     <div className="flex w-full flex-col gap-5 items-center">
                         <div className="relative">
-                            <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-xl shadow-lg border-4 border-white dark:border-slate-800 min-h-40 w-40 flex items-center justify-center bg-slate-200 dark:bg-slate-700 overflow-hidden"
+                            <div className="bg-center bg-no-repeat aspect-square bg-cover rounded-xl shadow-lg border-4 border-line dark:border-slate-800 min-h-40 w-40 flex items-center justify-center bg-slate-200 dark:bg-slate-700 overflow-hidden"
                                 style={{ backgroundImage: `url(${doctor.profileImage || getDoctorMockImage(doctor.id)})` }}
                             >
                             </div>
-                            <div className="absolute -bottom-2 -right-2 bg-emerald-400 p-1.5 rounded-full shadow-md flex items-center justify-center border-2 border-white dark:border-slate-800">
+                            <div className="absolute -bottom-2 -right-2 bg-emerald-400 p-1.5 rounded-full shadow-md flex items-center justify-center border-2 border-line dark:border-slate-800">
                                 <span className="material-symbols-outlined text-white text-sm">verified</span>
                             </div>
                         </div>
@@ -203,7 +203,7 @@ const DoctorProfilePopup = ({ doctor, onBack, onBook }) => {
                                         ? 'bg-slate-100 dark:bg-slate-800/50 text-slate-400 cursor-not-allowed border border-transparent'
                                         : isSelected
                                             ? 'bg-emerald-400 text-slate-900 shadow-lg transform scale-105 ring-4 ring-emerald-400/20 cursor-pointer'
-                                            : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer'
+                                            : 'bg-surface dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer'
                                         }`}
                                 >
                                     <p className="text-xs font-medium">{d.day}</p>
@@ -229,7 +229,7 @@ const DoctorProfilePopup = ({ doctor, onBack, onBook }) => {
                                             onClick={() => setSelectedTimeSlot(time)}
                                             className={`py-3 px-2 rounded-lg font-medium text-sm text-center transition-all ${isSelected
                                                 ? 'bg-emerald-400/20 border border-emerald-400 text-emerald-700 dark:text-emerald-400 shadow-sm ring-2 ring-emerald-400/30'
-                                                : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-300'
+                                                : 'bg-surface dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-300'
                                                 }`}
                                         >
                                             {time}
@@ -243,22 +243,22 @@ const DoctorProfilePopup = ({ doctor, onBack, onBook }) => {
             </div>
 
             {/* Sticky Footer Action */}
-            <div className="absolute bottom-0 left-0 right-0 bg-white/90 dark:bg-[#102219]/90 backdrop-blur-lg border-t border-slate-100 dark:border-slate-800 p-4 pb-8 z-50">
+            <div className="absolute bottom-0 left-0 right-0 bg-surface border-t border-slate-100 dark:border-slate-800 p-4 pb-8 z-50">
                 <div className="flex items-center justify-between mb-4 px-2">
                     <div className="flex flex-col">
                         <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wide">Consultation Fee</p>
                         <p className="text-xl font-bold text-slate-900 dark:text-slate-100">$120.00</p>
                     </div>
                     <div className="flex -space-x-2">
-                        <div className="w-8 h-8 rounded-full border-2 border-white dark:border-[#102219] bg-indigo-100 text-indigo-700 flex items-center justify-center text-[10px] font-bold">JD</div>
-                        <div className="w-8 h-8 rounded-full border-2 border-white dark:border-[#102219] bg-teal-100 text-teal-700 flex items-center justify-center text-[10px] font-bold">AS</div>
-                        <div className="w-8 h-8 rounded-full border-2 border-white dark:border-[#102219] bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-[10px] font-bold text-slate-600 dark:text-slate-400">+12</div>
+                        <div className="w-8 h-8 rounded-full border-2 border-line bg-primary-100 text-primary-700 flex items-center justify-center text-[10px] font-bold">JD</div>
+                        <div className="w-8 h-8 rounded-full border-2 border-line bg-primary-100 text-primary-700 flex items-center justify-center text-[10px] font-bold">AS</div>
+                        <div className="w-8 h-8 rounded-full border-2 border-line bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-[10px] font-bold text-slate-600 dark:text-slate-400">+12</div>
                     </div>
                 </div>
                 <button
                     onClick={handleBook}
                     disabled={!selectedDateObj || !selectedTimeSlot}
-                    className="w-full bg-emerald-400 hover:bg-emerald-500 disabled:bg-slate-300 disabled:dark:bg-slate-700/50 disabled:text-slate-500 text-slate-900 font-bold py-4 px-6 rounded-xl shadow-lg transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                    className="w-full bg-primary-600 hover:bg-primary-700 disabled:bg-slate-300 disabled:dark:bg-slate-700/50 disabled:text-muted text-white font-bold py-4 px-6 rounded-lg shadow-lg transition-all flex items-center justify-center gap-2"
                 >
                     <span className="material-symbols-outlined">calendar_today</span>
                     {(!selectedDateObj || !selectedTimeSlot) ? 'Select Date & Time' : 'Book Appointment'}

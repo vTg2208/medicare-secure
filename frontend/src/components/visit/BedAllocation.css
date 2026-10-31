@@ -9,22 +9,22 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    background: var(--gradient-primary);
+    background: var(--mc-brand);
     padding: 32px;
-    border-radius: var(--radius-lg);
+    border-radius: var(--mc-radius-panel);
     margin-bottom: 24px;
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--mc-shadow-panel);
 }
 
 .bed-allocation-header h3 {
     margin: 0 0 8px 0;
-    color: var(--white);
+    color: var(--mc-on-brand);
     font-size: 24px;
 }
 
 .bed-allocation-subtitle {
     margin: 0;
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--mc-on-brand);
     font-size: 14px;
 }
 
@@ -39,21 +39,20 @@
     flex-direction: column;
     align-items: center;
     padding: 12px 20px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: var(--radius-md);
-    backdrop-filter: blur(10px);
+    background: var(--mc-brand-hover);
+    border-radius: var(--mc-radius-control);
 }
 
 .stat-value {
     font-size: 28px;
     font-weight: 700;
-    color: var(--white);
+    color: var(--mc-on-brand);
     line-height: 1;
 }
 
 .stat-label {
     font-size: 11px;
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--mc-on-brand);
     text-transform: uppercase;
     font-weight: 600;
     letter-spacing: 0.5px;
@@ -74,28 +73,28 @@
     align-items: center;
     gap: 8px;
     padding: 10px 16px;
-    background: var(--gray-100);
-    border: 2px solid var(--gray-300);
-    border-radius: var(--radius-full);
+    background: var(--mc-surface-muted);
+    border: 1px solid var(--mc-border-strong);
+    border-radius: var(--mc-radius-control);
     font-size: 13px;
     font-weight: 600;
-    color: var(--gray-700);
+    color: var(--mc-text);
     cursor: pointer;
     white-space: nowrap;
     transition: all var(--transition-base);
 }
 
 .ward-chip:hover {
-    border-color: var(--primary-blue);
-    color: var(--primary-blue);
-    background: var(--secondary-sky);
+    border-color: var(--mc-accent);
+    color: var(--mc-accent);
+    background: var(--mc-brand-soft);
 }
 
 .ward-chip.active {
-    background: var(--gradient-primary);
-    border-color: var(--primary-blue);
-    color: var(--white);
-    box-shadow: var(--shadow-md);
+    background: var(--mc-brand);
+    border-color: var(--mc-accent);
+    color: var(--mc-on-brand);
+    box-shadow: var(--mc-shadow-panel);
 }
 
 .ward-icon {
@@ -121,9 +120,9 @@
 
 /* Bed Card */
 .bed-card {
-    background: var(--white);
-    border: 2px solid var(--gray-300);
-    border-radius: var(--radius-lg);
+    background: var(--mc-surface);
+    border: 1px solid var(--mc-border-strong);
+    border-radius: var(--mc-radius-panel);
     padding: 16px;
     cursor: pointer;
     transition: all var(--transition-base);
@@ -133,28 +132,27 @@
 }
 
 .bed-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--mc-shadow-sm);
 }
 
 .bed-card.selected {
-    border-color: var(--primary-blue);
-    box-shadow: var(--shadow-blue);
+    border-color: var(--mc-accent);
+    box-shadow: var(--mc-shadow-panel);
 }
 
 .bed-card.bed-available {
-    border-color: var(--success-green);
-    background: linear-gradient(135deg, #E8F5F3 0%, #ffffff 100%);
+    border-color: var(--mc-success-border);
+    background: var(--mc-success-bg);
 }
 
 .bed-card.bed-occupied {
-    border-color: var(--warning-amber);
-    background: linear-gradient(135deg, #FFF4E6 0%, #ffffff 100%);
+    border-color: var(--mc-warning-border);
+    background: var(--mc-warning-bg);
 }
 
 .bed-card.bed-maintenance {
-    border-color: var(--gray-400);
-    background: var(--gray-100);
+    border-color: var(--mc-text-subtle);
+    background: var(--mc-surface-muted);
     opacity: 0.7;
 }
 
@@ -169,7 +167,7 @@
 .bed-number {
     font-size: 14px;
     font-weight: 700;
-    color: var(--gray-900);
+    color: var(--mc-text);
 }
 
 .bed-status {
@@ -182,18 +180,18 @@
 }
 
 .bed-status.bed-available {
-    background: var(--success-green);
-    color: var(--white);
+    background: var(--mc-success-solid);
+    color: var(--mc-on-brand);
 }
 
 .bed-status.bed-occupied {
-    background: var(--warning-amber);
-    color: var(--white);
+    background: var(--mc-warning-bg);
+    color: var(--mc-warning);
 }
 
 .bed-status.bed-maintenance {
-    background: var(--gray-500);
-    color: var(--white);
+    background: var(--mc-surface-muted);
+    color: var(--mc-text-muted);
 }
 
 /* Bed Patient Info */
@@ -206,22 +204,22 @@
     margin: 0 0 4px 0;
     font-size: 14px;
     font-weight: 600;
-    color: var(--gray-900);
+    color: var(--mc-text);
 }
 
 .patient-id,
 .patient-admitted {
     margin: 2px 0;
     font-size: 11px;
-    color: var(--gray-600);
+    color: var(--mc-text-muted);
 }
 
 /* Bed Meta */
 .bed-meta {
     font-size: 11px;
-    color: var(--gray-500);
+    color: var(--mc-text-muted);
     padding-top: 8px;
-    border-top: 1px solid var(--gray-300);
+    border-top: 1px solid var(--mc-border-strong);
 }
 
 /* Bed Actions Panel */
@@ -231,10 +229,10 @@
     top: 50%;
     transform: translateY(-50%);
     width: 320px;
-    background: var(--white);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-xl);
-    border: 2px solid var(--primary-blue);
+    background: var(--mc-surface);
+    border-radius: var(--mc-radius-panel);
+    box-shadow: var(--mc-shadow-overlay);
+    border: 1px solid var(--mc-accent);
     z-index: 100;
     animation: slideInRight 0.3s ease-out;
 }
@@ -256,13 +254,13 @@
     justify-content: space-between;
     align-items: center;
     padding: 16px 20px;
-    background: var(--gradient-primary);
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    background: var(--mc-brand);
+    border-radius: var(--mc-radius-panel) var(--mc-radius-panel) 0 0;
 }
 
 .panel-header h4 {
     margin: 0;
-    color: var(--white);
+    color: var(--mc-on-brand);
     font-size: 16px;
     font-weight: 600;
 }
@@ -270,7 +268,7 @@
 .close-panel {
     background: transparent;
     border: none;
-    color: var(--white);
+    color: var(--mc-on-brand);
     font-size: 20px;
     cursor: pointer;
     padding: 4px;
@@ -279,12 +277,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: var(--radius-md);
+    border-radius: var(--mc-radius-control);
     transition: all var(--transition-base);
 }
 
 .close-panel:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--mc-brand-hover);
 }
 
 .panel-content {
@@ -300,28 +298,28 @@
 .action-description {
     margin: 0;
     font-size: 13px;
-    color: var(--gray-600);
+    color: var(--mc-text-muted);
     line-height: 1.5;
 }
 
 .patient-details {
     padding: 12px;
-    background: var(--gray-50);
-    border-radius: var(--radius-md);
-    border: 1px solid var(--gray-300);
+    background: var(--mc-canvas);
+    border-radius: var(--mc-radius-control);
+    border: 1px solid var(--mc-border-strong);
 }
 
 .patient-details h5 {
     margin: 0 0 8px 0;
     font-size: 13px;
     font-weight: 600;
-    color: var(--primary-blue);
+    color: var(--mc-accent);
 }
 
 .patient-details p {
     margin: 4px 0;
     font-size: 12px;
-    color: var(--gray-700);
+    color: var(--mc-text);
 }
 
 .action-buttons {
@@ -345,7 +343,7 @@
 }
 
 .loading-state p {
-    color: var(--gray-600);
+    color: var(--mc-text-muted);
     font-size: 14px;
     margin: 0;
 }

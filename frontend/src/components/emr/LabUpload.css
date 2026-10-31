@@ -1,12 +1,14 @@
 /* Lab Upload Styling */
 
 .lab-upload-container {
-    background: var(--white);
-    border-radius: var(--radius-lg);
+    background: var(--mc-surface);
+    border-radius: var(--mc-radius-panel);
     padding: 32px;
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--mc-shadow-panel);
     max-width: 800px;
     margin: 0 auto;
+    border: 1px solid var(--mc-border);
+    color: var(--mc-text);
 }
 
 .lab-upload-form {

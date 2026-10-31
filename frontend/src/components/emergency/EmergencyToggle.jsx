@@ -35,7 +35,7 @@ function EmergencyToggle({ onToggle }) {
     };
     return <div className="space-y-3">
         {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
-        <button type="button" onClick={() => setOpen(value => !value)} className="px-4 py-2 rounded-xl bg-red-600 text-white font-semibold text-xs">
+        <button type="button" onClick={() => setOpen(value => !value)} className="px-4 py-2 rounded-lg bg-red-600 text-white font-semibold text-xs">
             Request emergency record access
         </button>
         {open && <form onSubmit={activate} className="space-y-3 text-sm">

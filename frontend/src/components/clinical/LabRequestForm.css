@@ -1,15 +1,17 @@
 .lab-request-form {
     padding: 20px;
-    background: #fff;
-    border-radius: 8px;
+    background: var(--mc-surface);
+    border-radius: var(--mc-radius-panel);
     max-width: 500px;
     margin: 0 auto;
+    border: 1px solid var(--mc-border);
+    color: var(--mc-text);
 }
 
 .lab-request-form h3 {
     margin-top: 0;
-    color: #2c3e50;
-    border-bottom: 2px solid #f0f2f5;
+    color: var(--mc-text);
+    border-bottom: 1px solid var(--mc-border);
     padding-bottom: 10px;
     margin-bottom: 20px;
 }
@@ -22,24 +24,26 @@
     display: block;
     margin-bottom: 8px;
     font-weight: 500;
-    color: #34495e;
+    color: var(--mc-text);
 }
 
 .form-group select,
 .form-group textarea {
     width: 100%;
     padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
+    border: 1px solid var(--mc-border);
+    border-radius: var(--mc-radius-control);
     font-size: 14px;
-    font-family: inherit;
+    font-family: var(--mc-font);
+    background: var(--mc-surface);
+    color: var(--mc-text);
 }
 
 .form-group select:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: #3498db;
-    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.1);
+    border-color: var(--mc-accent);
+    box-shadow: 0 0 0 3px var(--mc-focus);
 }
 
 .radio-group {
@@ -61,14 +65,14 @@
     gap: 12px;
     margin-top: 30px;
     padding-top: 20px;
-    border-top: 1px solid #f0f2f5;
+    border-top: 1px solid var(--mc-border);
 }
 
 .error-message {
-    background-color: #fee;
-    color: #e74c3c;
+    background-color: var(--mc-danger-bg);
+    color: var(--mc-danger);
     padding: 10px;
-    border-radius: 6px;
+    border-radius: var(--mc-radius-control);
     margin-bottom: 20px;
     font-size: 14px;
 }

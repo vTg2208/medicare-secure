@@ -34,7 +34,7 @@ function LabQueue({ tests, onSelect }) {
                                     <td className="p-3">
                                         <button
                                             onClick={() => onSelect(test)}
-                                            className="px-3 py-1.5 bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400 font-medium text-xs rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
+                                            className="px-3 py-1.5 bg-primary-50 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400 font-medium text-xs rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900/50 transition-colors"
                                         >
                                             View Details
                                         </button>

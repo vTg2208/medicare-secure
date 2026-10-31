@@ -32,9 +32,9 @@ const IMAGING_TESTS = [
 ];
 
 const PRIORITIES = [
-    { value: 'ROUTINE', label: 'Routine', color: '#16a34a' },
-    { value: 'URGENT', label: 'Urgent', color: '#d97706' },
-    { value: 'STAT', label: 'STAT (Emergency)', color: '#dc2626' },
+    { value: 'ROUTINE', label: 'Routine', color: 'var(--mc-success)', background: 'var(--mc-success-bg)', border: 'var(--mc-success-border)' },
+    { value: 'URGENT', label: 'Urgent', color: 'var(--mc-warning)', background: 'var(--mc-warning-bg)', border: 'var(--mc-warning-border)' },
+    { value: 'STAT', label: 'STAT (Emergency)', color: 'var(--mc-danger)', background: 'var(--mc-danger-bg)', border: 'var(--mc-danger-border)' },
 ];
 
 // ─── Modal ────────────────────────────────────────────────────────────────────
@@ -124,7 +124,7 @@ function OrderTestsModal({ patientId, patientName, visitId, onClose, initialTab 
                     /* ── Success State ── */
                     <div className="ot-success">
                         <div className="ot-success-icon">
-                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#16a34a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--mc-success)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="M22 11.08V12a10 10 0 11-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" />
                             </svg>
                         </div>
@@ -186,7 +186,7 @@ function OrderTestsModal({ patientId, patientName, visitId, onClose, initialTab 
                                 <label className="ot-label">Priority</label>
                                 <div className="ot-priority-group">
                                     {PRIORITIES.map(p => (
-                                        <label key={p.value} className={`ot-priority-btn${priority === p.value ? ' active' : ''}`} style={priority === p.value ? { borderColor: p.color, color: p.color, background: p.color + '15' } : {}}>
+                                        <label key={p.value} className={`ot-priority-btn${priority === p.value ? ' active' : ''}`} style={priority === p.value ? { borderColor: p.border, color: p.color, background: p.background } : {}}>
                                             <input
                                                 type="radio"
                                                 name="priority"

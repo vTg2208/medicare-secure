@@ -1,29 +1,31 @@
 /* Delegation Form Styling */
 
 .delegation-form-container {
-    background: var(--white);
-    border-radius: var(--radius-lg);
+    background: var(--mc-surface);
+    border-radius: var(--mc-radius-panel);
     padding: 32px;
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--mc-shadow-panel);
     max-width: 900px;
     margin: 0 auto;
+    border: 1px solid var(--mc-border);
+    color: var(--mc-text);
 }
 
 .delegation-header {
     margin-bottom: 32px;
-    border-bottom: 2px solid var(--gray-200);
+    border-bottom: 1px solid var(--mc-border);
     padding-bottom: 16px;
 }
 
 .delegation-header h3 {
     margin: 0 0 8px 0;
-    color: var(--gray-900);
+    color: var(--mc-text);
     font-size: 24px;
 }
 
 .delegation-subtitle {
     margin: 0;
-    color: var(--gray-600);
+    color: var(--mc-text-muted);
     font-size: 14px;
 }
 
@@ -31,16 +33,16 @@
 .form-section {
     margin-bottom: 32px;
     padding: 24px;
-    background: var(--gray-50);
-    border-radius: var(--radius-md);
-    border: 1px solid var(--gray-200);
+    background: var(--mc-canvas);
+    border-radius: var(--mc-radius-control);
+    border: 1px solid var(--mc-border);
 }
 
 .section-title {
     margin: 0 0 20px 0;
     font-size: 18px;
     font-weight: 600;
-    color: var(--primary-blue);
+    color: var(--mc-accent);
     display: flex;
     align-items: center;
     gap: 8px;
@@ -50,7 +52,7 @@
     content: '';
     width: 4px;
     height: 20px;
-    background: var(--gradient-primary);
+    background: var(--mc-brand);
     border-radius: var(--radius-full);
 }
 
@@ -64,26 +66,26 @@
     margin-bottom: 8px;
     font-size: 14px;
     font-weight: 500;
-    color: var(--gray-700);
+    color: var(--mc-text);
 }
 
 .form-select {
     width: 100%;
     padding: 12px 16px;
-    border: 2px solid var(--gray-300);
-    border-radius: var(--radius-md);
-    font-family: 'Inter', sans-serif;
+    border: 1px solid var(--mc-border-strong);
+    border-radius: var(--mc-radius-control);
+    font-family: var(--mc-font);
     font-size: 15px;
-    color: var(--gray-900);
-    background: var(--white);
+    color: var(--mc-text);
+    background: var(--mc-surface);
     transition: all var(--transition-base);
     cursor: pointer;
 }
 
 .form-select:focus {
     outline: none;
-    border-color: var(--primary-blue);
-    box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+    border-color: var(--mc-accent);
+    box-shadow: 0 0 0 3px var(--mc-focus);
 }
 
 .form-row {
@@ -98,9 +100,9 @@
     align-items: flex-start;
     gap: 8px;
     padding: 12px;
-    background: linear-gradient(135deg, #E6F2FF 0%, #F0F9FF 100%);
-    border-radius: var(--radius-md);
-    border: 1px solid var(--primary-blue-light);
+    background: var(--mc-brand-soft);
+    border-radius: var(--mc-radius-control);
+    border: 1px solid var(--mc-brand-soft);
     margin-top: 12px;
 }
 
@@ -112,17 +114,17 @@
 .validity-note p {
     margin: 0;
     font-size: 12px;
-    color: var(--gray-700);
+    color: var(--mc-text);
     line-height: 1.5;
 }
 
 /* Error Alert */
 .error-alert {
     padding: 12px 16px;
-    background: linear-gradient(135deg, #FFE8E8 0%, #FFD6D6 100%);
-    border: 2px solid var(--error-red);
-    border-radius: var(--radius-md);
-    color: var(--error-red);
+    background: var(--mc-danger-bg);
+    border: 1px solid var(--mc-danger-border);
+    border-radius: var(--mc-radius-control);
+    color: var(--mc-danger);
     font-size: 14px;
     font-weight: 500;
     margin-bottom: 20px;
@@ -135,7 +137,7 @@
     justify-content: flex-end;
     margin-top: 8px;
     padding-top: 24px;
-    border-top: 2px solid var(--gray-200);
+    border-top: 1px solid var(--mc-border);
 }
 
 /* Delegation Warning */
@@ -144,12 +146,12 @@
     align-items: flex-start;
     gap: 12px;
     padding: 16px;
-    background: linear-gradient(135deg, #FFF4E6 0%, #FFE8CC 100%);
-    border: 2px solid var(--warning-amber);
-    border-radius: var(--radius-md);
+    background: var(--mc-warning-bg);
+    border: 1px solid var(--mc-warning-border);
+    border-radius: var(--mc-radius-control);
     margin-top: 24px;
     font-size: 13px;
-    color: var(--gray-700);
+    color: var(--mc-text);
 }
 
 .warning-icon {

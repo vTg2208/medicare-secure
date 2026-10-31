@@ -72,7 +72,7 @@ function LabResultUpload({ test, onUploadSuccess }) {
     return (
         <div className="glass-card rounded-3xl p-6">
             <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                <div className="w-10 h-10 rounded-xl bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400">
                     <span className="material-symbols-outlined text-xl">cloud_upload</span>
                 </div>
                 <h4 className="text-xl font-semibold text-slate-800 dark:text-slate-100">Upload Result Form</h4>
@@ -94,7 +94,7 @@ function LabResultUpload({ test, onUploadSuccess }) {
                             type="file"
                             accept=".pdf, .jpg, .jpeg, .png"
                             onChange={handleFileChange}
-                            className="w-full text-sm text-slate-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-600 hover:file:bg-indigo-100 dark:file:bg-indigo-900/30 dark:file:text-indigo-400 dark:hover:file:bg-indigo-900/50 transition-colors"
+                            className="w-full text-sm text-slate-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-600 hover:file:bg-primary-100 dark:file:bg-primary-900/30 dark:file:text-primary-400 dark:hover:file:bg-primary-900/50 transition-colors"
                         />
                     </div>
                 </div>
@@ -106,7 +106,7 @@ function LabResultUpload({ test, onUploadSuccess }) {
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
                         placeholder="Enter any observational notes here..."
-                        className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-slate-800 dark:text-slate-100 transition-all resize-none shadow-sm"
+                        className="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-slate-800 dark:text-slate-100 transition-all resize-none shadow-sm"
                     ></textarea>
                 </div>
 
@@ -114,7 +114,7 @@ function LabResultUpload({ test, onUploadSuccess }) {
                     <button
                         type="submit"
                         disabled={loading || !file}
-                        className={`w-full py-3 px-4 flex items-center justify-center gap-2 text-sm font-bold text-white rounded-xl shadow-md transition-all ${loading || !file ? 'bg-indigo-400 dark:bg-indigo-600/50 cursor-not-allowed cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 hover:shadow-lg dark:hover:shadow-indigo-900/20'}`}
+                        className={`w-full py-3 px-4 flex items-center justify-center gap-2 text-sm font-bold text-white rounded-lg shadow-sm transition-all ${loading || !file ? 'bg-primary-600 opacity-50 cursor-not-allowed' : 'bg-primary-600 hover:bg-primary-700'}`}
                     >
                         {loading ? (
                             <>

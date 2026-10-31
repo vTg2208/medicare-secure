@@ -234,9 +234,9 @@ function ClinicalNotesEditor({ visitId, patientId, onSave, onCancel }) {
             {saveError && (
                 <div style={{
                     marginTop: 12, padding: '10px 16px',
-                    background: 'rgba(239,68,68,0.1)',
-                    border: '1px solid rgba(239,68,68,0.3)',
-                    borderRadius: 10, color: '#dc2626',
+                    background: 'var(--mc-danger-bg)',
+                    border: '1px solid var(--mc-danger-border)',
+                    borderRadius: 'var(--mc-radius-control)', color: 'var(--mc-danger)',
                     fontSize: 13, fontWeight: 500,
                 }}>
                     ⚠ {saveError}

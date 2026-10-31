@@ -1,10 +1,11 @@
 /* Category Filter Styling */
 
 .category-filter-container {
-    background: var(--white);
-    border-radius: var(--radius-lg);
+    background: var(--mc-surface);
+    border-radius: var(--mc-radius-panel);
     padding: 24px;
-    border: 2px solid var(--gray-200);
+    border: 1px solid var(--mc-border);
+    color: var(--mc-text);
 }
 
 .filter-header {
@@ -13,14 +14,14 @@
 
 .filter-header h4 {
     margin: 0 0 4px 0;
-    color: var(--gray-900);
+    color: var(--mc-text);
     font-size: 18px;
     font-weight: 600;
 }
 
 .filter-subtitle {
     margin: 0;
-    color: var(--gray-600);
+    color: var(--mc-text-muted);
     font-size: 13px;
 }
 
@@ -36,9 +37,9 @@
 .category-card {
     position: relative;
     padding: 16px;
-    background: var(--gray-50);
-    border: 2px solid var(--gray-300);
-    border-radius: var(--radius-md);
+    background: var(--mc-canvas);
+    border: 1px solid var(--mc-border-strong);
+    border-radius: var(--mc-radius-control);
     cursor: pointer;
     transition: all var(--transition-base);
     display: flex;
@@ -49,21 +50,20 @@
 }
 
 .category-card:hover {
-    border-color: var(--primary-blue);
-    background: linear-gradient(135deg, #E6F2FF 0%, #F0F9FF 100%);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    border-color: var(--mc-accent);
+    background: var(--mc-brand-soft);
+    box-shadow: var(--mc-shadow-sm);
 }
 
 .category-card.selected {
-    background: var(--gradient-primary);
-    border-color: var(--primary-blue);
-    box-shadow: var(--shadow-blue);
+    background: var(--mc-brand);
+    border-color: var(--mc-accent);
+    box-shadow: var(--mc-shadow-panel);
 }
 
 .category-card.selected .category-label,
 .category-card.selected .category-description {
-    color: var(--white);
+    color: var(--mc-on-brand);
 }
 
 /* Checkmark */
@@ -74,21 +74,21 @@
     width: 20px;
     height: 20px;
     border-radius: var(--radius-full);
-    background: var(--white);
+    background: var(--mc-surface);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 12px;
     font-weight: 700;
-    color: var(--success-green);
-    border: 2px solid var(--gray-300);
+    color: var(--mc-success);
+    border: 1px solid var(--mc-border-strong);
     transition: all var(--transition-base);
 }
 
 .category-card.selected .category-checkmark {
-    background: var(--white);
-    border-color: var(--white);
-    color: var(--primary-blue);
+    background: var(--mc-surface);
+    border-color: var(--mc-surface);
+    color: var(--mc-accent);
 }
 
 /* Category Icon */
@@ -106,13 +106,13 @@
     margin: 0 0 4px 0;
     font-size: 14px;
     font-weight: 600;
-    color: var(--gray-900);
+    color: var(--mc-text);
 }
 
 .category-description {
     margin: 0;
     font-size: 11px;
-    color: var(--gray-600);
+    color: var(--mc-text-muted);
     line-height: 1.4;
 }
 
@@ -122,10 +122,12 @@
     align-items: center;
     gap: 8px;
     padding: 12px 16px;
-    background: linear-gradient(135deg, #E6F2FF 0%, #F0F9FF 100%);
-    border: 2px solid var(--primary-blue);
-    border-radius: var(--radius-md);
+    background: var(--mc-surface);
+    border: 1px solid var(--mc-accent);
+    border-radius: var(--mc-radius-control);
     margin-top: 16px;
+    color: var(--mc-text);
+    font-family: var(--mc-font);
 }
 
 .summary-icon {
@@ -136,7 +138,7 @@
 .summary-text {
     font-size: 13px;
     font-weight: 600;
-    color: var(--primary-blue);
+    color: var(--mc-accent);
 }
 
 /* Responsive */

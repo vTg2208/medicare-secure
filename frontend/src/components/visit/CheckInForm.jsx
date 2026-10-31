@@ -37,9 +37,9 @@ function CheckInForm({ onCheckIn }) {
     };
 
     return (
-        <div className="w-full max-w-md mx-auto bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 p-8 transition-all">
+        <div className="w-full max-w-md mx-auto bg-surface dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 p-8 transition-all">
             <div className="mb-8 text-center">
-                <div className="w-16 h-16 bg-teal-50 dark:bg-slate-700 text-teal-600 dark:text-teal-400 rounded-full flex items-center justify-center text-2xl mx-auto mb-4 border border-teal-100 dark:border-slate-600">
+                <div className="w-16 h-16 bg-primary-50 dark:bg-slate-700 text-primary-600 dark:text-primary-400 rounded-full flex items-center justify-center text-2xl mx-auto mb-4 border border-primary-100 dark:border-slate-600">
                     🏥
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white m-0">Check In for Your Visit</h3>
@@ -54,7 +54,7 @@ function CheckInForm({ onCheckIn }) {
                     <input
                         type="text"
                         id="visitCode"
-                        className="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all text-2xl tracking-[0.5em] text-center font-bold text-gray-900 dark:text-white disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-slate-800"
+                        className="w-full px-4 py-3 bg-surface dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all text-2xl tracking-[0.5em] text-center font-bold text-gray-900 dark:text-white disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-slate-800"
                         value={visitCode}
                         onChange={handleChange}
                         placeholder="000000"
@@ -76,7 +76,7 @@ function CheckInForm({ onCheckIn }) {
                 <button
                     type="submit"
                     disabled={visitCode.length !== 6 || loading}
-                    className="w-full bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white font-semibold py-3 px-4 rounded-lg shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5 active:translate-y-0"
+                    className="w-full text-white font-semibold py-3 px-4 rounded-lg shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed transform active:translate-y-0 bg-primary-600"
                 >
                     {loading ? 'Checking in...' : 'Check In'}
                 </button>

@@ -1,8 +1,3 @@
-/* ========================================
-   BUTTON COMPONENT - Medical Blue Theme
-   Animated, Modern, Professional
-   ======================================== */
-
 .btn {
     position: relative;
     display: inline-flex;
@@ -11,97 +6,69 @@
     gap: 8px;
     padding: 12px 24px;
     border: none;
-    border-radius: var(--radius-md);
+    border-radius: var(--mc-radius-control);
     font-size: 15px;
     font-weight: 600;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--mc-font);
     cursor: pointer;
     transition: all var(--transition-base);
     overflow: hidden;
     user-select: none;
     text-decoration: none;
 }
-
-/* Ripple Effect */
-.btn::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.5);
-    transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
-}
-
-.btn:active::before {
-    width: 300px;
-    height: 300px;
-}
-
-/* ========================================
-   PRIMARY BUTTON - Gradient Blue
-   ======================================== */
 .btn-primary {
-    background: var(--gradient-primary);
-    color: var(--white);
-    box-shadow: var(--shadow-md);
+    background: var(--mc-brand);
+    color: var(--mc-on-brand);
+    box-shadow: var(--mc-shadow-sm);
 }
 
 .btn-primary:hover:not(:disabled) {
-    box-shadow: var(--shadow-blue);
-    transform: translateY(-2px);
-}
-
-.btn-primary:active:not(:disabled) {
-    transform: translateY(0);
+    box-shadow: var(--mc-shadow-sm);
+    background: var(--mc-brand-hover);
 }
 
 /* ========================================
    SECONDARY BUTTON - Outline Style
    ======================================== */
 .btn-secondary {
-    background-color: var(--white);
-    color: var(--primary-blue);
-    border: 2px solid var(--primary-blue);
-    box-shadow: var(--shadow-sm);
+    background-color: var(--mc-surface);
+    color: var(--mc-text);
+    border: 1px solid var(--mc-border-strong);
+    box-shadow: var(--mc-shadow-sm);
 }
 
 .btn-secondary:hover:not(:disabled) {
-    background-color: var(--secondary-sky);
-    border-color: var(--primary-blue-dark);
-    box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
+    background-color: var(--mc-surface-hover);
+    border-color: var(--mc-border-strong);
+    box-shadow: var(--mc-shadow-sm);
 }
 
 /* ========================================
    DANGER BUTTON - Red for Destructive Actions
    ======================================== */
 .btn-danger {
-    background: linear-gradient(135deg, #EF5350 0%, #E53935 100%);
-    color: var(--white);
-    box-shadow: var(--shadow-md);
+    background: var(--mc-danger-solid);
+    color: var(--mc-on-brand);
+    box-shadow: var(--mc-shadow-sm);
 }
 
 .btn-danger:hover:not(:disabled) {
-    box-shadow: 0 10px 30px -5px rgba(239, 83, 80, 0.4);
-    transform: translateY(-2px);
+    box-shadow: var(--mc-shadow-sm);
+    background: color-mix(in srgb, var(--mc-danger-solid) 88%, black);
 }
 
 /* ========================================
    SUCCESS BUTTON - Green
    ======================================== */
 .btn-success {
-    background: linear-gradient(135deg, #00C48C 0%, #00A876 100%);
-    color: var(--white);
-    box-shadow: var(--shadow-md);
+    background: var(--mc-success-solid);
+    color: var(--mc-on-brand);
+    box-shadow: var(--mc-shadow-sm);
 }
 
 .btn-success:hover:not(:disabled) {
-    box-shadow: 0 10px 30px -5px rgba(0, 196, 140, 0.4);
-    transform: translateY(-2px);
+    box-shadow: var(--mc-shadow-sm);
+    background: color-mix(in srgb, var(--mc-success-solid) 88%, black);
 }
 
 /* ========================================
@@ -109,12 +76,12 @@
    ======================================== */
 .btn-ghost {
     background: transparent;
-    color: var(--primary-blue);
+    color: var(--mc-accent);
     border: none;
 }
 
 .btn-ghost:hover:not(:disabled) {
-    background: var(--secondary-sky);
+    background: var(--mc-brand-soft);
 }
 
 /* ========================================
@@ -123,8 +90,7 @@
 .btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-    transform: none !important;
-    box-shadow: none !important;
+    box-shadow: none;
 }
 
 /* ========================================
@@ -146,17 +112,17 @@
     margin-left: -8px;
     margin-top: -8px;
     border: 2px solid transparent;
-    border-top-color: currentColor;
+    border-top-color: var(--mc-accent);
     border-radius: 50%;
     animation: spin 0.6s linear infinite;
 }
 
 .btn-primary.btn-loading::after {
-    border-top-color: var(--white);
+    border-top-color: var(--mc-on-brand);
 }
 
 .btn-secondary.btn-loading::after {
-    border-top-color: var(--primary-blue);
+    border-top-color: var(--mc-accent);
 }
 
 /* ========================================
@@ -179,7 +145,7 @@
     width: 40px;
     height: 40px;
     padding: 0;
-    border-radius: var(--radius-full);
+    border-radius: var(--mc-radius-control);
 }
 
 .btn-icon-sm {
@@ -205,49 +171,6 @@
 }
 
 /* ========================================
-   PULSE ANIMATION for Call-to-Action
-   ======================================== */
-.btn-pulse {
-    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes pulse {
-
-    0%,
-    100% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0.8;
-    }
-}
-
-/* ========================================
-   GLOW EFFECT
-   ======================================== */
-.btn-glow {
-    position: relative;
-}
-
-.btn-glow::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border-radius: inherit;
-    opacity: 0;
-    transition: opacity var(--transition-base);
-    box-shadow: 0 0 20px var(--primary-blue);
-}
-
-.btn-glow:hover::after {
-    opacity: 0.5;
-}
-
-/* ========================================
    RESPONSIVE
    ======================================== */
 @media (max-width: 768px) {
@@ -260,4 +183,12 @@
         padding: 14px 28px;
         font-size: 16px;
     }
+}
+.btn-danger.btn-loading::after,
+.btn-success.btn-loading::after {
+    border-top-color: var(--mc-on-brand);
+}
+.btn:focus-visible {
+    outline: 2px solid var(--mc-accent);
+    outline-offset: 3px;
 }

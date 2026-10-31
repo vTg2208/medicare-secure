@@ -16,14 +16,15 @@
     align-items: center;
     gap: 12px;
     padding: 16px 20px;
-    background: var(--white);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-xl);
+    background: var(--mc-surface);
+    border-radius: var(--mc-radius-panel);
+    box-shadow: var(--mc-shadow-overlay);
     min-width: 320px;
     max-width: 400px;
-    border-left: 4px solid;
+    border: 1px solid var(--mc-border);
     pointer-events: all;
     animation: slideInRight 0.3s ease-out;
+    color: var(--mc-text);
 }
 
 @keyframes slideInRight {
@@ -40,23 +41,23 @@
 
 /* Toast Types */
 .toast-info {
-    border-left-color: var(--info-blue);
-    background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+    background: var(--mc-info-bg);
+    border-color: var(--mc-info-border);
 }
 
 .toast-success {
-    border-left-color: var(--success-green);
-    background: linear-gradient(135deg, #ffffff 0%, #E8F5F3 100%);
+    background: var(--mc-success-bg);
+    border-color: var(--mc-success-border);
 }
 
 .toast-warning {
-    border-left-color: var(--warning-amber);
-    background: linear-gradient(135deg, #ffffff 0%, #FFF4E6 100%);
+    background: var(--mc-warning-bg);
+    border-color: var(--mc-warning-border);
 }
 
 .toast-error {
-    border-left-color: var(--error-red);
-    background: linear-gradient(135deg, #ffffff 0%, #FFE8E8 100%);
+    background: var(--mc-danger-bg);
+    border-color: var(--mc-danger-border);
 }
 
 /* Toast Icon */
@@ -69,7 +70,7 @@
 .toast-message {
     flex: 1;
     font-size: 14px;
-    color: var(--gray-900);
+    color: var(--mc-text);
     font-weight: 500;
     line-height: 1.5;
 }
@@ -79,11 +80,11 @@
     flex-shrink: 0;
     background: transparent;
     border: none;
-    color: var(--gray-500);
+    color: var(--mc-text-muted);
     font-size: 18px;
     cursor: pointer;
     padding: 4px;
-    border-radius: var(--radius-md);
+    border-radius: var(--mc-radius-control);
     transition: all var(--transition-base);
     width: 24px;
     height: 24px;
@@ -93,8 +94,8 @@
 }
 
 .toast-close:hover {
-    background: var(--gray-200);
-    color: var(--gray-900);
+    background: var(--mc-border);
+    color: var(--mc-text);
 }
 
 /* Responsive */
@@ -108,5 +109,6 @@
     .notification-toast {
         min-width: auto;
         max-width: none;
+        border: 1px solid var(--mc-border);
     }
 }

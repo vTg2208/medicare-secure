@@ -1,11 +1,13 @@
 /* Staff Assignment Styling */
 
 .staff-assignment-container {
-    background: var(--white);
-    border-radius: var(--radius-lg);
+    background: var(--mc-surface);
+    border-radius: var(--mc-radius-panel);
     padding: 24px;
     max-width: 1000px;
     margin: 0 auto;
+    border: 1px solid var(--mc-border);
+    color: var(--mc-text);
 }
 
 .assignment-header {
@@ -16,13 +18,13 @@
     margin: 0 0 8px 0;
     font-size: 22px;
     font-weight: 600;
-    color: var(--gray-900);
+    color: var(--mc-text);
 }
 
 .assignment-subtitle {
     margin: 0;
     font-size: 14px;
-    color: var(--gray-600);
+    color: var(--mc-text-muted);
 }
 
 /* Role Filter */
@@ -35,27 +37,27 @@
 
 .filter-chip {
     padding: 8px 16px;
-    background: var(--gray-100);
-    border: 2px solid var(--gray-300);
-    border-radius: var(--radius-full);
+    background: var(--mc-surface-muted);
+    border: 1px solid var(--mc-border-strong);
+    border-radius: var(--mc-radius-control);
     font-size: 13px;
     font-weight: 600;
-    color: var(--gray-700);
+    color: var(--mc-text);
     cursor: pointer;
     transition: all var(--transition-base);
 }
 
 .filter-chip:hover {
-    border-color: var(--primary-blue);
-    color: var(--primary-blue);
-    background: var(--secondary-sky);
+    border-color: var(--mc-accent);
+    color: var(--mc-accent);
+    background: var(--mc-brand-soft);
 }
 
 .filter-chip.active {
-    background: var(--gradient-primary);
-    border-color: var(--primary-blue);
-    color: var(--white);
-    box-shadow: var(--shadow-md);
+    background: var(--mc-brand);
+    border-color: var(--mc-accent);
+    color: var(--mc-on-brand);
+    box-shadow: var(--mc-shadow-panel);
 }
 
 /* Staff List Container */
@@ -72,27 +74,27 @@
 
 /* Staff Item */
 .staff-item {
-    background: var(--gray-50);
-    border: 2px solid var(--gray-200);
-    border-radius: var(--radius-lg);
+    background: var(--mc-canvas);
+    border: 1px solid var(--mc-border);
+    border-radius: var(--mc-radius-panel);
     padding: 16px;
     transition: all var(--transition-base);
     position: relative;
 }
 
 .staff-item:hover {
-    border-color: var(--primary-blue);
-    box-shadow: var(--shadow-md);
+    border-color: var(--mc-accent);
+    box-shadow: var(--mc-shadow-sm);
 }
 
 .staff-item.off-shift {
     opacity: 0.6;
-    background: var(--gray-100);
+    background: var(--mc-surface-muted);
 }
 
 .staff-item.assigned {
-    border-color: var(--success-green);
-    background: linear-gradient(135deg, #E8F5F3 0%, #ffffff 100%);
+    border-color: var(--mc-success-border);
+    background: var(--mc-success-bg);
 }
 
 /* Staff Item Header */
@@ -109,8 +111,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--gradient-primary);
-    color: var(--white);
+    background: var(--mc-brand);
+    color: var(--mc-on-brand);
     border-radius: var(--radius-full);
     font-size: 14px;
     font-weight: 700;
@@ -125,7 +127,7 @@
     margin: 0 0 4px 0;
     font-size: 15px;
     font-weight: 600;
-    color: var(--gray-900);
+    color: var(--mc-text);
 }
 
 .role-badge {
@@ -139,28 +141,28 @@
 }
 
 .role-nurse {
-    background: linear-gradient(135deg, #E6F2FF 0%, #D9ECFF 100%);
-    color: var(--primary-blue);
+    background: var(--mc-brand-soft);
+    color: var(--mc-accent);
 }
 
 .role-lab {
-    background: linear-gradient(135deg, #E8F5F3 0%, #D4F1E8 100%);
-    color: var(--primary-teal);
+    background: var(--mc-success-bg);
+    color: var(--mc-success);
 }
 
 .role-radiology {
-    background: linear-gradient(135deg, #F0F4FF 0%, #E6ECFF 100%);
-    color: #5B7FDB;
+    background: var(--mc-brand-soft);
+    color: var(--mc-accent);
 }
 
 .role-pharmacy {
-    background: linear-gradient(135deg, #FFF4E6 0%, #FFE8CC 100%);
-    color: var(--warning-amber);
+    background: var(--mc-warning-bg);
+    color: var(--mc-warning);
 }
 
 .role-default {
-    background: var(--gray-200);
-    color: var(--gray-700);
+    background: var(--mc-border);
+    color: var(--mc-text);
 }
 
 /* Staff Item Details */
@@ -179,13 +181,13 @@
 
 .detail-label {
     font-size: 12px;
-    color: var(--gray-600);
+    color: var(--mc-text-muted);
     font-weight: 500;
 }
 
 .detail-value {
     font-size: 12px;
-    color: var(--gray-900);
+    color: var(--mc-text);
     font-weight: 600;
 }
 
@@ -198,13 +200,13 @@
 }
 
 .status-indicator.on-shift {
-    background: var(--success-green);
-    color: var(--white);
+    background: var(--mc-success-solid);
+    color: var(--mc-on-brand);
 }
 
 .status-indicator.off-shift {
-    background: var(--gray-400);
-    color: var(--white);
+    background: var(--mc-surface-muted);
+    color: var(--mc-text-muted);
 }
 
 /* Staff Item Actions */
@@ -217,10 +219,10 @@
 .off-shift-warning {
     margin-top: 8px;
     padding: 8px;
-    background: linear-gradient(135deg, #FFF4E6 0%, #FFE8CC 100%);
-    border-radius: var(--radius-md);
+    background: var(--mc-warning-bg);
+    border-radius: var(--mc-radius-control);
     font-size: 11px;
-    color: var(--warning-amber);
+    color: var(--mc-warning);
     font-weight: 600;
     text-align: center;
 }
@@ -238,7 +240,7 @@
 
 .loading-state p,
 .empty-state p {
-    color: var(--gray-600);
+    color: var(--mc-text-muted);
     font-size: 14px;
     margin: 0;
 }
@@ -250,7 +252,7 @@
 
 .empty-state h3 {
     margin: 0;
-    color: var(--gray-700);
+    color: var(--mc-text);
     font-size: 18px;
 }
 

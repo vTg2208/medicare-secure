@@ -1,9 +1,11 @@
 .add-record-form-container {
-    background: white;
-    border-radius: 12px;
+    background: var(--mc-surface);
+    border-radius: var(--mc-radius-panel);
     padding: 2rem;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--mc-shadow-panel);
     margin-bottom: 2rem;
+    border: 1px solid var(--mc-border);
+    color: var(--mc-text);
 }
 
 .form-header {
@@ -12,13 +14,13 @@
     align-items: center;
     margin-bottom: 1.5rem;
     padding-bottom: 1rem;
-    border-bottom: 2px solid #edf2f7;
+    border-bottom: 1px solid var(--mc-border);
 }
 
 .form-header h3 {
     margin: 0;
     font-size: 1.5rem;
-    color: #1a202c;
+    color: var(--mc-text);
     font-weight: 600;
 }
 
@@ -26,7 +28,7 @@
     background: none;
     border: none;
     font-size: 2rem;
-    color: #718096;
+    color: var(--mc-text-muted);
     cursor: pointer;
     line-height: 1;
     padding: 0;
@@ -35,13 +37,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 4px;
+    border-radius: var(--mc-radius-control);
     transition: all 0.2s;
 }
 
 .close-btn:hover {
-    background: #edf2f7;
-    color: #2d3748;
+    background: var(--mc-surface-muted);
+    color: var(--mc-text);
 }
 
 .add-record-form {
@@ -58,7 +60,7 @@
 
 .form-group label {
     font-weight: 600;
-    color: #2d3748;
+    color: var(--mc-text);
     font-size: 0.95rem;
 }
 
@@ -66,19 +68,21 @@
 .form-group select,
 .form-group textarea {
     padding: 0.75rem;
-    border: 2px solid #e2e8f0;
-    border-radius: 8px;
+    border: 1px solid var(--mc-border);
+    border-radius: var(--mc-radius-control);
     font-size: 0.95rem;
-    font-family: inherit;
+    font-family: var(--mc-font);
     transition: all 0.2s;
+    background: var(--mc-surface);
+    color: var(--mc-text);
 }
 
 .form-group input:focus,
 select:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: #0066CC;
-    box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+    border-color: var(--mc-accent);
+    box-shadow: 0 0 0 3px var(--mc-focus);
 }
 
 .form-group textarea {
@@ -88,16 +92,16 @@ select:focus,
 
 .char-count {
     font-size: 0.85rem;
-    color: #718096;
+    color: var(--mc-text-muted);
     text-align: right;
 }
 
 .error-alert {
-    background: #fed7d7;
-    color: #c53030;
+    background: var(--mc-danger-bg);
+    color: var(--mc-danger);
     padding: 1rem;
-    border-radius: 8px;
-    border-left: 4px solid #e53e3e;
+    border-radius: var(--mc-radius-control);
+    border: 1px solid var(--mc-danger-border);
     font-size: 0.95rem;
 }
 
@@ -107,7 +111,7 @@ select:focus,
     justify-content: flex-end;
     margin-top: 1rem;
     padding-top: 1rem;
-    border-top: 1px solid #edf2f7;
+    border-top: 1px solid var(--mc-border);
 }
 
 .form-actions button {

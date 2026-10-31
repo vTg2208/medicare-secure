@@ -1,46 +1,27 @@
-/* ========================================
-   CONSENT CARD - Medical Blue Theme
-   Individual Consent Display
-   ======================================== */
-
 .consent-card {
-    border-radius: var(--radius-lg);
+    border-radius: var(--mc-radius-panel);
     padding: 24px;
     margin-bottom: 20px;
     transition: all var(--transition-base);
     position: relative;
     overflow: hidden;
-    animation: slideIn 0.5s ease-out;
+    border: 1px solid var(--mc-border);
+    background: var(--mc-surface);
+    color: var(--mc-text);
 }
-
-/* Stagger animation */
-.consent-card:nth-child(1) {
-    animation-delay: 0.05s;
-}
-
-.consent-card:nth-child(2) {
-    animation-delay: 0.1s;
-}
-
-.consent-card:nth-child(3) {
-    animation-delay: 0.15s;
-}
-
-/* Status Border - Left Accent */
 .consent-card.active {
-    border-left: 5px solid var(--success-green);
-    background: linear-gradient(to right, rgba(0, 196, 140, 0.02) 0%, var(--white) 100%);
+    border: 1px solid var(--mc-success-border);
+    background: var(--mc-success-bg);
 }
 
 .consent-card.inactive {
     opacity: 0.7;
-    border-left: 5px solid var(--gray-400);
+    border: 1px solid var(--mc-text-subtle);
 }
 
 .consent-card:hover {
-    box-shadow: var(--shadow-lg);
-    transform: translateY(-4px);
-    border-color: var(--primary-blue-light);
+    box-shadow: var(--mc-shadow-sm);
+    border-color: var(--mc-border-strong);
 }
 
 /* ========================================
@@ -52,12 +33,12 @@
     align-items: flex-start;
     margin-bottom: 20px;
     padding-bottom: 16px;
-    border-bottom: 1px solid var(--gray-100);
+    border-bottom: 1px solid var(--mc-border);
 }
 
 .consent-header h4 {
     margin: 0 0 6px 0;
-    color: var(--gray-900);
+    color: var(--mc-text);
     font-size: 18px;
     font-weight: 600;
 }
@@ -65,10 +46,10 @@
 .consent-specialization {
     display: inline-block;
     font-size: 13px;
-    color: var(--gray-600);
-    background: var(--secondary-sky);
+    color: var(--mc-text-muted);
+    background: var(--mc-brand-soft);
     padding: 4px 10px;
-    border-radius: var(--radius-sm);
+    border-radius: var(--mc-radius-control);
     font-weight: 500;
 }
 
@@ -82,26 +63,26 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--mc-shadow-sm);
     animation: fadeIn 0.3s ease-out;
 }
 
 .consent-status.active {
-    background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
-    color: #065F46;
-    border: 1px solid var(--success-green);
+    background: var(--mc-success-bg);
+    color: var(--mc-success);
+    border: 1px solid var(--mc-success-border);
 }
 
 .consent-status.revoked {
-    background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
-    color: #991B1B;
-    border: 1px solid var(--error-red);
+    background: var(--mc-danger-bg);
+    color: var(--mc-danger);
+    border: 1px solid var(--mc-danger-border);
 }
 
 .consent-status.expired {
-    background: linear-gradient(135deg, #F3F4F6 0%, #E5E7EB 100%);
-    color: #6B7280;
-    border: 1px solid var(--gray-300);
+    background: var(--mc-surface-muted);
+    color: var(--mc-text-muted);
+    border: 1px solid var(--mc-border-strong);
 }
 
 /* ========================================
@@ -116,7 +97,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 12px 0;
-    border-bottom: 1px solid var(--gray-100);
+    border-bottom: 1px solid var(--mc-border);
     transition: background var(--transition-fast);
 }
 
@@ -125,16 +106,16 @@
 }
 
 .consent-detail-row:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--mc-surface-hover);
     margin: 0 -8px;
     padding-left: 8px;
     padding-right: 8px;
-    border-radius: var(--radius-sm);
+    border-radius: var(--mc-radius-control);
 }
 
 .detail-label {
     font-size: 13px;
-    color: var(--gray-600);
+    color: var(--mc-text-muted);
     font-weight: 500;
     display: flex;
     align-items: center;
@@ -143,14 +124,14 @@
 
 .detail-label::before {
     content: '•';
-    color: var(--primary-blue);
+    color: var(--mc-accent);
     font-size: 18px;
     font-weight: bold;
 }
 
 .detail-value {
     font-size: 14px;
-    color: var(--gray-900);
+    color: var(--mc-text);
     font-weight: 500;
     text-align: right;
 }
@@ -161,7 +142,7 @@
 .consent-actions {
     margin-top: 20px;
     padding-top: 16px;
-    border-top: 1px solid var(--gray-100);
+    border-top: 1px solid var(--mc-border);
     display: flex;
     justify-content: flex-end;
     gap: 12px;
@@ -173,6 +154,7 @@
 @media (max-width: 768px) {
     .consent-card {
         padding: 20px;
+        background: var(--mc-surface);
     }
 
     .consent-header {

@@ -8,13 +8,15 @@
     align-items: center;
     gap: 12px;
     padding: 16px 20px;
-    background: var(--white);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-xl);
+    background: var(--mc-surface);
+    border-radius: var(--mc-radius-panel);
+    box-shadow: var(--mc-shadow-overlay);
     min-width: 300px;
     max-width: 500px;
     z-index: 9999;
     animation: slideInRight 0.3s ease-out;
+    border: 1px solid var(--mc-border);
+    color: var(--mc-text);
 }
 
 @keyframes slideInRight {
@@ -38,30 +40,34 @@
     justify-content: center;
     font-size: 14px;
     font-weight: 700;
-    color: white;
+    color: var(--mc-on-brand);
     flex-shrink: 0;
 }
 
 .toast-success .toast-icon {
-    background: var(--success-green);
+    background: var(--mc-success-bg);
+    color: var(--mc-success);
 }
 
 .toast-error .toast-icon {
-    background: var(--error-red);
+    background: var(--mc-danger-bg);
+    color: var(--mc-danger);
 }
 
 .toast-warning .toast-icon {
-    background: var(--warning-amber);
+    background: var(--mc-warning-bg);
+    color: var(--mc-warning);
 }
 
 .toast-info .toast-icon {
-    background: var(--info-blue);
+    background: var(--mc-info-bg);
+    color: var(--mc-info);
 }
 
 .toast-message {
     flex: 1;
     font-size: 14px;
-    color: var(--gray-900);
+    color: var(--mc-text);
     line-height: 1.5;
 }
 
@@ -69,8 +75,8 @@
     width: 24px;
     height: 24px;
     border: none;
-    background: var(--gray-200);
-    color: var(--gray-700);
+    background: var(--mc-border);
+    color: var(--mc-text);
     border-radius: 50%;
     font-size: 12px;
     cursor: pointer;
@@ -79,7 +85,7 @@
 }
 
 .toast-close:hover {
-    background: var(--gray-300);
+    background: var(--mc-border-strong);
 }
 
 /* Responsive */

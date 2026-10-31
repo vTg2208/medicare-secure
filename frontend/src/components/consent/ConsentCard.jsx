@@ -97,28 +97,28 @@ function ConsentCard({ consent, onRevoke, onEdit }) {
     }, [consent.endTime]);
 
     return (
-        <div className={`glass-card p-6 rounded-3xl hover:bg-white/80 dark:hover:bg-slate-800/80 transition-all cursor-pointer group relative overflow-hidden ${isExpired ? 'opacity-80' : ''}`}>
+        <div className={`glass-card p-6 rounded-3xl hover:bg-surface dark:hover:bg-slate-800/80 transition-all cursor-pointer group relative overflow-hidden ${isExpired ? 'opacity-80' : ''}`}>
             <div className="flex justify-between items-start mb-6 border-b border-gray-100/50 dark:border-slate-700/50 pb-4">
                 <div>
                     <h4 className="text-lg font-bold mb-1 text-slate-800 dark:text-slate-100">{consent.recipientName}</h4>
                     <p className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold">{consent.specialization}</p>
                 </div>
                 <div className="flex flex-col items-end">
-                    <span className={`px-3 py-1 bg-indigo-600 text-white text-[10px] font-bold rounded-lg truncate max-w-[120px] shadow-sm uppercase ${isExpired ? 'bg-slate-400' :
-                            isActive ? 'bg-indigo-600' :
-                                'bg-red-500'
+                    <span className={`px-3 py-1 text-[10px] font-bold rounded-lg truncate max-w-[120px] shadow-sm uppercase ${isExpired ? 'bg-[var(--mc-surface-muted)] text-muted' :
+                            isActive ? 'bg-[var(--mc-success-bg)] text-[var(--mc-success)]' :
+                                'bg-[var(--mc-danger-bg)] text-[var(--mc-danger)]'
                         }`}>
                         {isExpired ? 'EXPIRED' : consent.status}
                     </span>
                     {isActive && consent.endTime && (
-                        <span className="text-xs font-semibold text-indigo-500 dark:text-indigo-400 mt-2 text-right">
+                        <span className="text-xs font-semibold text-primary-500 dark:text-primary-400 mt-2 text-right">
                             {remainingTime}
                         </span>
                     )}
                 </div>
             </div>
 
-            <div className="bg-indigo-50/50 dark:bg-indigo-900/20 p-4 rounded-2xl border border-indigo-100/50 dark:border-indigo-500/10 mb-4 space-y-3">
+            <div className="bg-primary-50/50 dark:bg-primary-900/20 p-4 rounded-2xl border border-primary-100/50 dark:border-primary-500/10 mb-4 space-y-3">
                 <div className="flex justify-between items-center sm:grid sm:grid-cols-3 sm:gap-4">
                     <span className="text-sm font-medium text-slate-700 dark:text-slate-200">Data Category</span>
                     <span className="text-sm font-bold text-slate-900 dark:text-white text-right sm:col-span-2">{formatCategory(consent.dataCategory)}</span>
@@ -146,7 +146,7 @@ function ConsentCard({ consent, onRevoke, onEdit }) {
                 {isActive && (
                     <div className="flex items-center gap-2">
                         <button
-                            className="px-4 py-2 bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 text-xs font-bold rounded-lg transition-colors shadow-sm"
+                            className="px-4 py-2 bg-primary-50 text-primary-600 dark:bg-primary-500/10 dark:text-primary-400 hover:bg-primary-100 dark:hover:bg-primary-500/20 text-xs font-bold rounded-lg transition-colors shadow-sm"
                             onClick={() => onEdit(consent)}
                         >
                             Edit

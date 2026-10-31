@@ -47,7 +47,7 @@ function VisitCard({ visit, onAction, showActions = true, userRole = 'patient' }
     const visitType = getProp(visit, 'visitType', 'type');
 
     return (
-        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 hover:shadow-md hover:border-teal-200 dark:hover:border-teal-400 transition-all p-5 mb-4">
+        <div className="bg-surface dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 hover:shadow-md hover:border-primary-200 dark:hover:border-primary-400 transition-all p-5 mb-4">
             <div className="visit-card-header flex justify-between items-start mb-4">
                 <div className="visit-info">
                     <h3 className="visit-doctor font-bold text-gray-900 dark:text-white text-lg m-0">

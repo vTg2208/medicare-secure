@@ -6,7 +6,7 @@ function LabTestDetails({ test }) {
     return (
         <div className="glass-card rounded-3xl p-6">
             <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center text-teal-600 dark:text-teal-400">
+                <div className="w-10 h-10 rounded-xl bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400">
                     <span className="material-symbols-outlined text-xl">biotech</span>
                 </div>
                 <h4 className="text-xl font-semibold text-slate-800 dark:text-slate-100">Test Details Panel</h4>

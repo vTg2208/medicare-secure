@@ -132,7 +132,7 @@ function ConsentForm({ onSuccess, onCancel, initialData }) {
         }
     };
     return (
-        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 p-6 md:p-8 mb-6">
+        <div className="bg-surface dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 p-6 md:p-8 mb-6">
             <h3 className="text-xl font-bold text-gray-800 dark:text-white m-0 mb-1">Grant Data Access Consent</h3>
             <p className="text-gray-500 dark:text-gray-400 text-sm mb-6 m-0">
                 Control who can access your medical data and for what purpose
@@ -286,14 +286,14 @@ function ConsentForm({ onSuccess, onCancel, initialData }) {
                     <button
                         type="button"
                         onClick={onCancel}
-                        className="flex-1 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-slate-600 font-semibold py-3 px-4 rounded-lg transition-all"
+                        className="flex-1 bg-surface dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-slate-600 font-semibold py-3 px-4 rounded-lg transition-all"
                     >
                         Cancel
                     </button>
                     <button
                         type="submit"
                         disabled={loading}
-                        className="flex-1 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white font-semibold py-3 px-4 rounded-lg shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5 active:translate-y-0"
+                        className="flex-1 text-white font-semibold py-3 px-4 rounded-lg shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed transform active:translate-y-0 bg-primary-600"
                     >
                         {loading ? 'Processing...' : (initialData ? 'Update Consent' : 'Grant Consent')}
                     </button>
