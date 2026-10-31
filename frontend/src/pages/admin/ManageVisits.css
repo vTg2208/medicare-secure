@@ -1,0 +1,166 @@
+/* Remove container styles as they are now handled by Dashboard.css */
+/* .manage-visits-container { ... } */
+
+.visits-table-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    overflow-x: auto;
+    border: 1px solid #e2e8f0;
+    padding: 1.5rem;
+}
+
+.visits-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1000px;
+}
+
+.visits-table th,
+.visits-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: middle;
+}
+
+.visits-table th {
+    background: linear-gradient(135deg, #0066cc 0%, #004999 100%);
+    color: white;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.visits-table th:first-child {
+    border-top-left-radius: 8px;
+}
+
+.visits-table th:last-child {
+    border-top-right-radius: 8px;
+}
+
+.visits-table tbody tr {
+    transition: background-color 0.2s;
+}
+
+.visits-table tbody tr:hover {
+    background-color: #f7fafc;
+}
+
+.patient-name {
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.25rem;
+}
+
+.patient-email {
+    font-size: 0.875rem;
+    color: #718096;
+}
+
+/* Date and Time Input Styling */
+.date-input,
+.time-input {
+    width: 100%;
+    padding: 0.625rem;
+    border: 2px solid #cbd5e0;
+    border-radius: 6px;
+    background-color: white;
+    font-size: 0.875rem;
+    color: #2d3748;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.date-input:focus,
+.time-input:focus {
+    outline: none;
+    border-color: #0066cc;
+    box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+}
+
+.date-input:hover,
+.time-input:hover {
+    border-color: #0066cc;
+}
+
+/* Staff Select Dropdowns */
+.staff-select {
+    width: 100%;
+    padding: 0.625rem;
+    border: 2px solid #cbd5e0;
+    border-radius: 6px;
+    background-color: white;
+    font-size: 0.875rem;
+    color: #2d3748;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.staff-select:focus {
+    outline: none;
+    border-color: #0066cc;
+    box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+}
+
+.staff-select:hover {
+    border-color: #0066cc;
+}
+
+/* Approve Button */
+.assign-btn {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    padding: 0.75rem 1.25rem;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+}
+
+.assign-btn:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+}
+
+.assign-btn:active {
+    transform: translateY(0);
+}
+
+/* Success Message */
+.success-message {
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    color: #065f46;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    border: 2px solid #10b981;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.1);
+}
+
+/* Loading, Error, No Visits States */
+.loading,
+.error,
+.no-visits {
+    text-align: center;
+    padding: 3rem;
+    color: #718096;
+    font-size: 1rem;
+}
+
+.error {
+    color: #e53e3e;
+    font-weight: 500;
+}
+
+.no-visits {
+    color: #4a5568;
+}

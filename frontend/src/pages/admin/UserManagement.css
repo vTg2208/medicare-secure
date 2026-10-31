@@ -1,0 +1,267 @@
+/* ============================================================
+   User Management — Teal Dashboard Theme
+   ============================================================ */
+
+.dashboard-container {
+    padding: 0;
+    min-height: 100vh;
+    background: #f8fafc;
+    font-family: 'Inter', sans-serif;
+}
+
+/* ── Header ── */
+.dashboard-header {
+    background: linear-gradient(135deg, #326773 0%, #438a99 70%, #54acbf 100%) !important;
+    padding: 1.25rem 4%;
+    color: white;
+    margin-bottom: 0;
+    box-shadow: 0 4px 12px rgba(50, 103, 115, 0.2);
+    border-bottom: none;
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dashboard-header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #ffffff !important;
+}
+
+.dashboard-header .back-btn {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    color: white !important;
+    padding: 6px 14px !important;
+    border-radius: 6px !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.2s !important;
+}
+
+.dashboard-header .back-btn:hover {
+    background: rgba(255, 255, 255, 0.25) !important;
+    transform: translateY(-1px);
+}
+
+.header-subtitle {
+    margin: 4px 0 0;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.95) !important;
+    opacity: 1 !important;
+}
+
+/* ── Content ── */
+.dashboard-content {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1.5rem 4%;
+}
+
+/* ── Filters ── */
+.filters-container {
+    background: white;
+    padding: 1rem;
+    /* Reduced from 1.5rem */
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f1f5f9;
+    margin: -1.5rem auto 1.5rem;
+    /* Reduced bottom margin */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    position: relative;
+    z-index: 10;
+}
+
+.search-box {
+    flex: 1;
+}
+
+.search-input {
+    width: 100%;
+    padding: 8px 14px;
+    /* More compact */
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    background: #f8fafc;
+}
+
+.filter-group {
+    display: flex;
+    gap: 10px;
+}
+
+.filter-select {
+    padding: 8px 14px;
+    /* More compact */
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    background: white;
+    color: #475569;
+}
+
+/* ── Table ── */
+.users-table-container {
+    background: white;
+    border-radius: 12px;
+    padding: 1.25rem;
+    /* Reduced from 1.5rem */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f1f5f9;
+    margin-bottom: 2rem;
+}
+
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.users-table th {
+    text-align: left;
+    padding: 0.75rem 1rem;
+    /* Reduced from 1rem */
+    font-size: 0.7rem;
+    /* Reduced from 0.75rem */
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #ffffff;
+    background: #438a99;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.users-table th:first-child {
+    border-top-left-radius: 10px;
+}
+
+.users-table th:last-child {
+    border-top-right-radius: 10px;
+}
+
+.users-table td {
+    padding: 0.75rem 1rem;
+    /* Reduced from 1.25rem */
+    font-size: 0.9rem;
+    color: #334155;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+/* ── Badges ── */
+.role-badge,
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.badge-admin {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.badge-doctor {
+    background: #e0f2fe;
+    color: #075985;
+}
+
+.badge-nurse {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.badge-patient {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.status-active {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-inactive {
+    background: #f1f5f9;
+    color: #94a3b8;
+}
+
+/* ── Button ── */
+.deactivate-btn {
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid #fca5a5;
+    background: white;
+    color: #e11d48;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.deactivate-btn:hover {
+    background: #fff1f2;
+}
+
+/* ── Stats Summary ── */
+.stats-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+.stat-box {
+    background: #5296a6;
+    /* Theme Teal */
+    padding: 1.5rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(50, 103, 115, 0.1);
+    border: none;
+    text-align: center;
+    transition: transform 0.2s;
+}
+
+.stat-box:hover {
+    transform: translateY(-5px);
+}
+
+.stat-value {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #ffffff;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.9);
+    text-transform: uppercase;
+}
+
+.stat-icon {
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+    color: white;
+}
+
+.stat-icon svg {
+    width: 22px;
+    height: 22px;
+}

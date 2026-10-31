@@ -1,0 +1,84 @@
+/* Diagnosis Form Styling */
+
+.diagnosis-form-container {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    box-shadow: var(--shadow-lg);
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+/* Immutability Notice */
+.immutability-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+    background: linear-gradient(135deg, #FFF4E6 0%, #FFE8CC 100%);
+    border-left: 4px solid var(--warning-amber);
+    border-radius: var(--radius-md);
+    margin-bottom: 24px;
+}
+
+.notice-icon {
+    font-size: 24px;
+    line-height: 1;
+}
+
+.immutability-notice strong {
+    display: block;
+    color: var(--gray-900);
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.immutability-notice p {
+    margin: 0;
+    color: var(--gray-700);
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+/* Select Field */
+.select-field {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: var(--gray-900);
+    background: var(--white);
+    transition: all var(--transition-base);
+    cursor: pointer;
+}
+
+.select-field:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+}
+
+.select-field option {
+    padding: 8px;
+}
+
+/* Form Styling */
+.diagnosis-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .diagnosis-form-container {
+        padding: 24px 20px;
+    }
+
+    .immutability-notice {
+        flex-direction: column;
+        gap: 8px;
+    }
+}

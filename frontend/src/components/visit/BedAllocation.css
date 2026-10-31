@@ -1,0 +1,391 @@
+/* Bed Allocation Styling */
+
+.bed-allocation-container {
+    width: 100%;
+    padding: 24px;
+}
+
+.bed-allocation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    background: var(--gradient-primary);
+    padding: 32px;
+    border-radius: var(--radius-lg);
+    margin-bottom: 24px;
+    box-shadow: var(--shadow-lg);
+}
+
+.bed-allocation-header h3 {
+    margin: 0 0 8px 0;
+    color: var(--white);
+    font-size: 24px;
+}
+
+.bed-allocation-subtitle {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 14px;
+}
+
+/* Bed Stats */
+.bed-stats {
+    display: flex;
+    gap: 16px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-md);
+    backdrop-filter: blur(10px);
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.9);
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-top: 4px;
+}
+
+/* Ward Selection */
+.ward-selection {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+}
+
+.ward-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: var(--gray-100);
+    border: 2px solid var(--gray-300);
+    border-radius: var(--radius-full);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-700);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all var(--transition-base);
+}
+
+.ward-chip:hover {
+    border-color: var(--primary-blue);
+    color: var(--primary-blue);
+    background: var(--secondary-sky);
+}
+
+.ward-chip.active {
+    background: var(--gradient-primary);
+    border-color: var(--primary-blue);
+    color: var(--white);
+    box-shadow: var(--shadow-md);
+}
+
+.ward-icon {
+    font-size: 18px;
+}
+
+.ward-name {
+    font-size: 13px;
+}
+
+/* Bed Content */
+.bed-content {
+    position: relative;
+}
+
+/* Bed Grid */
+.bed-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+/* Bed Card */
+.bed-card {
+    background: var(--white);
+    border: 2px solid var(--gray-300);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    min-height: 140px;
+    display: flex;
+    flex-direction: column;
+}
+
+.bed-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.bed-card.selected {
+    border-color: var(--primary-blue);
+    box-shadow: var(--shadow-blue);
+}
+
+.bed-card.bed-available {
+    border-color: var(--success-green);
+    background: linear-gradient(135deg, #E8F5F3 0%, #ffffff 100%);
+}
+
+.bed-card.bed-occupied {
+    border-color: var(--warning-amber);
+    background: linear-gradient(135deg, #FFF4E6 0%, #ffffff 100%);
+}
+
+.bed-card.bed-maintenance {
+    border-color: var(--gray-400);
+    background: var(--gray-100);
+    opacity: 0.7;
+}
+
+/* Bed Card Header */
+.bed-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.bed-number {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gray-900);
+}
+
+.bed-status {
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.bed-status.bed-available {
+    background: var(--success-green);
+    color: var(--white);
+}
+
+.bed-status.bed-occupied {
+    background: var(--warning-amber);
+    color: var(--white);
+}
+
+.bed-status.bed-maintenance {
+    background: var(--gray-500);
+    color: var(--white);
+}
+
+/* Bed Patient Info */
+.bed-patient-info {
+    flex: 1;
+    margin-bottom: 8px;
+}
+
+.bed-patient-info h4 {
+    margin: 0 0 4px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.patient-id,
+.patient-admitted {
+    margin: 2px 0;
+    font-size: 11px;
+    color: var(--gray-600);
+}
+
+/* Bed Meta */
+.bed-meta {
+    font-size: 11px;
+    color: var(--gray-500);
+    padding-top: 8px;
+    border-top: 1px solid var(--gray-300);
+}
+
+/* Bed Actions Panel */
+.bed-actions-panel {
+    position: fixed;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 320px;
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    border: 2px solid var(--primary-blue);
+    z-index: 100;
+    animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateY(-50%) translateX(50px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(-50%) translateX(0);
+    }
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background: var(--gradient-primary);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.panel-header h4 {
+    margin: 0;
+    color: var(--white);
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.close-panel {
+    background: transparent;
+    border: none;
+    color: var(--white);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    transition: all var(--transition-base);
+}
+
+.close-panel:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.panel-content {
+    padding: 20px;
+}
+
+.action-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.action-description {
+    margin: 0;
+    font-size: 13px;
+    color: var(--gray-600);
+    line-height: 1.5;
+}
+
+.patient-details {
+    padding: 12px;
+    background: var(--gray-50);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--gray-300);
+}
+
+.patient-details h5 {
+    margin: 0 0 8px 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--primary-blue);
+}
+
+.patient-details p {
+    margin: 4px 0;
+    font-size: 12px;
+    color: var(--gray-700);
+}
+
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.action-buttons button {
+    width: 100%;
+}
+
+/* Loading State */
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 20px;
+    gap: 16px;
+}
+
+.loading-state p {
+    color: var(--gray-600);
+    font-size: 14px;
+    margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .bed-allocation-container {
+        padding: 16px;
+    }
+
+    .bed-allocation-header {
+        flex-direction: column;
+        gap: 16px;
+        padding: 24px 20px;
+    }
+
+    .bed-stats {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .stat-item {
+        padding: 8px 12px;
+    }
+
+    .stat-value {
+        font-size: 20px;
+    }
+
+    .bed-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .bed-actions-panel {
+        position: fixed;
+        right: 12px;
+        left: 12px;
+        width: auto;
+        bottom: 12px;
+        top: auto;
+        transform: none;
+    }
+}

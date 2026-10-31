@@ -1,0 +1,11 @@
+const express = require('express');
+const router = express.Router();
+const controller = require('./chatbot.controller');
+const { authenticate, authorize } = require('../../middleware/auth.middleware');
+router.use(authenticate);
+router.post('/start', authorize('patient'), controller.startSession);
+router.post('/message', authorize('patient'), controller.sendMessage);
+router.post('/analyze', authorize('patient'), controller.analyzeSession);
+router.get('/summary/:id', authorize(['patient', 'doctor']), controller.getSummary);
+router.get('/sessions', authorize('doctor'), controller.getAllSessions);
+module.exports = router;

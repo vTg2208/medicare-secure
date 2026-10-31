@@ -1,0 +1,252 @@
+/* ========================================
+   CONSENT FORM - Medical Blue Theme
+   Grant Consent Interface
+   ======================================== */
+
+.consent-form-container {
+    border-radius: var(--radius-xl);
+    padding: 32px;
+    margin-bottom: 32px;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.consent-form-container h3 {
+    margin: 0 0 8px 0;
+    color: var(--gray-900);
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.consent-subtitle {
+    color: var(--gray-600);
+    margin-bottom: 28px;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* ========================================
+   FORM STYLING
+   ======================================== */
+.consent-form-container form {
+    animation: slideIn 0.6s ease-out 0.1s both;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray-700);
+}
+
+/* ========================================
+   SELECT DROPDOWN - Enhanced
+   ======================================== */
+.form-select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    font-size: 15px;
+    font-family: 'Inter', sans-serif;
+    color: var(--gray-800);
+    background-color: var(--white);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%230066CC' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 40px;
+}
+
+.form-select:hover {
+    border-color: var(--primary-blue-light);
+}
+
+.form-select:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+}
+
+/* ========================================
+   FORM ROW - Two Column Layout
+   ======================================== */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+/* ========================================
+   CHECKBOX GROUP - Enhanced
+   ======================================== */
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 20px 0;
+    padding: 16px;
+    background: var(--secondary-sky);
+    border-radius: var(--radius-md);
+    border: 2px solid var(--primary-blue-light);
+    transition: all var(--transition-base);
+}
+
+.checkbox-group:hover {
+    background: var(--secondary-lavender);
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: var(--primary-blue);
+}
+
+.checkbox-group label {
+    font-size: 14px;
+    color: var(--gray-800);
+    cursor: pointer;
+    font-weight: 500;
+    margin: 0;
+}
+
+/* ========================================
+   FORM ACTIONS - Button Group
+   ======================================== */
+.form-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 2px solid var(--gray-100);
+}
+
+/* ========================================
+   WARNING BOX - Privacy Notice
+   ======================================== */
+.consent-warning {
+    margin-top: 20px;
+    padding: 16px;
+    background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+    border-radius: var(--radius-md);
+    font-size: 13px;
+    color: #92400E;
+    line-height: 1.6;
+    border-left: 4px solid var(--warning-amber);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.consent-warning::before {
+    content: '⚠️';
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+.consent-warning strong {
+    color: #78350F;
+}
+
+/* ========================================
+   DURATION SELECTOR - Custom
+   ======================================== */
+.duration-container {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.duration-field {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: var(--gray-50);
+    padding: 8px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--gray-200);
+    transition: all 0.2s;
+}
+
+.duration-field:focus-within {
+    border-color: var(--primary-blue);
+    background: var(--white);
+    box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+}
+
+.duration-field input {
+    width: 100%;
+    text-align: center;
+    border: none;
+    background: transparent;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--primary-blue);
+    padding: 4px;
+}
+
+.duration-field input:focus {
+    outline: none;
+}
+
+.duration-field label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--gray-500);
+    margin: 0;
+    font-weight: 600;
+}
+
+.duration-field input::placeholder {
+    color: var(--gray-300);
+    font-weight: 400;
+}
+
+/* Chrome, Safari, Edge, Opera */
+.duration-field input::-webkit-outer-spin-button,
+.duration-field input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Firefox */
+.duration-field input[type=number] {
+    -moz-appearance: textfield;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+@media (max-width: 768px) {
+    .consent-form-container {
+        padding: 24px;
+    }
+
+    .consent-form-container h3 {
+        font-size: 20px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .form-actions button {
+        width: 100%;
+    }
+}

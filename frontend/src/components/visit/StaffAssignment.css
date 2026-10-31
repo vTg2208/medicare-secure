@@ -1,0 +1,275 @@
+/* Staff Assignment Styling */
+
+.staff-assignment-container {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.assignment-header {
+    margin-bottom: 24px;
+}
+
+.assignment-header h3 {
+    margin: 0 0 8px 0;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.assignment-subtitle {
+    margin: 0;
+    font-size: 14px;
+    color: var(--gray-600);
+}
+
+/* Role Filter */
+.role-filter {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.filter-chip {
+    padding: 8px 16px;
+    background: var(--gray-100);
+    border: 2px solid var(--gray-300);
+    border-radius: var(--radius-full);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-700);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.filter-chip:hover {
+    border-color: var(--primary-blue);
+    color: var(--primary-blue);
+    background: var(--secondary-sky);
+}
+
+.filter-chip.active {
+    background: var(--gradient-primary);
+    border-color: var(--primary-blue);
+    color: var(--white);
+    box-shadow: var(--shadow-md);
+}
+
+/* Staff List Container */
+.staff-list-container {
+    min-height: 300px;
+}
+
+/* Staff Grid */
+.staff-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+}
+
+/* Staff Item */
+.staff-item {
+    background: var(--gray-50);
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    transition: all var(--transition-base);
+    position: relative;
+}
+
+.staff-item:hover {
+    border-color: var(--primary-blue);
+    box-shadow: var(--shadow-md);
+}
+
+.staff-item.off-shift {
+    opacity: 0.6;
+    background: var(--gray-100);
+}
+
+.staff-item.assigned {
+    border-color: var(--success-green);
+    background: linear-gradient(135deg, #E8F5F3 0%, #ffffff 100%);
+}
+
+/* Staff Item Header */
+.staff-item-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.staff-avatar-small {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gradient-primary);
+    color: var(--white);
+    border-radius: var(--radius-full);
+    font-size: 14px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.staff-info-main {
+    flex: 1;
+}
+
+.staff-info-main h4 {
+    margin: 0 0 4px 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.role-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.role-nurse {
+    background: linear-gradient(135deg, #E6F2FF 0%, #D9ECFF 100%);
+    color: var(--primary-blue);
+}
+
+.role-lab {
+    background: linear-gradient(135deg, #E8F5F3 0%, #D4F1E8 100%);
+    color: var(--primary-teal);
+}
+
+.role-radiology {
+    background: linear-gradient(135deg, #F0F4FF 0%, #E6ECFF 100%);
+    color: #5B7FDB;
+}
+
+.role-pharmacy {
+    background: linear-gradient(135deg, #FFF4E6 0%, #FFE8CC 100%);
+    color: var(--warning-amber);
+}
+
+.role-default {
+    background: var(--gray-200);
+    color: var(--gray-700);
+}
+
+/* Staff Item Details */
+.staff-item-details {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.detail-label {
+    font-size: 12px;
+    color: var(--gray-600);
+    font-weight: 500;
+}
+
+.detail-value {
+    font-size: 12px;
+    color: var(--gray-900);
+    font-weight: 600;
+}
+
+.status-indicator {
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.status-indicator.on-shift {
+    background: var(--success-green);
+    color: var(--white);
+}
+
+.status-indicator.off-shift {
+    background: var(--gray-400);
+    color: var(--white);
+}
+
+/* Staff Item Actions */
+.staff-item-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Off Shift Warning */
+.off-shift-warning {
+    margin-top: 8px;
+    padding: 8px;
+    background: linear-gradient(135deg, #FFF4E6 0%, #FFE8CC 100%);
+    border-radius: var(--radius-md);
+    font-size: 11px;
+    color: var(--warning-amber);
+    font-weight: 600;
+    text-align: center;
+}
+
+/* Loading & Empty States */
+.loading-state,
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    gap: 12px;
+}
+
+.loading-state p,
+.empty-state p {
+    color: var(--gray-600);
+    font-size: 14px;
+    margin: 0;
+}
+
+.empty-icon {
+    font-size: 48px;
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    margin: 0;
+    color: var(--gray-700);
+    font-size: 18px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .staff-assignment-container {
+        padding: 20px 16px;
+    }
+
+    .staff-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .role-filter {
+        gap: 6px;
+    }
+
+    .filter-chip {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+}

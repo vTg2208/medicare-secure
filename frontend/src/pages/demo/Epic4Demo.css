@@ -1,0 +1,159 @@
+/* Epic 4 Demo Page Styling */
+
+.epic4-demo-page {
+    min-height: 100vh;
+    background: var(--gray-50);
+}
+
+/* Demo Header */
+.demo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 32px;
+    background: linear-gradient(135deg, #0066CC 0%, #0052A3 100%);
+    color: var(--white);
+    box-shadow: var(--shadow-lg);
+}
+
+.demo-header h1 {
+    margin: 0 0 4px 0;
+    font-size: 28px;
+}
+
+.demo-header p {
+    margin: 0;
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+/* Demo Navigation */
+.demo-nav {
+    display: flex;
+    gap: 12px;
+    padding: 20px 32px;
+    background: var(--white);
+    border-bottom: 2px solid var(--gray-200);
+    overflow-x: auto;
+}
+
+.demo-nav a {
+    padding: 8px 16px;
+    background: var(--gray-100);
+    border: 2px solid var(--gray-300);
+    border-radius: var(--radius-full);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-700);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all var(--transition-base);
+}
+
+.demo-nav a:hover {
+    border-color: var(--primary-blue);
+    color: var(--primary-blue);
+    background: var(--secondary-sky);
+}
+
+/* Demo Content */
+.demo-content {
+    padding: 24px 32px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Demo Section */
+.demo-section {
+    margin-bottom: 48px;
+    scroll-margin-top: 80px;
+}
+
+.demo-section h2 {
+    margin: 0 0 8px 0;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.section-desc {
+    margin: 0 0 20px 0;
+    font-size: 14px;
+    color: var(--gray-600);
+}
+
+.component-wrapper {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    box-shadow: var(--shadow-md);
+    border: 2px solid var(--gray-200);
+}
+
+.demo-section.full-width .component-wrapper {
+    padding: 0;
+}
+
+/* Demo Info */
+.demo-info {
+    margin: 48px 32px 32px;
+    padding: 24px;
+    background: linear-gradient(135deg, #E6F2FF 0%, #F0F9FF 100%);
+    border-radius: var(--radius-lg);
+    border: 2px solid var(--primary-blue);
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.demo-info h3 {
+    margin: 0 0 16px 0;
+    font-size: 18px;
+    color: var(--primary-blue);
+}
+
+.demo-info ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.demo-info li {
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: var(--gray-700);
+    line-height: 1.6;
+}
+
+.demo-info strong {
+    color: var(--primary-blue);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .demo-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+        padding: 20px;
+    }
+
+    .demo-nav,
+    .demo-content,
+    .demo-info {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .demo-nav {
+        gap: 8px;
+    }
+
+    .demo-nav a {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
+
+    .component-wrapper {
+        padding: 16px;
+    }
+}

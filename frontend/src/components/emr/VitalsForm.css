@@ -1,0 +1,88 @@
+/* Vitals Form Styling */
+
+.vitals-form-container {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    box-shadow: var(--shadow-lg);
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.vitals-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* Read-Only Notice */
+.read-only-notice {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #E6F2FF 0%, #F0F9FF 100%);
+    border-left: 4px solid var(--info-blue);
+    border-radius: var(--radius-md);
+    margin-bottom: 24px;
+    font-size: 14px;
+    color: var(--gray-700);
+}
+
+.notice-icon {
+    font-size: 18px;
+}
+
+/* Vitals Sections */
+.vitals-section {
+    padding: 20px;
+    background: var(--gray-50);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--gray-200);
+}
+
+.section-title {
+    margin: 0 0 16px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--primary-blue);
+}
+
+/* BMI Display */
+.bmi-display {
+    margin-top: 16px;
+    padding: 16px;
+    background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+    border-radius: var(--radius-md);
+    font-size: 18px;
+    color: var(--gray-900);
+    text-align: center;
+}
+
+.bmi-display strong {
+    font-weight: 700;
+    color: var(--success-green);
+}
+
+.bmi-category {
+    display: block;
+    margin-top: 4px;
+    font-size: 14px;
+    color: var(--gray-700);
+    font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .vitals-form-container {
+        padding: 24px 20px;
+    }
+
+    .vitals-section {
+        padding: 16px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}

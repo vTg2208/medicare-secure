@@ -1,0 +1,83 @@
+/* Prescription Form Styling */
+
+.prescription-form-container {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    box-shadow: var(--shadow-lg);
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.prescription-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Form Row for Side-by-Side Inputs */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+/* Prescription Preview */
+.prescription-preview {
+    background: linear-gradient(135deg, #F0F9FF 0%, #E6F2FF 100%);
+    border: 2px dashed var(--primary-blue);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    margin-top: 8px;
+}
+
+.preview-header {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--primary-blue);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.preview-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.preview-content p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--gray-800);
+    line-height: 1.6;
+}
+
+.preview-content strong {
+    color: var(--gray-900);
+    font-weight: 600;
+}
+
+.preview-instructions {
+    margin-top: 8px;
+    padding-top: 12px;
+    border-top: 1px solid var(--gray-300);
+    font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .prescription-form-container {
+        padding: 24px 20px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .prescription-preview {
+        padding: 16px;
+    }
+}

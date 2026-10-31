@@ -1,0 +1,370 @@
+/* ============================================================
+   Hospital Admin Dashboard — Doctor Portal Aesthetic
+   Matches: #326773 → #438a99 → #54acbf
+   ============================================================ */
+
+* {
+    box-sizing: border-box;
+}
+
+/* ── Page ── */
+.ha-container {
+    min-height: 100vh;
+    background: #f8fafc;
+    /* Lighter background like screenshot */
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+}
+
+/* ── Header ── */
+.ha-header {
+    background: linear-gradient(135deg, #326773 0%, #438a99 70%, #54acbf 100%);
+    padding: 1.25rem 4%;
+    box-shadow: 0 4px 12px rgba(50, 103, 115, 0.2);
+    color: white;
+}
+
+.ha-header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.ha-header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.ha-header-icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ha-header-icon svg {
+    width: 22px;
+    height: 22px;
+}
+
+.ha-header-title {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.ha-header-subtitle {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #ffffff;
+    opacity: 1;
+}
+
+.ha-header-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.ha-header-theme-toggle {
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.ha-header-theme-toggle:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.ha-header-theme-toggle svg {
+    width: 18px;
+    height: 18px;
+}
+
+.ha-header-profile-btn {
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: white;
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.ha-header-profile-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-1px);
+}
+
+.ha-header-profile-btn svg {
+    width: 20px;
+    height: 20px;
+}
+
+.ha-header-signout {
+    background: white;
+    border: none;
+    color: #326773;
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.ha-header-signout:hover {
+    background: #f1f5f9;
+    transform: translateY(-1px);
+}
+
+/* ── Content ── */
+.ha-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem 4%;
+}
+
+/* ── User Info Bar ── */
+.ha-info-bar {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 auto 2rem;
+    max-width: 1100px;
+    /* Align with stat grid */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f1f5f9;
+}
+
+.ha-user-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 4px;
+}
+
+.ha-user-role {
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+.ha-status-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f0fdf4;
+    border: 1px solid #bcf0da;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #166534;
+}
+
+.ha-status-dot {
+    width: 8px;
+    height: 8px;
+    background: #22c55e;
+    border-radius: 50%;
+}
+
+/* ── Stats ── */
+.ha-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin: 0 auto 3rem;
+    max-width: 1100px;
+    /* Reduced width to make boxes smaller */
+}
+
+.ha-stat {
+    background: linear-gradient(135deg, #54acbf 0%, #438a99 100%);
+    border-radius: 16px;
+    padding: 2rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    box-shadow: 0 4px 20px rgba(50, 103, 115, 0.15);
+    transition: transform 0.2s, box-shadow 0.2s;
+    min-height: 160px;
+}
+
+.ha-stat.clickable {
+    cursor: pointer;
+}
+
+.ha-stat:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(50, 103, 115, 0.25);
+}
+
+.ha-stat-icon {
+    margin-bottom: 12px;
+    opacity: 0.8;
+}
+
+.ha-stat-icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+.ha-stat-num {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin-bottom: 4px;
+}
+
+.ha-stat-lbl {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    opacity: 0.9;
+}
+
+/* ── Nav Sections ── */
+.ha-nav-section {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.ha-section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ha-section-title::before {
+    content: '';
+    display: block;
+    width: 4px;
+    height: 18px;
+    background: #326773;
+    border-radius: 2px;
+}
+
+.ha-nav-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+}
+
+.ha-nav-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    border: 1px solid #f1f5f9;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    transition: all 0.2s;
+}
+
+.ha-nav-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    border-color: #54acbf;
+}
+
+.ha-nav-card-main {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.ha-nav-icon {
+    width: 44px;
+    height: 44px;
+    background: #f0fdfa;
+    /* Light teal bg */
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #326773;
+}
+
+.ha-nav-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.ha-nav-text h3 {
+    margin: 0 0 4px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.ha-nav-text p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #64748b;
+    line-height: 1.4;
+}
+
+.ha-arrow {
+    color: #cbd5e1;
+    transition: transform 0.2s, color 0.2s;
+}
+
+.ha-arrow svg {
+    width: 20px;
+    height: 20px;
+}
+
+.ha-nav-card:hover .ha-arrow {
+    color: #326773;
+    transform: translateX(4px);
+}
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+    .ha-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .ha-nav-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .ha-stats-grid {
+        gap: 1rem;
+    }
+
+    .ha-header-subtitle {
+        display: none;
+    }
+}

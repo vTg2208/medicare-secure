@@ -1,0 +1,248 @@
+/* ============================================================
+   Audit Logs — Teal Dashboard Theme
+   ============================================================ */
+
+.dashboard-container {
+    padding: 0;
+    min-height: 100vh;
+    background: #f8fafc;
+    font-family: 'Inter', sans-serif;
+}
+
+/* ── Header ── */
+.dashboard-header {
+    background: linear-gradient(135deg, #326773 0%, #438a99 70%, #54acbf 100%) !important;
+    padding: 1.25rem 4%;
+    color: white;
+    margin-bottom: 0;
+    box-shadow: 0 4px 12px rgba(50, 103, 115, 0.2);
+    border-bottom: none;
+}
+
+.header-content {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dashboard-header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: white;
+}
+
+.dashboard-header .back-btn {
+    background: rgba(255, 255, 255, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    color: white !important;
+    padding: 6px 14px !important;
+    border-radius: 6px !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.2s !important;
+}
+
+.dashboard-header .back-btn:hover {
+    background: rgba(255, 255, 255, 0.25) !important;
+    transform: translateY(-1px);
+}
+
+.header-subtitle {
+    margin: 2px 0 0;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.8) !important;
+    opacity: 1 !important;
+}
+
+/* ── Content Area ── */
+.dashboard-content {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1.5rem 4%;
+}
+
+/* ── Filters ── */
+.filters-container {
+    background: white;
+    padding: 0.75rem 1.25rem;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f1f5f9;
+    margin: -1.5rem auto 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    position: relative;
+    z-index: 10;
+}
+
+.search-box {
+    flex: 1;
+    min-width: 200px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 7px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    background: #f8fafc;
+    transition: all 0.2s;
+}
+
+.search-input:focus {
+    background: white;
+    border-color: #54acbf;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(84, 172, 191, 0.1);
+}
+
+.filter-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.filter-select,
+.date-input {
+    padding: 6px 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    background: white;
+    color: #475569;
+    font-family: inherit;
+}
+
+.date-input {
+    width: 130px;
+}
+
+.filter-select {
+    min-width: 140px;
+}
+
+/* ── Logs Table ── */
+.logs-table-container {
+    background: white;
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f1f5f9;
+    overflow-x: auto;
+}
+
+.logs-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.logs-table th {
+    text-align: left;
+    padding: 0.75rem 1rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #64748b;
+    background: transparent;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.logs-table th:first-child {
+    border-top-left-radius: 10px;
+}
+
+.logs-table th:last-child {
+    border-top-right-radius: 10px;
+}
+
+.logs-table td {
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+    color: #334155;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: top;
+}
+
+.timestamp-cell {
+    white-space: nowrap;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.user-cell {
+    font-weight: 600;
+    color: #326773;
+}
+
+.details-cell {
+    max-width: 400px;
+    line-height: 1.4;
+    color: #475569;
+}
+
+.ip-cell {
+    color: #94a3b8;
+    font-family: monospace;
+    font-size: 0.75rem;
+}
+
+/* ── Badges ── */
+.action-badge {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: inline-block;
+}
+
+.badge-success {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.badge-info {
+    background: #e0f2fe;
+    color: #075985;
+}
+
+.badge-warning {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.badge-danger {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.badge-primary {
+    background: #ecfeff;
+    color: #0891b2;
+}
+
+.badge-neutral {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+
+    .filters-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}

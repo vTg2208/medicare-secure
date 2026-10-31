@@ -1,0 +1,12 @@
+/* TriageQueue.css */
+
+.doctor-glass-button {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(10px);
+    color: var(--text-dark);
+}
+
+.dark .doctor-glass-button {
+    background: rgba(30, 41, 59, 0.5);
+    color: var(--text-light);
+}

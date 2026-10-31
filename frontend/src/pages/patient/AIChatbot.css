@@ -1,0 +1,69 @@
+/* AIChatbot.css */
+
+.chatbot-wrapper {
+    /* Base background handled by tailwind classes */
+}
+
+.glass-button {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: var(--text-dark);
+}
+
+.dark .glass-button {
+    background: rgba(30, 41, 59, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    color: var(--text-light);
+}
+
+/* Custom Scrollbar for Chat Area */
+.chatbot-wrapper main div::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chatbot-wrapper main div::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.chatbot-wrapper main div::-webkit-scrollbar-thumb {
+    background-color: rgba(99, 102, 241, 0.2);
+    border-radius: 10px;
+}
+
+.dark .chatbot-wrapper main div::-webkit-scrollbar-thumb {
+    background-color: rgba(99, 102, 241, 0.4);
+}
+
+/* Animations */
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes zoom-in {
+    from {
+        transform: scale(0.95);
+    }
+
+    to {
+        transform: scale(1);
+    }
+}
+
+.animate-in {
+    animation-fill-mode: both;
+}
+
+.fade-in {
+    animation-name: fade-in;
+}
+
+.zoom-in {
+    animation-name: zoom-in;
+}

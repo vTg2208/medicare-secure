@@ -1,0 +1,170 @@
+/* Visit Lifecycle Styling */
+
+.visit-lifecycle {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    border: 2px solid var(--gray-200);
+}
+
+.lifecycle-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.lifecycle-header h4 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.current-stage-badge {
+    padding: 6px 12px;
+    background: var(--gradient-primary);
+    color: var(--white);
+    border-radius: var(--radius-full);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Timeline */
+.lifecycle-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+/* Timeline Stage */
+.timeline-stage {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    position: relative;
+    padding-bottom: 24px;
+}
+
+.timeline-stage:last-child {
+    padding-bottom: 0;
+}
+
+/* Stage Connector */
+.stage-connector-wrapper {
+    position: absolute;
+    left: 19px;
+    top: 40px;
+    bottom: 0;
+    width: 2px;
+}
+
+.stage-connector {
+    width: 100%;
+    height: 100%;
+    background: var(--gray-300);
+    transition: all var(--transition-base);
+}
+
+.stage-connector.completed {
+    background: var(--primary-blue);
+}
+
+.timeline-stage:last-child .stage-connector-wrapper {
+    display: none;
+}
+
+/* Stage Marker */
+.stage-marker {
+    flex-shrink: 0;
+    z-index: 1;
+}
+
+.stage-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--gray-200);
+    border: 3px solid var(--white);
+    border-radius: var(--radius-full);
+    font-size: 18px;
+    transition: all var(--transition-base);
+    box-shadow: var(--shadow-md);
+}
+
+.timeline-stage.completed .stage-icon {
+    background: var(--primary-blue);
+    color: var(--white);
+    font-weight: 700;
+}
+
+.timeline-stage.current .stage-icon {
+    background: var(--gradient-primary);
+    color: var(--white);
+    animation: pulse 2s infinite;
+    box-shadow: var(--shadow-blue);
+}
+
+/* Stage Content */
+.stage-content {
+    flex: 1;
+    padding-top: 4px;
+}
+
+.stage-label {
+    margin: 0 0 4px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.timeline-stage.completed .stage-label {
+    color: var(--primary-blue);
+}
+
+.stage-description {
+    margin: 0 0 6px 0;
+    font-size: 13px;
+    color: var(--gray-600);
+}
+
+.stage-timestamp {
+    display: inline-block;
+    font-size: 12px;
+    color: var(--gray-500);
+    font-weight: 500;
+}
+
+.stage-current-indicator {
+    display: inline-block;
+    margin-left: 12px;
+    padding: 2px 8px;
+    background: linear-gradient(135deg, #E6F2FF 0%, #F0F9FF 100%);
+    color: var(--primary-blue);
+    border-radius: var(--radius-full);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .visit-lifecycle {
+        padding: 20px 16px;
+    }
+
+    .lifecycle-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .stage-content {
+        padding-top: 2px;
+    }
+}

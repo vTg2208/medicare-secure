@@ -1,0 +1,334 @@
+/* Pharmacy Dashboard Styling */
+
+.pharmacy-dashboard {
+    width: 100%;
+    padding: 24px;
+    animation: fadeIn var(--transition-base) ease-out;
+}
+
+.dashboard-header {
+    background: var(--gradient-primary);
+    padding: 32px;
+    border-radius: var(--radius-lg);
+    margin-bottom: 24px;
+    box-shadow: var(--shadow-lg);
+}
+
+.header-content h2 {
+    margin: 0 0 8px 0;
+    color: var(--white);
+    font-size: 28px;
+}
+
+.header-subtitle {
+    margin: 0;
+    color: #FFFFFF;
+    font-size: 14px;
+    opacity: 1;
+}
+
+/* Filter Tabs */
+.filter-tabs {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.filter-tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: var(--white);
+    border: 2px solid var(--gray-300);
+    border-radius: var(--radius-lg);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray-700);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.filter-tab:hover {
+    border-color: var(--primary-blue);
+    color: var(--primary-blue);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.filter-tab.active {
+    background: var(--gradient-primary);
+    border-color: var(--primary-blue);
+    color: var(--white);
+    box-shadow: var(--shadow-blue);
+}
+
+.tab-icon {
+    font-size: 18px;
+}
+
+.tab-count {
+    padding: 2px 8px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: var(--radius-full);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* Prescriptions Container */
+.prescriptions-container {
+    min-height: 400px;
+}
+
+.prescriptions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 20px;
+}
+
+/* Prescription Card */
+.prescription-card {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-base);
+    border: 2px solid var(--gray-200);
+}
+
+.prescription-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-4px);
+    border-color: var(--primary-blue);
+}
+
+/* Card Header */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--gray-200);
+}
+
+.prescription-id {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.id-label {
+    font-size: 11px;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
+
+.id-value {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--primary-blue);
+}
+
+/* Status Badge */
+.status-badge {
+    padding: 4px 12px;
+    border-radius: var(--radius-full);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-pending {
+    background: linear-gradient(135deg, #FFF4E6 0%, #FFE8CC 100%);
+    color: var(--warning-amber);
+    border: 2px solid var(--warning-amber);
+}
+
+.status-dispensed {
+    background: linear-gradient(135deg, #E8F5F3 0%, #D4F1E8 100%);
+    color: var(--success-green);
+    border: 2px solid var(--success-green);
+}
+
+.status-cancelled {
+    background: linear-gradient(135deg, #FFE8E8 0%, #FFD6D6 100%);
+    color: var(--error-red);
+    border: 2px solid var(--error-red);
+}
+
+/* Patient Info */
+.patient-info {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.info-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.info-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.patient-name,
+.doctor-name {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.patient-id,
+.prescribed-date {
+    margin: 0;
+    font-size: 12px;
+    color: var(--gray-600);
+}
+
+/* Medication Details */
+.medication-details {
+    background: var(--gray-50);
+    padding: 16px;
+    border-radius: var(--radius-md);
+    margin-bottom: 16px;
+}
+
+.medication-name {
+    margin: 0 0 12px 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--primary-blue);
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.detail-label {
+    font-size: 13px;
+    color: var(--gray-600);
+    font-weight: 500;
+}
+
+.detail-value {
+    font-size: 13px;
+    color: var(--gray-900);
+    font-weight: 600;
+}
+
+.instructions-box {
+    margin-top: 12px;
+    padding: 12px;
+    background: var(--white);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--gray-300);
+}
+
+.instructions-label {
+    margin: 0 0 4px 0;
+    font-size: 12px;
+    color: var(--gray-600);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.instructions-text {
+    margin: 0;
+    font-size: 13px;
+    color: var(--gray-900);
+    line-height: 1.5;
+}
+
+/* Card Actions */
+.card-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+/* Loading State */
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 80px 20px;
+}
+
+.loading-state p {
+    color: var(--gray-600);
+    font-size: 14px;
+}
+
+/* Empty State */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 80px 20px;
+    text-align: center;
+}
+
+.empty-icon {
+    font-size: 64px;
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    margin: 0;
+    color: var(--gray-700);
+    font-size: 18px;
+}
+
+.empty-state p {
+    margin: 0;
+    color: var(--gray-500);
+    font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .pharmacy-dashboard {
+        padding: 16px;
+    }
+
+    .dashboard-header {
+        padding: 24px 20px;
+    }
+
+    .prescriptions-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .filter-tabs {
+        flex-direction: column;
+    }
+
+    .filter-tab {
+        justify-content: space-between;
+    }
+
+    .card-actions {
+        flex-direction: column;
+    }
+
+    .card-actions button {
+        width: 100%;
+    }
+}

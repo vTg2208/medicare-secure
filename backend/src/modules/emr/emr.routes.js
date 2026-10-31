@@ -1,0 +1,32 @@
+const router = require('express').Router();
+const c = require('./emr.controller');
+const { authenticate } = require('../../middleware/auth.middleware');
+const { requireRole } = require('../../middleware/rbac.middleware');
+const { auditLog } = require('../../middleware/audit.middleware');
+const { clinicalAccess, orgContext, RECORD_CATEGORIES } = require('../../middleware/clinical-access.middleware');
+const { uploadSingle, handleUploadError } = require('../../middleware/file.upload.middleware');
+router.use(authenticate);
+const record = (access = 'read', roles, category) => clinicalAccess({ resource: 'record', id: req => req.params.recordId || req.body.recordId, access, roles, category: category || ((req, context) => req.query.includeRelated === 'true' ? 'all' : RECORD_CATEGORIES[context.type] || 'all') });
+const visit = (access = 'read', roles, category = 'all') => clinicalAccess({ resource: 'visit', id: req => req.params.visitId || req.body.visitId, access, roles, category });
+const doctor = ['doctor'];
+router.post('/medical-records', requireRole(['doctor', 'nurse']), clinicalAccess({ resource: req => req.body.visitId ? 'visit' : 'patient', id: req => req.body.visitId || req.body.patientId, access: 'write', category: req => RECORD_CATEGORIES[req.body.type] || 'all' }), auditLog('create_medical_record', 'medical_record'), c.createMedicalRecord);
+router.get('/medical-records/:recordId', record(), auditLog('view_medical_record', 'medical_record'), c.getMedicalRecord);
+router.get('/patients/:patientId/medical-records', clinicalAccess({ category: req => RECORD_CATEGORIES[req.query.type] || 'all' }), auditLog('view_patient_records', 'medical_record'), c.getPatientMedicalRecords);
+router.post('/diagnoses', record('write', doctor, 'diagnoses'), auditLog('create_diagnosis', 'diagnosis'), c.createDiagnosis);
+router.post('/diagnoses/:diagnosisId/addendum', clinicalAccess({ resource: 'diagnosis', id: req => req.params.diagnosisId, access: 'write', roles: doctor, category: 'diagnoses' }), c.createDiagnosisAddendum);
+router.patch('/diagnoses/:diagnosisId/status', clinicalAccess({ resource: 'diagnosis', id: req => req.params.diagnosisId, access: 'write', roles: doctor, category: 'diagnoses' }), c.updateDiagnosisStatus);
+router.get('/visits/:visitId/diagnoses', visit('read', undefined, 'diagnoses'), c.getDiagnoses);
+router.post('/prescriptions', record('write', doctor, 'prescriptions'), auditLog('create_prescription', 'prescription'), c.createPrescription);
+router.post('/prescriptions/check-interactions', clinicalAccess({ access: 'read', roles: doctor }), c.checkDrugInteractions);
+router.patch('/prescriptions/:prescriptionId/status', clinicalAccess({ resource: 'prescription', id: req => req.params.prescriptionId, access: 'write', roles: ['doctor', 'pharmacist'], category: 'prescriptions' }), c.updatePrescriptionStatus);
+router.get('/visits/:visitId/prescriptions', visit('read', undefined, 'prescriptions'), c.getPrescriptions);
+router.post('/lab-results', requireRole(['lab_technician', 'doctor']), uploadSingle, handleUploadError, clinicalAccess({ resource: 'record', id: req => req.body.recordId, access: 'write', category: 'lab_results' }), c.uploadLabResult);
+router.post('/imaging-reports', requireRole(['radiologist', 'doctor']), uploadSingle, handleUploadError,
+    clinicalAccess({ resource: req => req.body.recordId ? 'record' : req.body.visitId ? 'visit' : 'imagingOrder', id: req => req.body.recordId || req.body.visitId || req.body.orderId, access: 'write', category: 'imaging' }),
+    auditLog('upload_imaging_report', 'imaging_report'), c.uploadImagingReport);
+router.get('/my-imaging-orders', requireRole(['radiologist', 'doctor']), orgContext, c.getMyImagingOrders);
+router.post('/lab-orders', visit('write', doctor, 'lab_results'), c.createLabOrder);
+router.get('/visits/:visitId/lab-orders', visit('read', undefined, 'lab_results'), c.getLabOrders);
+router.post('/imaging-orders', visit('write', doctor, 'imaging'), c.createImagingOrder);
+router.get('/visits/:visitId/imaging-orders', visit('read', undefined, 'imaging'), c.getImagingOrders);
+module.exports = router;

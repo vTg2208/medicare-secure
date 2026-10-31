@@ -1,0 +1,14 @@
+const router = require('express').Router();
+const c = require('./lab.controller');
+const { authenticate } = require('../../middleware/auth.middleware');
+const { requireRole } = require('../../middleware/rbac.middleware');
+const { clinicalAccess } = require('../../middleware/clinical-access.middleware');
+const { auditLog } = require('../../middleware/audit.middleware');
+const { uploadSingle, handleUploadError } = require('../../middleware/file.upload.middleware');
+router.use(authenticate, requireRole(['lab_technician']));
+router.get('/stats', c.getStats);
+router.get('/orders', auditLog('view_lab_queue','lab_order'), c.getAssignedOrders);
+router.get('/orders/:id', clinicalAccess({ resource: 'labOrder', id: req => req.params.id, category: 'lab_results' }), auditLog('view_lab_order','lab_order'), c.getOrderById);
+router.post('/upload', uploadSingle, handleUploadError, clinicalAccess({ resource: req => req.body.order_id ? 'labOrder' : 'record', id: req => req.body.order_id || req.body.record_id, access: 'write', category: 'lab_results' }), auditLog('upload_lab_result','lab_result'), c.uploadResult);
+router.get('/results', auditLog('view_lab_results','lab_result'), c.getUploadedResults);
+module.exports = router;

@@ -1,0 +1,271 @@
+/* ========================================
+   CONSENT PAGE - Medical Blue Theme
+   Privacy & Data Control Interface
+   ======================================== */
+
+.consent-page {
+    min-height: 100vh;
+    background: var(--gray-50);
+}
+
+/* ========================================
+   PAGE HEADER - Gradient Medical Blue
+   ======================================== */
+.page-header {
+    background: var(--gradient-primary);
+    padding: 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: var(--shadow-lg);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Animated Background Pattern */
+.page-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 1;
+}
+
+.page-header h1 {
+    margin: 0 0 6px 0;
+    font-size: 32px;
+    color: var(--white);
+    font-weight: 700;
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.page-subtitle {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 15px;
+    position: relative;
+    z-index: 1;
+}
+
+/* ========================================
+   CONTENT AREA
+   ======================================== */
+.consent-content {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 32px 20px 60px;
+}
+
+.consent-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.view-toggle {
+    display: flex;
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+    gap: 20px;
+    border-bottom: 2px solid #e2e8f0;
+    margin-bottom: 0;
+}
+
+.toggle-btn {
+    padding: 12px 4px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-weight: 500;
+    color: #64748b;
+    transition: all 0.2s ease;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    /* Overlap border */
+    border-radius: 0;
+}
+
+.toggle-btn.active {
+    background: transparent;
+    color: #0284c7;
+    /* Brand Blue */
+    border-bottom: 2px solid #0284c7;
+    box-shadow: none;
+}
+
+.toggle-btn:hover:not(.active) {
+    background: transparent;
+    color: #0284c7;
+}
+
+/* ========================================
+   ACTIONS BAR
+   ======================================== */
+.consent-actions-bar {
+    margin-bottom: 32px;
+    animation: slideIn 0.5s ease-out;
+}
+
+/* ========================================
+   CONSENTS SECTION
+   ======================================== */
+.consents-section {
+    margin-top: 32px;
+    animation: fadeIn 0.6s ease-out 0.2s both;
+}
+
+.consents-section h2 {
+    margin-bottom: 20px;
+    color: var(--gray-900);
+    font-size: 22px;
+    font-weight: 600;
+}
+
+/* ========================================
+   EMPTY STATE
+   ======================================== */
+.empty-state {
+    background: var(--white);
+    border-radius: var(--radius-xl);
+    padding: 60px 40px;
+    text-align: center;
+    color: var(--gray-600);
+    box-shadow: var(--shadow-md);
+    border: 2px dashed var(--gray-200);
+    animation: fadeIn 0.5s ease-out;
+}
+
+.empty-state::before {
+    content: '🔒';
+    display: block;
+    font-size: 64px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.empty-state p {
+    margin: 8px 0;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.empty-state p:first-of-type {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--gray-800);
+}
+
+/* ========================================
+   INFO BOX - Privacy Shield
+   ======================================== */
+.consent-info-box {
+    margin-top: 40px;
+    background: var(--gradient-primary);
+    color: var(--white);
+    border-radius: var(--radius-xl);
+    padding: 32px;
+    box-shadow: var(--shadow-blue);
+    position: relative;
+    overflow: hidden;
+    animation: fadeIn 0.8s ease-out 0.4s both;
+}
+
+.consent-info-box::before {
+    content: '';
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+}
+
+.consent-info-box h3 {
+    margin: 0 0 20px 0;
+    font-size: 20px;
+    font-weight: 600;
+    position: relative;
+}
+
+.consent-info-box ul {
+    margin: 0;
+    padding-left: 24px;
+    position: relative;
+}
+
+.consent-info-box li {
+    margin: 12px 0;
+    line-height: 1.7;
+    font-size: 15px;
+}
+
+.consent-info-box li::marker {
+    content: '✓ ';
+    font-weight: bold;
+}
+
+/* ========================================
+   LOADING STATE
+   ======================================== */
+.consent-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    gap: 16px;
+}
+
+.consent-loading .spinner {
+    width: 40px;
+    height: 40px;
+    border-width: 4px;
+}
+
+.consent-loading p {
+    color: var(--gray-600);
+    font-size: 15px;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+@media (max-width: 768px) {
+    .page-header {
+        padding: 24px 20px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .page-header h1 {
+        font-size: 26px;
+    }
+
+    .consent-content {
+        padding: 24px 16px 40px;
+    }
+
+    .empty-state {
+        padding: 40px 24px;
+    }
+
+    .empty-state::before {
+        font-size: 48px;
+    }
+
+    .consent-info-box {
+        padding: 24px;
+    }
+
+    .consent-info-box h3 {
+        font-size: 18px;
+    }
+}

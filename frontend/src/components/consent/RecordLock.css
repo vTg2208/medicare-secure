@@ -1,0 +1,55 @@
+/* Record Lock Styling */
+
+.record-lock-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    background: var(--white);
+    border: 2px solid var(--gray-300);
+    border-radius: var(--radius-lg);
+    transition: all var(--transition-base);
+}
+
+.lock-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.lock-icon {
+    font-size: 32px;
+}
+
+.lock-title {
+    margin: 0 0 4px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.lock-description {
+    margin: 0;
+    font-size: 13px;
+    color: var(--gray-600);
+}
+
+.locked-badge {
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #FFE8E8 0%, #FFD6D6 100%);
+    border: 2px solid var(--error-red);
+    border-radius: var(--radius-full);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--error-red);
+    text-transform: uppercase;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .record-lock-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

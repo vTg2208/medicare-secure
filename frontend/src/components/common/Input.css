@@ -1,0 +1,261 @@
+/* ========================================
+   INPUT COMPONENT - Medical Blue Theme
+   Floating Labels, Smooth Animations
+   ======================================== */
+
+.input-group {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+/* ========================================
+   LABEL STYLING
+   ======================================== */
+.input-label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--gray-700);
+    transition: color var(--transition-base);
+}
+
+.required {
+    color: var(--error-red);
+    margin-left: 2px;
+}
+
+/* ========================================
+   INPUT FIELD
+   ======================================== */
+.input-field {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    font-size: 15px;
+    font-family: 'Inter', sans-serif;
+    color: var(--gray-800);
+    background-color: var(--white);
+    transition: all var(--transition-base);
+}
+
+.input-field::placeholder {
+    color: var(--gray-400);
+}
+
+/* ========================================
+   FOCUS STATE - Glow Effect
+   ======================================== */
+.input-field:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+}
+
+.input-group:focus-within .input-label {
+    color: var(--primary-blue);
+}
+
+/* ========================================
+   ERROR STATE
+   ======================================== */
+.input-error {
+    border-color: var(--error-red);
+    background-color: #FEF2F2;
+}
+
+.input-error:focus {
+    border-color: var(--error-red);
+    box-shadow: 0 0 0 3px rgba(239, 83, 80, 0.1);
+}
+
+.error-message {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--error-red);
+    animation: slideIn var(--transition-base);
+}
+
+.error-message::before {
+    content: '⚠';
+    font-size: 14px;
+}
+
+/* ========================================
+   SUCCESS STATE
+   ======================================== */
+.input-success {
+    border-color: var(--success-green);
+}
+
+.input-success:focus {
+    box-shadow: 0 0 0 3px rgba(0, 196, 140, 0.1);
+}
+
+/* ========================================
+   DISABLED STATE
+   ======================================== */
+.input-field:disabled {
+    background-color: var(--gray-100);
+    color: var(--gray-500);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* ========================================
+   INPUT WITH ICON
+   ======================================== */
+.input-with-icon {
+    position: relative;
+}
+
+.input-with-icon .input-field {
+    padding-left: 44px;
+}
+
+.input-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-400);
+    pointer-events: none;
+    transition: color var(--transition-base);
+}
+
+.input-with-icon:focus-within .input-icon {
+    color: var(--primary-blue);
+}
+
+/* ========================================
+   FLOATING LABEL VARIANT
+   ======================================== */
+.input-floating {
+    position: relative;
+    margin-top: 8px;
+}
+
+.input-floating .input-field {
+    padding-top: 20px;
+    padding-bottom: 8px;
+}
+
+.input-floating .input-label {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    margin: 0;
+    pointer-events: none;
+    transition: all var(--transition-base);
+    background: var(--white);
+    padding: 0 4px;
+}
+
+.input-floating .input-field:focus~.input-label,
+.input-floating .input-field:not(:placeholder-shown)~.input-label {
+    top: 0;
+    font-size: 12px;
+    color: var(--primary-blue);
+}
+
+/* ========================================
+   TEXTAREA
+   ======================================== */
+textarea.input-field {
+    min-height: 100px;
+    resize: vertical;
+    line-height: 1.6;
+}
+
+/* ========================================
+   SELECT DROPDOWN
+   ======================================== */
+select.input-field {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748B' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 40px;
+}
+
+/* ========================================
+   INPUT GROUP ADDONS
+   ======================================== */
+.input-addon-group {
+    display: flex;
+    align-items: stretch;
+}
+
+.input-addon {
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    background: var(--gray-100);
+    border: 2px solid var(--gray-200);
+    color: var(--gray-600);
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.input-addon:first-child {
+    border-right: none;
+    border-radius: var(--radius-md) 0 0 var(--radius-md);
+}
+
+.input-addon:last-child {
+    border-left: none;
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+.input-addon-group .input-field {
+    border-radius: 0;
+}
+
+.input-addon-group .input-field:first-child {
+    border-radius: var(--radius-md) 0 0 var(--radius-md);
+}
+
+.input-addon-group .input-field:last-child {
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+/* ========================================
+   CHECKBOX & RADIO
+   ======================================== */
+.checkbox-wrapper,
+.radio-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: var(--primary-blue);
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+@media (max-width: 768px) {
+    .input-field {
+        padding: 10px 14px;
+        font-size: 14px;
+    }
+
+    .input-label {
+        font-size: 13px;
+    }
+}

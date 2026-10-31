@@ -1,0 +1,565 @@
+/* ========================================
+   AUTH PAGES - Medical Blue Theme
+   Split-Screen Modern Design
+   ======================================== */
+
+/* ========================================
+   SPLIT-SCREEN CONTAINER
+   ======================================== */
+.split-auth-container {
+    display: flex;
+    min-height: 100vh;
+    background: var(--white);
+}
+
+/* ========================================
+   LEFT PANEL - Quote & Branding
+   ======================================== */
+.auth-left-panel {
+    flex: 1;
+    background: var(--gradient-primary);
+    padding: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+    color: var(--white);
+}
+
+/* Animated Background Pattern */
+.auth-left-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 1;
+    animation: float 30s linear infinite;
+}
+
+/* ========================================
+   BRANDING SECTION
+   ======================================== */
+.auth-branding {
+    position: relative;
+    z-index: 1;
+    animation: fadeIn 0.8s ease-out;
+}
+
+.brand-icon {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    margin-bottom: 24px;
+}
+
+.pulse-ring {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 3px solid rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse-ring {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(1.5);
+        opacity: 0;
+    }
+}
+
+.heartbeat-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 40px;
+    animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+
+    0%,
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    25% {
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+
+    50% {
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+.auth-branding h1 {
+    margin: 0 0 12px 0;
+    font-size: 42px;
+    font-weight: 700;
+    color: var(--white);
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.brand-tagline {
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 400;
+    margin: 0;
+}
+
+/* ========================================
+   QUOTE SECTION
+   ======================================== */
+.quote-section {
+    position: relative;
+    z-index: 1;
+    padding: 40px 0;
+    animation: slideIn 1s ease-out 0.3s both;
+}
+
+.quote-icon {
+    font-size: 120px;
+    line-height: 1;
+    opacity: 0.15;
+    font-family: Georgia, serif;
+    margin-bottom: -60px;
+}
+
+.quote-section blockquote {
+    margin: 0;
+    padding: 0;
+}
+
+.quote-text {
+    font-size: 24px;
+    line-height: 1.6;
+    font-weight: 300;
+    font-style: italic;
+    margin: 0 0 20px 0;
+    color: var(--white);
+}
+
+.quote-section cite {
+    font-size: 16px;
+    font-style: normal;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 500;
+}
+
+/* ========================================
+   FEATURES LIST
+   ======================================== */
+.features-list {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    animation: fadeIn 1.2s ease-out 0.6s both;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.95);
+    font-weight: 500;
+}
+
+.feature-icon {
+    font-size: 20px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: var(--radius-md);
+    backdrop-filter: blur(10px);
+}
+
+/* ========================================
+   RIGHT PANEL - Login Form
+   ======================================== */
+.auth-right-panel {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px;
+    background: var(--gray-50);
+}
+
+.login-form-container {
+    width: 100%;
+    max-width: 460px;
+    animation: fadeIn 0.8s ease-out 0.2s both;
+}
+
+/* ========================================
+   FORM HEADER
+   ======================================== */
+.form-header {
+    margin-bottom: 32px;
+}
+
+.form-header h2 {
+    margin: 0 0 8px 0;
+    font-size: 32px;
+    color: var(--gray-900);
+    font-weight: 700;
+}
+
+.form-subtitle {
+    margin: 0;
+    font-size: 15px;
+    color: var(--gray-600);
+    line-height: 1.6;
+}
+
+/* ========================================
+   LOGIN FORM
+   ======================================== */
+.login-form {
+    background: var(--white);
+    padding: 40px;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
+    border: 1px solid var(--gray-200);
+}
+
+.login-form .input-group {
+    margin-bottom: 24px;
+}
+
+.login-form button {
+    width: 100%;
+    margin-top: 8px;
+}
+
+/* ========================================
+   SUCCESS/ERROR ALERTS
+   ======================================== */
+.success-alert {
+    padding: 14px 18px;
+    background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+    color: #065F46;
+    border-radius: var(--radius-md);
+    margin-bottom: 24px;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: slideIn var(--transition-base);
+    border-left: 4px solid var(--success-green);
+}
+
+.success-alert::before {
+    content: '✓';
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: var(--success-green);
+    color: var(--white);
+    border-radius: 50%;
+    font-weight: bold;
+}
+
+.error-alert {
+    padding: 14px 18px;
+    background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+    color: #991B1B;
+    border-radius: var(--radius-md);
+    margin-bottom: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: slideIn var(--transition-base);
+    border-left: 4px solid var(--error-red);
+}
+
+.error-alert::before {
+    content: '!';
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: var(--error-red);
+    color: var(--white);
+    border-radius: 50%;
+    font-weight: bold;
+}
+
+/* ========================================
+   DIVIDER
+   ======================================== */
+.auth-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 24px 0;
+    color: var(--gray-500);
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.auth-divider::before {
+    margin-right: 16px;
+}
+
+.auth-divider::after {
+    margin-left: 16px;
+}
+
+/* ========================================
+   FOOTER LINKS
+   ======================================== */
+.auth-footer {
+    margin-top: 24px;
+    text-align: center;
+    font-size: 14px;
+    color: var(--gray-600);
+}
+
+.auth-footer a {
+    color: var(--primary-blue);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color var(--transition-base);
+}
+
+.auth-footer a:hover {
+    color: var(--primary-blue-dark);
+    text-decoration: underline;
+}
+
+/* ========================================
+   RESPONSIVE - Mobile
+   ======================================== */
+@media (max-width: 1024px) {
+    .split-auth-container {
+        flex-direction: column;
+    }
+
+    .auth-left-panel {
+        padding: 40px 24px;
+        min-height: 40vh;
+    }
+
+    .auth-branding h1 {
+        font-size: 32px;
+    }
+
+    .brand-tagline {
+        font-size: 16px;
+    }
+
+    .quote-text {
+        font-size: 20px;
+    }
+
+    .features-list {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .auth-right-panel {
+        padding: 40px 24px;
+    }
+
+    .login-form {
+        padding: 32px 24px;
+    }
+
+    .form-header h2 {
+        font-size: 26px;
+    }
+}
+
+@media (max-width: 640px) {
+    .auth-left-panel {
+        padding: 32px 20px;
+    }
+
+    .auth-branding h1 {
+        font-size: 28px;
+    }
+
+    .quote-section {
+        padding: 24px 0;
+    }
+
+    .quote-text {
+        font-size: 18px;
+    }
+
+    .features-list {
+        flex-direction: column;
+    }
+
+    .auth-right-panel {
+        padding: 32px 20px;
+    }
+
+    .login-form {
+        padding: 24px 20px;
+    }
+
+    .form-header h2 {
+        font-size: 24px;
+    }
+}
+
+/* ========================================
+   OLD AUTH CONTAINER (for other pages)
+   Keep for RegisterPatient, etc.
+   ======================================== */
+.auth-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: var(--gradient-subtle);
+    position: relative;
+    overflow: hidden;
+}
+
+.auth-container::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, var(--primary-blue-light) 1px, transparent 1px);
+    background-size: 50px 50px;
+    opacity: 0.1;
+    animation: float 20s ease-in-out infinite;
+}
+
+.auth-card {
+    position: relative;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: var(--radius-xl);
+    padding: 48px;
+    box-shadow: var(--shadow-xl);
+    max-width: 480px;
+    width: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    animation: fadeIn 0.5s ease-out;
+}
+
+.auth-card h2 {
+    margin: 0 0 8px 0;
+    text-align: center;
+    color: var(--gray-900);
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.auth-subtitle {
+    text-align: center;
+    margin-bottom: 32px;
+    color: var(--gray-600);
+    font-size: 15px;
+}
+
+.auth-card form {
+    animation: slideIn 0.6s ease-out 0.2s both;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+@media (max-width: 768px) {
+    .auth-card {
+        padding: 32px 24px;
+    }
+
+    .auth-card h2 {
+        font-size: 24px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ========================================
+   AUTH TABS
+   ======================================== */
+.auth-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--gray-200);
+    padding-bottom: 1px;
+}
+
+.auth-tab {
+    background: none;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--gray-600);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.auth-tab:hover {
+    color: var(--primary-blue);
+}
+
+.auth-tab.active {
+    color: var(--primary-blue);
+    border-bottom: 2px solid var(--primary-blue);
+    font-weight: 600;
+}
+
+.tab-content {
+    animation: fadeIn 0.4s ease-out;
+}
+
+.auth-card input[type="file"] {
+    display: block;
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    margin-top: 5px;
+    font-size: 14px;
+}
