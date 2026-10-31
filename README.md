@@ -23,3 +23,5 @@ Backend: `cd backend`, `npm ci`, `npm test`, `npm run check`.
 Frontend: `cd frontend`, `npm ci`, `npm test`, `npm run lint`, `npm run build`.
 
 The native database integration suites run only when explicitly enabled against a disposable loopback PostgreSQL database. Credentials and generated synthetic account passwords must stay private.
+
+Interface conventions and theme verification are documented in [STYLEGUIDE.md](STYLEGUIDE.md).
