@@ -1,8 +1,10 @@
+import { brandName } from '../../config/brand';
+import Brand from '../../components/common/Brand';
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { staffApi } from '../../api/staffApi';
 import ThemeToggle from '../../components/common/ThemeToggle';
-import ParticleBackground from '../../components/common/ParticleBackground';
+
 import '../patient/Dashboard.css'; // Importing dashboard css for common utility classes if any, though we aim for pure tailwind
 
 function AcceptInvitation() {
@@ -91,9 +93,9 @@ function AcceptInvitation() {
     if (loading) {
         return (
             <div className="patient-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] min-h-screen flex items-center justify-center transition-colors duration-300 relative overflow-hidden">
-                <ParticleBackground />
-                <div className="relative z-10 glass-card p-10 rounded-3xl shadow-2xl border border-white/40 dark:border-white/10 flex flex-col items-center">
-                    <div className="w-12 h-12 border-4 border-slate-200 dark:border-slate-700 border-t-indigo-500 rounded-full animate-spin mb-4"></div>
+
+                <div className="relative z-10 glass-card p-10 rounded-3xl shadow-sm border border-line dark:border-line flex flex-col items-center">
+                    <div className="w-12 h-12 border-4 border-slate-200 dark:border-slate-700 border-t-primary-500 rounded-full animate-spin mb-4"></div>
                     <p className="text-slate-500 dark:text-slate-400 font-medium">Validating your invitation…</p>
                 </div>
             </div>
@@ -103,9 +105,9 @@ function AcceptInvitation() {
     if (validationError) {
         return (
             <div className="patient-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] min-h-screen flex items-center justify-center transition-colors duration-300 relative overflow-hidden">
-                <ParticleBackground />
+
                 <ThemeToggle className="absolute top-4 right-4 z-50" />
-                <div className="relative z-10 max-w-md w-full mx-4 glass-card p-8 sm:p-10 rounded-3xl shadow-2xl border border-white/40 dark:border-white/10 text-center animate-fade-in">
+                <div className="relative z-10 max-w-md w-full mx-4 glass-card p-8 sm:p-10 rounded-3xl shadow-sm border border-line dark:border-line text-center animate-fade-in">
                     <div className="w-16 h-16 mx-auto bg-rose-100 dark:bg-rose-900/30 rounded-full flex items-center justify-center mb-6 border-2 border-rose-200 dark:border-rose-800/50 text-rose-500">
                         <span className="material-symbols-outlined text-3xl">error</span>
                     </div>
@@ -113,7 +115,7 @@ function AcceptInvitation() {
                     <p className="text-slate-500 dark:text-slate-400 mb-6">{validationError}</p>
                     <button
                         onClick={() => navigate('/login')}
-                        className="w-full py-4 px-4 rounded-2xl shadow-xl shadow-indigo-500/20 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition-all duration-300 transform hover:scale-[1.02]"
+                        className="w-full py-4 px-4 rounded-lg shadow-sm shadow-primary-500/20 text-sm font-bold text-white bg-primary-600 hover:bg-primary-700 transition-all duration-300 transform"
                     >
                         Go to Login
                     </button>
@@ -125,9 +127,9 @@ function AcceptInvitation() {
     if (success) {
         return (
             <div className="patient-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] min-h-screen flex items-center justify-center transition-colors duration-300 relative overflow-hidden">
-                <ParticleBackground />
-                <div className="relative z-10 max-w-md w-full mx-4 glass-card p-10 rounded-3xl shadow-2xl border border-white/40 dark:border-white/10 text-center animate-fade-in">
-                    <div className="w-20 h-20 mx-auto bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center mb-6 shadow-lg shadow-indigo-500/30 text-white animate-bounce">
+
+                <div className="relative z-10 max-w-md w-full mx-4 glass-card p-10 rounded-3xl shadow-sm border border-line dark:border-line text-center animate-fade-in">
+                    <div className="w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-6 shadow-lg shadow-primary-500/30 text-white bg-primary-600">
                         <span className="material-symbols-outlined text-4xl">check</span>
                     </div>
                     <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Account Created!</h2>
@@ -139,26 +141,16 @@ function AcceptInvitation() {
 
     return (
         <div className="patient-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] min-h-screen flex items-center justify-center p-4 sm:p-6 lg:p-8 transition-colors duration-300 relative overflow-hidden">
-            <ParticleBackground />
+
 
             <div className="absolute top-4 right-4 z-50">
                 <ThemeToggle />
             </div>
 
-            <div className="w-full max-w-xl glass-card rounded-3xl shadow-2xl relative z-10 animate-fade-in p-8 sm:p-10 border border-white/40 dark:border-white/10">
+            <div className="w-full max-w-xl glass-card rounded-3xl shadow-sm relative z-10 animate-fade-in p-8 sm:p-10 border border-line dark:border-line">
 
                 {/* Logo & Header */}
-                <div className="flex flex-col items-center justify-center mb-6 group cursor-default">
-                    <div className="relative">
-                        <div className="absolute inset-0 bg-indigo-500 blur-xl opacity-0 group-hover:opacity-60 transition-opacity duration-500 rounded-full"></div>
-                        <div className="relative w-16 h-16 bg-indigo-500 rounded-2xl flex items-center justify-center text-white shadow-lg mb-4 transform transition-all duration-500 group-hover:scale-110 group-hover:-rotate-3 group-hover:shadow-[0_0_20px_rgba(99,102,241,0.5)]">
-                            <span className="material-symbols-outlined text-3xl transition-transform duration-500 group-hover:scale-110">local_hospital</span>
-                        </div>
-                    </div>
-                    <h1 className="text-3xl font-extrabold tracking-tight text-slate-800 dark:text-white transition-all duration-500 drop-shadow-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
-                        {process.env.REACT_APP_APP_NAME || 'MediCare'}
-                    </h1>
-                </div>
+                <Brand to={'/'} className="mc-brand--large mc-brand--stack" />
 
                 <div className="text-center mb-8">
                     <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Complete Registration</h2>
@@ -167,8 +159,8 @@ function AcceptInvitation() {
 
                 {/* Role Badge */}
                 <div className="flex justify-center mb-6">
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800/50 text-indigo-700 dark:text-indigo-300 text-sm font-semibold shadow-sm">
-                        <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-50 dark:bg-primary-900/30 border border-primary-100 dark:border-primary-800/50 text-primary-700 dark:text-primary-300 text-sm font-semibold shadow-sm">
+                        <span className="w-2 h-2 rounded-full bg-primary-500"></span>
                         Invited as <span className="uppercase tracking-wider">{invitation?.role}</span>
                     </div>
                 </div>
@@ -206,7 +198,7 @@ function AcceptInvitation() {
                                     value={formData.firstName}
                                     onChange={handleChange}
                                     required
-                                    className="block w-full pl-11 pr-4 py-3 border-none rounded-2xl bg-white/60 dark:bg-slate-800/60 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 transition-all duration-200 text-sm shadow-inner backdrop-blur-sm"
+                                    className="block w-full pl-11 pr-4 py-3 border-none rounded-2xl bg-surface dark:bg-slate-800/60 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500 transition-all duration-200 text-sm shadow-inner"
                                     placeholder="First Name"
                                 />
                             </div>
@@ -225,7 +217,7 @@ function AcceptInvitation() {
                                     value={formData.lastName}
                                     onChange={handleChange}
                                     required
-                                    className="block w-full pl-11 pr-4 py-3 border-none rounded-2xl bg-white/60 dark:bg-slate-800/60 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 transition-all duration-200 text-sm shadow-inner backdrop-blur-sm"
+                                    className="block w-full pl-11 pr-4 py-3 border-none rounded-2xl bg-surface dark:bg-slate-800/60 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500 transition-all duration-200 text-sm shadow-inner"
                                     placeholder="Last Name"
                                 />
                             </div>
@@ -245,7 +237,7 @@ function AcceptInvitation() {
                                 value={formData.phone}
                                 onChange={handleChange}
                                 required
-                                className="block w-full pl-11 pr-4 py-3 border-none rounded-2xl bg-white/60 dark:bg-slate-800/60 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 transition-all duration-200 text-sm shadow-inner backdrop-blur-sm"
+                                className="block w-full pl-11 pr-4 py-3 border-none rounded-2xl bg-surface dark:bg-slate-800/60 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500 transition-all duration-200 text-sm shadow-inner"
                                 placeholder="+91 98765 43210"
                             />
                         </div>
@@ -265,7 +257,7 @@ function AcceptInvitation() {
                                     value={formData.password}
                                     onChange={handleChange}
                                     required
-                                    className="block w-full pl-11 pr-4 py-3 border-none rounded-2xl bg-white/60 dark:bg-slate-800/60 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 transition-all duration-200 text-sm shadow-inner backdrop-blur-sm"
+                                    className="block w-full pl-11 pr-4 py-3 border-none rounded-2xl bg-surface dark:bg-slate-800/60 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500 transition-all duration-200 text-sm shadow-inner"
                                     placeholder="Min. 8 chars"
                                 />
                             </div>
@@ -284,7 +276,7 @@ function AcceptInvitation() {
                                     value={formData.confirmPassword}
                                     onChange={handleChange}
                                     required
-                                    className="block w-full pl-11 pr-4 py-3 border-none rounded-2xl bg-white/60 dark:bg-slate-800/60 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 transition-all duration-200 text-sm shadow-inner backdrop-blur-sm"
+                                    className="block w-full pl-11 pr-4 py-3 border-none rounded-2xl bg-surface dark:bg-slate-800/60 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500 transition-all duration-200 text-sm shadow-inner"
                                     placeholder="Re-enter password"
                                 />
                             </div>
@@ -294,7 +286,7 @@ function AcceptInvitation() {
                     <button
                         type="submit"
                         disabled={submitting}
-                        className={`mt-6 w-full flex justify-center py-4 px-4 rounded-2xl shadow-xl shadow-indigo-500/20 text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-300 transform hover:scale-[1.02] ${submitting ? 'opacity-70 cursor-not-allowed' : ''}`}
+                        className={`mt-6 w-full flex justify-center py-4 px-4 rounded-lg shadow-sm shadow-primary-500/20 text-sm font-bold text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-300 transform ${submitting ? 'opacity-70 cursor-not-allowed' : ''}`}
                     >
                         {submitting ? 'Creating Account...' : 'Create My Account'}
                     </button>
@@ -302,7 +294,7 @@ function AcceptInvitation() {
 
                 <p className="mt-8 text-center text-sm text-slate-500 dark:text-slate-400">
                     Already have an account?{' '}
-                    <a href="/login" className="font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 hover:underline transition-colors">
+                    <a href="/login" className="font-bold text-primary-600 dark:text-primary-400 hover:text-primary-500 hover:underline transition-colors">
                         Sign in here
                     </a>
                 </p>
@@ -314,11 +306,11 @@ function AcceptInvitation() {
                         Aggregated research data
                     </div>
                     <div className="flex items-center text-xs text-slate-500 dark:text-slate-400 font-medium">
-                        <span className="material-symbols-outlined text-[16px] mr-1 text-blue-500">shield</span>
+                        <span className="material-symbols-outlined text-[16px] mr-1 text-primary-500">shield</span>
                         Secure Auth
                     </div>
                     <div className="flex items-center text-xs text-slate-500 dark:text-slate-400 font-medium">
-                        <span className="material-symbols-outlined text-[16px] mr-1 text-indigo-500">group</span>
+                        <span className="material-symbols-outlined text-[16px] mr-1 text-primary-500">group</span>
                         Role-Based Access
                     </div>
                 </div>
@@ -326,7 +318,7 @@ function AcceptInvitation() {
 
             <div className="absolute bottom-6 w-full text-center z-10">
                 <p className="text-xs font-medium text-slate-400 dark:text-slate-500">
-                    &copy; {new Date().getFullYear()} {process.env.REACT_APP_APP_NAME || 'MediCare'}. All rights reserved.
+                    &copy; {new Date().getFullYear()} {brandName}. All rights reserved.
                 </p>
             </div>
         </div>

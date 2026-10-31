@@ -5,6 +5,7 @@ import { authApi } from '../../api/authApi';
 import { startAuthentication } from '@simplewebauthn/browser';
 import ThemeToggle from '../../components/common/ThemeToggle';
 import { isDemoMode } from '../../config/demoMode';
+import Brand from '../../components/common/Brand';
 import './Login.css';
 
 function Login() {
@@ -126,12 +127,11 @@ function Login() {
     };
 
     const busy = loading || passkeyLoading;
-    const brand = <><img src="/medicare-icon.svg" alt="" width="42" height="42" /><span>medicare</span></>;
 
     return (
         <main className="medicare-login">
             <section className="login-story" aria-label="About Medicare">
-                <Link to="/" className="login-brand" aria-label="Medicare home">{brand}</Link>
+                <Brand className="login-brand" />
                 <div className="login-story-content">
                     <p className="login-eyebrow">Your connected care space</p>
                     <h1>Better care.<br /><span>Closer together.</span></h1>
@@ -152,7 +152,7 @@ function Login() {
                     <ThemeToggle />
                 </div>
                 <div className="login-form-content">
-                    <Link to="/" className="login-brand login-mobile-brand" aria-label="Medicare home">{brand}</Link>
+                    <Brand className="login-brand login-mobile-brand" />
                     <div className="login-form-heading"><h2>Welcome back</h2><p>Sign in to your Medicare account.</p></div>
                     {successMessage && <div role="status" className="login-notice login-success">{successMessage}</div>}
                     {error && <div id="login-error" role="alert" className="login-notice login-error">{error}</div>}
