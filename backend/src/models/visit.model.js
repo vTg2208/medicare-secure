@@ -453,9 +453,9 @@ class VisitModel {
      */
     static async getQueuePosition(visitId, doctorId) {
         try {
-            // First get the visit's creation time
+            // Verify that this visit belongs to the requested doctor.
             const visitResult = await pool.query(
-                'SELECT created_at, status FROM visits WHERE id = $1 AND assigned_doctor_id = $2',
+                'SELECT status FROM visits WHERE id = $1 AND assigned_doctor_id = $2',
                 [visitId, doctorId]
             );
 
@@ -469,15 +469,15 @@ class VisitModel {
                 return { position: 0, total: 0, status: visit.status };
             }
 
-            // Count how many active/pending visits the doctor has that were created BEFORE this visit
-            // These patients are "ahead" in the queue
+            // Include this visit in its position. Compare timestamps inside
+            // Postgres: JavaScript Date truncates their microsecond precision.
             const aheadResult = await pool.query(`
                 SELECT COUNT(*) as count 
                 FROM visits 
                 WHERE assigned_doctor_id = $1 
                 AND status IN ('pending', 'approved', 'checked_in', 'in_progress')
-                AND created_at <= $2
-            `, [doctorId, visit.created_at]);
+                AND created_at <= (SELECT created_at FROM visits WHERE id = $2)
+            `, [doctorId, visitId]);
 
             // Count total active/pending visits for the doctor to give "X of Y"
             const totalResult = await pool.query(`
@@ -495,7 +495,7 @@ class VisitModel {
                 total,
                 status: visit.status,
                 // Simple ETA: 15 mins per patient ahead
-                eta_minutes: (position - 1) * 15
+                eta_minutes: Math.max(0, position - 1) * 15
             };
         } catch (error) {
             // Assuming 'logger' is defined elsewhere or will be handled by a global error handler

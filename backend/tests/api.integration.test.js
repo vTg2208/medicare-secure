@@ -269,6 +269,18 @@ test('real API: registration, sessions, patient boundaries, administration, and 
             expectStatus(await send('get',`/api/emr/medical-records/${record}`,nextLogin.body.token),200);
             assert.deepEqual((await db.query('SELECT started_at FROM visits WHERE id=$1',[visit])).rows[0].started_at,originalStart);
         });
+
+        await t.test('queue positions preserve database timestamp precision and never show negative waits', async () => {
+            const doctor = (await db.query(`INSERT INTO users(email,role_id,status,is_verified)
+                SELECT 'queue-precision@example.invalid',id,'active',true FROM roles WHERE name='doctor' RETURNING id`)).rows[0].id;
+            const target = (await db.query(`INSERT INTO visits(patient_id,organization_id,assigned_doctor_id,status,visit_code,created_at)
+                VALUES($1,$2,$3,'approved','QUEUE-PRECISION','2026-01-01 00:00:00.000999') RETURNING id`,[users.patient,org,doctor])).rows[0].id;
+            const Visit = require('../src/models/visit.model');
+            assert.deepEqual(await Visit.getQueuePosition(target,doctor), { position:1,total:1,status:'approved',eta_minutes:0 });
+            await db.query(`INSERT INTO visits(patient_id,organization_id,assigned_doctor_id,status,visit_code,created_at)
+                VALUES($1,$2,$3,'approved','QUEUE-AHEAD','2026-01-01 00:00:00.000500')`,[users.patient,org,doctor]);
+            assert.deepEqual(await Visit.getQueuePosition(target,doctor), { position:2,total:2,status:'approved',eta_minutes:15 });
+        });
     } finally {
         await new Promise(resolve => setImmediate(resolve));
         if (db) await db.pool.end();
