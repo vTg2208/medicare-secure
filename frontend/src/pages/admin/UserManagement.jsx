@@ -60,11 +60,11 @@ function UserManagement() {
         return matchesSearch && matchesRole && matchesStatus;
     });
 
-    const selectCls = "px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-violet-400";
+    const selectCls = "px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-surface dark:bg-slate-800 text-slate-800 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-violet-400";
 
     return (
-        <div className="admin-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-800 dark:text-slate-100 flex h-screen w-full overflow-hidden">
-            <div className="absolute top-4 right-4 z-50"><ThemeToggle /></div>
+        <div className="admin-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-800 dark:text-slate-100 flex h-screen w-full overflow-hidden mc-workspace">
+            <div className="mc-workspace-theme"><ThemeToggle /></div>
             <AdminSidebar active="/admin/users" />
 
             <main className="flex-grow p-4 md:p-8 overflow-y-auto h-full relative">
@@ -76,7 +76,7 @@ function UserManagement() {
                     </div>
                     <button
                         onClick={() => navigate('/admin/dashboard')}
-                        className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-white/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-800 transition-all text-sm font-bold shadow-sm group"
+                        className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-surface dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-surface dark:hover:bg-slate-800 transition-all text-sm font-bold shadow-sm group"
                     >
                         <span className="material-symbols-outlined text-[20px] transition-transform group-hover:-translate-x-1">arrow_back</span>
                         Back to Dashboard
@@ -85,16 +85,16 @@ function UserManagement() {
 
                 {/* Quick Stats */}
                 <div className="grid grid-cols-3 gap-4 mb-6">
-                    <div className="glass-card p-5 rounded-2xl border border-violet-100 dark:border-violet-900/30 bg-violet-50/50 dark:bg-violet-900/10">
-                        <p className="text-3xl font-black text-violet-600 dark:text-violet-400">{filteredUsers.length}</p>
+                    <div className="glass-card p-5 rounded-2xl border border-primary-100 dark:border-primary-900/30 bg-primary-50/50 dark:bg-primary-900/10">
+                        <p className="text-3xl font-bold text-primary-600 dark:text-primary-400">{filteredUsers.length}</p>
                         <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">Total Users</p>
                     </div>
                     <div className="glass-card p-5 rounded-2xl border border-emerald-100 dark:border-emerald-900/30 bg-emerald-50/50 dark:bg-emerald-900/10">
-                        <p className="text-3xl font-black text-emerald-600 dark:text-emerald-400">{filteredUsers.filter(u => u.is_active).length}</p>
+                        <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">{filteredUsers.filter(u => u.is_active).length}</p>
                         <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">Active</p>
                     </div>
                     <div className="glass-card p-5 rounded-2xl border border-rose-100 dark:border-rose-900/30 bg-rose-50/50 dark:bg-rose-900/10">
-                        <p className="text-3xl font-black text-rose-600 dark:text-rose-400">{filteredUsers.filter(u => !u.is_active).length}</p>
+                        <p className="text-3xl font-bold text-rose-600 dark:text-rose-400">{filteredUsers.filter(u => !u.is_active).length}</p>
                         <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">Inactive</p>
                     </div>
                 </div>
@@ -169,7 +169,7 @@ function UserManagement() {
                                                 {user.is_active && user.role !== 'system_admin' && (
                                                     <button
                                                         onClick={() => handleDeactivate(user.id)}
-                                                        className="px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-900/20 dark:text-rose-400 dark:hover:bg-rose-900/40 transition"
+                                                        className="px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-50 text-rose-600 hover:bg-rose-100 dark:bg-rose-900/20 dark:text-rose-400 dark:hover:bg-rose-900/40 transition"
                                                     >
                                                         Deactivate
                                                     </button>

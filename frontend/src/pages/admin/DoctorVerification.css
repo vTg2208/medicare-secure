@@ -4,14 +4,14 @@
 
 .dv-container {
     min-height: 100vh;
-    background: #f8fafc;
-    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--mc-canvas);
+    font-family: var(--mc-font);
 }
 
 /* Header */
 .dv-header {
-    background: white;
-    border-bottom: 1px solid #e2e8f0;
+    background: var(--mc-surface);
+    border-bottom: 1px solid var(--mc-border);
     padding: 1.25rem 2.5rem;
     position: sticky;
     top: 0;
@@ -35,9 +35,9 @@
 .dv-header-icon {
     width: 48px;
     height: 48px;
-    background: #326773;
-    color: white;
-    border-radius: 12px;
+    background: var(--mc-brand);
+    color: var(--mc-on-brand);
+    border-radius: var(--mc-radius-control);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -51,21 +51,21 @@
 .dv-header-title {
     font-size: 1.25rem;
     font-weight: 800;
-    color: #1e293b;
+    color: var(--mc-text);
     margin: 0;
 }
 
 .dv-header-subtitle {
     font-size: 0.875rem;
-    color: #64748b;
+    color: var(--mc-text-muted);
     margin: 2px 0 0 0;
 }
 
 .dv-back-btn {
-    background: #f1f5f9;
-    color: #475569;
+    background: var(--mc-surface-muted);
+    color: var(--mc-text-muted);
     padding: 0.625rem 1.25rem;
-    border-radius: 8px;
+    border-radius: var(--mc-radius-control);
     font-size: 0.875rem;
     font-weight: 600;
     border: none;
@@ -74,8 +74,8 @@
 }
 
 .dv-back-btn:hover {
-    background: #e2e8f0;
-    color: #1e293b;
+    background: var(--mc-surface-muted);
+    color: var(--mc-text);
 }
 
 /* Content */
@@ -94,23 +94,23 @@
 }
 
 .dv-stat-card {
-    background: white;
+    background: var(--mc-surface);
     padding: 1.5rem;
-    border-radius: 16px;
-    border: 1px solid #f1f5f9;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border-radius: var(--mc-radius-panel);
+    border: 1px solid var(--mc-border);
+    box-shadow: var(--mc-shadow-panel);
 }
 
 .dv-stat-value {
     font-size: 2rem;
     font-weight: 800;
-    color: #326773;
+    color: var(--mc-accent);
 }
 
 .dv-stat-label {
     font-size: 0.875rem;
     font-weight: 600;
-    color: #64748b;
+    color: var(--mc-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.025em;
     margin-top: 4px;
@@ -118,15 +118,15 @@
 
 /* Main Card */
 .dv-main-card {
-    background: white;
-    border-radius: 20px;
-    border: 1px solid #f1f5f9;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+    background: var(--mc-surface);
+    border-radius: var(--mc-radius-panel);
+    border: 1px solid var(--mc-border);
+    box-shadow: var(--mc-shadow-panel);
     overflow: hidden;
 }
 
 .dv-card-header {
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--mc-border);
     padding: 0 1.5rem;
 }
 
@@ -141,14 +141,14 @@
     border: none;
     font-size: 0.9375rem;
     font-weight: 600;
-    color: #64748b;
+    color: var(--mc-text-muted);
     cursor: pointer;
     position: relative;
     transition: all 0.2s;
 }
 
 .dv-tab.active {
-    color: #326773;
+    color: var(--mc-accent);
 }
 
 .dv-tab.active::after {
@@ -158,7 +158,7 @@
     left: 0;
     right: 0;
     height: 3px;
-    background: #326773;
+    background: var(--mc-brand);
 }
 
 /* Table */
@@ -177,40 +177,40 @@
     font-size: 0.75rem;
     font-weight: 700;
     text-transform: uppercase;
-    color: #64748b;
+    color: var(--mc-text-muted);
     letter-spacing: 0.05em;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--mc-border);
 }
 
 .dv-table td {
     padding: 1.25rem 1rem;
     font-size: 0.9375rem;
-    color: #1e293b;
-    border-bottom: 1px solid #f8fafc;
+    color: var(--mc-text);
+    border-bottom: 1px solid var(--mc-border);
 }
 
 .dv-doctor-name {
     font-weight: 700;
-    color: #326773;
+    color: var(--mc-accent);
 }
 
 .dv-doc-count {
     display: inline-flex;
     align-items: center;
     padding: 4px 12px;
-    background: #f0fdfa;
-    color: #0d9488;
-    border-radius: 20px;
+    background: var(--mc-surface-muted);
+    color: var(--mc-accent);
+    border-radius: var(--mc-radius-control);
     font-size: 0.8125rem;
     font-weight: 600;
 }
 
 .dv-btn-review {
-    background: white;
-    border: 1px solid #cbd5e1;
-    color: #475569;
+    background: var(--mc-surface);
+    border: 1px solid var(--mc-border);
+    color: var(--mc-text-muted);
     padding: 8px 16px;
-    border-radius: 8px;
+    border-radius: var(--mc-radius-control);
     font-size: 0.8125rem;
     font-weight: 600;
     cursor: pointer;
@@ -218,9 +218,9 @@
 }
 
 .dv-btn-review:hover {
-    border-color: #326773;
-    color: #326773;
-    background: #f0fdfa;
+    border-color: var(--mc-border-strong);
+    color: var(--mc-accent);
+    background: var(--mc-surface-muted);
 }
 
 /* Modal */
@@ -230,8 +230,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(15, 23, 42, 0.5);
-    backdrop-filter: blur(4px);
+    background: var(--mc-overlay);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -240,18 +239,18 @@
 }
 
 .dv-modal {
-    background: white;
+    background: var(--mc-surface);
     width: 100%;
     max-width: 800px;
-    border-radius: 24px;
+    border-radius: var(--mc-radius-panel);
     overflow: hidden;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    box-shadow: var(--mc-shadow-overlay);
 }
 
 .dv-modal-header {
-    background: #326773;
+    background: var(--mc-brand);
     padding: 1.5rem 2rem;
-    color: white;
+    color: var(--mc-on-brand);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -264,9 +263,9 @@
 }
 
 .dv-modal-close {
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--mc-surface);
     border: none;
-    color: white;
+    color: var(--mc-accent);
     width: 32px;
     height: 32px;
     border-radius: 50%;
@@ -286,11 +285,11 @@
 .dv-review-section h3 {
     margin: 0 0 1.5rem 0;
     font-size: 1.125rem;
-    color: #1e293b;
+    color: var(--mc-text);
 }
 
 .dv-info-text {
-    color: #64748b;
+    color: var(--mc-text-muted);
     font-size: 0.9375rem;
     margin-bottom: 2rem;
 }
@@ -303,18 +302,18 @@
 
 .dv-action-box {
     padding: 1.5rem;
-    border-radius: 16px;
-    border: 1px solid #f1f5f9;
+    border-radius: var(--mc-radius-control);
+    border: 1px solid var(--mc-border);
 }
 
 .dv-action-box.approve {
-    background: #f0fdfa;
-    border-color: #ccfbf1;
+    background: var(--mc-surface-muted);
+    border-color: var(--mc-border-strong);
 }
 
 .dv-action-box.reject {
-    background: #fef2f2;
-    border-color: #fee2e2;
+    background: var(--mc-surface-muted);
+    border-color: var(--mc-danger-border);
 }
 
 .dv-action-box h4 {
@@ -323,20 +322,20 @@
 }
 
 .dv-action-box.approve h4 {
-    color: #0d9488;
+    color: var(--mc-accent);
 }
 
 .dv-action-box.reject h4 {
-    color: #dc2626;
+    color: var(--mc-danger);
 }
 
 .dv-action-box textarea {
     width: 100%;
     height: 100px;
     padding: 12px;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    font-family: inherit;
+    border: 1px solid var(--mc-border);
+    border-radius: var(--mc-radius-control);
+    font-family: var(--mc-font);
     font-size: 0.875rem;
     margin-bottom: 1.25rem;
     resize: none;
@@ -344,22 +343,22 @@
 
 .dv-btn-approve {
     width: 100%;
-    background: #326773;
-    color: white;
+    background: var(--mc-brand);
+    color: var(--mc-on-brand);
     padding: 10px;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--mc-radius-control);
     font-weight: 600;
     cursor: pointer;
 }
 
 .dv-btn-reject {
     width: 100%;
-    background: #dc2626;
-    color: white;
+    background: var(--mc-danger-solid);
+    color: var(--mc-on-brand);
     padding: 10px;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--mc-radius-control);
     font-weight: 600;
     cursor: pointer;
 }
@@ -369,7 +368,7 @@
 .dv-empty {
     padding: 4rem;
     text-align: center;
-    color: #64748b;
+    color: var(--mc-text-muted);
     font-style: italic;
 }
 

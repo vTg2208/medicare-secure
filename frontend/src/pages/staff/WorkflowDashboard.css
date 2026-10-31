@@ -10,11 +10,11 @@
 }
 
 .workflow-card {
-    background: white;
-    border-radius: 12px;
+    background: var(--mc-surface);
+    border-radius: var(--mc-radius-panel);
     padding: 1.5rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    border: 1px solid #e2e8f0;
+    box-shadow: var(--mc-shadow-panel);
+    border: 1px solid var(--mc-border);
 }
 
 .card-header {
@@ -23,12 +23,12 @@
     align-items: center;
     margin-bottom: 1.5rem;
     padding-bottom: 1rem;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--mc-border);
 }
 
 .card-header h2 {
     font-size: 1.25rem;
-    color: #1e293b;
+    color: var(--mc-text);
     margin: 0;
 }
 
@@ -46,12 +46,12 @@
 .stat .number {
     font-size: 2rem;
     font-weight: 700;
-    color: #0ea5e9;
+    color: var(--mc-accent);
 }
 
 .stat .label {
     font-size: 0.875rem;
-    color: #64748b;
+    color: var(--mc-text-muted);
 }
 
 .bed-list {
@@ -62,15 +62,15 @@
 
 .bed-item {
     padding: 0.5rem 1rem;
-    border-radius: 6px;
+    border-radius: var(--mc-radius-control);
     font-size: 0.875rem;
     font-weight: 500;
 }
 
 .bed-item.available {
-    background: #dcfce7;
-    color: #166534;
-    border: 1px solid #bbf7d0;
+    background: var(--mc-success-bg);
+    color: var(--mc-success);
+    border: 1px solid var(--mc-success-border);
 }
 
 .task-list {
@@ -81,7 +81,7 @@
 
 .task-item {
     padding: 1rem;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--mc-border);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -92,6 +92,6 @@
 }
 
 .task-item.high {
-    border-left: 4px solid #ef4444;
-    background: #fef2f2;
+    border-left: 1px solid var(--mc-danger-border);
+    background: var(--mc-surface-muted);
 }

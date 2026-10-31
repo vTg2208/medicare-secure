@@ -2,11 +2,11 @@
 /* .manage-visits-container { ... } */
 
 .visits-table-container {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    background: var(--mc-surface);
+    border-radius: var(--mc-radius-panel);
+    box-shadow: var(--mc-shadow-sm);
     overflow-x: auto;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--mc-border);
     padding: 1.5rem;
 }
 
@@ -20,13 +20,13 @@
 .visits-table td {
     padding: 1rem;
     text-align: left;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--mc-border);
     vertical-align: middle;
 }
 
 .visits-table th {
-    background: linear-gradient(135deg, #0066cc 0%, #004999 100%);
-    color: white;
+    background: var(--mc-brand);
+    color: var(--mc-on-brand);
     font-weight: 600;
     font-size: 0.875rem;
     text-transform: uppercase;
@@ -46,18 +46,18 @@
 }
 
 .visits-table tbody tr:hover {
-    background-color: #f7fafc;
+    background-color: var(--mc-surface-muted);
 }
 
 .patient-name {
     font-weight: 600;
-    color: #2d3748;
+    color: var(--mc-text);
     margin-bottom: 0.25rem;
 }
 
 .patient-email {
     font-size: 0.875rem;
-    color: #718096;
+    color: var(--mc-text-muted);
 }
 
 /* Date and Time Input Styling */
@@ -65,69 +65,69 @@
 .time-input {
     width: 100%;
     padding: 0.625rem;
-    border: 2px solid #cbd5e0;
-    border-radius: 6px;
-    background-color: white;
+    border: 1px solid var(--mc-border);
+    border-radius: var(--mc-radius-control);
+    background-color: var(--mc-surface);
     font-size: 0.875rem;
-    color: #2d3748;
+    color: var(--mc-text);
     transition: all 0.2s;
-    font-family: inherit;
+    font-family: var(--mc-font);
 }
 
 .date-input:focus,
 .time-input:focus {
     outline: none;
-    border-color: #0066cc;
-    box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+    border-color: var(--mc-border-strong);
+    box-shadow: 0 0 0 3px var(--mc-focus);
 }
 
 .date-input:hover,
 .time-input:hover {
-    border-color: #0066cc;
+    border-color: var(--mc-border-strong);
 }
 
 /* Staff Select Dropdowns */
 .staff-select {
     width: 100%;
     padding: 0.625rem;
-    border: 2px solid #cbd5e0;
-    border-radius: 6px;
-    background-color: white;
+    border: 1px solid var(--mc-border);
+    border-radius: var(--mc-radius-control);
+    background-color: var(--mc-surface);
     font-size: 0.875rem;
-    color: #2d3748;
+    color: var(--mc-text);
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .staff-select:focus {
     outline: none;
-    border-color: #0066cc;
-    box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+    border-color: var(--mc-border-strong);
+    box-shadow: 0 0 0 3px var(--mc-focus);
 }
 
 .staff-select:hover {
-    border-color: #0066cc;
+    border-color: var(--mc-border-strong);
 }
 
 /* Approve Button */
 .assign-btn {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: white;
+    background: var(--mc-success-solid);
+    color: var(--mc-on-brand);
     padding: 0.75rem 1.25rem;
     border: none;
-    border-radius: 6px;
+    border-radius: var(--mc-radius-control);
     font-weight: 600;
     font-size: 0.875rem;
     cursor: pointer;
     transition: all 0.2s;
     white-space: nowrap;
-    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+    box-shadow: var(--mc-shadow-sm);
 }
 
 .assign-btn:hover {
-    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    background: var(--mc-success-solid);
     transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+    box-shadow: var(--mc-shadow-sm);
 }
 
 .assign-btn:active {
@@ -136,14 +136,14 @@
 
 /* Success Message */
 .success-message {
-    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
-    color: #065f46;
+    background: var(--mc-success-bg);
+    color: var(--mc-success);
     padding: 1rem 1.5rem;
-    border-radius: 8px;
+    border-radius: var(--mc-radius-control);
     margin-bottom: 1.5rem;
-    border: 2px solid #10b981;
+    border: 1px solid var(--mc-success-border);
     font-weight: 500;
-    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.1);
+    box-shadow: var(--mc-shadow-sm);
 }
 
 /* Loading, Error, No Visits States */
@@ -152,15 +152,15 @@
 .no-visits {
     text-align: center;
     padding: 3rem;
-    color: #718096;
+    color: var(--mc-text-muted);
     font-size: 1rem;
 }
 
 .error {
-    color: #e53e3e;
+    color: var(--mc-danger);
     font-weight: 500;
 }
 
 .no-visits {
-    color: #4a5568;
+    color: var(--mc-text-muted);
 }

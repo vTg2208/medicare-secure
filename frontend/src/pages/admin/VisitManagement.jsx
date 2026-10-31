@@ -152,8 +152,8 @@ function VisitManagement() {
     };
 
     return (
-        <div className="admin-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-800 dark:text-slate-100 flex h-screen w-full overflow-hidden">
-            <div className="absolute top-4 right-4 z-50"><ThemeToggle /></div>
+        <div className="admin-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-800 dark:text-slate-100 flex h-screen w-full overflow-hidden mc-workspace">
+            <div className="mc-workspace-theme"><ThemeToggle /></div>
             <AdminSidebar active="/admin/visits" />
 
             <main className="flex-grow p-4 md:p-8 overflow-y-auto h-full relative">
@@ -165,7 +165,7 @@ function VisitManagement() {
                     </div>
                     <button
                         onClick={() => navigate('/admin/dashboard')}
-                        className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-white/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-800 transition-all text-sm font-bold shadow-sm group"
+                        className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-surface dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-surface dark:hover:bg-slate-800 transition-all text-sm font-bold shadow-sm group"
                     >
                         <span className="material-symbols-outlined text-[20px] transition-transform group-hover:-translate-x-1">arrow_back</span>
                         Back to Dashboard
@@ -173,7 +173,7 @@ function VisitManagement() {
                 </div>
 
                 {/* Tab Navigation */}
-                <div className="flex items-center gap-1 p-1 bg-white/40 dark:bg-slate-900/40 backdrop-blur-md rounded-2xl border border-slate-200/50 dark:border-slate-700/50 w-fit">
+                <div className="flex items-center gap-1 p-1 bg-surface dark:bg-slate-900/40 rounded-2xl border border-slate-200/50 dark:border-slate-700/50 w-fit">
                     {[
                         { id: 'pending', label: 'Queued Request', icon: 'pending_actions' },
                         { id: 'active', label: 'Active Sessions', icon: 'stethoscope' },
@@ -181,8 +181,8 @@ function VisitManagement() {
                     ].map(tab => (
                         <button
                             key={tab.id}
-                            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold transition-all ${activeTab === tab.id
-                                ? 'bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm border border-slate-200/50 dark:border-slate-700/50'
+                            className={`flex items-center gap-2 px-6 py-2.5 rounded-lg text-xs font-bold transition-all ${activeTab === tab.id
+                                ? "bg-surface dark:bg-slate-800 text-primary-600 dark:text-primary-400 shadow-sm border border-slate-200/50 dark:border-slate-700/50"
                                 : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                                 }`}
                             onClick={() => setActiveTab(tab.id)}
@@ -209,10 +209,10 @@ function VisitManagement() {
                     <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                         {visits.length > 0 ? (
                             visits.map(visit => (
-                                <div key={visit.id} className="admin-glass-card rounded-3xl p-6 flex flex-col group hover:border-indigo-500/30 transition-all border border-transparent">
+                                <div key={visit.id} className="admin-glass-card rounded-3xl p-6 flex flex-col group hover:border-primary-500/30 transition-all border border-transparent">
                                     <div className="flex justify-between items-start mb-6">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover:text-indigo-600 transition-colors">
+                                            <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover:text-primary-600 transition-colors">
                                                 <span className="material-symbols-outlined text-xl">person</span>
                                             </div>
                                             <div>
@@ -230,20 +230,20 @@ function VisitManagement() {
 
                                     <div className="grid grid-cols-2 gap-4 mb-6 pt-6 border-t border-slate-100 dark:border-slate-800/50">
                                         <div>
-                                            <p className="text-[9px] text-slate-400 uppercase tracking-widest font-black mb-1">Reason for Visit</p>
+                                            <p className="text-[9px] text-slate-400 uppercase tracking-widest font-bold mb-1">Reason for Visit</p>
                                             <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">{visit.reason}</p>
                                         </div>
                                         {visit.doctor_first_name && (
                                             <div>
-                                                <p className="text-[9px] text-slate-400 uppercase tracking-widest font-black mb-1">Assigned Physician</p>
-                                                <p className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 italic">Dr. {visit.doctor_first_name} {visit.doctor_last_name}</p>
+                                                <p className="text-[9px] text-slate-400 uppercase tracking-widest font-bold mb-1">Assigned Physician</p>
+                                                <p className="text-xs font-semibold text-primary-600 dark:text-primary-400 italic">Dr. {visit.doctor_first_name} {visit.doctor_last_name}</p>
                                             </div>
                                         )}
                                     </div>
 
                                     {visit.symptoms && (
                                         <div className="mb-6 p-4 rounded-2xl bg-slate-50/50 dark:bg-slate-900/30 border border-slate-100 dark:border-slate-800/50">
-                                            <p className="text-[9px] text-slate-400 uppercase tracking-widest font-black mb-1">Reported Symptoms</p>
+                                            <p className="text-[9px] text-slate-400 uppercase tracking-widest font-bold mb-1">Reported Symptoms</p>
                                             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed italic">"{visit.symptoms}"</p>
                                         </div>
                                     )}
@@ -253,13 +253,13 @@ function VisitManagement() {
                                             <>
                                                 <button
                                                     onClick={() => handleApproveClick(visit)}
-                                                    className="flex-grow bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-indigo-500/10"
+                                                    className="flex-grow bg-primary-600 hover:bg-primary-700 text-white py-3 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all shadow-lg shadow-primary-500/10"
                                                 >
                                                     Approve Protocol
                                                 </button>
                                                 <button
                                                     onClick={() => handleCloseVisit(visit.id, 'cancelled')}
-                                                    className="px-6 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-rose-500 hover:border-rose-200 transition-all rounded-2xl text-[10px] font-black uppercase tracking-widest"
+                                                    className="px-6 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-rose-500 hover:border-rose-200 transition-all rounded-lg text-[10px] font-bold uppercase tracking-widest"
                                                 >
                                                     Reject
                                                 </button>
@@ -268,7 +268,7 @@ function VisitManagement() {
                                         {['checked_in', 'in_progress'].includes(visit.status) && (
                                             <button
                                                 onClick={() => handleCloseVisit(visit.id, 'completed')}
-                                                className="flex-grow bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-emerald-500/10"
+                                                className="flex-grow bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all shadow-lg shadow-emerald-500/10"
                                             >
                                                 Complete Clinical Session
                                             </button>
@@ -284,7 +284,7 @@ function VisitManagement() {
                                         {['approved', 'checked_in', 'in_progress'].includes(visit.status) && (
                                             <button
                                                 onClick={() => handleCloseVisit(visit.id, 'cancelled')}
-                                                className="px-6 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-rose-500 hover:border-rose-200 transition-all rounded-2xl text-[10px] font-black uppercase tracking-widest"
+                                                className="px-6 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-rose-500 hover:border-rose-200 transition-all rounded-lg text-[10px] font-bold uppercase tracking-widest"
                                             >
                                                 Cancel
                                             </button>
@@ -293,11 +293,11 @@ function VisitManagement() {
                                 </div>
                             ))
                         ) : (
-                            <div className="col-span-full py-32 flex flex-col items-center justify-center text-slate-300 dark:text-slate-600 border-2 border-dashed border-slate-200/50 dark:border-slate-800/50 rounded-[3rem] bg-white/20 dark:bg-slate-900/20 backdrop-blur-sm group">
-                                <div className="w-20 h-20 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500">
+                            <div className="col-span-full py-32 flex flex-col items-center justify-center text-slate-300 dark:text-slate-600 border-2 border-dashed border-slate-200/50 dark:border-slate-800/50 rounded-[3rem] bg-surface dark:bg-slate-900/20 group">
+                                <div className="w-20 h-20 rounded-full bg-slate-50 dark:bg-slate-800 flex items-center justify-center mb-6 transition-transform duration-500">
                                     <span className="material-symbols-outlined text-4xl opacity-50">event_busy</span>
                                 </div>
-                                <h4 className="text-xl font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em] opacity-80">Silent Corridor</h4>
+                                <h4 className="text-xl font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em] opacity-80">Silent Corridor</h4>
                                 <p className="text-xs font-bold text-slate-400 dark:text-slate-500 mt-2 lowercase italic opacity-60">No pharmaceutical or clinical sessions currently queued.</p>
                             </div>
                         )}
@@ -312,21 +312,21 @@ function VisitManagement() {
                             <div className="space-y-6">
                                 <div className="grid grid-cols-2 gap-6">
                                     <div>
-                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Patient</p>
+                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Patient</p>
                                         <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{selectedVisit?.patient_first_name} {selectedVisit?.patient_last_name}</p>
                                     </div>
                                     <div>
-                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Reason</p>
+                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Reason</p>
                                         <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">{selectedVisit?.reason}</p>
                                     </div>
                                 </div>
 
                                 <div className="form-group">
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Assign Medical Lead</label>
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">Assign Medical Lead</label>
                                     <select
                                         value={approvalData.doctorId || selectedVisit?.assigned_doctor_id || selectedVisit?.doctor_id || ''}
                                         onChange={(e) => setApprovalData({ ...approvalData, doctorId: e.target.value })}
-                                        className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                                        className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white text-sm focus:ring-2 focus:ring-primary-500 outline-none transition-all"
                                         required
                                     >
                                         <option value="">Select a doctor</option>
@@ -339,11 +339,11 @@ function VisitManagement() {
                                 </div>
 
                                 <div className="form-group">
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Assign Nurse Specialist (Optional)</label>
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">Assign Nurse Specialist (Optional)</label>
                                     <select
                                         value={approvalData.nurseId}
                                         onChange={(e) => setApprovalData({ ...approvalData, nurseId: e.target.value })}
-                                        className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                                        className="w-full px-4 py-3 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-white text-sm focus:ring-2 focus:ring-primary-500 outline-none transition-all"
                                     >
                                         <option value="">Select a nurse</option>
                                         {nurses.map(nurse => (
@@ -352,9 +352,9 @@ function VisitManagement() {
                                     </select>
                                 </div>
 
-                                <div className="p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-900/30 flex items-start gap-3">
-                                    <span className="material-symbols-outlined text-indigo-500 mt-0.5">info</span>
-                                    <p className="text-xs text-indigo-700 dark:text-indigo-300 leading-relaxed font-medium">
+                                <div className="p-4 rounded-2xl bg-primary-50 dark:bg-primary-900/20 border border-primary-100 dark:border-primary-900/30 flex items-start gap-3">
+                                    <span className="material-symbols-outlined text-primary-500 mt-0.5">info</span>
+                                    <p className="text-xs text-primary-700 dark:text-primary-300 leading-relaxed font-medium">
                                         Approving this protocol will generate a secure visit code and notify the patient via encrypted communication channels.
                                     </p>
                                 </div>
@@ -363,13 +363,13 @@ function VisitManagement() {
                             <div className="flex gap-4 mt-8 pt-8 border-t border-slate-100 dark:border-slate-800">
                                 <button
                                     onClick={() => setShowApprovalModal(false)}
-                                    className="px-8 py-3 rounded-2xl text-xs font-black uppercase tracking-widest text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all border border-slate-200 dark:border-slate-700"
+                                    className="px-8 py-3 rounded-lg text-xs font-bold uppercase tracking-widest text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all border border-slate-200 dark:border-slate-700"
                                 >
                                     Abort
                                 </button>
                                 <button
                                     onClick={handleApproveVisit}
-                                    className="flex-grow bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-lg shadow-indigo-500/20"
+                                    className="flex-grow bg-primary-600 hover:bg-primary-700 text-white py-3 rounded-lg text-xs font-bold uppercase tracking-widest transition-all shadow-lg shadow-primary-500/20"
                                 >
                                     Authorize Approval
                                 </button>
@@ -384,15 +384,15 @@ function VisitManagement() {
                             <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center mx-auto mb-6">
                                 <span className="material-symbols-outlined text-3xl text-emerald-600 dark:text-emerald-400">check_circle</span>
                             </div>
-                            <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2">{successModal.title}</h2>
+                            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">{successModal.title}</h2>
                             <p className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-6 max-w-[280px] mx-auto leading-relaxed">
                                 {successModal.message}
                             </p>
 
                             {successModal.highlight && (
                                 <div className="bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 mb-8 inline-block shadow-inner">
-                                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-2">Secure Visit Code</p>
-                                    <p className="text-4xl font-mono font-black text-indigo-600 dark:text-indigo-400 tracking-widest">
+                                    <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400 mb-2">Secure Visit Code</p>
+                                    <p className="text-4xl font-mono font-bold text-primary-600 dark:text-primary-400 tracking-widest">
                                         {successModal.highlight}
                                     </p>
                                 </div>
@@ -401,7 +401,7 @@ function VisitManagement() {
                             <div>
                                 <button
                                     onClick={() => setSuccessModal({ show: false, title: '', message: '', highlight: '' })}
-                                    className="px-8 py-3 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 dark:text-slate-900 text-white rounded-2xl text-xs font-black uppercase tracking-widest transition-all"
+                                    className="px-8 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-xs font-bold uppercase tracking-widest transition-all"
                                 >
                                     Acknowledge
                                 </button>

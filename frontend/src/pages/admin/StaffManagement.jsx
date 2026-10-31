@@ -110,8 +110,8 @@ function StaffManagement() {
     };
 
     return (
-        <div className="admin-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-800 dark:text-slate-100 flex h-screen w-full overflow-hidden">
-            <div className="absolute top-4 right-4 z-50"><ThemeToggle /></div>
+        <div className="admin-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-800 dark:text-slate-100 flex h-screen w-full overflow-hidden mc-workspace">
+            <div className="mc-workspace-theme"><ThemeToggle /></div>
             <AdminSidebar active="/admin/staff" />
 
             <main className="flex-grow p-4 md:p-8 overflow-y-auto h-full relative">
@@ -123,7 +123,7 @@ function StaffManagement() {
                     </div>
                     <button
                         onClick={() => navigate('/admin/dashboard')}
-                        className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-white/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-800 transition-all text-sm font-bold shadow-sm group"
+                        className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-surface dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-surface dark:hover:bg-slate-800 transition-all text-sm font-bold shadow-sm group"
                     >
                         <span className="material-symbols-outlined text-[20px] transition-transform group-hover:-translate-x-1">arrow_back</span>
                         Back to Dashboard
@@ -133,20 +133,20 @@ function StaffManagement() {
                 {/* Stats */}
                 {stats && (
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                        <div className="glass-card p-5 rounded-2xl border border-indigo-100 dark:border-indigo-900/30 bg-indigo-50/50 dark:bg-indigo-900/10">
-                            <p className="text-3xl font-black text-indigo-600 dark:text-indigo-400">{stats.total || 0}</p>
+                        <div className="glass-card p-5 rounded-2xl border border-primary-100 dark:border-primary-900/30 bg-primary-50/50 dark:bg-primary-900/10">
+                            <p className="text-3xl font-bold text-primary-600 dark:text-primary-400">{stats.total || 0}</p>
                             <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">Total Invitations</p>
                         </div>
                         <div className="glass-card p-5 rounded-2xl border border-amber-100 dark:border-amber-900/30 bg-amber-50/50 dark:bg-amber-900/10">
-                            <p className="text-3xl font-black text-amber-600 dark:text-amber-400">{stats.pending || 0}</p>
+                            <p className="text-3xl font-bold text-amber-600 dark:text-amber-400">{stats.pending || 0}</p>
                             <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">Pending</p>
                         </div>
                         <div className="glass-card p-5 rounded-2xl border border-emerald-100 dark:border-emerald-900/30 bg-emerald-50/50 dark:bg-emerald-900/10">
-                            <p className="text-3xl font-black text-emerald-600 dark:text-emerald-400">{stats.accepted || 0}</p>
+                            <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">{stats.accepted || 0}</p>
                             <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">Accepted</p>
                         </div>
                         <div className="glass-card p-5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50">
-                            <p className="text-3xl font-black text-slate-600 dark:text-slate-400">{stats.expired || 0}</p>
+                            <p className="text-3xl font-bold text-slate-600 dark:text-slate-400">{stats.expired || 0}</p>
                             <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">Expired</p>
                         </div>
                     </div>
@@ -166,12 +166,12 @@ function StaffManagement() {
                         <form onSubmit={handleInviteSubmit} className="invite-form space-y-4 max-w-lg">
                             <div>
                                 <Input label="Email Address" type="email" name="email" value={formData.email} onChange={handleChange} onBlur={handleEmailBlur} required />
-                                {checkingEmail && <p className="text-xs text-indigo-500 mt-1">Verifying email...</p>}
+                                {checkingEmail && <p className="text-xs text-primary-500 mt-1">Verifying email...</p>}
                                 {emailError && <p className="text-xs text-rose-500 mt-1 font-semibold">{emailError}</p>}
                             </div>
                             <div className="form-group">
                                 <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Role</label>
-                                <select name="role" value={formData.role} onChange={handleChange} className="form-select w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white" required>
+                                <select name="role" value={formData.role} onChange={handleChange} className="form-select w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-surface dark:bg-slate-800 text-slate-800 dark:text-white" required>
                                     <option value="NURSE">Nurse</option>
                                     <option value="LAB_TECHNICIAN">Lab Technician</option>
                                     <option value="RADIOLOGIST">Radiologist</option>
@@ -227,12 +227,12 @@ function StaffManagement() {
                                             <td className="px-6 py-4 text-right">
                                                 <div className="flex items-center justify-end gap-2">
                                                     {(['PENDING', 'EXPIRED', 'CANCELLED'].includes(inv.status?.toUpperCase())) && (
-                                                        <button onClick={() => handleResend(inv.id)} className="p-2 rounded-xl text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition" title="Resend">
+                                                        <button onClick={() => handleResend(inv.id)} className="p-2 rounded-lg text-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition" title="Resend">
                                                             <span className="material-symbols-outlined text-[18px]">refresh</span>
                                                         </button>
                                                     )}
                                                     {inv.status?.toUpperCase() === 'PENDING' && (
-                                                        <button onClick={() => handleCancel(inv.id)} className="p-2 rounded-xl text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition" title="Cancel">
+                                                        <button onClick={() => handleCancel(inv.id)} className="p-2 rounded-lg text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition" title="Cancel">
                                                             <span className="material-symbols-outlined text-[18px]">close</span>
                                                         </button>
                                                     )}

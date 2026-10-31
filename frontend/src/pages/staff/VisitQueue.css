@@ -10,30 +10,30 @@
 }
 
 .stat-card-small {
-    background: linear-gradient(135deg, #3399FF 0%, #0066CC 100%);
-    border-radius: 12px;
+    background: var(--mc-brand);
+    border-radius: var(--mc-radius-panel);
     padding: 20px;
     text-align: center;
-    box-shadow: 0 4px 12px rgba(0, 102, 204, 0.2);
+    box-shadow: var(--mc-shadow-panel);
     transition: all 0.3s ease;
 }
 
 .stat-card-small:hover {
     transform: translateY(-4px);
-    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.3);
+    box-shadow: var(--mc-shadow-panel);
 }
 
 .stat-card-small .stat-number {
     font-size: 36px;
     font-weight: 700;
-    color: #FFFFFF;
+    color: var(--mc-on-brand);
     margin-bottom: 6px;
     line-height: 1;
 }
 
 .stat-card-small .stat-label {
     font-size: 12px;
-    color: rgba(255, 255, 255, 0.95);
+    color: var(--mc-on-brand);
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.5px;

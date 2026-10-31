@@ -65,8 +65,8 @@ function DoctorVerification() {
     };
 
     return (
-        <div className="admin-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-800 dark:text-slate-100 flex h-screen w-full overflow-hidden">
-            <div className="absolute top-4 right-4 z-50"><ThemeToggle /></div>
+        <div className="admin-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-800 dark:text-slate-100 flex h-screen w-full overflow-hidden mc-workspace">
+            <div className="mc-workspace-theme"><ThemeToggle /></div>
             <AdminSidebar active="/admin/doctor-verification" />
 
             <main className="flex-grow p-4 md:p-8 overflow-y-auto h-full relative">
@@ -78,7 +78,7 @@ function DoctorVerification() {
                     </div>
                     <button
                         onClick={() => navigate('/admin/dashboard')}
-                        className="flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-white/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-white dark:hover:bg-slate-800 transition-all text-sm font-bold shadow-sm group"
+                        className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-surface dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-surface dark:hover:bg-slate-800 transition-all text-sm font-bold shadow-sm group"
                     >
                         <span className="material-symbols-outlined text-[20px] transition-transform group-hover:-translate-x-1">arrow_back</span>
                         Back to Dashboard
@@ -89,15 +89,15 @@ function DoctorVerification() {
                 {stats && (
                     <div className="grid grid-cols-3 gap-4 mb-8">
                         <div className="glass-card p-5 rounded-2xl border border-amber-100 dark:border-amber-900/30 bg-amber-50/50 dark:bg-amber-900/10">
-                            <p className="text-3xl font-black text-amber-600 dark:text-amber-400">{stats.pending}</p>
+                            <p className="text-3xl font-bold text-amber-600 dark:text-amber-400">{stats.pending}</p>
                             <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">Pending Review</p>
                         </div>
                         <div className="glass-card p-5 rounded-2xl border border-emerald-100 dark:border-emerald-900/30 bg-emerald-50/50 dark:bg-emerald-900/10">
-                            <p className="text-3xl font-black text-emerald-600 dark:text-emerald-400">{stats.verified}</p>
+                            <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">{stats.verified}</p>
                             <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">Verified Doctors</p>
                         </div>
                         <div className="glass-card p-5 rounded-2xl border border-rose-100 dark:border-rose-900/30 bg-rose-50/50 dark:bg-rose-900/10">
-                            <p className="text-3xl font-black text-rose-600 dark:text-rose-400">{stats.rejected}</p>
+                            <p className="text-3xl font-bold text-rose-600 dark:text-rose-400">{stats.rejected}</p>
                             <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">Rejected</p>
                         </div>
                     </div>
@@ -107,7 +107,7 @@ function DoctorVerification() {
                 <div className="glass-card rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden">
                     <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex gap-4">
                         <button
-                            className={`text-sm font-semibold pb-1 border-b-2 transition-colors ${activeTab === 'pending' ? 'border-violet-500 text-violet-600 dark:text-violet-400' : 'border-transparent text-slate-500 dark:text-slate-400'}`}
+                            className={`text-sm font-semibold pb-1 border-b-2 transition-colors ${activeTab === 'pending' ? "border-primary-500 text-primary-600 dark:text-primary-400" : 'border-transparent text-slate-500 dark:text-slate-400'}`}
                             onClick={() => setActiveTab('pending')}
                         >
                             Pending Verifications
@@ -142,14 +142,14 @@ function DoctorVerification() {
                                             <td className="px-6 py-4 text-slate-600 dark:text-slate-400">{doctor.email}</td>
                                             <td className="px-6 py-4 text-slate-500 dark:text-slate-400">{new Date(doctor.created_at).toLocaleDateString()}</td>
                                             <td className="px-6 py-4">
-                                                <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300">
+                                                <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300">
                                                     {doctor.document_count} Docs
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 text-right">
                                                 <button
                                                     onClick={() => setSelectedDoctor(doctor)}
-                                                    className="px-4 py-1.5 rounded-xl text-xs font-bold bg-violet-500 hover:bg-violet-600 text-white transition"
+                                                    className="px-4 py-1.5 rounded-lg text-xs font-bold bg-primary-500 hover:bg-primary-600 text-white transition"
                                                 >
                                                     Review Credentials
                                                 </button>
@@ -165,13 +165,13 @@ function DoctorVerification() {
 
             {/* Review Modal — unchanged logic, restyled */}
             {selectedDoctor && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                    <div className="glass-card rounded-3xl p-8 w-full max-w-2xl border border-slate-200 dark:border-slate-700 shadow-2xl">
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                    <div className="glass-card rounded-3xl p-8 w-full max-w-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
                         <div className="flex items-center justify-between mb-6">
                             <h2 className="text-xl font-bold text-slate-900 dark:text-white">
                                 Review Dr. {selectedDoctor.first_name} {selectedDoctor.last_name}
                             </h2>
-                            <button onClick={() => setSelectedDoctor(null)} className="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                            <button onClick={() => setSelectedDoctor(null)} className="p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
                                 <span className="material-symbols-outlined">close</span>
                             </button>
                         </div>
@@ -183,7 +183,7 @@ function DoctorVerification() {
                         <ul className="mb-6 space-y-2">
                             {(selectedDoctor.documents || []).map(document => <li key={document.id}>
                                 <button type="button" disabled={documentLoading === document.id}
-                                    className="text-indigo-600 underline disabled:opacity-50"
+                                    className="text-primary-600 underline disabled:opacity-50"
                                     onClick={() => handleDocumentDownload(document)}>
                                     Download {document.document_type || 'credential'}: {document.file_name}
                                 </button>
@@ -195,14 +195,14 @@ function DoctorVerification() {
                             <div className="p-4 rounded-2xl bg-emerald-50/50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-900/30">
                                 <h4 className="font-bold text-emerald-700 dark:text-emerald-300 mb-3">✓ Approve Account</h4>
                                 <textarea
-                                    className="w-full px-3 py-2 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-white dark:bg-slate-900 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-emerald-400 dark:text-white"
+                                    className="w-full px-3 py-2 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-surface dark:bg-slate-900 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary-400 dark:text-white"
                                     placeholder="Approval notes (optional)" rows={3}
                                     value={notes} onChange={(e) => setNotes(e.target.value)}
                                 />
                                 <button
                                     onClick={() => handleApprove(selectedDoctor.id)}
                                     disabled={actionLoading === selectedDoctor.id}
-                                    className="mt-3 w-full py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm transition disabled:opacity-50"
+                                    className="mt-3 w-full py-2 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm transition disabled:opacity-50"
                                 >
                                     {actionLoading === selectedDoctor.id ? 'Approving...' : 'Approve Doctor'}
                                 </button>
@@ -212,14 +212,14 @@ function DoctorVerification() {
                             <div className="p-4 rounded-2xl bg-rose-50/50 dark:bg-rose-900/10 border border-rose-100 dark:border-rose-900/30">
                                 <h4 className="font-bold text-rose-700 dark:text-rose-300 mb-3">✕ Reject Account</h4>
                                 <textarea
-                                    className="w-full px-3 py-2 rounded-xl border border-rose-200 dark:border-rose-800 bg-white dark:bg-slate-900 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-rose-400 dark:text-white"
+                                    className="w-full px-3 py-2 rounded-xl border border-rose-200 dark:border-rose-800 bg-surface dark:bg-slate-900 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-rose-400 dark:text-white"
                                     placeholder="Reason for rejection (required)" rows={3} required
                                     value={reason} onChange={(e) => setReason(e.target.value)}
                                 />
                                 <button
                                     onClick={() => handleReject(selectedDoctor.id)}
                                     disabled={actionLoading === selectedDoctor.id}
-                                    className="mt-3 w-full py-2 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-bold text-sm transition disabled:opacity-50"
+                                    className="mt-3 w-full py-2 rounded-lg bg-rose-500 hover:bg-rose-600 text-white font-bold text-sm transition disabled:opacity-50"
                                 >
                                     {actionLoading === selectedDoctor.id ? 'Rejecting...' : 'Reject Doctor'}
                                 </button>

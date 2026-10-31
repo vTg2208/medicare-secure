@@ -1,3 +1,4 @@
+import Brand from '../../components/common/Brand';
 import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
@@ -56,7 +57,7 @@ const STATUS_COLORS = {
 const StatusBadge = ({ status }) => {
     const c = STATUS_COLORS[status] || STATUS_COLORS.pending;
     return (
-        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${c.bg} ${c.text}`}>
+        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${c.bg}  ${c.text}`}>
             {status?.replace('_', ' ')}
         </span>
     );
@@ -71,7 +72,7 @@ function SortableVisitCard({ visit }) {
         <div
             ref={setNodeRef}
             style={style}
-            className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 flex items-center gap-3 cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md transition-shadow"
+            className="bg-surface dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 flex items-center gap-3 cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md transition-shadow"
         >
             <div {...attributes} {...listeners} className="text-slate-300 dark:text-slate-600 hover:text-slate-500 flex-shrink-0">
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -180,7 +181,7 @@ function ApproveVisitsTab() {
                         key={tab}
                         onClick={() => setActiveSubTab(tab)}
                         className={`px-5 py-2 rounded-lg text-sm font-semibold capitalize transition-all ${activeSubTab === tab
-                            ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
+                            ? 'bg-surface dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
                             : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
                     >
                         {tab}
@@ -199,14 +200,14 @@ function ApproveVisitsTab() {
                             <p className="font-medium">No {activeSubTab} visits</p>
                         </div>
                     ) : visits.map(visit => (
-                        <div key={visit.id} className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 shadow-sm">
+                        <div key={visit.id} className="bg-surface dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 shadow-sm">
                             <div className="flex items-start justify-between mb-3">
                                 <div className="flex items-center gap-2 flex-wrap">
                                     <StatusBadge status={visit.status} />
                                     <span className="text-xs text-slate-400">{formatTimeAgo(visit.created_at)}</span>
                                 </div>
                                 {visit.scheduled_time && (
-                                    <span className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-2 py-0.5 rounded-lg">
+                                    <span className="text-xs font-semibold text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/30 px-2 py-0.5 rounded-lg">
                                         🕐 {formatDateTime(visit.scheduled_time)}
                                     </span>
                                 )}
@@ -222,14 +223,14 @@ function ApproveVisitsTab() {
                             <div className="flex gap-2 flex-wrap">
                                 {visit.status === 'pending' && (
                                     <>
-                                        <button onClick={() => handleApproveClick(visit)} className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl transition-colors">Approve</button>
-                                        <button onClick={() => handleCloseVisit(visit.id, 'cancelled')} className="px-4 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-700 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400 text-sm font-semibold rounded-xl transition-colors">Reject</button>
+                                        <button onClick={() => handleApproveClick(visit)} className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold rounded-lg transition-colors">Approve</button>
+                                        <button onClick={() => handleCloseVisit(visit.id, 'cancelled')} className="px-4 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-700 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400 text-sm font-semibold rounded-lg transition-colors">Reject</button>
                                     </>
                                 )}
                                 {['approved', 'checked_in', 'in_progress'].includes(visit.status) && (
                                     <>
-                                        <button onClick={() => handleCloseVisit(visit.id, 'completed')} className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-xl transition-colors">Complete Visit</button>
-                                        <button onClick={() => handleCloseVisit(visit.id, 'cancelled')} className="px-4 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-700 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400 text-sm font-semibold rounded-xl transition-colors">Cancel</button>
+                                        <button onClick={() => handleCloseVisit(visit.id, 'completed')} className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-lg transition-colors">Complete Visit</button>
+                                        <button onClick={() => handleCloseVisit(visit.id, 'cancelled')} className="px-4 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-700 dark:text-slate-300 hover:text-red-600 dark:hover:text-red-400 text-sm font-semibold rounded-lg transition-colors">Cancel</button>
                                     </>
                                 )}
                             </div>
@@ -240,8 +241,8 @@ function ApproveVisitsTab() {
 
             {/* Approval Modal */}
             {showApprovalModal && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowApprovalModal(false)}>
-                    <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-md p-6" onClick={e => e.stopPropagation()}>
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowApprovalModal(false)}>
+                    <div className="bg-surface dark:bg-slate-900 rounded-2xl shadow-sm w-full max-w-md p-6" onClick={e => e.stopPropagation()}>
                         <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-4">Approve Visit</h2>
                         <div className="space-y-3 mb-6">
                             <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-3">
@@ -263,7 +264,7 @@ function ApproveVisitsTab() {
                                 <select
                                     value={approvalData.doctorId}
                                     onChange={e => setApprovalData({ ...approvalData, doctorId: e.target.value })}
-                                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 outline-none mb-3"
+                                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-primary-500 outline-none mb-3"
                                 >
                                     <option value="">Select a doctor</option>
                                     {doctors.map(d => <option key={d.id} value={d.id}>Dr. {d.name || `${d.first_name} ${d.last_name}`}</option>)}
@@ -273,7 +274,7 @@ function ApproveVisitsTab() {
                                 <select
                                     value={approvalData.nurseId}
                                     onChange={e => setApprovalData({ ...approvalData, nurseId: e.target.value })}
-                                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-indigo-500 outline-none"
+                                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-primary-500 outline-none"
                                 >
                                     <option value="">No nurse</option>
                                     {nurses.map(n => <option key={n.id} value={n.id}>{n.name || `${n.first_name} ${n.last_name}`}</option>)}
@@ -282,8 +283,8 @@ function ApproveVisitsTab() {
                             <p className="text-xs text-slate-400">{isDemoMode ? 'Email is unavailable in this demo. Share the visit code after approval.' : 'The visit code is shown after approval. An email is sent when delivery is available.'}</p>
                         </div>
                         <div className="flex gap-3">
-                            <button onClick={() => setShowApprovalModal(false)} className="flex-1 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">Cancel</button>
-                            <button onClick={handleApproveVisit} className="flex-1 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition-colors">Approve visit</button>
+                            <button onClick={() => setShowApprovalModal(false)} className="flex-1 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">Cancel</button>
+                            <button onClick={handleApproveVisit} className="flex-1 py-2 rounded-lg bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold transition-colors">Approve visit</button>
                         </div>
                     </div>
                 </div>
@@ -305,7 +306,7 @@ function WalkInQRTab() {
 
     return (
         <div className="flex flex-col items-center max-w-lg mx-auto py-8">
-            <div className="w-12 h-12 rounded-2xl bg-teal-100 dark:bg-teal-900/30 flex items-center justify-center mb-4">
+            <div className="w-12 h-12 rounded-2xl bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center mb-4">
                 <span className="text-2xl">🏥</span>
             </div>
             <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">Walk-In QR Code</h2>
@@ -313,7 +314,7 @@ function WalkInQRTab() {
                 Display this QR code at the reception desk. Patients can scan it to access the walk-in check-in portal.
             </p>
 
-            <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl p-8 shadow-xl mb-6 flex flex-col items-center">
+            <div className="bg-surface dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl p-8 shadow-sm mb-6 flex flex-col items-center">
                 <QRCodeSVG
                     value={walkInUrl}
                     size={220}
@@ -329,7 +330,7 @@ function WalkInQRTab() {
                 <span className="text-sm text-slate-600 dark:text-slate-300 truncate flex-1 font-mono">{walkInUrl}</span>
                 <button
                     onClick={handleCopy}
-                    className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${copied ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 hover:bg-indigo-200 dark:hover:bg-indigo-900/50'}`}
+                    className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${copied ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : "bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400 hover:bg-primary-200 dark:hover:bg-primary-900/50"}`}
                 >
                     {copied ? '✓ Copied' : 'Copy'}
                 </button>
@@ -337,7 +338,7 @@ function WalkInQRTab() {
 
             <button
                 onClick={() => window.print()}
-                className="w-full py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm transition-colors"
+                className="w-full py-3 rounded-lg bg-primary-600 hover:bg-primary-700 text-white font-semibold text-sm transition-colors"
             >
                 🖨️ Print QR Code
             </button>
@@ -473,11 +474,11 @@ function AppointmentSchedulingTab() {
             {doctorIds.map(docId => {
                 const { doctorName, visits: docVisits } = doctorGroups[docId];
                 return (
-                    <div key={docId} className="bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden">
+                    <div key={docId} className="bg-surface dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden">
                         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-700">
                             <div className="flex items-center gap-3">
-                                <div className="w-9 h-9 rounded-xl bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
-                                    <span className="text-indigo-600 dark:text-indigo-400 text-sm font-bold">{doctorName.split(' ').filter(p => !['Dr.'].includes(p)).map(p => p[0]).join('').slice(0, 2)}</span>
+                                <div className="w-9 h-9 rounded-xl bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
+                                    <span className="text-primary-600 dark:text-primary-400 text-sm font-bold">{doctorName.split(' ').filter(p => !['Dr.'].includes(p)).map(p => p[0]).join('').slice(0, 2)}</span>
                                 </div>
                                 <div>
                                     <p className="font-bold text-slate-900 dark:text-white text-sm">{doctorName}</p>
@@ -487,9 +488,9 @@ function AppointmentSchedulingTab() {
                             <button
                                 onClick={() => handleSaveSchedule(docId)}
                                 disabled={saving}
-                                className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${savedDoctors[docId]
+                                className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${savedDoctors[docId]
                                     ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
-                                    : 'bg-indigo-600 hover:bg-indigo-700 text-white'} disabled:opacity-50`}
+                                    : "bg-primary-600 hover:bg-primary-700 text-white"} disabled:opacity-50`}
                             >
                                 {savedDoctors[docId] ? '✓ Saved' : saving ? 'Saving...' : 'Save Schedule'}
                             </button>
@@ -529,41 +530,33 @@ function ReceptionistVisitManagement() {
     }, []);
 
     return (
-        <div className="patient-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-800 dark:text-slate-100 flex h-screen w-full overflow-hidden">
-            <div className="absolute top-4 right-4 z-50">
+        <div className="patient-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-800 dark:text-slate-100 flex h-screen w-full overflow-hidden mc-workspace">
+            <div className="mc-workspace-theme">
                 <ThemeToggle />
             </div>
 
-            <aside className="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800/50 p-6 flex flex-col h-full overflow-y-auto">
-                <div className="flex items-center gap-3 mb-10 px-2 cursor-pointer group" onClick={() => navigate('/staff/dashboard')}>
-                    <div className="relative">
-                        <div className="absolute inset-0 bg-indigo-500 blur-lg opacity-0 group-hover:opacity-60 transition-opacity duration-500 rounded-full"></div>
-                        <div className="relative w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center text-white shadow-lg transform transition-all duration-500 group-hover:scale-110 group-hover:-rotate-3 group-hover:shadow-[0_0_15px_rgba(99,102,241,0.5)]">
-                            <span className="material-symbols-outlined text-xl transition-transform duration-500 group-hover:scale-110">local_hospital</span>
-                        </div>
-                    </div>
-                    <h1 className="text-xl font-bold tracking-tight text-slate-800 dark:text-white transition-all duration-500 drop-shadow-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-hover:drop-shadow-[0_0_10px_rgba(99,102,241,0.4)]">Medicare</h1>
-                </div>
+            <aside className="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800/50 p-6 flex flex-col h-full overflow-y-auto mc-sidebar">
+                <Brand to={'/staff/dashboard'} />
                 <nav className="space-y-2 flex-grow">
-                    <button onClick={() => navigate('/staff/dashboard')} className="w-full flex items-center justify-start gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl">
+                    <button onClick={() => navigate('/staff/dashboard')} className="w-full flex items-center justify-start gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-lg">
                         <span className="material-symbols-outlined text-[20px]">grid_view</span>
                         Overview
                     </button>
-                    <button onClick={() => setActiveTab('approve')} className={`w-full flex items-center justify-start gap-3 px-4 py-3 rounded-xl transition ${activeTab === 'approve' ? 'sidebar-item-active font-medium text-slate-800 dark:text-slate-800' : 'text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5'}`}>
+                    <button onClick={() => setActiveTab('approve')} className={`w-full flex items-center justify-start gap-3 px-4 py-3 rounded-lg transition ${activeTab === 'approve' ? 'sidebar-item-active font-medium text-slate-800 dark:text-slate-800' : 'text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface'}`}>
                         <span className="material-symbols-outlined text-[20px]">fact_check</span>
                         Approve Visits
                     </button>
-                    <button onClick={() => setActiveTab('walkin')} className={`w-full flex items-center justify-start gap-3 px-4 py-3 rounded-xl transition ${activeTab === 'walkin' ? 'sidebar-item-active font-medium text-slate-800 dark:text-slate-800' : 'text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5'}`}>
+                    <button onClick={() => setActiveTab('walkin')} className={`w-full flex items-center justify-start gap-3 px-4 py-3 rounded-lg transition ${activeTab === 'walkin' ? 'sidebar-item-active font-medium text-slate-800 dark:text-slate-800' : 'text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface'}`}>
                         <span className="material-symbols-outlined text-[20px]">qr_code_scanner</span>
                         Walk-In QR Code
                     </button>
-                    <button onClick={() => setActiveTab('schedule')} className={`w-full flex items-center justify-start gap-3 px-4 py-3 rounded-xl transition ${activeTab === 'schedule' ? 'sidebar-item-active font-medium text-slate-800 dark:text-slate-800' : 'text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5'}`}>
+                    <button onClick={() => setActiveTab('schedule')} className={`w-full flex items-center justify-start gap-3 px-4 py-3 rounded-lg transition ${activeTab === 'schedule' ? 'sidebar-item-active font-medium text-slate-800 dark:text-slate-800' : 'text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface'}`}>
                         <span className="material-symbols-outlined text-[20px]">calendar_month</span>
                         Scheduling
                     </button>
                 </nav>
                 <div className="space-y-2 mt-auto pt-6 border-t border-slate-200 dark:border-slate-800/50">
-                    <button onClick={logout} className="w-full flex items-center justify-start gap-3 px-4 py-3 text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition rounded-xl font-medium">
+                    <button onClick={logout} className="w-full flex items-center justify-start gap-3 px-4 py-3 text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition rounded-lg font-medium">
                         <span className="material-symbols-outlined text-[20px]">logout</span>
                         Sign Out
                     </button>

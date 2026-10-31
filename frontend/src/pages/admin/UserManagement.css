@@ -5,17 +5,17 @@
 .dashboard-container {
     padding: 0;
     min-height: 100vh;
-    background: #f8fafc;
-    font-family: 'Inter', sans-serif;
+    background: var(--mc-canvas);
+    font-family: var(--mc-font);
 }
 
 /* ── Header ── */
 .dashboard-header {
-    background: linear-gradient(135deg, #326773 0%, #438a99 70%, #54acbf 100%) !important;
+    background: var(--mc-brand) !important;
     padding: 1.25rem 4%;
-    color: white;
+    color: var(--mc-on-brand);
     margin-bottom: 0;
-    box-shadow: 0 4px 12px rgba(50, 103, 115, 0.2);
+    box-shadow: var(--mc-shadow-panel);
     border-bottom: none;
 }
 
@@ -31,15 +31,15 @@
     margin: 0;
     font-size: 1.5rem;
     font-weight: 800;
-    color: #ffffff !important;
+    color: var(--mc-on-brand) !important;
 }
 
 .dashboard-header .back-btn {
-    background: rgba(255, 255, 255, 0.15) !important;
-    border: 1px solid rgba(255, 255, 255, 0.3) !important;
-    color: white !important;
+    background: var(--mc-surface) !important;
+    border: 1px solid var(--mc-border) !important;
+    color: var(--mc-accent) !important;
     padding: 6px 14px !important;
-    border-radius: 6px !important;
+    border-radius: var(--mc-radius-control) !important;
     font-size: 0.8rem !important;
     font-weight: 600 !important;
     cursor: pointer !important;
@@ -47,14 +47,14 @@
 }
 
 .dashboard-header .back-btn:hover {
-    background: rgba(255, 255, 255, 0.25) !important;
+    background: var(--mc-surface) !important;
     transform: translateY(-1px);
 }
 
 .header-subtitle {
     margin: 4px 0 0;
     font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.95) !important;
+    color: var(--mc-on-brand) !important;
     opacity: 1 !important;
 }
 
@@ -67,12 +67,12 @@
 
 /* ── Filters ── */
 .filters-container {
-    background: white;
+    background: var(--mc-surface);
     padding: 1rem;
     /* Reduced from 1.5rem */
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    border: 1px solid #f1f5f9;
+    border-radius: var(--mc-radius-panel);
+    box-shadow: var(--mc-shadow-sm);
+    border: 1px solid var(--mc-border);
     margin: -1.5rem auto 1.5rem;
     /* Reduced bottom margin */
     display: flex;
@@ -91,10 +91,10 @@
     width: 100%;
     padding: 8px 14px;
     /* More compact */
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
+    border: 1px solid var(--mc-border);
+    border-radius: var(--mc-radius-control);
     font-size: 0.9rem;
-    background: #f8fafc;
+    background: var(--mc-surface-muted);
 }
 
 .filter-group {
@@ -105,21 +105,21 @@
 .filter-select {
     padding: 8px 14px;
     /* More compact */
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
+    border: 1px solid var(--mc-border);
+    border-radius: var(--mc-radius-control);
     font-size: 0.85rem;
-    background: white;
-    color: #475569;
+    background: var(--mc-surface);
+    color: var(--mc-text-muted);
 }
 
 /* ── Table ── */
 .users-table-container {
-    background: white;
-    border-radius: 12px;
+    background: var(--mc-surface);
+    border-radius: var(--mc-radius-panel);
     padding: 1.25rem;
     /* Reduced from 1.5rem */
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    border: 1px solid #f1f5f9;
+    box-shadow: var(--mc-shadow-sm);
+    border: 1px solid var(--mc-border);
     margin-bottom: 2rem;
 }
 
@@ -136,9 +136,9 @@
     /* Reduced from 0.75rem */
     font-weight: 700;
     text-transform: uppercase;
-    color: #ffffff;
-    background: #438a99;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--mc-on-brand);
+    background: var(--mc-brand);
+    border-bottom: 1px solid var(--mc-border);
 }
 
 .users-table th:first-child {
@@ -153,57 +153,57 @@
     padding: 0.75rem 1rem;
     /* Reduced from 1.25rem */
     font-size: 0.9rem;
-    color: #334155;
-    border-bottom: 1px solid #f1f5f9;
+    color: var(--mc-text);
+    border-bottom: 1px solid var(--mc-border);
 }
 
 /* ── Badges ── */
 .role-badge,
 .status-badge {
     padding: 4px 10px;
-    border-radius: 20px;
+    border-radius: var(--mc-radius-control);
     font-size: 0.7rem;
     font-weight: 700;
     text-transform: uppercase;
 }
 
 .badge-admin {
-    background: #fee2e2;
-    color: #991b1b;
+    background: var(--mc-danger-bg);
+    color: var(--mc-danger);
 }
 
 .badge-doctor {
-    background: #e0f2fe;
-    color: #075985;
+    background: var(--mc-brand-soft);
+    color: var(--mc-accent);
 }
 
 .badge-nurse {
-    background: #dcfce7;
-    color: #166534;
+    background: var(--mc-success-bg);
+    color: var(--mc-success);
 }
 
 .badge-patient {
-    background: #f1f5f9;
-    color: #475569;
+    background: var(--mc-surface-muted);
+    color: var(--mc-text-muted);
 }
 
 .status-active {
-    background: #dcfce7;
-    color: #166534;
+    background: var(--mc-success-bg);
+    color: var(--mc-success);
 }
 
 .status-inactive {
-    background: #f1f5f9;
-    color: #94a3b8;
+    background: var(--mc-surface-muted);
+    color: var(--mc-text-muted);
 }
 
 /* ── Button ── */
 .deactivate-btn {
     padding: 6px 12px;
-    border-radius: 8px;
-    border: 1px solid #fca5a5;
-    background: white;
-    color: #e11d48;
+    border-radius: var(--mc-radius-control);
+    border: 1px solid var(--mc-danger-border);
+    background: var(--mc-surface);
+    color: var(--mc-danger);
     font-size: 0.8rem;
     font-weight: 600;
     cursor: pointer;
@@ -211,7 +211,7 @@
 }
 
 .deactivate-btn:hover {
-    background: #fff1f2;
+    background: var(--mc-surface-muted);
 }
 
 /* ── Stats Summary ── */
@@ -222,11 +222,11 @@
 }
 
 .stat-box {
-    background: #5296a6;
+    background: var(--mc-brand);
     /* Theme Teal */
     padding: 1.5rem;
-    border-radius: 16px;
-    box-shadow: 0 4px 15px rgba(50, 103, 115, 0.1);
+    border-radius: var(--mc-radius-panel);
+    box-shadow: var(--mc-shadow-panel);
     border: none;
     text-align: center;
     transition: transform 0.2s;
@@ -239,26 +239,26 @@
 .stat-value {
     font-size: 1.75rem;
     font-weight: 800;
-    color: #ffffff;
+    color: var(--mc-on-brand);
 }
 
 .stat-label {
     font-size: 0.75rem;
     font-weight: 700;
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--mc-on-brand);
     text-transform: uppercase;
 }
 
 .stat-icon {
     width: 44px;
     height: 44px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
+    background: var(--mc-surface);
+    border-radius: var(--mc-radius-control);
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 0 auto 12px;
-    color: white;
+    color: var(--mc-accent);
 }
 
 .stat-icon svg {

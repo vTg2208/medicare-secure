@@ -1,3 +1,4 @@
+import Brand from '../../components/common/Brand';
 import React, { useContext, useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
@@ -133,26 +134,18 @@ function StaffDashboard() {
     ];
 
     return (
-        <div className="patient-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-800 dark:text-slate-100 flex h-screen w-full overflow-hidden">
-            <div className="absolute top-4 right-4 z-50"><ThemeToggle /></div>
+        <div className="patient-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-800 dark:text-slate-100 flex h-screen w-full overflow-hidden mc-workspace">
+            <div className="mc-workspace-theme"><ThemeToggle /></div>
 
             {/* ── Sidebar ── */}
-            <aside className="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800/50 p-6 flex flex-col h-full overflow-y-auto z-20">
-                <div className="flex items-center gap-3 mb-10 px-2 cursor-pointer group" onClick={() => navigate('/staff/dashboard')}>
-                    <div className="relative">
-                        <div className="absolute inset-0 bg-indigo-500 blur-lg opacity-0 group-hover:opacity-60 transition-opacity duration-500 rounded-full" />
-                        <div className="relative w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center text-white shadow-lg transform transition-all duration-500 group-hover:scale-110 group-hover:-rotate-3">
-                            <span className="material-symbols-outlined text-xl">local_hospital</span>
-                        </div>
-                    </div>
-                    <h1 className="text-xl font-bold tracking-tight text-slate-800 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Medicare</h1>
-                </div>
+            <aside className="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800/50 p-6 flex flex-col h-full overflow-y-auto z-20 mc-sidebar">
+                <Brand to={'/staff/dashboard'} />
 
                 <nav className="space-y-2 flex-grow">
                     {sidebarLinks.map((item, i) => {
                         const cls = item.active
                             ? 'flex items-center gap-3 px-4 py-3 sidebar-item-active rounded-xl font-medium text-slate-800 dark:text-slate-800 shadow-sm'
-                            : 'w-full flex items-center justify-start gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl';
+                            : 'w-full flex items-center justify-start gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl';
                         if (item.to) {
                             return <Link key={i} to={item.to} className={cls}><span className="material-symbols-outlined text-[20px]">{item.icon}</span>{item.label}</Link>;
                         }
@@ -161,7 +154,7 @@ function StaffDashboard() {
                 </nav>
 
                 <div className="space-y-2 mt-auto pt-6 border-t border-slate-200 dark:border-slate-800/50">
-                    <button onClick={logout} className="w-full flex items-center justify-start gap-3 px-4 py-3 text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition rounded-xl font-medium">
+                    <button onClick={logout} className="w-full flex items-center justify-start gap-3 px-4 py-3 text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition rounded-lg font-medium">
                         <span className="material-symbols-outlined text-[20px]">logout</span>Sign Out
                     </button>
                 </div>
@@ -179,7 +172,7 @@ function StaffDashboard() {
                         </div>
                         <div className="flex items-center gap-3 glass-card px-4 py-2 rounded-2xl">
                             <div className="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
-                                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                                <div className="w-2 h-2 rounded-full bg-emerald-500" />
                             </div>
                             <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">
                                 {user?.firstName} {user?.lastName} · On Duty
@@ -190,24 +183,24 @@ function StaffDashboard() {
                     {/* ── Top 4 Quick-Action Cards ── */}
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
                         {[
-                            { onClick: navToVisits, icon: 'fact_check', color: 'amber', title: 'Visit Management', sub: 'Patient Queue & Approval', desc: 'Track Consultations' },
-                            { to: '/staff/registration', icon: 'person_add', color: 'indigo', title: 'Patient Registration', sub: 'Demographics & Insurance', desc: 'New Profiles' },
-                            { onClick: () => { if (user?.role === 'receptionist') navigate('/receptionist/visits#schedule'); }, icon: 'event_available', color: 'teal', title: 'Appointment Scheduling', sub: 'Manage time slots', desc: 'Doctor Calendar' },
-                            { to: '/staff/workflow', icon: 'health_and_safety', color: 'rose', title: 'Clinical Workflow', sub: 'Visits & Beds Manager', desc: 'Triage & IPD' },
+                            { onClick: navToVisits, icon: 'fact_check', color: "primary", title: 'Visit Management', sub: 'Patient Queue & Approval', desc: 'Track Consultations' },
+                            { to: '/staff/registration', icon: 'person_add', color: "primary", title: 'Patient Registration', sub: 'Demographics & Insurance', desc: 'New Profiles' },
+                            { onClick: () => { if (user?.role === 'receptionist') navigate('/receptionist/visits#schedule'); }, icon: 'event_available', color: "primary", title: 'Appointment Scheduling', sub: 'Manage time slots', desc: 'Doctor Calendar' },
+                            { to: '/staff/workflow', icon: 'health_and_safety', color: "primary", title: 'Clinical Workflow', sub: 'Visits & Beds Manager', desc: 'Triage & IPD' },
                         ].map((card, i) => {
                             const Wrapper = card.to ? Link : 'div';
                             const props = card.to ? { to: card.to } : { onClick: card.onClick };
                             return (
-                                <Wrapper key={i} {...props} className={`glass-card p-6 rounded-3xl hover:bg-white/80 dark:hover:bg-slate-800/80 transition-all cursor-pointer group block`}>
+                                <Wrapper key={i} {...props} className={`glass-card p-6 rounded-3xl hover:bg-surface dark:hover:bg-slate-800/80 transition-all cursor-pointer group block`}>
                                     <div className="flex items-center justify-between mb-6">
-                                        <div className={`w-12 h-12 rounded-2xl bg-${card.color}-50 dark:bg-${card.color}-900/30 flex items-center justify-center text-${card.color}-600 dark:text-${card.color}-400`}>
+                                        <div className={`w-12 h-12 rounded-2xl bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400`}>
                                             <span className="material-symbols-outlined text-2xl">{card.icon}</span>
                                         </div>
-                                        <span className={`material-symbols-outlined text-slate-300 dark:text-slate-600 group-hover:text-${card.color}-500 transition-colors`}>arrow_forward</span>
+                                        <span className={`material-symbols-outlined text-slate-300 dark:text-slate-600 group-hover:text-primary-500 transition-colors`}>arrow_forward</span>
                                     </div>
                                     <h4 className="text-lg font-bold mb-1 text-slate-800 dark:text-slate-100">{card.title}</h4>
                                     <p className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold mb-4">{card.desc}</p>
-                                    <div className={`bg-${card.color}-50/50 dark:bg-${card.color}-900/20 p-4 rounded-2xl border border-${card.color}-100/50 dark:border-${card.color}-500/10`}>
+                                    <div className={`bg-primary-50/50 dark:bg-primary-900/20 p-4 rounded-2xl border border-primary-100/50 dark:border-primary-500/10`}>
                                         <span className="text-sm font-medium text-slate-700 dark:text-slate-200">{card.sub}</span>
                                     </div>
                                 </Wrapper>
@@ -224,12 +217,12 @@ function StaffDashboard() {
                         <div className="flex items-center justify-between mb-5">
                             <div>
                                 <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                                    <span className="material-symbols-outlined text-[20px] text-indigo-500">groups</span>
+                                    <span className="material-symbols-outlined text-[20px] text-primary-500">groups</span>
                                     Live Patient Queue
                                 </h3>
                                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Active visits requiring attention</p>
                             </div>
-                            <button onClick={fetchData} className="p-2 rounded-xl text-slate-400 hover:text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors" title="Refresh">
+                            <button onClick={fetchData} className="p-2 rounded-lg text-slate-400 hover:text-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors" title="Refresh">
                                 <span className="material-symbols-outlined text-[18px]">refresh</span>
                             </button>
                         </div>
@@ -267,7 +260,7 @@ function StaffDashboard() {
                                             return (
                                                 <tr key={v.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
                                                     <td className="py-3 pr-4">
-                                                        <span className="font-mono font-bold text-indigo-600 dark:text-indigo-400 text-xs">
+                                                        <span className="font-mono font-bold text-primary-600 dark:text-primary-400 text-xs">
                                                             {(v.visit_code || v.visitCode || v.id?.slice(0, 8) || '—').toUpperCase()}
                                                         </span>
                                                     </td>
@@ -279,7 +272,7 @@ function StaffDashboard() {
                                                             <button
                                                                 onClick={() => handleTransition(v)}
                                                                 disabled={updatingId === v.id}
-                                                                className={`px-3 py-1.5 rounded-xl text-white text-xs font-bold transition-colors ${next.color} disabled:opacity-50`}
+                                                                className={`px-3 py-1.5 rounded-lg text-white text-xs font-bold transition-colors ${next.color} disabled:opacity-50`}
                                                             >
                                                                 {updatingId === v.id ? '...' : next.label}
                                                             </button>
@@ -298,7 +291,7 @@ function StaffDashboard() {
                     <div className="glass-card rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-800">
                         <div className="mb-5">
                             <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                                <span className="material-symbols-outlined text-[20px] text-teal-500">stethoscope</span>
+                                <span className="material-symbols-outlined text-[20px] text-primary-500">stethoscope</span>
                                 Doctor Availability
                             </h3>
                             <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Real-time status</p>
@@ -323,7 +316,7 @@ function StaffDashboard() {
                                     return (
                                         <div key={doc.id || i} className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700">
                                             <div className="flex items-center gap-3">
-                                                <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-sm ${isAvailable ? 'bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300'}`}>
+                                                <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-sm ${isAvailable ? "bg-primary-100 text-primary-700 dark:bg-primary-900/40 dark:text-primary-300" : 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300'}`}>
                                                     {name.charAt(4) || 'D'}
                                                 </div>
                                                 <div>
@@ -331,8 +324,8 @@ function StaffDashboard() {
                                                     <p className="text-xs text-slate-500 dark:text-slate-400">{doc.specialization || doc.specialty || 'General'}</p>
                                                 </div>
                                             </div>
-                                            <span className={`flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full ${isAvailable ? 'bg-teal-50 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300' : 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'}`}>
-                                                <span className={`w-1.5 h-1.5 rounded-full ${isAvailable ? 'bg-teal-500' : 'bg-amber-500 animate-pulse'}`} />
+                                            <span className={`flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full ${isAvailable ? "bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300" : 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'}`}>
+                                                <span className={`w-1.5 h-1.5 rounded-full ${isAvailable ? "bg-primary-500" : 'bg-amber-500 animate-pulse'}`} />
                                                 {doc.availability}
                                             </span>
                                         </div>
@@ -346,28 +339,28 @@ function StaffDashboard() {
                 {/* ── Widget 3: Today's Statistics ── */}
                 <div className="mt-6 glass-card rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-800">
                     <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-6">
-                        <span className="material-symbols-outlined text-[20px] text-rose-500">bar_chart</span>
+                        <span className="material-symbols-outlined text-[20px] text-primary-500">bar_chart</span>
                         Today's Activity
                     </h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         {/* New Registrations — Indigo */}
-                        <div className="p-5 rounded-2xl bg-indigo-50/50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-900/30 flex flex-col gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                        <div className="p-5 rounded-2xl bg-primary-50/50 dark:bg-primary-900/10 border border-primary-100 dark:border-primary-900/30 flex flex-col gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400">
                                 <span className="material-symbols-outlined text-[20px]">person_add</span>
                             </div>
                             <div>
-                                <p className="text-3xl font-black text-indigo-600 dark:text-indigo-400">{loading ? '—' : stats.newRegistrations}</p>
+                                <p className="text-3xl font-bold text-primary-600 dark:text-primary-400">{loading ? '—' : stats.newRegistrations}</p>
                                 <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">New Registrations</p>
                             </div>
                         </div>
 
                         {/* Appointments — Blue */}
-                        <div className="p-5 rounded-2xl bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 flex flex-col gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                        <div className="p-5 rounded-2xl bg-primary-50/50 dark:bg-primary-900/10 border border-primary-100 dark:border-primary-900/30 flex flex-col gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400">
                                 <span className="material-symbols-outlined text-[20px]">event_available</span>
                             </div>
                             <div>
-                                <p className="text-3xl font-black text-blue-600 dark:text-blue-400">{loading ? '—' : stats.appointments}</p>
+                                <p className="text-3xl font-bold text-primary-600 dark:text-primary-400">{loading ? '—' : stats.appointments}</p>
                                 <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">Appointments</p>
                             </div>
                         </div>
@@ -378,7 +371,7 @@ function StaffDashboard() {
                                 <span className="material-symbols-outlined text-[20px]">check_circle</span>
                             </div>
                             <div>
-                                <p className="text-3xl font-black text-emerald-600 dark:text-emerald-400">{loading ? '—' : stats.consultationsDone}</p>
+                                <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">{loading ? '—' : stats.consultationsDone}</p>
                                 <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">Consultations Done</p>
                             </div>
                         </div>
@@ -389,7 +382,7 @@ function StaffDashboard() {
                                 <span className="material-symbols-outlined text-[20px]">pending</span>
                             </div>
                             <div>
-                                <p className="text-3xl font-black text-amber-600 dark:text-amber-400">{loading ? '—' : stats.pendingVisits}</p>
+                                <p className="text-3xl font-bold text-amber-600 dark:text-amber-400">{loading ? '—' : stats.pendingVisits}</p>
                                 <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">Pending Visits</p>
                             </div>
                         </div>

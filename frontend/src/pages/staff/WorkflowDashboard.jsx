@@ -1,3 +1,4 @@
+import Brand from '../../components/common/Brand';
 // Workflow Dashboard - Epic 4: Clinical Workflow
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
@@ -70,35 +71,27 @@ function WorkflowDashboard() {
     };
 
     return (
-        <div className="patient-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-800 dark:text-slate-100 flex h-screen w-full overflow-hidden">
-            <div className="absolute top-4 right-4 z-50">
+        <div className="patient-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-800 dark:text-slate-100 flex h-screen w-full overflow-hidden mc-workspace">
+            <div className="mc-workspace-theme">
                 <ThemeToggle />
             </div>
 
             {/* Sidebar */}
-            <aside className="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800/50 p-6 flex flex-col h-full overflow-y-auto w-full md:w-64 z-20">
-                <div className="flex items-center gap-3 mb-10 px-2 cursor-pointer group" onClick={() => navigate(backPath)}>
-                    <div className="relative">
-                        <div className="absolute inset-0 bg-indigo-500 blur-lg opacity-0 group-hover:opacity-60 transition-opacity duration-500 rounded-full"></div>
-                        <div className="relative w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center text-white shadow-lg transform transition-all duration-500 group-hover:scale-110 group-hover:-rotate-3 group-hover:shadow-[0_0_15px_rgba(99,102,241,0.5)]">
-                            <span className="material-symbols-outlined text-xl transition-transform duration-500 group-hover:scale-110">local_hospital</span>
-                        </div>
-                    </div>
-                    <h1 className="text-xl font-bold tracking-tight text-slate-800 dark:text-white transition-all duration-500 drop-shadow-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-hover:drop-shadow-[0_0_10px_rgba(99,102,241,0.4)]">Medicare</h1>
-                </div>
+            <aside className="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800/50 p-6 flex flex-col h-full overflow-y-auto w-full md:w-64 z-20 mc-sidebar">
+                <Brand to={backPath} />
                 <nav className="space-y-2 flex-grow">
-                    <button onClick={() => navigate(backPath)} className="w-full flex items-center justify-start gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl">
+                    <button onClick={() => navigate(backPath)} className="w-full flex items-center justify-start gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-lg">
                         <span className="material-symbols-outlined text-[20px]">grid_view</span>
                         Overview
                     </button>
                     {!isAdmin && (
                         <>
-                            <button onClick={navToVisits} className="w-full flex items-center justify-start gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl">
+                            <button onClick={navToVisits} className="w-full flex items-center justify-start gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-lg">
                                 <span className="material-symbols-outlined text-[20px]">fact_check</span>
                                 Visit Management
                             </button>
                             {['receptionist', 'nurse', 'staff'].includes(user?.role) && (
-                                <Link to="/staff/registration" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl">
+                                <Link to="/staff/registration" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
                                     <span className="material-symbols-outlined text-[20px]">person_add</span>
                                     Patient Registration
                                 </Link>
@@ -111,7 +104,7 @@ function WorkflowDashboard() {
                     </Link>
                 </nav>
                 <div className="space-y-2 mt-auto pt-6 border-t border-slate-200 dark:border-slate-800/50">
-                    <button onClick={logout} className="w-full flex items-center justify-start gap-3 px-4 py-3 text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition rounded-xl font-medium">
+                    <button onClick={logout} className="w-full flex items-center justify-start gap-3 px-4 py-3 text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition rounded-lg font-medium">
                         <span className="material-symbols-outlined text-[20px]">logout</span>
                         Sign Out
                     </button>
@@ -134,7 +127,7 @@ function WorkflowDashboard() {
                 <div className="glass-card rounded-3xl p-8 max-w-7xl mx-auto shadow-sm">
                     <div className="workflow-grid">
                         {/* Bed Management Card */}
-                        <div className="glass-card rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50">
+                        <div className="glass-card rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 bg-surface dark:bg-slate-900/50">
                             <div className="flex justify-between items-center mb-6 pb-4 border-b border-slate-200 dark:border-slate-700">
                                 <h2 className="text-xl font-bold text-slate-800 dark:text-white m-0 flex items-center gap-2">🛏️ Bed Management</h2>
                                 <Button onClick={handleAllocateBed} size="small">+ Allocate</Button>
@@ -144,11 +137,11 @@ function WorkflowDashboard() {
                                     <div>
                                         <div className="flex gap-8 mb-6">
                                             <div className="flex flex-col">
-                                                <span className="text-4xl font-bold text-sky-500">{beds.length}</span>
+                                                <span className="text-4xl font-bold text-primary-500">{beds.length}</span>
                                                 <span className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">Available Beds</span>
                                             </div>
                                             <div className="flex flex-col">
-                                                <span className="text-4xl font-bold text-sky-500">{beds.filter(b => b.ward === 'ICU').length}</span>
+                                                <span className="text-4xl font-bold text-primary-500">{beds.filter(b => b.ward === 'ICU').length}</span>
                                                 <span className="text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">ICU Vacancy</span>
                                             </div>
                                         </div>
@@ -169,7 +162,7 @@ function WorkflowDashboard() {
                         </div>
 
                         {/* Notifications / Tasks */}
-                        <div className="glass-card rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50">
+                        <div className="glass-card rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 bg-surface dark:bg-slate-900/50">
                             <div className="flex justify-between items-center mb-6 pb-4 border-b border-slate-200 dark:border-slate-700">
                                 <h2 className="text-xl font-bold text-slate-800 dark:text-white m-0 flex items-center gap-2">🔔 Active Tasks</h2>
                             </div>
@@ -179,7 +172,7 @@ function WorkflowDashboard() {
                                 ) : (
                                     <ul className="m-0 p-0 list-none space-y-2">
                                         {notifications.map(n => (
-                                            <li key={n.id} className={`p-4 rounded-xl border border-slate-200 dark:border-slate-700 flex justify-between items-center ${n.priority === 'high' ? 'border-l-4 border-l-rose-500 bg-rose-50 dark:bg-rose-900/20' : 'bg-slate-50 dark:bg-slate-800/50'}`}>
+                                            <li key={n.id} className={`p-4 rounded-xl border border-slate-200 dark:border-slate-700 flex justify-between items-center ${n.priority === 'high' ? "border-l-rose-500 bg-rose-50 dark:bg-rose-900/20" : 'bg-slate-50 dark:bg-slate-800/50'}`}>
                                                 <span className="font-medium text-slate-800 dark:text-slate-200">{n.message}</span>
                                                 <span className="text-xs text-slate-500 dark:text-slate-400">{new Date(n.created_at).toLocaleTimeString()}</span>
                                             </li>

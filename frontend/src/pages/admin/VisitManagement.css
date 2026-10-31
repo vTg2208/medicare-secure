@@ -1,22 +1,21 @@
 /* ============================================================
-   Visit Management — Teal Dashboard Theme
-   Matches: #326773 → #438a99 → #54acbf
+   Visit Management — Medicare Teal Theme
    ============================================================ */
 
 .visit-management-container {
     padding: 0;
     min-height: 100vh;
-    background: #f8fafc;
-    font-family: 'Inter', sans-serif;
+    background: var(--mc-canvas);
+    font-family: var(--mc-font);
 }
 
 /* ── Header ── */
 .visit-management-header {
-    background: linear-gradient(135deg, #326773 0%, #438a99 70%, #54acbf 100%) !important;
+    background: var(--mc-brand) !important;
     padding: 1.25rem 4%;
-    color: white;
+    color: var(--mc-on-brand);
     margin-bottom: 0;
-    box-shadow: 0 4px 12px rgba(50, 103, 115, 0.2);
+    box-shadow: var(--mc-shadow-panel);
     border-bottom: none;
     display: flex;
     justify-content: space-between;
@@ -27,22 +26,22 @@
     margin: 0;
     font-size: 1.5rem;
     font-weight: 800;
-    color: #ffffff !important;
+    color: var(--mc-on-brand) !important;
 }
 
 .visit-management-header .subtitle {
     margin: 2px 0 0;
     font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.95) !important;
+    color: var(--mc-on-brand) !important;
     opacity: 1 !important;
 }
 
 .visit-management-header .back-btn {
-    background: rgba(255, 255, 255, 0.15) !important;
-    border: 1px solid rgba(255, 255, 255, 0.3) !important;
-    color: white !important;
+    background: var(--mc-surface) !important;
+    border: 1px solid var(--mc-border) !important;
+    color: var(--mc-accent) !important;
     padding: 6px 14px !important;
-    border-radius: 6px !important;
+    border-radius: var(--mc-radius-control) !important;
     font-size: 0.8rem !important;
     font-weight: 600 !important;
     cursor: pointer !important;
@@ -50,7 +49,7 @@
 }
 
 .visit-management-header .back-btn:hover {
-    background: rgba(255, 255, 255, 0.25) !important;
+    background: var(--mc-surface) !important;
     transform: translateY(-1px);
 }
 
@@ -66,10 +65,10 @@
     display: flex;
     gap: 0.5rem;
     margin: -1.25rem auto 1.5rem;
-    background: white;
+    background: var(--mc-surface);
     padding: 0.4rem;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border-radius: var(--mc-radius-control);
+    box-shadow: var(--mc-shadow-sm);
     max-width: fit-content;
     position: relative;
     z-index: 10;
@@ -79,32 +78,32 @@
     padding: 8px 18px;
     background: transparent;
     border: none;
-    border-radius: 6px;
+    border-radius: var(--mc-radius-control);
     cursor: pointer;
     font-size: 0.85rem;
     font-weight: 600;
-    color: #64748b;
+    color: var(--mc-text-muted);
     transition: all 0.2s ease;
 }
 
 .visit-tabs .tab:hover {
-    background: #f1f5f9;
-    color: #334155;
+    background: var(--mc-surface-muted);
+    color: var(--mc-text);
 }
 
 .visit-tabs .tab.active {
-    background: #54acbf;
-    color: white;
-    box-shadow: 0 4px 10px rgba(84, 172, 191, 0.3);
+    background: var(--mc-brand);
+    color: var(--mc-on-brand);
+    box-shadow: var(--mc-shadow-sm);
 }
 
 /* ── Messages ── */
 .error-message {
-    background: #fff1f2;
-    color: #e11d48;
+    background: var(--mc-surface-muted);
+    color: var(--mc-danger);
     padding: 0.75rem;
-    border-radius: 8px;
-    border: 1px solid #fecdd3;
+    border-radius: var(--mc-radius-control);
+    border: 1px solid var(--mc-danger-border);
     margin-bottom: 1.5rem;
     font-size: 0.85rem;
     display: flex;
@@ -115,7 +114,7 @@
 .loading-message {
     text-align: center;
     padding: 2rem;
-    color: #64748b;
+    color: var(--mc-text-muted);
     font-weight: 500;
 }
 
@@ -127,32 +126,32 @@
 }
 
 .visit-card {
-    background: white;
-    border-radius: 12px;
+    background: var(--mc-surface);
+    border-radius: var(--mc-radius-panel);
     padding: 1.25rem;
-    border: 1px solid #f1f5f9;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--mc-border);
+    box-shadow: var(--mc-shadow-panel);
     transition: all 0.2s ease;
 }
 
 .visit-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.1);
-    border-color: #e2e8f0;
+    box-shadow: var(--mc-shadow-panel);
+    border-color: var(--mc-border);
 }
 
 /* ── Empty State ── */
 .no-requests-container {
     padding: 3rem 2rem;
     text-align: center;
-    background: white;
-    border-radius: 16px;
-    border: 1px dashed #cbd5e1;
+    background: var(--mc-surface);
+    border-radius: var(--mc-radius-control);
+    border: 1px dashed var(--mc-border);
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 12px;
-    color: #64748b;
+    color: var(--mc-text-muted);
     margin-top: 2rem;
 }
 
@@ -183,12 +182,12 @@
 .visit-info h3 {
     font-size: 1.1rem;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--mc-text);
     margin: 0;
 }
 
 .visit-time {
-    color: #94a3b8;
+    color: var(--mc-text-muted);
     font-size: 0.8rem;
     font-weight: 500;
 }
@@ -196,7 +195,7 @@
 /* ── Status Badges ── */
 .status-badge {
     padding: 4px 12px;
-    border-radius: 20px;
+    border-radius: var(--mc-radius-control);
     font-size: 0.75rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -205,33 +204,33 @@
 }
 
 .status-pending {
-    background: #fef3c7;
-    color: #92400e;
+    background: var(--mc-warning-bg);
+    color: var(--mc-warning);
 }
 
 .status-approved {
-    background: #dcfce7;
-    color: #166534;
+    background: var(--mc-success-bg);
+    color: var(--mc-success);
 }
 
 .status-checked-in {
-    background: #e0f2fe;
-    color: #075985;
+    background: var(--mc-info-bg);
+    color: var(--mc-info);
 }
 
 .status-in-progress {
-    background: #fae8ff;
-    color: #86198f;
+    background: var(--mc-surface-muted);
+    color: var(--mc-accent);
 }
 
 .status-completed {
-    background: #f1f5f9;
-    color: #475569;
+    background: var(--mc-surface-muted);
+    color: var(--mc-text-muted);
 }
 
 .status-cancelled {
-    background: #fee2e2;
-    color: #991b1b;
+    background: var(--mc-danger-bg);
+    color: var(--mc-danger);
 }
 
 /* ── Visit Details ── */
@@ -241,8 +240,8 @@
     gap: 1.5rem;
     margin: 1.5rem 0;
     padding: 1.25rem;
-    background: #f8fafc;
-    border-radius: 12px;
+    background: var(--mc-surface-muted);
+    border-radius: var(--mc-radius-panel);
 }
 
 .visit-detail {
@@ -254,25 +253,25 @@
 .visit-detail strong {
     font-size: 0.75rem;
     text-transform: uppercase;
-    color: #94a3b8;
+    color: var(--mc-text-muted);
     letter-spacing: 0.05em;
 }
 
 .visit-detail span {
     font-size: 0.95rem;
-    color: #334155;
+    color: var(--mc-text);
     font-weight: 600;
 }
 
 .code-highlight {
-    font-family: 'Monaco', 'Consolas', monospace;
+    font-family: var(--mc-font);
     font-size: 1.1rem !important;
-    color: #326773 !important;
-    background: #e0f2fe;
+    color: var(--mc-accent) !important;
+    background: var(--mc-brand-soft);
     padding: 2px 8px;
-    border-radius: 4px;
+    border-radius: var(--mc-radius-control);
     letter-spacing: 1px;
-    border: 1px solid #bae6fd;
+    border: 1px solid var(--mc-border-strong);
 }
 
 /* ── Actions ── */
@@ -280,7 +279,7 @@
     display: flex;
     gap: 12px;
     padding-top: 1.5rem;
-    border-top: 1px solid #f1f5f9;
+    border-top: 1px solid var(--mc-border);
 }
 
 .visit-card-actions button {
@@ -295,8 +294,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(15, 23, 42, 0.75);
-    backdrop-filter: blur(4px);
+    background: var(--mc-overlay);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -305,19 +303,19 @@
 }
 
 .modal-content {
-    background: white;
-    border-radius: 20px;
+    background: var(--mc-surface);
+    border-radius: var(--mc-radius-panel);
     padding: 2.5rem;
     max-width: 550px;
     width: 100%;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    box-shadow: var(--mc-shadow-overlay);
 }
 
 .modal-content h2 {
     margin: 0 0 1.5rem;
     font-size: 1.5rem;
     font-weight: 800;
-    color: #1e293b;
+    color: var(--mc-text);
 }
 
 .form-group {
@@ -329,7 +327,7 @@
     font-size: 0.8rem;
     font-weight: 700;
     text-transform: uppercase;
-    color: #64748b;
+    color: var(--mc-text-muted);
     margin-bottom: 8px;
     letter-spacing: 0.05em;
 }
@@ -337,25 +335,25 @@
 .form-group select {
     width: 100%;
     padding: 12px 16px;
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
+    border: 1px solid var(--mc-border);
+    border-radius: var(--mc-radius-control);
     font-size: 0.95rem;
-    color: #1e293b;
-    background: #f8fafc;
+    color: var(--mc-text);
+    background: var(--mc-surface-muted);
     transition: all 0.2s;
 }
 
 .form-group select:focus {
     outline: none;
-    border-color: #54acbf;
-    box-shadow: 0 0 0 3px rgba(84, 172, 191, 0.1);
+    border-color: var(--mc-border-strong);
+    box-shadow: 0 0 0 3px var(--mc-focus);
 }
 
 .info-text {
-    background: #ecfeff;
+    background: var(--mc-surface-muted);
     padding: 1rem;
-    border-radius: 10px;
-    color: #0891b2;
+    border-radius: var(--mc-radius-control);
+    color: var(--mc-info);
     font-size: 0.85rem;
     line-height: 1.5;
     margin-top: 1.5rem;
