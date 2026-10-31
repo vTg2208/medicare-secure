@@ -30,7 +30,7 @@ function LandingPage() {
                     <div className="relative">
                         <div className="absolute inset-0 bg-indigo-500 blur-lg opacity-0 group-hover:opacity-60 transition-opacity duration-500 rounded-full"></div>
                         <div className="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center text-white shadow-lg relative transform transition-all duration-500 group-hover:scale-110 group-hover:-rotate-3 group-hover:shadow-[0_0_15px_rgba(99,102,241,0.5)]">
-                            <span className="material-symbols-outlined text-xl transition-transform duration-500 group-hover:scale-110">local_hospital</span>
+                            <img src="/medicare-icon.svg" alt="" className="w-10 h-10 rounded-xl" width="40" height="40" />
                             {/* Server Status Indicator */}
                             <span className={`absolute -bottom-1 -right-1 w-3.5 h-3.5 border-2 border-[var(--background-light)] dark:border-[var(--background-dark)] rounded-full ${isBackendUp ? 'bg-emerald-500' : 'bg-rose-500'}`} title={isBackendUp ? 'System Online' : 'System Offline'}></span>
                         </div>
