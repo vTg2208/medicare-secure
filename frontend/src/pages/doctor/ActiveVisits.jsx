@@ -97,12 +97,10 @@ function ActiveVisits() {
     return (
         <div className="aq-wrapper">
             {/* Theme toggle */}
-            <div style={{ position: 'absolute', top: 16, right: 16, zIndex: 50 }}>
-                <ThemeToggle />
-            </div>
+
 
             {/* Top bar */}
-            <div className="aq-topbar">
+            <div className="aq-topbar mc-page-topbar">
                 <div className="aq-topbar-left">
                     <div className="aq-topbar-icon">
                         <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -115,7 +113,7 @@ function ActiveVisits() {
                         <p className="aq-topbar-subtitle">View scheduled appointments and manage consultation workflow</p>
                     </div>
                 </div>
-                <div className="aq-topbar-actions">
+                <div className="aq-topbar-actions mc-page-actions">
                     <button
                         className={`aq-btn-refresh${refreshing ? "spinning" : ''}`}
                         onClick={() => fetchVisits(true)}
@@ -132,6 +130,7 @@ function ActiveVisits() {
                         </svg>
                         Back to Dashboard
                     </button>
+                    <ThemeToggle />
                 </div>
             </div>
 

@@ -92,12 +92,10 @@ function PatientMedicalRecords() {
     return (
         <div className="pr-wrapper">
             {/* Theme Toggle */}
-            <div style={{ position: 'absolute', top: 16, right: 16, zIndex: 50 }}>
-                <ThemeToggle />
-            </div>
+
 
             {/* Top Bar */}
-            <div className="pr-topbar">
+            <div className="pr-topbar mc-page-topbar">
                 <div className="pr-topbar-left">
                     <div className="pr-topbar-icon">
                         <span className="material-symbols-outlined" style={{ fontSize: 22 }}>medical_information</span>
@@ -111,7 +109,7 @@ function PatientMedicalRecords() {
                         )}
                     </div>
                 </div>
-                <div className="pr-topbar-actions">
+                <div className="pr-topbar-actions mc-page-actions">
                     {hasWriteAccess && !loading && !error && (
                         <button
                             className="pr-btn-primary"
@@ -129,6 +127,7 @@ function PatientMedicalRecords() {
                         </svg>
                         Back to Patients
                     </button>
+                    <ThemeToggle />
                 </div>
             </div>
 

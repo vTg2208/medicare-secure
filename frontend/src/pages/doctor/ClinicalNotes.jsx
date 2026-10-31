@@ -151,9 +151,7 @@ function ClinicalNotes() {
     return (
         <div className="cn-wrapper">
             {/* Theme Toggle */}
-            <div style={{ position: 'absolute', top: 16, right: 16, zIndex: 50 }}>
-                <ThemeToggle />
-            </div>
+
 
             {/* Save Success Toast */}
             {saveSuccess && (
@@ -170,7 +168,7 @@ function ClinicalNotes() {
             )}
 
             {/* Top Bar */}
-            <div className="cn-topbar">
+            <div className="cn-topbar mc-page-topbar">
                 <div className="cn-topbar-left">
                     <div className="cn-topbar-icon">
                         <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -187,7 +185,7 @@ function ClinicalNotes() {
                         </p>
                     </div>
                 </div>
-                <div className="cn-topbar-actions">
+                <div className="cn-topbar-actions mc-page-actions">
                     {selectedVisit && (
                         <button className="cn-btn-outline" onClick={handleChangePatient}>
                             <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -202,6 +200,7 @@ function ClinicalNotes() {
                         </svg>
                         Back to Dashboard
                     </button>
+                    <ThemeToggle />
                 </div>
             </div>
 

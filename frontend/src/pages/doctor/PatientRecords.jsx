@@ -26,12 +26,10 @@ function PatientRecords() {
     return (
         <div className="pr-wrapper">
             {/* Theme Toggle */}
-            <div style={{ position: 'absolute', top: 16, right: 16, zIndex: 50 }}>
-                <ThemeToggle />
-            </div>
+
 
             {/* Top Bar */}
-            <div className="pr-topbar">
+            <div className="pr-topbar mc-page-topbar">
                 <div className="pr-topbar-left">
                     <div className="pr-topbar-icon">
                         <span className="material-symbols-outlined" style={{ fontSize: 22 }}>folder_shared</span>
@@ -41,13 +39,14 @@ function PatientRecords() {
                         <p className="pr-topbar-subtitle">Access and manage patient medical records with consent verification</p>
                     </div>
                 </div>
-                <div className="pr-topbar-actions">
+                <div className="pr-topbar-actions mc-page-actions">
                     <button className="pr-btn-back" onClick={() => navigate('/doctor/dashboard')}>
                         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
                         </svg>
                         Back to Dashboard
                     </button>
+                    <ThemeToggle />
                 </div>
             </div>
 

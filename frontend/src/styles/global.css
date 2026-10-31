@@ -105,3 +105,10 @@ input[type='checkbox'], input[type='radio'], input[type='range'] { accent-color:
 }
 
 .mc-brand > span { text-transform: lowercase; }
+
+/* Header actions stay in normal flow so the demo notice and controls never overlap. */
+.mc-page-topbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+.mc-page-topbar .mc-page-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+@media (max-width: 760px) {
+    .mc-page-topbar > .mc-page-actions { width: 100%; }
+}
