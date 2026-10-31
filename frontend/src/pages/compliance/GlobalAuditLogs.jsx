@@ -1,3 +1,4 @@
+import Brand from '../../components/common/Brand';
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -48,20 +49,12 @@ const GlobalAuditLogs = () => {
     };
 
     return (
-        <div className="patient-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-800 dark:text-slate-100 flex h-screen w-full overflow-hidden">
+        <div className="patient-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-800 dark:text-slate-100 flex h-screen w-full overflow-hidden mc-workspace">
 
             {/* Left Sidebar */}
-            <aside className="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800/50 p-6 flex flex-col h-full overflow-y-auto z-20 bg-[var(--background-light)] dark:bg-[var(--background-dark)] relative">
+            <aside className="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800/50 p-6 flex flex-col h-full overflow-y-auto z-20 bg-[var(--background-light)] dark:bg-[var(--background-dark)] relative mc-sidebar">
                 {/* Logo Area */}
-                <div className="flex items-center gap-3 mb-10 px-2 cursor-pointer group" onClick={() => navigate('/compliance/dashboard')}>
-                    <div className="relative">
-                        <div className="absolute inset-0 bg-slate-500 blur-lg opacity-0 group-hover:opacity-60 transition-opacity duration-500 rounded-full"></div>
-                        <div className="relative w-10 h-10 bg-slate-800 dark:bg-slate-700 rounded-xl flex items-center justify-center text-white shadow-lg transform transition-all duration-500 group-hover:scale-110 group-hover:-rotate-3 group-hover:shadow-[0_0_15px_rgba(71,85,105,0.5)]">
-                            <span className="material-symbols-outlined text-xl transition-transform duration-500 group-hover:scale-110">admin_panel_settings</span>
-                        </div>
-                    </div>
-                    <h1 className="text-xl font-bold tracking-tight text-slate-800 dark:text-white transition-all duration-500 drop-shadow-sm group-hover:text-slate-600 dark:group-hover:text-slate-300 group-hover:drop-shadow-[0_0_10px_rgba(71,85,105,0.4)]">Medicare</h1>
-                </div>
+                <Brand to={'/compliance/dashboard'} />
 
                 {/* Navigation Links */}
                 <nav className="space-y-2 flex-grow">
@@ -74,7 +67,7 @@ const GlobalAuditLogs = () => {
                                 to={item.path}
                                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition font-medium ${isActive
                                     ? 'bg-slate-100 dark:bg-slate-800/80 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 shadow-sm'
-                                    : 'text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5'
+                                    : 'text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface'
                                     }`}
                             >
                                 <span className="material-symbols-outlined text-[20px]">{item.icon}</span>
@@ -86,13 +79,13 @@ const GlobalAuditLogs = () => {
 
                 {/* Bottom Profile & Logout */}
                 <div className="space-y-2 mt-auto pt-6 border-t border-slate-200 dark:border-slate-800/50">
-                    <Link to="/compliance/profile" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl font-medium">
+                    <Link to="/compliance/profile" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl font-medium">
                         <span className="material-symbols-outlined text-[20px]">manage_accounts</span>
                         Profile
                     </Link>
                     <button
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-3 px-4 py-3 text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition rounded-xl font-medium"
+                        className="w-full flex items-center gap-3 px-4 py-3 text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition rounded-lg font-medium"
                     >
                         <span className="material-symbols-outlined text-[20px]">logout</span>
                         Sign Out
@@ -103,12 +96,12 @@ const GlobalAuditLogs = () => {
             {/* Main Content Area */}
             <main className="flex-1 flex flex-col h-full overflow-hidden relative">
                 {/* Decorative background element */}
-                <div className="absolute top-0 right-0 w-96 h-96 bg-slate-400/5 dark:bg-slate-600/5 rounded-full blur-3xl -z-10 transform translate-x-1/3 -translate-y-1/3 pointer-events-none"></div>
+
 
                 {/* Header */}
-                <header className="px-8 py-6 flex items-center justify-between flex-shrink-0 z-10 sticky top-0 bg-[var(--background-light)]/80 dark:bg-[var(--background-dark)]/80 backdrop-blur-md border-b border-transparent transition-all pr-[80px]">
+                <header className="px-8 py-6 flex items-center justify-between flex-shrink-0 z-10 sticky top-0 bg-[var(--background-light)]/80 dark:bg-[var(--background-dark)]/80 border-b border-transparent transition-all pr-[80px]">
                     <div>
-                        <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-slate-300 flex items-center gap-2">
+                        <h2 className="text-2xl font-bold flex items-center gap-2 text-accent">
                             <span className="material-symbols-outlined">policy</span> Global Security Audit Logs
                         </h2>
                         <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Immutable record of all system data access and events</p>
@@ -129,20 +122,20 @@ const GlobalAuditLogs = () => {
                             <input
                                 type="text"
                                 placeholder="Search by User, Action, ID..."
-                                className="w-full pl-10 pr-4 py-2.5 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md border border-slate-200 dark:border-slate-700/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500 dark:text-white"
+                                className="w-full pl-10 pr-4 py-2.5 bg-surface dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-500 dark:text-white"
                             />
                             <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
                         </div>
-                        <button className="flex items-center gap-2 px-4 py-2.5 bg-white/50 dark:bg-slate-900/50 backdrop-blur-md border border-slate-200 dark:border-slate-700/50 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition text-sm font-medium dark:text-slate-200">
+                        <button className="flex items-center gap-2 px-4 py-2.5 bg-surface dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition text-sm font-medium dark:text-slate-200">
                             <span className="material-symbols-outlined text-[18px]">filter_list</span>
                             Filter
                         </button>
                     </div>
 
                     {/* Logs List */}
-                    <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-3xl overflow-hidden shadow-sm flex-1 flex flex-col relative z-10">
+                    <div className="bg-surface dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800/80 rounded-3xl overflow-hidden shadow-sm flex-1 flex flex-col relative z-10">
                         {loading && logs.length === 0 && (
-                            <div className="absolute inset-0 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm z-20 flex items-center justify-center">
+                            <div className="absolute inset-0 bg-surface dark:bg-slate-900/50 z-20 flex items-center justify-center">
                                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600"></div>
                             </div>
                         )}

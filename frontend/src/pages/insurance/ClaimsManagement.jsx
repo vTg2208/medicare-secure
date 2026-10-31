@@ -1,3 +1,4 @@
+import Brand from '../../components/common/Brand';
 import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
@@ -65,32 +66,24 @@ function ClaimsManagement() {
     const formatDate = (d) => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
     return (
-        <div className="patient-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-800 dark:text-slate-100 flex h-screen w-full overflow-hidden">
+        <div className="patient-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-800 dark:text-slate-100 flex h-screen w-full overflow-hidden mc-workspace">
             {/* Left Sidebar */}
-            <aside className="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800/50 p-6 flex flex-col h-full overflow-y-auto">
-                <div className="flex items-center gap-3 mb-10 px-2 cursor-pointer group" onClick={() => navigate('/insurance/dashboard')}>
-                    <div className="relative">
-                        <div className="absolute inset-0 bg-indigo-500 blur-lg opacity-0 group-hover:opacity-60 transition-opacity duration-500 rounded-full"></div>
-                        <div className="relative w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center text-white shadow-lg transform transition-all duration-500 group-hover:scale-110 group-hover:-rotate-3 group-hover:shadow-[0_0_15px_rgba(99,102,241,0.5)]">
-                            <span className="material-symbols-outlined text-xl transition-transform duration-500 group-hover:scale-110">local_hospital</span>
-                        </div>
-                    </div>
-                    <h1 className="text-xl font-bold tracking-tight text-slate-800 dark:text-white transition-all duration-500 drop-shadow-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-hover:drop-shadow-[0_0_10px_rgba(99,102,241,0.4)]">Medicare</h1>
-                </div>
+            <aside className="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800/50 p-6 flex flex-col h-full overflow-y-auto mc-sidebar">
+                <Brand to={'/insurance/dashboard'} />
                 <nav className="space-y-2 flex-grow">
                     {navItems.map(item => (
-                        <Link key={item.path} to={item.path} className={`flex items-center gap-3 px-4 py-3 rounded-xl transition font-medium ${location.pathname === item.path ? 'sidebar-item-active text-slate-800 dark:text-slate-800' : 'text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5'}`}>
+                        <Link key={item.path} to={item.path} className={`flex items-center gap-3 px-4 py-3 rounded-xl transition font-medium ${location.pathname === item.path ? 'sidebar-item-active text-slate-800 dark:text-slate-800' : 'text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface'}`}>
                             <span className="material-symbols-outlined text-[20px]">{item.icon}</span>
                             {item.label}
                         </Link>
                     ))}
                 </nav>
                 <div className="space-y-2 mt-auto pt-6 border-t border-slate-200 dark:border-slate-800/50">
-                    <Link to="/insurance/profile" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl">
+                    <Link to="/insurance/profile" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
                         <span className="material-symbols-outlined text-[20px]">manage_accounts</span>
                         Profile
                     </Link>
-                    <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition rounded-xl font-medium">
+                    <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition rounded-lg font-medium">
                         <span className="material-symbols-outlined text-[20px]">logout</span>
                         Sign Out
                     </button>
@@ -99,7 +92,7 @@ function ClaimsManagement() {
 
             {/* Main Content */}
             <main className="flex-1 flex flex-col h-full overflow-hidden">
-                <header className="px-8 py-6 flex items-center justify-between flex-shrink-0 sticky top-0 bg-[var(--background-light)]/80 dark:bg-[var(--background-dark)]/80 backdrop-blur-md border-b border-transparent">
+                <header className="px-8 py-6 flex items-center justify-between flex-shrink-0 sticky top-0 bg-[var(--background-light)]/80 dark:bg-[var(--background-dark)]/80 border-b border-transparent">
                     <div>
                         <h2 className="text-3xl font-bold text-slate-900 dark:text-white">Claims Management</h2>
                         <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">{claims.length} total claims on file</p>
@@ -107,7 +100,7 @@ function ClaimsManagement() {
                     <div className="flex items-center gap-4">
                         <div className="flex gap-2">
                             {['All', 'Pending', 'Approved', 'Denied'].map(f => (
-                                <button key={f} onClick={() => setFilter(f)} className={`px-4 py-2 rounded-xl text-sm font-semibold transition ${filter === f ? 'bg-blue-600 text-white shadow-md' : 'glass-card text-slate-600 dark:text-slate-300 hover:bg-white/70'}`}>{f}</button>
+                                <button key={f} onClick={() => setFilter(f)} className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${filter === f ? "bg-primary-600 text-white shadow-md" : 'glass-card text-slate-600 dark:text-slate-300 hover:bg-surface'}`}>{f}</button>
                             ))}
                         </div>
                         <ThemeToggle />
@@ -121,7 +114,7 @@ function ClaimsManagement() {
                         {!loading && filteredClaims.length === 0 && <p className="text-center text-slate-400 py-10">No claims found.</p>}
                         <div className="space-y-3">
                             {filteredClaims.map(claim => (
-                                <div key={claim.id} onClick={() => setSelectedClaim(claim)} className={`glass-card p-5 rounded-2xl cursor-pointer hover:shadow-md transition-all border-2 ${selectedClaim?.id === claim.id ? 'border-blue-400 dark:border-blue-600' : 'border-transparent'}`}>
+                                <div key={claim.id} onClick={() => setSelectedClaim(claim)} className={`glass-card p-5 rounded-2xl cursor-pointer hover:shadow-md transition-all border-2 ${selectedClaim?.id === claim.id ? "border-primary-400 dark:border-primary-600" : 'border-transparent'}`}>
                                     <div className="flex items-start justify-between mb-2">
                                         <div>
                                             <h4 className="font-bold text-slate-800 dark:text-slate-100">{claim.patientName}</h4>
@@ -172,19 +165,19 @@ function ClaimsManagement() {
                                         onChange={e => setActionNote(e.target.value)}
                                         placeholder="Add notes (e.g. reason for denial)…"
                                         rows={3}
-                                        className="w-full text-sm p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/50 dark:bg-slate-800/50 text-slate-800 dark:text-slate-200 resize-none focus:outline-none focus:ring-2 focus:ring-blue-400"
+                                        className="w-full text-sm p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-surface dark:bg-slate-800/50 text-slate-800 dark:text-slate-200 resize-none focus:outline-none focus:ring-2 focus:ring-primary-400"
                                     />
                                     <button
                                         onClick={() => handleUpdateClaim('Approved')}
                                         disabled={processing}
-                                        className="w-full py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-sm hover:bg-emerald-700 transition disabled:opacity-50"
+                                        className="w-full py-2.5 rounded-lg bg-emerald-600 text-white font-bold text-sm hover:bg-emerald-700 transition disabled:opacity-50"
                                     >
                                         {processing ? 'Processing…' : '✓ Approve Claim'}
                                     </button>
                                     <button
                                         onClick={() => handleUpdateClaim('Denied')}
                                         disabled={processing}
-                                        className="w-full py-2.5 rounded-xl bg-rose-600 text-white font-bold text-sm hover:bg-rose-700 transition disabled:opacity-50"
+                                        className="w-full py-2.5 rounded-lg bg-rose-600 text-white font-bold text-sm hover:bg-rose-700 transition disabled:opacity-50"
                                     >
                                         {processing ? 'Processing…' : '✕ Deny Claim'}
                                     </button>

@@ -1,3 +1,4 @@
+import Brand from '../../components/common/Brand';
 import { useAuth } from '../../context/AuthContext';
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -39,21 +40,13 @@ function DataExplorer() {
     };
 
     return (
-        <div className="patient-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-800 dark:text-slate-100 flex h-screen w-full overflow-hidden">
+        <div className="patient-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-800 dark:text-slate-100 flex h-screen w-full overflow-hidden mc-workspace">
             {/* Sidebar */}
-            <aside className="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800/50 p-6 flex flex-col h-full overflow-y-auto">
-                <div className="flex items-center gap-3 mb-10 px-2 cursor-pointer group" onClick={() => navigate('/researcher/dashboard')}>
-                    <div className="relative">
-                        <div className="absolute inset-0 bg-indigo-500 blur-lg opacity-0 group-hover:opacity-60 transition-opacity duration-500 rounded-full"></div>
-                        <div className="relative w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center text-white shadow-lg transform transition-all duration-500 group-hover:scale-110 group-hover:-rotate-3 group-hover:shadow-[0_0_15px_rgba(99,102,241,0.5)]">
-                            <span className="material-symbols-outlined text-xl transition-transform duration-500 group-hover:scale-110">science</span>
-                        </div>
-                    </div>
-                    <h1 className="text-xl font-bold tracking-tight text-slate-800 dark:text-white transition-all duration-500 drop-shadow-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-hover:drop-shadow-[0_0_10px_rgba(99,102,241,0.4)]">Medicare</h1>
-                </div>
+            <aside className="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800/50 p-6 flex flex-col h-full overflow-y-auto mc-sidebar">
+                <Brand to={'/researcher/dashboard'} />
 
                 <nav className="space-y-2 flex-grow">
-                    <Link to="/researcher/dashboard" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl">
+                    <Link to="/researcher/dashboard" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
                         <span className="material-symbols-outlined text-[20px]">insights</span>
                         Global Stats
                     </Link>
@@ -63,12 +56,12 @@ function DataExplorer() {
                     </Link>
                 </nav>
 
-                <div className="space-y-2 mt-auto pt-6 border-t border-white/20 dark:border-slate-800/50">
-                    <Link to="/researcher/profile" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl">
+                <div className="space-y-2 mt-auto pt-6 border-t border-line dark:border-slate-800/50">
+                    <Link to="/researcher/profile" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
                         <span className="material-symbols-outlined text-[20px]">manage_accounts</span>
                         Profile
                     </Link>
-                    <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition rounded-xl font-medium">
+                    <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition rounded-lg font-medium">
                         <span className="material-symbols-outlined text-[20px]">logout</span>
                         Sign Out
                     </button>
@@ -95,7 +88,7 @@ function DataExplorer() {
                 <div className="glass-card rounded-3xl border border-slate-200/50 dark:border-slate-700/50 overflow-hidden">
                     <div className="flex border-b border-slate-200 dark:border-slate-700/50 px-6 pt-4">
                         <button
-                            className={`px-6 py-3 font-medium text-sm transition-colors border-b-2 ${activeTab === 'symptoms' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}
+                            className={`px-6 py-3 font-medium text-sm transition-colors border-b-2 ${activeTab === 'symptoms' ? "border-primary-500 text-primary-600 dark:text-primary-400" : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}
                             onClick={() => setActiveTab('symptoms')}
                         >
                             <div className="flex items-center gap-2">
@@ -104,7 +97,7 @@ function DataExplorer() {
                             </div>
                         </button>
                         <button
-                            className={`px-6 py-3 font-medium text-sm transition-colors border-b-2 ${activeTab === 'treatments' ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400' : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}
+                            className={`px-6 py-3 font-medium text-sm transition-colors border-b-2 ${activeTab === 'treatments' ? "border-primary-500 text-primary-600 dark:text-primary-400" : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}
                             onClick={() => setActiveTab('treatments')}
                         >
                             <div className="flex items-center gap-2">
@@ -132,7 +125,7 @@ function DataExplorer() {
                                             <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/20 transition-colors">
                                                 <td className="py-4 px-4 font-medium text-slate-800 dark:text-slate-200">{sym.name}</td>
                                                 <td className="py-4 px-4 text-slate-600 dark:text-slate-300">
-                                                    <span className="bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 px-3 py-1 rounded-full text-sm font-medium">
+                                                    <span className="bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300 px-3 py-1 rounded-full text-sm font-medium">
                                                         {sym.count.toLocaleString()}
                                                     </span>
                                                 </td>
@@ -140,7 +133,7 @@ function DataExplorer() {
                                                     <div className="flex items-center gap-3">
                                                         <span className="text-slate-600 dark:text-slate-300 font-medium">{sym.severityAvg ?? 'Not measured'}</span>
                                                         <div hidden={sym.severityAvg == null} className="w-32 bg-slate-200 dark:bg-slate-700 rounded-full h-2">
-                                                            <div className={`h-2 rounded-full ${sym.severityAvg > 6 ? 'bg-rose-500' : sym.severityAvg > 4 ? 'bg-amber-500' : 'bg-teal-500'}`} style={{ width: `${sym.severityAvg * 10}%` }}></div>
+                                                            <div className={`h-2 rounded-full ${sym.severityAvg > 6 ? 'bg-rose-500' : sym.severityAvg > 4 ? 'bg-amber-500' : "bg-primary-500"}`} style={{ width: `${sym.severityAvg * 10}%` }}></div>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -164,7 +157,7 @@ function DataExplorer() {
                                             <tr key={idx} className="hover:bg-slate-50 dark:hover:bg-slate-800/20 transition-colors">
                                                 <td className="py-4 px-4 font-medium text-slate-800 dark:text-slate-200">{trt.name}</td>
                                                 <td className="py-4 px-4 text-slate-600 dark:text-slate-300">
-                                                    <span className="bg-teal-50 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300 px-3 py-1 rounded-full text-sm font-medium">
+                                                    <span className="bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300 px-3 py-1 rounded-full text-sm font-medium">
                                                         {trt.usageCount.toLocaleString()}
                                                     </span>
                                                 </td>
@@ -172,7 +165,7 @@ function DataExplorer() {
                                                     <div className="flex items-center gap-3">
                                                         <span className="text-slate-600 dark:text-slate-300 font-medium">{trt.successRate == null ? 'Not measured' : `${trt.successRate}%`}</span>
                                                         <div hidden={trt.successRate == null} className="w-32 bg-slate-200 dark:bg-slate-700 rounded-full h-2">
-                                                            <div className={`h-2 rounded-full ${trt.successRate > 80 ? 'bg-teal-500' : trt.successRate > 60 ? 'bg-amber-500' : 'bg-rose-500'}`} style={{ width: `${trt.successRate ?? 0}%` }}></div>
+                                                            <div className={`h-2 rounded-full ${trt.successRate > 80 ? "bg-primary-500" : trt.successRate > 60 ? 'bg-amber-500' : 'bg-rose-500'}`} style={{ width: `${trt.successRate ?? 0}%` }}></div>
                                                         </div>
                                                     </div>
                                                 </td>

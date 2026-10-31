@@ -1,3 +1,4 @@
+import Brand from '../../components/common/Brand';
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -94,20 +95,12 @@ const Profile = () => {
     if (!profile) return null;
 
     return (
-        <div className="patient-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-800 dark:text-slate-100 flex h-screen w-full overflow-hidden">
+        <div className="patient-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-800 dark:text-slate-100 flex h-screen w-full overflow-hidden mc-workspace">
 
             {/* Left Sidebar */}
-            <aside className="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800/50 p-6 flex flex-col h-full overflow-y-auto z-20 bg-[var(--background-light)] dark:bg-[var(--background-dark)] relative">
+            <aside className="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800/50 p-6 flex flex-col h-full overflow-y-auto z-20 bg-[var(--background-light)] dark:bg-[var(--background-dark)] relative mc-sidebar">
                 {/* Logo Area */}
-                <div className="flex items-center gap-3 mb-10 px-2 cursor-pointer group" onClick={() => navigate('/compliance/dashboard')}>
-                    <div className="relative">
-                        <div className="absolute inset-0 bg-slate-500 blur-lg opacity-0 group-hover:opacity-60 transition-opacity duration-500 rounded-full"></div>
-                        <div className="relative w-10 h-10 bg-slate-800 dark:bg-slate-700 rounded-xl flex items-center justify-center text-white shadow-lg transform transition-all duration-500 group-hover:scale-110 group-hover:-rotate-3 group-hover:shadow-[0_0_15px_rgba(71,85,105,0.5)]">
-                            <span className="material-symbols-outlined text-xl transition-transform duration-500 group-hover:scale-110">admin_panel_settings</span>
-                        </div>
-                    </div>
-                    <h1 className="text-xl font-bold tracking-tight text-slate-800 dark:text-white transition-all duration-500 drop-shadow-sm group-hover:text-slate-600 dark:group-hover:text-slate-300 group-hover:drop-shadow-[0_0_10px_rgba(71,85,105,0.4)]">Medicare</h1>
-                </div>
+                <Brand to={'/compliance/dashboard'} />
 
                 {/* Navigation Links */}
                 <nav className="space-y-2 flex-grow">
@@ -120,7 +113,7 @@ const Profile = () => {
                                 to={item.path}
                                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition font-medium ${isActive
                                     ? 'bg-slate-100 dark:bg-slate-800/80 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 shadow-sm'
-                                    : 'text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5'
+                                    : 'text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface'
                                     }`}
                             >
                                 <span className="material-symbols-outlined text-[20px]">{item.icon}</span>
@@ -138,7 +131,7 @@ const Profile = () => {
                     </Link>
                     <button
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-3 px-4 py-3 text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition rounded-xl font-medium"
+                        className="w-full flex items-center gap-3 px-4 py-3 text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition rounded-lg font-medium"
                     >
                         <span className="material-symbols-outlined text-[20px]">logout</span>
                         Sign Out
@@ -149,12 +142,12 @@ const Profile = () => {
             {/* Main Content Area */}
             <main className="flex-1 flex flex-col h-full overflow-hidden relative">
                 {/* Decorative background element */}
-                <div className="absolute top-0 right-0 w-96 h-96 bg-slate-400/5 dark:bg-slate-600/5 rounded-full blur-3xl -z-10 transform translate-x-1/3 -translate-y-1/3 pointer-events-none"></div>
+
 
                 {/* Header (Sticky Header) */}
-                <header className="px-8 py-6 flex items-center justify-between flex-shrink-0 z-10 sticky top-0 bg-[var(--background-light)]/80 dark:bg-[var(--background-dark)]/80 backdrop-blur-md border-b border-transparent transition-all pr-[80px]">
+                <header className="px-8 py-6 flex items-center justify-between flex-shrink-0 z-10 sticky top-0 bg-[var(--background-light)]/80 dark:bg-[var(--background-dark)]/80 border-b border-transparent transition-all pr-[80px]">
                     <div>
-                        <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-slate-300">My Profile</h2>
+                        <h2 className="text-2xl font-bold text-accent">My Profile</h2>
                         <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Manage your professional information and settings</p>
                     </div>
                 </header>
@@ -176,10 +169,10 @@ const Profile = () => {
                     <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
                         {/* Left Column: ID Card style summary */}
                         <div className="xl:col-span-1 space-y-6">
-                            <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-3xl p-8 flex flex-col items-center text-center shadow-sm relative overflow-hidden group">
-                                <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-br from-slate-500/20 to-gray-500/20 dark:from-slate-500/10 dark:to-gray-500/10"></div>
+                            <div className="bg-surface dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800/80 rounded-3xl p-8 flex flex-col items-center text-center shadow-sm relative overflow-hidden group">
+                                <div className="absolute top-0 left-0 w-full h-32 bg-primary-50 dark:bg-primary-900/20"></div>
 
-                                <div className="w-32 h-32 rounded-full border-4 border-white dark:border-slate-800 shadow-xl overflow-hidden relative z-10 mb-4 bg-slate-100 dark:bg-slate-800 group-hover:scale-105 transition-transform duration-500">
+                                <div className="w-32 h-32 rounded-full border-4 border-line dark:border-slate-800 shadow-sm overflow-hidden relative z-10 mb-4 bg-slate-100 dark:bg-slate-800 transition-transform duration-500">
                                     <div className="w-full h-full flex items-center justify-center text-5xl font-bold text-slate-300 dark:text-slate-600">
                                         {profile.firstName[0]}{profile.lastName[0]}
                                     </div>
@@ -208,7 +201,7 @@ const Profile = () => {
                             </div>
 
                             {/* Professional Details summary */}
-                            <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-3xl p-6 shadow-sm">
+                            <div className="bg-surface dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800/80 rounded-3xl p-6 shadow-sm">
                                 <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 px-2">Professional Info</h3>
                                 <div className="space-y-4">
                                     <div className="flex justify-between items-center px-4 py-3 bg-slate-50/50 dark:bg-slate-800/20 rounded-xl">
@@ -231,7 +224,7 @@ const Profile = () => {
 
                         {/* Right Column: Detailed Settings */}
                         <div className="xl:col-span-2 space-y-6">
-                            <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-3xl p-8 shadow-sm">
+                            <div className="bg-surface dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800/80 rounded-3xl p-8 shadow-sm">
                                 <div className="flex justify-between items-center mb-8 border-b border-slate-100 dark:border-slate-800 pb-4">
                                     <h3 className="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
                                         <span className="material-symbols-outlined text-slate-500">contact_mail</span>
@@ -240,7 +233,7 @@ const Profile = () => {
                                     {!editMode ? (
                                         <button
                                             onClick={() => setEditMode(true)}
-                                            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-sm font-semibold transition"
+                                            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-semibold transition"
                                         >
                                             Edit Details
                                         </button>
@@ -251,7 +244,7 @@ const Profile = () => {
                                                     setEditMode(false);
                                                     setFormData({ phone: profile.phone, address: profile.address });
                                                 }}
-                                                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-sm font-semibold transition"
+                                                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-semibold transition"
                                                 disabled={saving}
                                             >
                                                 Cancel
@@ -277,7 +270,7 @@ const Profile = () => {
                                                     name="phone"
                                                     value={formData.phone}
                                                     onChange={handleInputChange}
-                                                    className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 focus:border-slate-500 dark:focus:border-slate-400 focus:ring-4 focus:ring-slate-500/10 rounded-xl outline-none transition-all text-slate-800 dark:text-slate-200"
+                                                    className="w-full px-4 py-3 bg-surface dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 focus:border-slate-500 dark:focus:border-slate-400 focus:ring-4 focus:ring-slate-500/10 rounded-xl outline-none transition-all text-slate-800 dark:text-slate-200"
                                                     required
                                                 />
                                             </div>
@@ -288,7 +281,7 @@ const Profile = () => {
                                                     value={formData.address}
                                                     onChange={handleInputChange}
                                                     rows="3"
-                                                    className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 focus:border-slate-500 dark:focus:border-slate-400 focus:ring-4 focus:ring-slate-500/10 rounded-xl outline-none transition-all text-slate-800 dark:text-slate-200 resize-none"
+                                                    className="w-full px-4 py-3 bg-surface dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 focus:border-slate-500 dark:focus:border-slate-400 focus:ring-4 focus:ring-slate-500/10 rounded-xl outline-none transition-all text-slate-800 dark:text-slate-200 resize-none"
                                                     required
                                                 ></textarea>
                                             </div>
@@ -298,10 +291,10 @@ const Profile = () => {
                                             <button
                                                 type="submit"
                                                 disabled={saving}
-                                                className="px-6 py-3 bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-xl font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center min-w-[140px]"
+                                                className="px-6 py-3 bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white rounded-lg font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center min-w-[140px]"
                                             >
                                                 {saving ? (
-                                                    <span className="animate-spin h-5 w-5 border-b-2 border-white rounded-full"></span>
+                                                    <span className="animate-spin h-5 w-5 border-b-2 border-line rounded-full"></span>
                                                 ) : (
                                                     "Save Changes"
                                                 )}

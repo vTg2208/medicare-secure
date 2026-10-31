@@ -1,3 +1,4 @@
+import Brand from '../../components/common/Brand';
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -62,25 +63,17 @@ const ComplianceDashboard = () => {
     };
 
     return (
-        <div className="patient-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-800 dark:text-slate-100 flex h-screen w-full overflow-hidden">
+        <div className="patient-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-800 dark:text-slate-100 flex h-screen w-full overflow-hidden mc-workspace">
 
             {/* Theme Toggle styling */}
-            <div className="absolute top-4 right-4 z-[60]">
+            <div className="mc-workspace-theme">
                 <ThemeToggle />
             </div>
 
             {/* Left Sidebar */}
-            <aside className="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800/50 p-6 flex flex-col h-full overflow-y-auto z-20 bg-[var(--background-light)] dark:bg-[var(--background-dark)] relative">
+            <aside className="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800/50 p-6 flex flex-col h-full overflow-y-auto z-20 bg-[var(--background-light)] dark:bg-[var(--background-dark)] relative mc-sidebar">
                 {/* Logo Area */}
-                <div className="flex items-center gap-3 mb-10 px-2 cursor-pointer group" onClick={() => navigate('/compliance/dashboard')}>
-                    <div className="relative">
-                        <div className="absolute inset-0 bg-slate-500 blur-lg opacity-0 group-hover:opacity-60 transition-opacity duration-500 rounded-full"></div>
-                        <div className="relative w-10 h-10 bg-slate-800 dark:bg-slate-700 rounded-xl flex items-center justify-center text-white shadow-lg transform transition-all duration-500 group-hover:scale-110 group-hover:-rotate-3 group-hover:shadow-[0_0_15px_rgba(71,85,105,0.5)]">
-                            <span className="material-symbols-outlined text-xl transition-transform duration-500 group-hover:scale-110">admin_panel_settings</span>
-                        </div>
-                    </div>
-                    <h1 className="text-xl font-bold tracking-tight text-slate-800 dark:text-white transition-all duration-500 drop-shadow-sm group-hover:text-slate-600 dark:group-hover:text-slate-300 group-hover:drop-shadow-[0_0_10px_rgba(71,85,105,0.4)]">Medicare</h1>
-                </div>
+                <Brand to={'/compliance/dashboard'} />
 
                 {/* Navigation Links */}
                 <nav className="space-y-2 flex-grow">
@@ -93,7 +86,7 @@ const ComplianceDashboard = () => {
                                 to={item.path}
                                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition font-medium ${isActive
                                         ? 'bg-slate-100 dark:bg-slate-800/80 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 shadow-sm'
-                                        : 'text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5'
+                                        : 'text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface'
                                     }`}
                             >
                                 <span className="material-symbols-outlined text-[20px]">{item.icon}</span>
@@ -105,13 +98,13 @@ const ComplianceDashboard = () => {
 
                 {/* Bottom Profile & Logout */}
                 <div className="space-y-2 mt-auto pt-6 border-t border-slate-200 dark:border-slate-800/50">
-                    <Link to="/compliance/profile" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl font-medium">
+                    <Link to="/compliance/profile" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl font-medium">
                         <span className="material-symbols-outlined text-[20px]">manage_accounts</span>
                         Profile
                     </Link>
                     <button
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-3 px-4 py-3 text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition rounded-xl font-medium"
+                        className="w-full flex items-center gap-3 px-4 py-3 text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition rounded-lg font-medium"
                     >
                         <span className="material-symbols-outlined text-[20px]">logout</span>
                         Sign Out
@@ -123,7 +116,7 @@ const ComplianceDashboard = () => {
             <main className="flex-1 overflow-y-auto px-8 py-8 relative h-full scrollbar-hide flex flex-col">
 
                 {/* Decorative background element */}
-                <div className="absolute top-0 left-0 w-96 h-96 bg-slate-400/5 dark:bg-slate-600/5 rounded-full blur-3xl -z-10 transform -translate-x-1/3 -translate-y-1/3 pointer-events-none"></div>
+
 
                 <header className="mb-10 flex-shrink-0">
                     <div className="flex items-center justify-between mb-8">
@@ -133,7 +126,7 @@ const ComplianceDashboard = () => {
                                 Welcome back, {user?.firstName || 'Officer'} {user?.lastName || ''} • Oversight Dashboard
                             </p>
                         </div>
-                        <div className="flex items-center gap-3 bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 px-4 py-2 rounded-2xl shadow-sm">
+                        <div className="flex items-center gap-3 bg-surface dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-800/80 px-4 py-2 rounded-2xl shadow-sm">
                             <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-900/50 flex items-center justify-center">
                                 <div className="w-2 h-2 rounded-full bg-slate-500"></div>
                             </div>
@@ -143,7 +136,7 @@ const ComplianceDashboard = () => {
 
                     {/* Stats Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 shadow-sm transition hover:shadow-md group">
+                        <div className="bg-surface dark:bg-slate-900/80 p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 shadow-sm transition hover:shadow-md group">
                             <div className="flex items-center justify-between mb-4">
                                 <div className="w-10 h-10 rounded-2xl bg-rose-50 dark:bg-rose-900/30 flex items-center justify-center text-rose-600 dark:text-rose-400">
                                     <span className="material-symbols-outlined">warning</span>
@@ -153,7 +146,7 @@ const ComplianceDashboard = () => {
                             <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">Auth Anomalies (24h)</p>
                         </div>
 
-                        <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 shadow-sm transition hover:shadow-md group">
+                        <div className="bg-surface dark:bg-slate-900/80 p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 shadow-sm transition hover:shadow-md group">
                             <div className="flex items-center justify-between mb-4">
                                 <div className="w-10 h-10 rounded-2xl bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400">
                                     <span className="material-symbols-outlined">gavel</span>
@@ -163,9 +156,9 @@ const ComplianceDashboard = () => {
                             <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">Open Incidents</p>
                         </div>
 
-                        <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 shadow-sm transition hover:shadow-md group">
+                        <div className="bg-surface dark:bg-slate-900/80 p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 shadow-sm transition hover:shadow-md group">
                             <div className="flex items-center justify-between mb-4">
-                                <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                                <div className="w-10 h-10 rounded-2xl bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400">
                                     <span className="material-symbols-outlined">key_off</span>
                                 </div>
                             </div>
@@ -173,9 +166,9 @@ const ComplianceDashboard = () => {
                             <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">Active Overrides</p>
                         </div>
 
-                        <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 shadow-sm transition hover:shadow-md group">
+                        <div className="bg-surface dark:bg-slate-900/80 p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 shadow-sm transition hover:shadow-md group">
                             <div className="flex items-center justify-between mb-4">
-                                <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                                <div className="w-10 h-10 rounded-2xl bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400">
                                     <span className="material-symbols-outlined">checklist</span>
                                 </div>
                             </div>
@@ -187,7 +180,7 @@ const ComplianceDashboard = () => {
 
                 <div className="flex-1 flex flex-col min-h-0">
                     {/* Recent Incidents Area */}
-                    <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-3xl border border-slate-200/80 dark:border-slate-800/80 p-6 shadow-sm flex flex-col flex-1 overflow-hidden">
+                    <div className="bg-surface dark:bg-slate-900/80 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 p-6 shadow-sm flex flex-col flex-1 overflow-hidden">
                         <div className="flex justify-between items-center mb-6">
                             <div>
                                 <h3 className="text-lg font-bold text-slate-800 dark:text-white">Active Privacy Incidents</h3>
@@ -195,7 +188,7 @@ const ComplianceDashboard = () => {
                             </div>
                             <button
                                 onClick={() => navigate('/compliance/incidents')}
-                                className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl text-sm font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 transition"
+                                className="px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-semibold hover:bg-slate-200 dark:hover:bg-slate-700 transition"
                             >
                                 View All
                             </button>
@@ -209,7 +202,7 @@ const ComplianceDashboard = () => {
                                 </div>
                             ) : (
                                 incidents.map((incident) => (
-                                    <div key={incident.id} className="p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-800/50 hover:border-slate-200 dark:hover:border-slate-700 transition-colors">
+                                    <div key={incident.id} className="p-4 rounded-2xl border border-slate-100 dark:border-slate-800 bg-surface dark:bg-slate-800/50 hover:border-slate-200 dark:hover:border-slate-700 transition-colors">
                                         <div className="flex justify-between items-start mb-2">
                                             <div className="flex items-center gap-2">
                                                 <span className={`w-2 h-2 rounded-full ${incident.status === 'Open' ? 'bg-rose-500' :
@@ -241,29 +234,29 @@ const ComplianceDashboard = () => {
             </main>
 
             {/* Right Sidebar for Quick Actions */}
-            <aside className="w-80 flex-shrink-0 border-l border-slate-200 dark:border-slate-800/50 p-6 bg-slate-50/50 dark:bg-slate-900/20 backdrop-blur-md flex flex-col h-full overflow-y-auto z-20 relative">
+            <aside className="w-80 flex-shrink-0 border-l border-slate-200 dark:border-slate-800/50 p-6 bg-slate-50/50 dark:bg-slate-900/20 flex flex-col h-full overflow-y-auto z-20 relative">
                 <h3 className="text-xl font-bold mb-6 text-slate-800 dark:text-slate-100">Quick Actions</h3>
 
                 <div className="grid grid-cols-2 gap-3 mb-8">
-                    <button onClick={() => navigate('/compliance/global-audits')} className="bg-white/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-800/80 shadow-sm rounded-2xl p-4 flex flex-col items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition">
-                        <span className="material-symbols-outlined text-indigo-500 text-xl">policy</span>
+                    <button onClick={() => navigate('/compliance/global-audits')} className="bg-surface dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-800/80 shadow-sm rounded-lg p-4 flex flex-col items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition">
+                        <span className="material-symbols-outlined text-primary-500 text-xl">policy</span>
                         <span className="text-[10px] font-bold text-slate-500 dark:text-slate-300 uppercase leading-none">View Audits</span>
                     </button>
-                    <button onClick={() => navigate('/compliance/consent-overrides')} className="bg-white/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-800/80 shadow-sm rounded-2xl p-4 flex flex-col items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition">
-                        <span className="material-symbols-outlined text-rose-500 text-xl">key_off</span>
+                    <button onClick={() => navigate('/compliance/consent-overrides')} className="bg-surface dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-800/80 shadow-sm rounded-lg p-4 flex flex-col items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition">
+                        <span className="material-symbols-outlined text-primary-500 text-xl">key_off</span>
                         <span className="text-[10px] font-bold text-slate-500 dark:text-slate-300 uppercase leading-none">Overrides</span>
                     </button>
-                    <button onClick={() => navigate('/compliance/incidents')} className="bg-white/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-800/80 shadow-sm rounded-2xl p-4 flex flex-col items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition">
-                        <span className="material-symbols-outlined text-amber-500 text-xl">gavel</span>
+                    <button onClick={() => navigate('/compliance/incidents')} className="bg-surface dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-800/80 shadow-sm rounded-lg p-4 flex flex-col items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition">
+                        <span className="material-symbols-outlined text-primary-500 text-xl">gavel</span>
                         <span className="text-[10px] font-bold text-slate-500 dark:text-slate-300 uppercase leading-none">Incidents</span>
                     </button>
-                    <button onClick={() => navigate('/compliance/profile')} className="bg-white/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-800/80 shadow-sm rounded-2xl p-4 flex flex-col items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition">
-                        <span className="material-symbols-outlined text-emerald-500 text-xl">manage_accounts</span>
+                    <button onClick={() => navigate('/compliance/profile')} className="bg-surface dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-800/80 shadow-sm rounded-lg p-4 flex flex-col items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition">
+                        <span className="material-symbols-outlined text-primary-500 text-xl">manage_accounts</span>
                         <span className="text-[10px] font-bold text-slate-500 dark:text-slate-300 uppercase leading-none">My Settings</span>
                     </button>
                 </div>
 
-                <div className="bg-white/80 dark:bg-slate-800/80 rounded-2xl p-5 shadow-sm border border-slate-200/80 dark:border-slate-800/80 mt-auto">
+                <div className="bg-surface dark:bg-slate-800/80 rounded-2xl p-5 shadow-sm border border-slate-200/80 dark:border-slate-800/80 mt-auto">
                     <div className="flex items-center gap-3 mb-3 text-slate-800 dark:text-slate-200 font-bold text-sm">
                         <span className="material-symbols-outlined text-slate-400">info</span>
                         Compliance Status
