@@ -1,52 +1,39 @@
 /* ========================================
-   CONSENT PAGE - Medical Blue Theme
+   CONSENT PAGE - Medicare Teal Theme
    Privacy & Data Control Interface
    ======================================== */
 
 .consent-page {
     min-height: 100vh;
-    background: var(--gray-50);
+    background: var(--mc-canvas);
 }
 
 /* ========================================
-   PAGE HEADER - Gradient Medical Blue
+   PAGE HEADER - Medicare Teal
    ======================================== */
 .page-header {
-    background: var(--gradient-primary);
+    background: var(--mc-brand);
     padding: 32px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--mc-shadow-panel);
     position: relative;
     overflow: hidden;
-}
-
-/* Animated Background Pattern */
-.page-header::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-    opacity: 1;
 }
 
 .page-header h1 {
     margin: 0 0 6px 0;
     font-size: 32px;
-    color: var(--white);
+    color: var(--mc-on-brand);
     font-weight: 700;
     position: relative;
     z-index: 1;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .page-subtitle {
     margin: 0;
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--mc-on-brand);
     font-size: 15px;
     position: relative;
     z-index: 1;
@@ -74,7 +61,7 @@
     padding: 0;
     border-radius: 0;
     gap: 20px;
-    border-bottom: 2px solid #e2e8f0;
+    border-bottom: 1px solid var(--mc-border);
     margin-bottom: 0;
 }
 
@@ -84,9 +71,9 @@
     background: transparent;
     cursor: pointer;
     font-weight: 500;
-    color: #64748b;
+    color: var(--mc-text-muted);
     transition: all 0.2s ease;
-    border-bottom: 2px solid transparent;
+    border-bottom: 1px solid transparent;
     margin-bottom: -2px;
     /* Overlap border */
     border-radius: 0;
@@ -94,15 +81,15 @@
 
 .toggle-btn.active {
     background: transparent;
-    color: #0284c7;
+    color: var(--mc-accent);
     /* Brand Blue */
-    border-bottom: 2px solid #0284c7;
+    border-bottom: 1px solid var(--mc-border-strong);
     box-shadow: none;
 }
 
 .toggle-btn:hover:not(.active) {
     background: transparent;
-    color: #0284c7;
+    color: var(--mc-accent);
 }
 
 /* ========================================
@@ -123,7 +110,7 @@
 
 .consents-section h2 {
     margin-bottom: 20px;
-    color: var(--gray-900);
+    color: var(--mc-text);
     font-size: 22px;
     font-weight: 600;
 }
@@ -132,13 +119,13 @@
    EMPTY STATE
    ======================================== */
 .empty-state {
-    background: var(--white);
-    border-radius: var(--radius-xl);
+    background: var(--mc-surface);
+    border-radius: var(--mc-radius-panel);
     padding: 60px 40px;
     text-align: center;
-    color: var(--gray-600);
-    box-shadow: var(--shadow-md);
-    border: 2px dashed var(--gray-200);
+    color: var(--mc-text-muted);
+    box-shadow: var(--mc-shadow-panel);
+    border: 1px dashed var(--mc-border);
     animation: fadeIn 0.5s ease-out;
 }
 
@@ -159,7 +146,7 @@
 .empty-state p:first-of-type {
     font-size: 18px;
     font-weight: 600;
-    color: var(--gray-800);
+    color: var(--mc-text);
 }
 
 /* ========================================
@@ -167,24 +154,14 @@
    ======================================== */
 .consent-info-box {
     margin-top: 40px;
-    background: var(--gradient-primary);
-    color: var(--white);
-    border-radius: var(--radius-xl);
+    background: var(--mc-brand);
+    color: var(--mc-on-brand);
+    border-radius: var(--mc-radius-control);
     padding: 32px;
-    box-shadow: var(--shadow-blue);
+    box-shadow: var(--mc-shadow-sm);
     position: relative;
     overflow: hidden;
     animation: fadeIn 0.8s ease-out 0.4s both;
-}
-
-.consent-info-box::before {
-    content: '';
-    position: absolute;
-    top: -50px;
-    right: -50px;
-    width: 200px;
-    height: 200px;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
 }
 
 .consent-info-box h3 {
@@ -230,7 +207,7 @@
 }
 
 .consent-loading p {
-    color: var(--gray-600);
+    color: var(--mc-text-muted);
     font-size: 15px;
 }
 

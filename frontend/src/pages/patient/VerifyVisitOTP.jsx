@@ -48,7 +48,7 @@ const VerifyVisitOTP = () => {
     if (success) {
         return (
             <div className="min-h-[80vh] flex justify-center items-center p-5 bg-slate-50 dark:bg-slate-900">
-                <div className="w-full max-w-md bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 p-10 text-center transition-all">
+                <div className="w-full max-w-md bg-surface dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 p-10 text-center transition-all">
                     <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full flex items-center justify-center text-4xl mx-auto mb-6">
                         ✓
                     </div>
@@ -62,7 +62,7 @@ const VerifyVisitOTP = () => {
 
     return (
         <div className="min-h-[80vh] flex justify-center items-center p-5 bg-slate-50 dark:bg-slate-900">
-            <div className="w-full max-w-md bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 p-8 transition-all">
+            <div className="w-full max-w-md bg-surface dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 p-8 transition-all">
                 <h2 className="text-gray-900 dark:text-white font-bold text-2xl mb-2 m-0">Verify Hospital Visit OTP</h2>
                 <p className="text-gray-500 dark:text-gray-400 mb-8 text-sm m-0">Enter the OTP provided by the hospital</p>
 
@@ -75,7 +75,7 @@ const VerifyVisitOTP = () => {
                             onChange={(e) => setVisitId(e.target.value)}
                             placeholder="Enter your visit ID"
                             disabled={loading}
-                            className="w-full px-4 py-2.5 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all text-gray-900 dark:text-white disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-slate-800"
+                            className="w-full px-4 py-2.5 bg-surface dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all text-gray-900 dark:text-white disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-slate-800"
                         />
                         <small className="block mt-1.5 text-xs text-gray-400 dark:text-gray-500">You can find this in your visit confirmation</small>
                     </div>
@@ -88,7 +88,7 @@ const VerifyVisitOTP = () => {
                             onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
                             placeholder="Enter 6-digit OTP"
                             maxLength="6"
-                            className="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 outline-none transition-all text-2xl tracking-[0.5em] text-center font-bold text-gray-900 dark:text-white disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-slate-800"
+                            className="w-full px-4 py-3 bg-surface dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all text-2xl tracking-[0.5em] text-center font-bold text-gray-900 dark:text-white disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-slate-800"
                             disabled={loading}
                         />
                     </div>
@@ -100,7 +100,7 @@ const VerifyVisitOTP = () => {
                         </p>
 
                         <div className="space-y-3">
-                            <label className={`block p-4 border-2 rounded-xl cursor-pointer transition-all ${accessLevel === 'read' ? 'border-teal-500 dark:border-teal-400 bg-teal-50/50 dark:bg-teal-900/20' : 'border-gray-100 dark:border-slate-700 hover:border-teal-200 dark:hover:border-teal-500/50 hover:bg-gray-50 dark:hover:bg-slate-700/50'}`}>
+                            <label className={`block p-4 border-2 rounded-xl cursor-pointer transition-all ${accessLevel === 'read' ? "border-primary-500 dark:border-primary-400 bg-primary-50/50 dark:bg-primary-900/20" : "border-gray-100 dark:border-slate-700 hover:border-primary-200 dark:hover:border-primary-500/50 hover:bg-gray-50 dark:hover:bg-slate-700/50"}`}>
                                 <input
                                     type="radio"
                                     name="accessLevel"
@@ -119,7 +119,7 @@ const VerifyVisitOTP = () => {
                                 </div>
                             </label>
 
-                            <label className={`block p-4 border-2 rounded-xl cursor-pointer transition-all ${accessLevel === 'write' ? 'border-teal-500 dark:border-teal-400 bg-teal-50/50 dark:bg-teal-900/20' : 'border-gray-100 dark:border-slate-700 hover:border-teal-200 dark:hover:border-teal-500/50 hover:bg-gray-50 dark:hover:bg-slate-700/50'}`}>
+                            <label className={`block p-4 border-2 rounded-xl cursor-pointer transition-all ${accessLevel === 'write' ? "border-primary-500 dark:border-primary-400 bg-primary-50/50 dark:bg-primary-900/20" : "border-gray-100 dark:border-slate-700 hover:border-primary-200 dark:hover:border-primary-500/50 hover:bg-gray-50 dark:hover:bg-slate-700/50"}`}>
                                 <input
                                     type="radio"
                                     name="accessLevel"
@@ -141,7 +141,7 @@ const VerifyVisitOTP = () => {
                     </div>
 
                     {error && (
-                        <div className="bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 text-red-700 dark:text-red-400 p-4 rounded text-sm flex items-center gap-2 mt-4">
+                        <div className="bg-red-50 dark:bg-red-900/30 border-red-500 text-red-700 dark:text-red-400 p-4 rounded text-sm flex items-center gap-2 mt-4">
                             <span className="text-lg">⚠️</span>
                             {error}
                         </div>
@@ -150,7 +150,7 @@ const VerifyVisitOTP = () => {
                     <div className="pt-2">
                         <button
                             type="submit"
-                            className="w-full bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white font-semibold py-3 px-4 rounded-lg shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5 active:translate-y-0"
+                            className="w-full text-white font-semibold py-3 px-4 rounded-lg shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed transform active:translate-y-0 bg-primary-600"
                             disabled={loading || !visitId || !otp}
                         >
                             {loading ? 'Verifying...' : 'Verify OTP & Grant Access'}
@@ -158,7 +158,7 @@ const VerifyVisitOTP = () => {
                     </div>
                 </form>
 
-                <div className="mt-8 p-4 border-l-4 border-teal-500 bg-teal-50/50 dark:bg-teal-900/20 rounded-r-lg">
+                <div className="mt-8 p-4 border-primary-500 bg-primary-50/50 dark:bg-primary-900/20 rounded-r-lg">
                     <strong className="block text-gray-900 dark:text-white font-bold mb-2 m-0">💡 Note:</strong>
                     <ul className="text-gray-700 dark:text-gray-300 text-sm space-y-1 m-0 pl-5 list-disc">
                         <li>OTP is valid for 24 hours</li>

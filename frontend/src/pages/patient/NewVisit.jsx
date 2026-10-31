@@ -1,3 +1,5 @@
+import ThemeToggle from '../../components/common/ThemeToggle';
+import Brand from '../../components/common/Brand';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -49,54 +51,40 @@ const NewVisit = () => {
         }
     };
 
-    const toggleDarkMode = () => {
-        document.documentElement.classList.toggle('dark');
-    };
-
-    return (
+return (
         <div className="patient-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-800 dark:text-slate-100 p-4 lg:p-8">
-            <div className="max-w-[1440px] mx-auto glass-panel rounded-3xl min-h-[90vh] shadow-2xl flex overflow-hidden">
+            <div className="max-w-[1440px] mx-auto glass-panel rounded-3xl min-h-[90vh] shadow-sm flex overflow-hidden mc-workspace mc-visit-flow">
                 {/* Left Sidebar */}
-                <aside className="w-64 border-r border-white/20 dark:border-slate-800/50 p-6 flex flex-col hidden md:flex">
-                    <div className="flex items-center gap-3 mb-10 px-2 cursor-pointer" onClick={() => navigate('/patient/dashboard')}>
-                        <div className="w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center text-white">
-                            <span className="material-symbols-outlined text-sm">local_hospital</span>
-                        </div>
-                        <h1 className="text-xl font-bold tracking-tight text-slate-800 dark:text-white">Medicare</h1>
-                    </div>
+                <aside className="w-64 border-r border-line dark:border-slate-800/50 p-6 flex flex-col mc-sidebar">
+                    <Brand to={'/patient/dashboard'} />
                     <nav className="space-y-2 flex-grow">
-                        <button onClick={() => navigate('/patient/dashboard')} className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl">
+                        <button onClick={() => navigate('/patient/dashboard')} className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-lg">
                             <span className="material-symbols-outlined text-[20px]">grid_view</span>
                             Dashboard
                         </button>
-                        <button onClick={() => navigate('/patient/visits')} className="w-full flex items-center gap-3 px-4 py-3 sidebar-item-active rounded-xl font-medium text-slate-800 dark:text-slate-800">
+                        <button onClick={() => navigate('/patient/visits')} className="w-full flex items-center gap-3 px-4 py-3 sidebar-item-active rounded-lg font-medium text-slate-800 dark:text-slate-800">
                             <span className="material-symbols-outlined text-[20px]">calendar_today</span>
                             Appointments
                         </button>
-                        <button onClick={() => navigate('/patient/messages')} className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl">
+                        <button onClick={() => navigate('/patient/messages')} className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-lg">
                             <span className="material-symbols-outlined text-[20px]">chat_bubble_outline</span>
                             Messages
                         </button>
-                        <button onClick={() => navigate('/patient/medical-records')} className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl">
+                        <button onClick={() => navigate('/patient/medical-records')} className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-lg">
                             <span className="material-symbols-outlined text-[20px]">folder_shared</span>
                             Records
                         </button>
-                        <button onClick={() => navigate('/patient/consent')} className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl">
+                        <button onClick={() => navigate('/patient/consent')} className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-lg">
                             <span className="material-symbols-outlined text-[20px]">verified_user</span>
                             Consents
                         </button>
                     </nav>
-                    <div className="space-y-2 mt-auto pt-6 border-t border-white/20 dark:border-slate-800/50">
-                        <button onClick={() => navigate('/patient/support')} className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl">
+                    <div className="space-y-2 mt-auto pt-6 border-t border-line dark:border-slate-800/50">
+                        <button onClick={() => navigate('/patient/support')} className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-lg">
                             <span className="material-symbols-outlined text-[20px]">favorite_border</span>
                             Support
                         </button>
-                        <button onClick={toggleDarkMode} className="p-2 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors flex items-center justify-center gap-2">
-                            <span className="material-symbols-outlined text-indigo-500 !block dark:!hidden">dark_mode</span>
-                            <span className="material-symbols-outlined text-amber-500 !hidden dark:!block">light_mode</span>
-                            <span className="!block dark:!hidden">Dark Mode</span>
-                            <span className="!hidden dark:!block">Light Mode</span>
-                        </button>
+                        <ThemeToggle />
                     </div>
                 </aside>
 
@@ -110,13 +98,13 @@ const NewVisit = () => {
                         Back to Visits
                     </button>
 
-                    <div className="w-full max-w-lg glass-card rounded-3xl p-8 border border-white/50 dark:border-slate-700/50 shadow-xl relative overflow-hidden group">
-                        <div className="absolute -top-20 -right-20 w-48 h-48 bg-indigo-500/10 dark:bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
-                        <div className="absolute -bottom-20 -left-20 w-48 h-48 bg-teal-500/10 dark:bg-teal-500/5 rounded-full blur-3xl pointer-events-none"></div>
+                    <div className="w-full max-w-lg glass-card rounded-3xl p-8 border border-line dark:border-slate-700/50 shadow-sm relative overflow-hidden group">
+
+
 
                         <div className="relative z-10">
                             <div className="flex flex-col items-center mb-8">
-                                <div className="w-16 h-16 rounded-2xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 mb-4 shadow-inner">
+                                <div className="w-16 h-16 rounded-2xl bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 mb-4 shadow-inner">
                                     <span className="material-symbols-outlined text-3xl">add_circle</span>
                                 </div>
                                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2 text-center">Request a New Visit</h2>
@@ -138,7 +126,7 @@ const NewVisit = () => {
                                         components={{ finder: false }}
                                     />
                                     {/* Overlay guide */}
-                                    <div className="absolute inset-0 border-[3px] border-dashed border-white/50 m-8 rounded-lg pointer-events-none"></div>
+                                    <div className="absolute inset-0 border-[3px] border-dashed border-line m-8 rounded-lg pointer-events-none"></div>
                                 </div>
                                 <p className="text-xs text-slate-500 mt-4 text-center font-medium">Position the QR code within the frame to scan.</p>
                             </div>
@@ -157,12 +145,12 @@ const NewVisit = () => {
                                         onChange={(e) => setManualUrl(e.target.value)}
                                         onKeyDown={(e) => e.key === 'Enter' && handleManualUrl()}
                                         placeholder="Paste the consent URL here..."
-                                        className="flex-1 px-4 py-3 bg-white/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-600/50 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none text-sm text-slate-900 dark:text-white"
+                                        className="flex-1 px-4 py-3 bg-surface dark:bg-slate-800/50 border border-slate-200 dark:border-slate-600/50 rounded-xl focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none text-sm text-slate-900 dark:text-white"
                                     />
                                     <button
                                         onClick={handleManualUrl}
                                         disabled={!manualUrl.trim()}
-                                        className="px-4 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold rounded-xl transition-colors flex items-center gap-2"
+                                        className="px-4 py-3 bg-primary-600 hover:bg-primary-700 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold rounded-lg transition-colors flex items-center gap-2"
                                     >
                                         <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
                                     </button>

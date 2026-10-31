@@ -1,3 +1,5 @@
+import ThemeToggle from '../../components/common/ThemeToggle';
+import Brand from '../../components/common/Brand';
 // Patient Visits Page - Epic 3: Visit Management
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
@@ -90,57 +92,46 @@ function Visits() {
     const filteredVisits = filterVisits();
 
     return (
-        <div className="patient-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-800 dark:text-slate-100 flex h-screen w-full overflow-hidden">
+        <div className="patient-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-800 dark:text-slate-100 flex h-screen w-full overflow-hidden mc-workspace">
             {/* Theme Toggle styling */}
-            <div className="absolute top-4 right-4 z-50">
-                <button onClick={() => document.documentElement.classList.toggle('dark')} className="glass-card p-3 rounded-full hover:bg-white/40 dark:hover:bg-slate-700/50 transition flex items-center justify-center">
-                    <span className="material-symbols-outlined text-indigo-500 !block dark:!hidden">dark_mode</span>
-                    <span className="material-symbols-outlined text-amber-500 !hidden dark:!block">light_mode</span>
-                </button>
+            <div className="mc-workspace-theme">
+                <ThemeToggle />
             </div>
 
-            <aside className="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800/50 p-6 flex flex-col h-full overflow-y-auto">
-                <div className="flex items-center gap-3 mb-10 px-2 cursor-pointer group" onClick={() => navigate('/patient/dashboard')}>
-                    <div className="relative">
-                        <div className="absolute inset-0 bg-indigo-500 blur-lg opacity-0 group-hover:opacity-60 transition-opacity duration-500 rounded-full"></div>
-                        <div className="relative w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center text-white shadow-lg transform transition-all duration-500 group-hover:scale-110 group-hover:-rotate-3 group-hover:shadow-[0_0_15px_rgba(99,102,241,0.5)]">
-                            <span className="material-symbols-outlined text-xl transition-transform duration-500 group-hover:scale-110">local_hospital</span>
-                        </div>
-                    </div>
-                    <h1 className="text-xl font-bold tracking-tight text-slate-800 dark:text-white transition-all duration-500 drop-shadow-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-hover:drop-shadow-[0_0_10px_rgba(99,102,241,0.4)]">Medicare</h1>
-                </div>
+            <aside className="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800/50 p-6 flex flex-col h-full overflow-y-auto mc-sidebar">
+                <Brand to={'/patient/dashboard'} />
                 <nav className="space-y-2 flex-grow">
-                    <button onClick={() => navigate('/patient/dashboard')} className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl">
+                    <button onClick={() => navigate('/patient/dashboard')} className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-lg">
                         <span className="material-symbols-outlined text-[20px]">grid_view</span>
                         Dashboard
                     </button>
-                    <button className="w-full flex items-center gap-3 px-4 py-3 sidebar-item-active rounded-xl font-medium text-slate-800 dark:text-slate-800">
+                    <button className="w-full flex items-center gap-3 px-4 py-3 sidebar-item-active rounded-lg font-medium text-slate-800 dark:text-slate-800">
                         <span className="material-symbols-outlined text-[20px]">calendar_today</span>
                         Appointments
                     </button>
-                    <button onClick={() => navigate('/patient/messages')} className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl">
+                    <button onClick={() => navigate('/patient/messages')} className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-lg">
                         <span className="material-symbols-outlined text-[20px]">chat_bubble_outline</span>
                         Messages
                     </button>
-                    <button onClick={() => navigate('/patient/medical-records')} className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl">
+                    <button onClick={() => navigate('/patient/medical-records')} className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-lg">
                         <span className="material-symbols-outlined text-[20px]">folder_shared</span>
                         Records
                     </button>
-                    <button onClick={() => navigate('/patient/consent')} className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl">
+                    <button onClick={() => navigate('/patient/consent')} className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-lg">
                         <span className="material-symbols-outlined text-[20px]">verified_user</span>
                         Consents
                     </button>
                 </nav>
                 <div className="space-y-2 mt-auto pt-6 border-t border-slate-200 dark:border-slate-800/50">
-                    <Link to="/patient/support" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl">
+                    <Link to="/patient/support" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
                         <span className="material-symbols-outlined text-[20px]">favorite_border</span>
                         Support
                     </Link>
-                    <Link to="/patient/profile" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl">
+                    <Link to="/patient/profile" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
                         <span className="material-symbols-outlined text-[20px]">manage_accounts</span>
                         Profile
                     </Link>
-                    <button onClick={logout} className="w-full flex items-center gap-3 px-4 py-3 text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition rounded-xl font-medium">
+                    <button onClick={logout} className="w-full flex items-center gap-3 px-4 py-3 text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition rounded-lg font-medium">
                         <span className="material-symbols-outlined text-[20px]">logout</span>
                         Sign Out
                     </button>
@@ -166,8 +157,8 @@ function Visits() {
                 )}
 
                 {/* Check In Section */}
-                <div className="glass-card p-6 md:p-8 rounded-3xl mb-8 border border-white/50 dark:border-slate-700/50 relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 dark:bg-indigo-500/5 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
+                <div className="glass-card p-6 md:p-8 rounded-3xl mb-8 border border-line dark:border-slate-700/50 relative overflow-hidden group">
+
                     <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                         <div>
                             <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">Schedule or Check In</h3>
@@ -175,19 +166,19 @@ function Visits() {
                         </div>
                         <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                             <button
-                                className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl text-sm font-semibold transition-all shadow-lg shadow-indigo-600/30 whitespace-nowrap"
+                                className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg text-sm font-semibold transition-all shadow-lg shadow-primary-600/30 whitespace-nowrap"
                                 onClick={handleScheduleVisit}
                             >
                                 Schedule a Visit
                             </button>
                             <button
-                                className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-3 rounded-xl text-sm font-semibold transition-all shadow-lg shadow-teal-600/30 whitespace-nowrap"
+                                className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg text-sm font-semibold transition-all shadow-lg shadow-primary-600/30 whitespace-nowrap"
                                 onClick={() => navigate('/patient/visits/new')}
                             >
                                 Walk-In Visit
                             </button>
                             <button
-                                className="bg-white/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 px-6 py-3 rounded-xl text-sm font-semibold transition-all whitespace-nowrap"
+                                className="bg-surface dark:bg-slate-800/80 hover:bg-surface dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 px-6 py-3 rounded-lg text-sm font-semibold transition-all whitespace-nowrap"
                                 onClick={() => setShowCheckIn(!showCheckIn)}
                             >
                                 {showCheckIn ? 'Hide Check-In Form' : 'Check In with Code'}
@@ -211,21 +202,21 @@ function Visits() {
                 )}
 
                 {/* Filter Tabs */}
-                <div className="flex gap-2 mb-8 bg-white/40 dark:bg-slate-800/40 p-1.5 rounded-2xl inline-flex backdrop-blur-sm border border-white/50 dark:border-slate-700/50">
+                <div className="flex gap-2 mb-8 bg-surface dark:bg-slate-800/40 p-1.5 rounded-2xl inline-flex border border-line dark:border-slate-700/50">
                     <button
-                        className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition-all ${filter === 'upcoming' ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
+                        className={`px-6 py-2.5 rounded-lg text-sm font-semibold transition-all ${filter === 'upcoming' ? "bg-surface dark:bg-slate-700 text-primary-600 dark:text-primary-400 shadow-sm" : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
                         onClick={() => setFilter('upcoming')}
                     >
                         Upcoming
                     </button>
                     <button
-                        className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition-all ${filter === 'past' ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
+                        className={`px-6 py-2.5 rounded-lg text-sm font-semibold transition-all ${filter === 'past' ? "bg-surface dark:bg-slate-700 text-primary-600 dark:text-primary-400 shadow-sm" : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
                         onClick={() => setFilter('past')}
                     >
                         Past Visits
                     </button>
                     <button
-                        className={`px-6 py-2.5 rounded-xl text-sm font-semibold transition-all ${filter === 'all' ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
+                        className={`px-6 py-2.5 rounded-lg text-sm font-semibold transition-all ${filter === 'all' ? "bg-surface dark:bg-slate-700 text-primary-600 dark:text-primary-400 shadow-sm" : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'}`}
                         onClick={() => setFilter('all')}
                     >
                         All
@@ -253,7 +244,7 @@ function Visits() {
                         </div>
                     ) : (
                         filteredVisits.map(visit => (
-                            <div key={visit.id} className="glass-card rounded-3xl overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                            <div key={visit.id} className="glass-card rounded-3xl overflow-hidden hover:shadow-lg transition-all duration-300 transform">
                                 <VisitCard
                                     visit={visit}
                                     userRole="patient"

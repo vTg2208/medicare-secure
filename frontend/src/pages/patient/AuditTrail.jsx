@@ -1,12 +1,12 @@
+import Brand from '../../components/common/Brand';
 import React, { useState, useEffect, useCallback, useContext } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import auditApi from '../../api/auditApi';
 import ThemeToggle from '../../components/common/ThemeToggle';
 import '../patient/Dashboard.css';
 
 function AuditTrail() {
-    const navigate = useNavigate();
     const {  logout } = useContext(AuthContext);
 
     const [logs, setLogs] = useState([]);
@@ -121,41 +121,33 @@ function AuditTrail() {
     };
 
     return (
-        <div className="patient-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-800 dark:text-slate-100 flex h-screen w-full overflow-hidden">
+        <div className="patient-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-800 dark:text-slate-100 flex h-screen w-full overflow-hidden mc-workspace">
             {/* Theme Toggle */}
-            <div className="absolute top-4 right-4 z-50">
+            <div className="mc-workspace-theme">
                 <ThemeToggle />
             </div>
 
             {/* ── Sidebar ── */}
-            <aside className="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800/50 p-6 flex flex-col h-full overflow-y-auto">
-                <div className="flex items-center gap-3 mb-10 px-2 cursor-pointer group" onClick={() => navigate('/patient/dashboard')}>
-                    <div className="relative">
-                        <div className="absolute inset-0 bg-indigo-500 blur-lg opacity-0 group-hover:opacity-60 transition-opacity duration-500 rounded-full"></div>
-                        <div className="relative w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center text-white shadow-lg transform transition-all duration-500 group-hover:scale-110 group-hover:-rotate-3 group-hover:shadow-[0_0_15px_rgba(99,102,241,0.5)]">
-                            <span className="material-symbols-outlined text-xl transition-transform duration-500 group-hover:scale-110">local_hospital</span>
-                        </div>
-                    </div>
-                    <h1 className="text-xl font-bold tracking-tight text-slate-800 dark:text-white transition-all duration-500 drop-shadow-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-hover:drop-shadow-[0_0_10px_rgba(99,102,241,0.4)]">Medicare</h1>
-                </div>
+            <aside className="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800/50 p-6 flex flex-col h-full overflow-y-auto mc-sidebar">
+                <Brand to={'/patient/dashboard'} />
                 <nav className="space-y-2 flex-grow">
-                    <Link to="/patient/dashboard" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl">
+                    <Link to="/patient/dashboard" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
                         <span className="material-symbols-outlined text-[20px]">grid_view</span>
                         Dashboard
                     </Link>
-                    <Link to="/patient/visits" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl">
+                    <Link to="/patient/visits" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
                         <span className="material-symbols-outlined text-[20px]">calendar_today</span>
                         Appointments
                     </Link>
-                    <Link to="/patient/messages" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl">
+                    <Link to="/patient/messages" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
                         <span className="material-symbols-outlined text-[20px]">chat_bubble_outline</span>
                         Messages
                     </Link>
-                    <Link to="/patient/medical-records" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl">
+                    <Link to="/patient/medical-records" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
                         <span className="material-symbols-outlined text-[20px]">folder_shared</span>
                         Records
                     </Link>
-                    <Link to="/patient/consent" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl">
+                    <Link to="/patient/consent" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
                         <span className="material-symbols-outlined text-[20px]">verified_user</span>
                         Consents
                     </Link>
@@ -165,15 +157,15 @@ function AuditTrail() {
                     </Link>
                 </nav>
                 <div className="space-y-2 mt-auto pt-6 border-t border-slate-200 dark:border-slate-800/50">
-                    <Link to="/patient/support" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl">
+                    <Link to="/patient/support" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
                         <span className="material-symbols-outlined text-[20px]">favorite_border</span>
                         Support
                     </Link>
-                    <Link to="/patient/profile" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl">
+                    <Link to="/patient/profile" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
                         <span className="material-symbols-outlined text-[20px]">manage_accounts</span>
                         Profile
                     </Link>
-                    <button onClick={logout} className="w-full flex items-center gap-3 px-4 py-3 text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition rounded-xl font-medium">
+                    <button onClick={logout} className="w-full flex items-center gap-3 px-4 py-3 text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition rounded-lg font-medium">
                         <span className="material-symbols-outlined text-[20px]">logout</span>
                         Sign Out
                     </button>
@@ -188,14 +180,14 @@ function AuditTrail() {
                 </header>
 
                 {/* Filters */}
-                <div className="glass-card rounded-2xl p-5 mb-6 flex flex-wrap gap-4 items-end border border-white/50 dark:border-slate-700/50">
+                <div className="glass-card rounded-2xl p-5 mb-6 flex flex-wrap gap-4 items-end border border-line dark:border-slate-700/50">
                     <div className="flex-1 min-w-[140px]">
                         <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Start Date</label>
                         <input
                             type="date"
                             value={startDate}
                             onChange={(e) => setStartDate(e.target.value)}
-                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600/50 bg-white/60 dark:bg-slate-800/60 text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition outline-none text-sm"
+                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600/50 bg-surface dark:bg-slate-800/60 text-slate-900 dark:text-white focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition outline-none text-sm"
                         />
                     </div>
                     <div className="flex-1 min-w-[140px]">
@@ -204,7 +196,7 @@ function AuditTrail() {
                             type="date"
                             value={endDate}
                             onChange={(e) => setEndDate(e.target.value)}
-                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600/50 bg-white/60 dark:bg-slate-800/60 text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition outline-none text-sm"
+                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600/50 bg-surface dark:bg-slate-800/60 text-slate-900 dark:text-white focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition outline-none text-sm"
                         />
                     </div>
                     <div className="flex-1 min-w-[160px]">
@@ -212,7 +204,7 @@ function AuditTrail() {
                         <select
                             value={actionFilter}
                             onChange={(e) => setActionFilter(e.target.value)}
-                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600/50 bg-white/60 dark:bg-slate-800/60 text-slate-900 dark:text-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition outline-none text-sm"
+                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600/50 bg-surface dark:bg-slate-800/60 text-slate-900 dark:text-white focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 transition outline-none text-sm"
                         >
                             <option value="">All Actions</option>
                             <option value="view_patient_records">Viewed Records</option>
@@ -226,7 +218,7 @@ function AuditTrail() {
                     </div>
                     <button
                         onClick={handleResetFilters}
-                        className="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-700/60 hover:bg-slate-200 dark:hover:bg-slate-600/60 text-slate-700 dark:text-slate-200 text-sm font-semibold transition-colors border border-slate-200/50 dark:border-slate-600/50 flex items-center gap-2"
+                        className="px-5 py-2.5 rounded-lg bg-slate-100 dark:bg-slate-700/60 hover:bg-slate-200 dark:hover:bg-slate-600/60 text-slate-700 dark:text-slate-200 text-sm font-semibold transition-colors border border-slate-200/50 dark:border-slate-600/50 flex items-center gap-2"
                     >
                         <span className="material-symbols-outlined text-[16px]">refresh</span>
                         Reset
@@ -245,7 +237,7 @@ function AuditTrail() {
                         {error}
                     </div>
                 ) : logs.length === 0 ? (
-                    <div className="glass-card rounded-2xl p-16 text-center border border-white/50 dark:border-slate-700/50 flex flex-col items-center">
+                    <div className="glass-card rounded-2xl p-16 text-center border border-line dark:border-slate-700/50 flex flex-col items-center">
                         <div className="w-16 h-16 bg-slate-100 dark:bg-slate-700/50 rounded-2xl flex items-center justify-center mb-4">
                             <span className="material-symbols-outlined text-3xl text-slate-400">history</span>
                         </div>
@@ -256,10 +248,10 @@ function AuditTrail() {
                     <>
                         <div className="space-y-3">
                             {logs.map((log) => (
-                                <div key={log.id} className="glass-card rounded-2xl border border-white/50 dark:border-slate-700/50 hover:border-indigo-200 dark:hover:border-indigo-800/50 transition-all p-5">
+                                <div key={log.id} className="glass-card rounded-2xl border border-line dark:border-slate-700/50 hover:border-primary-200 dark:hover:border-primary-800/50 transition-all p-5">
                                     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4 pb-4 border-b border-slate-100 dark:border-slate-700/50">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center flex-shrink-0">
+                                            <div className="w-10 h-10 bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 rounded-xl flex items-center justify-center flex-shrink-0">
                                                 <span className="material-symbols-outlined text-[20px]">{getRoleIcon(log.userRole)}</span>
                                             </div>
                                             <div>
@@ -298,7 +290,7 @@ function AuditTrail() {
                                 <button
                                     onClick={() => handlePageChange(currentPage - 1)}
                                     disabled={currentPage === 1}
-                                    className="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600/50 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                                    className="px-5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600/50 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition"
                                 >
                                     ← Previous
                                 </button>
@@ -309,7 +301,7 @@ function AuditTrail() {
                                 <button
                                     onClick={() => handlePageChange(currentPage + 1)}
                                     disabled={currentPage === pagination.pages}
-                                    className="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600/50 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                                    className="px-5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-600/50 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition"
                                 >
                                     Next →
                                 </button>

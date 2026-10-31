@@ -5,16 +5,15 @@
 }
 
 .glass-button {
-    background: rgba(255, 255, 255, 0.4);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: var(--text-dark);
+    background: var(--mc-surface);
+    border: 1px solid var(--mc-border);
+    color: var(--mc-text);
 }
 
 .dark .glass-button {
-    background: rgba(30, 41, 59, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    color: var(--text-light);
+    background: var(--mc-surface);
+    border: 1px solid var(--mc-border);
+    color: var(--mc-text-muted);
 }
 
 /* Custom Scrollbar for Chat Area */
@@ -27,12 +26,12 @@
 }
 
 .chatbot-wrapper main div::-webkit-scrollbar-thumb {
-    background-color: rgba(99, 102, 241, 0.2);
-    border-radius: 10px;
+    background-color: var(--mc-brand-soft);
+    border-radius: var(--mc-radius-control);
 }
 
 .dark .chatbot-wrapper main div::-webkit-scrollbar-thumb {
-    background-color: rgba(99, 102, 241, 0.4);
+    background-color: var(--mc-brand-soft);
 }
 
 /* Animations */

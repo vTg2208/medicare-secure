@@ -1,3 +1,4 @@
+import Brand from '../../components/common/Brand';
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -93,22 +94,14 @@ const NurseMedications = () => {
     );
 
     return (
-        <div className="patient-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-800 dark:text-slate-100 flex h-screen w-full overflow-hidden">
-            <div className="absolute top-4 right-4 z-50">
+        <div className="patient-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-800 dark:text-slate-100 flex h-screen w-full overflow-hidden mc-workspace">
+            <div className="mc-workspace-theme">
                 <ThemeToggle />
             </div>
 
             {/* Left Sidebar */}
-            <aside className="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800/50 p-6 flex flex-col h-full overflow-y-auto z-20 bg-[var(--background-light)] dark:bg-[var(--background-dark)] relative">
-                <div className="flex items-center gap-3 mb-10 px-2 cursor-pointer group" onClick={() => navigate('/nurse/dashboard')}>
-                    <div className="relative">
-                        <div className="absolute inset-0 bg-teal-500 blur-lg opacity-0 group-hover:opacity-60 transition-opacity duration-500 rounded-full"></div>
-                        <div className="relative w-10 h-10 bg-teal-500 rounded-xl flex items-center justify-center text-white shadow-lg transform transition-all duration-500 group-hover:scale-110 group-hover:-rotate-3 group-hover:shadow-[0_0_15px_rgba(20,184,166,0.5)]">
-                            <span className="material-symbols-outlined text-xl transition-transform duration-500 group-hover:scale-110">medical_services</span>
-                        </div>
-                    </div>
-                    <h1 className="text-xl font-bold tracking-tight text-slate-800 dark:text-white transition-all duration-500 drop-shadow-sm group-hover:text-teal-600 dark:group-hover:text-teal-400 group-hover:drop-shadow-[0_0_10px_rgba(20,184,166,0.4)]">Medicare</h1>
-                </div>
+            <aside className="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800/50 p-6 flex flex-col h-full overflow-y-auto z-20 bg-[var(--background-light)] dark:bg-[var(--background-dark)] relative mc-sidebar">
+                <Brand to={'/nurse/dashboard'} />
 
                 <nav className="space-y-2 flex-grow">
                     {navItems.map((item) => {
@@ -119,8 +112,8 @@ const NurseMedications = () => {
                                 key={item.id}
                                 to={item.path}
                                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition font-medium ${isActive
-                                    ? 'bg-teal-50/80 dark:bg-teal-900/20 text-teal-700 dark:text-teal-400 border border-teal-100 dark:border-teal-800/50 shadow-sm'
-                                    : 'text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5'
+                                    ? "bg-primary-50/80 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400 border border-primary-100 dark:border-primary-800/50 shadow-sm"
+                                    : 'text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface'
                                     }`}
                             >
                                 <span className={`material-symbols-outlined text-[20px] ${isActive ? '' : ''}`}>{item.icon}</span>
@@ -131,13 +124,13 @@ const NurseMedications = () => {
                 </nav>
 
                 <div className="space-y-2 mt-auto pt-6 border-t border-slate-200 dark:border-slate-800/50">
-                    <Link to="/nurse/profile" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl font-medium">
+                    <Link to="/nurse/profile" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl font-medium">
                         <span className="material-symbols-outlined text-[20px]">manage_accounts</span>
                         Profile
                     </Link>
                     <button
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-3 px-4 py-3 text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition rounded-xl font-medium"
+                        className="w-full flex items-center gap-3 px-4 py-3 text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition rounded-lg font-medium"
                     >
                         <span className="material-symbols-outlined text-[20px]">logout</span>
                         Sign Out
@@ -148,11 +141,11 @@ const NurseMedications = () => {
             {/* Main Content */}
             <main className="flex-1 flex flex-col h-full overflow-hidden relative">
                 {/* Decorative background element */}
-                <div className="absolute top-0 right-0 w-96 h-96 bg-teal-500/5 dark:bg-teal-400/5 rounded-full blur-3xl -z-10 transform translate-x-1/3 -translate-y-1/3 pointer-events-none"></div>
 
-                <header className="px-8 py-6 flex items-center justify-between flex-shrink-0 z-10 sticky top-0 bg-[var(--background-light)]/80 dark:bg-[var(--background-dark)]/80 backdrop-blur-md border-b border-transparent transition-all">
+
+                <header className="px-8 py-6 flex items-center justify-between flex-shrink-0 z-10 sticky top-0 bg-[var(--background-light)]/80 dark:bg-[var(--background-dark)]/80 border-b border-transparent transition-all">
                     <div>
-                        <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-slate-300">Medication Administration</h1>
+                        <h1 className="text-2xl font-bold text-accent">Medication Administration</h1>
                         <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Manage eMAR schedule for this shift</p>
                     </div>
                 </header>
@@ -161,23 +154,23 @@ const NurseMedications = () => {
                     <div className="max-w-7xl mx-auto space-y-6">
 
                         {/* Filters */}
-                        <div className="flex gap-4 items-center bg-white/60 dark:bg-slate-800/40 p-3 rounded-2xl border border-slate-200/60 dark:border-slate-700/50 shadow-sm backdrop-blur-xl w-fit">
+                        <div className="flex gap-4 items-center bg-surface dark:bg-slate-800/40 p-3 rounded-2xl border border-slate-200/60 dark:border-slate-700/50 shadow-sm w-fit">
                             <button
                                 onClick={() => setStatusFilter('all')}
-                                className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${statusFilter === 'all' ? 'bg-teal-600 text-white shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700/50'}`}
+                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${statusFilter === 'all' ? "bg-primary-600 text-white shadow-sm" : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700/50'}`}
                             >
                                 All Due
                             </button>
                             <button
                                 onClick={() => setStatusFilter('pending')}
-                                className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors gap-2 flex items-center ${statusFilter === 'pending' ? 'bg-amber-500 text-white shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700/50'}`}
+                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors gap-2 flex items-center ${statusFilter === 'pending' ? 'bg-amber-500 text-white shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700/50'}`}
                             >
                                 <span className="material-symbols-outlined text-[16px]">schedule</span>
                                 Pending
                             </button>
                             <button
                                 onClick={() => setStatusFilter('administered')}
-                                className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors gap-2 flex items-center ${statusFilter === 'administered' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700/50'}`}
+                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors gap-2 flex items-center ${statusFilter === 'administered' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700/50'}`}
                             >
                                 <span className="material-symbols-outlined text-[16px]">check_circle</span>
                                 Administered
@@ -187,21 +180,21 @@ const NurseMedications = () => {
                         {/* Medications Grid */}
                         {loading ? (
                             <div className="flex items-center justify-center py-20">
-                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600"></div>
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
                             </div>
                         ) : filteredMedications.length > 0 ? (
                             <div className="space-y-4">
                                 {filteredMedications.map((med, idx) => (
                                     <div
                                         key={med.id}
-                                        className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-5 shadow-sm hover:shadow transition animate-fade-in-up"
+                                        className="bg-surface dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-5 shadow-sm hover:shadow transition animate-fade-in-up"
                                         style={{ animationDelay: `${idx * 0.05}s` }}
                                     >
                                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
 
                                             {/* Patient & Drug Info */}
                                             <div className="flex gap-4 items-start md:items-center flex-1">
-                                                <div className={`w-12 h-12 rounded-full flex flex-shrink-0 items-center justify-center font-bold text-lg ${med.status === 'administered' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400' : 'bg-teal-100 text-teal-600 dark:bg-teal-900/50 dark:text-teal-400'}`}>
+                                                <div className={`w-12 h-12 rounded-full flex flex-shrink-0 items-center justify-center font-bold text-lg ${med.status === 'administered' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400' : "bg-primary-100 text-primary-600 dark:bg-primary-900/50 dark:text-primary-400"}`}>
                                                     {med.patientName.charAt(0)}
                                                 </div>
                                                 <div>
@@ -225,7 +218,7 @@ const NurseMedications = () => {
                                                 <div className="flex flex-col">
                                                     <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mb-1 uppercase tracking-wider">Scheduled</div>
                                                     <div className="text-sm font-bold text-slate-900 dark:text-slate-200 flex items-center gap-1.5">
-                                                        <span className="material-symbols-outlined text-teal-500 text-[18px]">alarm</span>
+                                                        <span className="material-symbols-outlined text-primary-500 text-[18px]">alarm</span>
                                                         {new Date(med.scheduledTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                     </div>
                                                 </div>
@@ -237,10 +230,10 @@ const NurseMedications = () => {
                                                             <button
                                                                 onClick={() => handleStatusUpdate(med.id, 'administered')}
                                                                 disabled={updatingId === med.id}
-                                                                className="flex-1 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-sm font-bold shadow-sm transition-colors flex justify-center items-center gap-1 disabled:opacity-50"
+                                                                className="flex-1 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm font-bold shadow-sm transition-colors flex justify-center items-center gap-1 disabled:opacity-50"
                                                             >
                                                                 {updatingId === med.id ? (
-                                                                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/20 border-t-white"></div>
+                                                                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-line border-t-white"></div>
                                                                 ) : (
                                                                     <>
                                                                         <span className="material-symbols-outlined text-[16px]">check</span>
@@ -251,7 +244,7 @@ const NurseMedications = () => {
                                                             <button
                                                                 onClick={() => handleStatusUpdate(med.id, 'refused')}
                                                                 disabled={updatingId === med.id}
-                                                                className="px-3 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 rounded-xl text-sm font-medium transition-colors flex items-center justify-center disabled:opacity-50"
+                                                                className="px-3 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 rounded-lg text-sm font-medium transition-colors flex items-center justify-center disabled:opacity-50"
                                                                 title="Refused"
                                                             >
                                                                 <span className="material-symbols-outlined text-[18px]">close</span>
@@ -275,7 +268,7 @@ const NurseMedications = () => {
                                 ))}
                             </div>
                         ) : (
-                            <div className="py-20 text-center bg-white/40 dark:bg-slate-800/20 backdrop-blur-lg rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">
+                            <div className="py-20 text-center bg-surface dark:bg-slate-800/20 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">
                                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 mb-4">
                                     <span className="material-symbols-outlined text-[32px] text-slate-400">check_circle</span>
                                 </div>

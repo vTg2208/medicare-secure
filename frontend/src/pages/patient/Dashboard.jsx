@@ -1,3 +1,4 @@
+import Brand from '../../components/common/Brand';
 import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
@@ -110,54 +111,46 @@ function PatientDashboard() {
     };
 
     return (
-        <div className="patient-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-800 dark:text-slate-100 flex h-screen w-full overflow-hidden">
+        <div className="patient-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-800 dark:text-slate-100 flex h-screen w-full overflow-hidden mc-workspace">
 
-            <aside className="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800/50 p-6 flex flex-col h-full overflow-y-auto">
-                <div className="flex items-center gap-3 mb-10 px-2 cursor-pointer group" onClick={() => navigate('/patient/dashboard')}>
-                    <div className="relative">
-                        <div className="absolute inset-0 bg-indigo-500 blur-lg opacity-0 group-hover:opacity-60 transition-opacity duration-500 rounded-full"></div>
-                        <div className="relative w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center text-white shadow-lg transform transition-all duration-500 group-hover:scale-110 group-hover:-rotate-3 group-hover:shadow-[0_0_15px_rgba(99,102,241,0.5)]">
-                            <span className="material-symbols-outlined text-xl transition-transform duration-500 group-hover:scale-110">local_hospital</span>
-                        </div>
-                    </div>
-                    <h1 className="text-xl font-bold tracking-tight text-slate-800 dark:text-white transition-all duration-500 drop-shadow-sm group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-hover:drop-shadow-[0_0_10px_rgba(99,102,241,0.4)]">Medicare</h1>
-                </div>
+            <aside className="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800/50 p-6 flex flex-col h-full overflow-y-auto mc-sidebar">
+                <Brand to={'/patient/dashboard'} />
                 <nav className="space-y-2 flex-grow">
                     <Link to="/patient/dashboard" className="flex items-center gap-3 px-4 py-3 sidebar-item-active rounded-xl font-medium text-slate-800 dark:text-slate-800">
                         <span className="material-symbols-outlined text-[20px]">grid_view</span>
                         Dashboard
                     </Link>
-                    <Link to="/patient/visits" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl">
+                    <Link to="/patient/visits" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
                         <span className="material-symbols-outlined text-[20px]">calendar_today</span>
                         Appointments
                     </Link>
-                    <Link to="/patient/chatbot" className="flex items-center gap-3 px-4 py-3 text-indigo-500 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition rounded-xl font-medium">
-                        <span className="material-symbols-outlined text-[20px] animate-pulse">smart_toy</span>
+                    <Link to="/patient/chatbot" className="flex items-center gap-3 px-4 py-3 text-primary-500 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition rounded-xl font-medium">
+                        <span className="material-symbols-outlined text-[20px]">smart_toy</span>
                         AI Pre-Screening
                     </Link>
-                    <Link to="#" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl">
+                    <Link to="#" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
                         <span className="material-symbols-outlined text-[20px]">chat_bubble_outline</span>
                         Messages
                     </Link>
-                    <Link to="/patient/medical-records" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl">
+                    <Link to="/patient/medical-records" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
                         <span className="material-symbols-outlined text-[20px]">folder_shared</span>
                         Records
                     </Link>
-                    <Link to="/patient/consent" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl">
+                    <Link to="/patient/consent" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
                         <span className="material-symbols-outlined text-[20px]">verified_user</span>
                         Consents
                     </Link>
                 </nav>
-                <div className="space-y-2 mt-auto pt-6 border-t border-white/20 dark:border-slate-800/50">
-                    <Link to="/patient/support" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl">
+                <div className="space-y-2 mt-auto pt-6 border-t border-line dark:border-slate-800/50">
+                    <Link to="/patient/support" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
                         <span className="material-symbols-outlined text-[20px]">favorite_border</span>
                         Support
                     </Link>
-                    <Link to="/patient/profile" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-white/50 dark:hover:bg-white/5 transition rounded-xl">
+                    <Link to="/patient/profile" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
                         <span className="material-symbols-outlined text-[20px]">manage_accounts</span>
                         Profile
                     </Link>
-                    <button onClick={logout} className="w-full flex items-center gap-3 px-4 py-3 text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition rounded-xl font-medium">
+                    <button onClick={logout} className="w-full flex items-center gap-3 px-4 py-3 text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition rounded-lg font-medium">
                         <span className="material-symbols-outlined text-[20px]">logout</span>
                         Sign Out
                     </button>
@@ -186,68 +179,68 @@ function PatientDashboard() {
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-6">
-                        <div onClick={() => navigate('/patient/consent')} className="glass-card p-6 rounded-3xl hover:bg-white/80 dark:hover:bg-slate-800/80 transition-all cursor-pointer group">
+                        <div onClick={() => navigate('/patient/consent')} className="glass-card p-6 rounded-3xl hover:bg-surface dark:hover:bg-slate-800/80 transition-all cursor-pointer group">
                             <div className="flex items-center justify-between mb-6">
-                                <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                                <div className="w-12 h-12 rounded-2xl bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400">
                                     <span className="material-symbols-outlined text-2xl">verified_user</span>
                                 </div>
-                                <span className="material-symbols-outlined text-slate-300 dark:text-slate-600 group-hover:text-indigo-500 transition-colors">arrow_forward</span>
+                                <span className="material-symbols-outlined text-slate-300 dark:text-slate-600 group-hover:text-primary-500 transition-colors">arrow_forward</span>
                             </div>
                             <h4 className="text-lg font-bold mb-1 text-slate-800 dark:text-slate-100">Consent Management</h4>
                             <p className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold mb-4">Privacy &amp; Permissions</p>
-                            <div className="bg-indigo-50/50 dark:bg-indigo-900/20 p-4 rounded-2xl border border-indigo-100/50 dark:border-indigo-500/10">
+                            <div className="bg-primary-50/50 dark:bg-primary-900/20 p-4 rounded-2xl border border-primary-100/50 dark:border-primary-500/10">
                                 <div className="flex justify-between items-center">
                                     <span className="text-sm font-medium text-slate-700 dark:text-slate-200">Active Consents</span>
-                                    <span className="px-2 py-1 bg-indigo-600 text-white text-[10px] font-bold rounded-lg truncate max-w-[120px]">{stats.activeConsents || 0} GRANTED</span>
+                                    <span className="px-2 py-1 bg-primary-600 text-white text-[10px] font-bold rounded-lg truncate max-w-[120px]">{stats.activeConsents || 0} GRANTED</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div onClick={() => navigate('/patient/medical-records')} className="glass-card p-6 rounded-3xl hover:bg-white/80 dark:hover:bg-slate-800/80 transition-all cursor-pointer group">
+                        <div onClick={() => navigate('/patient/medical-records')} className="glass-card p-6 rounded-3xl hover:bg-surface dark:hover:bg-slate-800/80 transition-all cursor-pointer group">
                             <div className="flex items-center justify-between mb-6">
-                                <div className="w-12 h-12 rounded-2xl bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center text-teal-600 dark:text-teal-400">
+                                <div className="w-12 h-12 rounded-2xl bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400">
                                     <span className="material-symbols-outlined text-2xl">folder_shared</span>
                                 </div>
-                                <span className="material-symbols-outlined text-slate-300 dark:text-slate-600 group-hover:text-teal-500 transition-colors">arrow_forward</span>
+                                <span className="material-symbols-outlined text-slate-300 dark:text-slate-600 group-hover:text-primary-500 transition-colors">arrow_forward</span>
                             </div>
                             <h4 className="text-lg font-bold mb-1 text-slate-800 dark:text-slate-100">Patient Records</h4>
                             <p className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold mb-4">Medical History</p>
-                            <div className="bg-teal-50/50 dark:bg-teal-900/20 p-4 rounded-2xl border border-teal-100/50 dark:border-teal-500/10 transition-colors">
+                            <div className="bg-primary-50/50 dark:bg-primary-900/20 p-4 rounded-2xl border border-primary-100/50 dark:border-primary-500/10 transition-colors">
                                 <div className="flex items-center gap-3">
-                                    <span className="text-sm font-semibold text-teal-700 dark:text-teal-400">View your records</span>
+                                    <span className="text-sm font-semibold text-primary-700 dark:text-primary-400">View your records</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div onClick={() => navigate('/patient/visits')} className="glass-card p-6 rounded-3xl hover:bg-white/80 dark:hover:bg-slate-800/80 transition-all cursor-pointer group">
+                        <div onClick={() => navigate('/patient/visits')} className="glass-card p-6 rounded-3xl hover:bg-surface dark:hover:bg-slate-800/80 transition-all cursor-pointer group">
                             <div className="flex items-center justify-between mb-6">
-                                <div className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400">
+                                <div className="w-12 h-12 rounded-2xl bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400">
                                     <span className="material-symbols-outlined text-2xl">assignment_ind</span>
                                 </div>
-                                <span className="material-symbols-outlined text-slate-300 dark:text-slate-600 group-hover:text-amber-500 transition-colors">arrow_forward</span>
+                                <span className="material-symbols-outlined text-slate-300 dark:text-slate-600 group-hover:text-primary-500 transition-colors">arrow_forward</span>
                             </div>
                             <h4 className="text-lg font-bold mb-1 text-slate-800 dark:text-slate-100">Visit Management</h4>
                             <p className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold mb-4">Appointments &amp; Queue</p>
-                            <div className="bg-amber-50/50 dark:bg-amber-900/20 p-4 rounded-2xl border border-amber-100/50 dark:border-amber-500/10">
+                            <div className="bg-primary-50/50 dark:bg-primary-900/20 p-4 rounded-2xl border border-primary-100/50 dark:border-primary-500/10">
                                 <div className="flex items-center gap-3">
-                                    <span className="material-symbols-outlined text-amber-600 text-sm">event</span>
+                                    <span className="material-symbols-outlined text-primary-600 text-sm">event</span>
                                     <span className="text-sm font-medium text-slate-700 dark:text-slate-200">{stats.scheduledVisits} Scheduled Upcoming</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div onClick={() => navigate('/patient/audit-trail')} className="glass-card p-6 rounded-3xl hover:bg-white/80 dark:hover:bg-slate-800/80 transition-all cursor-pointer group">
+                        <div onClick={() => navigate('/patient/audit-trail')} className="glass-card p-6 rounded-3xl hover:bg-surface dark:hover:bg-slate-800/80 transition-all cursor-pointer group">
                             <div className="flex items-center justify-between mb-6">
-                                <div className="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-900/30 flex items-center justify-center text-rose-600 dark:text-rose-400">
+                                <div className="w-12 h-12 rounded-2xl bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400">
                                     <span className="material-symbols-outlined text-2xl">history_edu</span>
                                 </div>
-                                <span className="material-symbols-outlined text-slate-300 dark:text-slate-600 group-hover:text-rose-500 transition-colors">arrow_forward</span>
+                                <span className="material-symbols-outlined text-slate-300 dark:text-slate-600 group-hover:text-primary-500 transition-colors">arrow_forward</span>
                             </div>
                             <h4 className="text-lg font-bold mb-1 text-slate-800 dark:text-slate-100">Access Logs</h4>
                             <p className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold mb-4">Security Audit</p>
-                            <div className="bg-rose-50/50 dark:bg-rose-900/20 p-4 rounded-2xl border border-rose-100/50 dark:border-rose-500/10">
+                            <div className="bg-primary-50/50 dark:bg-primary-900/20 p-4 rounded-2xl border border-primary-100/50 dark:border-primary-500/10">
                                 <div className="flex items-center gap-3">
-                                    <span className="material-symbols-outlined text-rose-600 text-sm">lock_clock</span>
+                                    <span className="material-symbols-outlined text-primary-600 text-sm">lock_clock</span>
                                     <span className="text-sm font-medium text-slate-700 dark:text-slate-200">Track Access Logs</span>
                                 </div>
                             </div>
@@ -281,14 +274,14 @@ function PatientDashboard() {
                                     <button
                                         onClick={handlePrevActivityPage}
                                         disabled={activityPage === 0}
-                                        className={`w-8 h-8 flex items-center justify-center glass-card rounded-full hover:bg-white dark:hover:bg-slate-700 transition ${activityPage === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                        className={`w-8 h-8 flex items-center justify-center glass-card rounded-full hover:bg-surface dark:hover:bg-slate-700 transition ${activityPage === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     >
                                         <span className="material-symbols-outlined text-sm text-slate-600 dark:text-slate-300">chevron_left</span>
                                     </button>
                                     <button
                                         onClick={handleNextActivityPage}
                                         disabled={activityPage >= totalActivityPages - 1}
-                                        className={`w-8 h-8 flex items-center justify-center glass-card rounded-full hover:bg-white dark:hover:bg-slate-700 transition ${activityPage >= totalActivityPages - 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                        className={`w-8 h-8 flex items-center justify-center glass-card rounded-full hover:bg-surface dark:hover:bg-slate-700 transition ${activityPage >= totalActivityPages - 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
                                     >
                                         <span className="material-symbols-outlined text-sm text-slate-600 dark:text-slate-300">chevron_right</span>
                                     </button>
@@ -298,8 +291,8 @@ function PatientDashboard() {
                         <div className="glass-card rounded-3xl p-6">
                             <div className="space-y-6">
                                 {currentActivities.map((activity) => (
-                                    <div key={activity.id} className={`relative pl-6 border-l-2 ${activity.borderColorClass || 'border-indigo-500/30'}`}>
-                                        <div className={`absolute -left-[9px] top-0 w-4 h-4 rounded-full ${activity.colorClass || 'bg-indigo-500'} border-4 border-white dark:border-slate-800`}></div>
+                                    <div key={activity.id} className={`relative pl-6 border-l-2 ${activity.borderColorClass || "border-primary-500/30"}`}>
+                                        <div className={`absolute -left-[9px] top-0 w-4 h-4 rounded-full ${activity.colorClass || "bg-primary-500"} border-4 border-line dark:border-slate-800`}></div>
                                         <div className="flex justify-between items-start">
                                             <div>
                                                 <p className="text-xs text-slate-500 uppercase tracking-tighter mb-1">{activity.type}</p>
@@ -322,7 +315,7 @@ function PatientDashboard() {
                 <h3 className="text-xl font-bold mb-6 text-slate-800 dark:text-slate-100">Search Records</h3>
                 <div className="relative mb-8">
                     <input
-                        className="w-full bg-white dark:bg-slate-800/50 border-none rounded-2xl py-3 pl-12 pr-4 text-sm focus:ring-2 focus:ring-indigo-500 shadow-sm text-slate-800 dark:text-slate-100"
+                        className="w-full bg-surface dark:bg-slate-800/50 border-none rounded-2xl py-3 pl-12 pr-4 text-sm focus:ring-2 focus:ring-primary-500 shadow-sm text-slate-800 dark:text-slate-100"
                         placeholder="Search files, tests..."
                         type="text"
                         value={dashboardSearch}
@@ -332,40 +325,40 @@ function PatientDashboard() {
                     <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">search</span>
                 </div>
                 <div className="grid grid-cols-3 gap-3 mb-10">
-                    <div onClick={() => handleSpecialtyClick('General')} className="glass-card rounded-2xl p-4 flex flex-col items-center gap-2 cursor-pointer hover:bg-white dark:hover:bg-white/10 transition">
-                        <span className="material-symbols-outlined text-indigo-500 text-xl">add</span>
+                    <div onClick={() => handleSpecialtyClick('General')} className="glass-card rounded-2xl p-4 flex flex-col items-center gap-2 cursor-pointer hover:bg-surface dark:hover:bg-surface transition">
+                        <span className="material-symbols-outlined text-primary-500 text-xl">add</span>
                         <span className="text-[9px] font-bold text-slate-500 dark:text-slate-300 uppercase">General</span>
                     </div>
-                    <div onClick={() => handleSpecialtyClick('Pediatrics')} className="glass-card rounded-2xl p-4 flex flex-col items-center gap-2 cursor-pointer hover:bg-white dark:hover:bg-white/10 transition">
-                        <span className="material-symbols-outlined text-indigo-500 text-xl">child_care</span>
+                    <div onClick={() => handleSpecialtyClick('Pediatrics')} className="glass-card rounded-2xl p-4 flex flex-col items-center gap-2 cursor-pointer hover:bg-surface dark:hover:bg-surface transition">
+                        <span className="material-symbols-outlined text-primary-500 text-xl">child_care</span>
                         <span className="text-[9px] font-bold text-slate-500 dark:text-slate-300 uppercase text-center leading-none">Peds</span>
                     </div>
-                    <div onClick={() => handleSpecialtyClick('OBGYN')} className="glass-card rounded-2xl p-4 flex flex-col items-center gap-2 cursor-pointer hover:bg-white dark:hover:bg-white/10 transition">
-                        <span className="material-symbols-outlined text-indigo-500 text-xl">favorite</span>
+                    <div onClick={() => handleSpecialtyClick('OBGYN')} className="glass-card rounded-2xl p-4 flex flex-col items-center gap-2 cursor-pointer hover:bg-surface dark:hover:bg-surface transition">
+                        <span className="material-symbols-outlined text-primary-500 text-xl">favorite</span>
                         <span className="text-[9px] font-bold text-slate-500 dark:text-slate-300 uppercase text-center leading-none">OBGYN</span>
                     </div>
-                    <div onClick={() => handleSpecialtyClick('Internal Medicine')} className="glass-card rounded-2xl p-4 flex flex-col items-center gap-2 cursor-pointer hover:bg-white dark:hover:bg-white/10 transition">
-                        <span className="material-symbols-outlined text-indigo-500 text-xl">monitor_heart</span>
+                    <div onClick={() => handleSpecialtyClick('Internal Medicine')} className="glass-card rounded-2xl p-4 flex flex-col items-center gap-2 cursor-pointer hover:bg-surface dark:hover:bg-surface transition">
+                        <span className="material-symbols-outlined text-primary-500 text-xl">monitor_heart</span>
                         <span className="text-[9px] font-bold text-slate-500 dark:text-slate-300 uppercase text-center leading-none">Internal</span>
                     </div>
-                    <div onClick={() => handleSpecialtyClick('Dermatology')} className="glass-card rounded-2xl p-4 flex flex-col items-center gap-2 cursor-pointer hover:bg-white dark:hover:bg-white/10 transition">
-                        <span className="material-symbols-outlined text-indigo-500 text-xl">spa</span>
+                    <div onClick={() => handleSpecialtyClick('Dermatology')} className="glass-card rounded-2xl p-4 flex flex-col items-center gap-2 cursor-pointer hover:bg-surface dark:hover:bg-surface transition">
+                        <span className="material-symbols-outlined text-primary-500 text-xl">spa</span>
                         <span className="text-[9px] font-bold text-slate-500 dark:text-slate-300 uppercase text-center leading-none">Derma</span>
                     </div>
-                    <div onClick={() => handleSpecialtyClick('Mental Health')} className="glass-card rounded-2xl p-4 flex flex-col items-center gap-2 cursor-pointer hover:bg-white dark:hover:bg-white/10 transition">
-                        <span className="material-symbols-outlined text-indigo-500 text-xl">psychology</span>
+                    <div onClick={() => handleSpecialtyClick('Mental Health')} className="glass-card rounded-2xl p-4 flex flex-col items-center gap-2 cursor-pointer hover:bg-surface dark:hover:bg-surface transition">
+                        <span className="material-symbols-outlined text-primary-500 text-xl">psychology</span>
                         <span className="text-[9px] font-bold text-slate-500 dark:text-slate-300 uppercase text-center leading-none">Mental</span>
                     </div>
-                    <div onClick={() => handleSpecialtyClick('Cardiology')} className="glass-card rounded-2xl p-4 flex flex-col items-center gap-2 cursor-pointer hover:bg-white dark:hover:bg-white/10 transition">
-                        <span className="material-symbols-outlined text-indigo-500 text-xl">favorite_border</span>
+                    <div onClick={() => handleSpecialtyClick('Cardiology')} className="glass-card rounded-2xl p-4 flex flex-col items-center gap-2 cursor-pointer hover:bg-surface dark:hover:bg-surface transition">
+                        <span className="material-symbols-outlined text-primary-500 text-xl">favorite_border</span>
                         <span className="text-[9px] font-bold text-slate-500 dark:text-slate-300 uppercase text-center leading-none">Cardio</span>
                     </div>
-                    <div onClick={() => handleSpecialtyClick('Orthopedics')} className="glass-card rounded-2xl p-4 flex flex-col items-center gap-2 cursor-pointer hover:bg-white dark:hover:bg-white/10 transition">
-                        <span className="material-symbols-outlined text-indigo-500 text-xl">hardware</span>
+                    <div onClick={() => handleSpecialtyClick('Orthopedics')} className="glass-card rounded-2xl p-4 flex flex-col items-center gap-2 cursor-pointer hover:bg-surface dark:hover:bg-surface transition">
+                        <span className="material-symbols-outlined text-primary-500 text-xl">hardware</span>
                         <span className="text-[9px] font-bold text-slate-500 dark:text-slate-300 uppercase text-center leading-none">Ortho</span>
                     </div>
-                    <div onClick={() => handleSpecialtyClick('Infectious Disease')} className="glass-card rounded-2xl p-4 flex flex-col items-center gap-2 cursor-pointer hover:bg-white dark:hover:bg-white/10 transition">
-                        <span className="material-symbols-outlined text-indigo-500 text-xl">security</span>
+                    <div onClick={() => handleSpecialtyClick('Infectious Disease')} className="glass-card rounded-2xl p-4 flex flex-col items-center gap-2 cursor-pointer hover:bg-surface dark:hover:bg-surface transition">
+                        <span className="material-symbols-outlined text-primary-500 text-xl">security</span>
                         <span className="text-[9px] font-bold text-slate-500 dark:text-slate-300 uppercase text-center leading-none">Disease</span>
                     </div>
                 </div>
@@ -374,7 +367,7 @@ function PatientDashboard() {
 
                 {activeVisit ? (
                     <>
-                        <div className="bg-white/80 dark:bg-slate-800/80 rounded-2xl p-4 shadow-sm mb-4 border border-white/50 dark:border-slate-700/50 text-slate-800 dark:text-slate-100">
+                        <div className="bg-surface dark:bg-slate-800/80 rounded-2xl p-4 shadow-sm mb-4 border border-line dark:border-slate-700/50 text-slate-800 dark:text-slate-100">
                             <div className="flex justify-between items-start">
                                 <div>
                                     <p className="text-[10px] text-slate-400 font-bold uppercase">Organization</p>
@@ -383,10 +376,10 @@ function PatientDashboard() {
                                         {activeVisit.doctor_first_name ? `Dr. ${activeVisit.doctor_first_name} ${activeVisit.doctor_last_name}` : 'Awaiting Assignment'}
                                     </p>
                                     {activeVisit.specialization && (
-                                        <p className="text-[10px] text-indigo-500 font-medium mt-0.5">{activeVisit.specialization}</p>
+                                        <p className="text-[10px] text-primary-500 font-medium mt-0.5">{activeVisit.specialization}</p>
                                     )}
                                 </div>
-                                <span className={`px-2 py-1 text-[10px] font-bold uppercase rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400`}>
+                                <span className={`px-2 py-1 text-[10px] font-bold uppercase rounded-lg bg-primary-50 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400`}>
                                     {activeVisit.status}
                                 </span>
                             </div>
@@ -417,12 +410,12 @@ function PatientDashboard() {
                         )}
                     </>
                 ) : (
-                    <div className="bg-white/50 dark:bg-slate-800/30 rounded-2xl p-6 text-center border border-white/50 dark:border-slate-700/50">
+                    <div className="bg-surface dark:bg-slate-800/30 rounded-2xl p-6 text-center border border-line dark:border-slate-700/50">
                         <span className="material-symbols-outlined text-3xl text-slate-300 dark:text-slate-600 mb-2">event_busy</span>
                         <p className="text-sm font-medium text-slate-500 dark:text-slate-400">No active visits in queue</p>
                         <button
                             onClick={() => navigate('/patient/visits/new')}
-                            className="mt-3 text-[11px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider hover:underline"
+                            className="mt-3 text-[11px] font-bold text-primary-600 dark:text-primary-400 uppercase tracking-wider hover:underline"
                         >
                             Walk-In Clinic / QR Sync
                         </button>
