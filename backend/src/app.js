@@ -60,6 +60,7 @@ const routes = {
     emergency: './modules/emergency/emergency.routes',
     privacy: './modules/privacy/privacy.routes',
     messages: './modules/messages/messages.routes',
+    appointments: './modules/appointments/appointments.routes',
 };
 for (const [prefix, source] of Object.entries(routes)) {
     const router = require(source);

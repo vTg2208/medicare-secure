@@ -18,7 +18,8 @@ class VisitModel {
             symptoms,
             type,
             priority,
-            doctorId
+            doctorId,
+            scheduledTime
         } = visitData;
 
         // Generate a random 8-character alphanumeric visit code
@@ -26,9 +27,9 @@ class VisitModel {
 
         const query = `
             INSERT INTO visits (
-                patient_id, organization_id, chief_complaint, symptoms, type, priority, status, assigned_doctor_id, visit_code
+                patient_id, organization_id, chief_complaint, symptoms, type, priority, status, assigned_doctor_id, visit_code, scheduled_time
             )
-            VALUES ($1, $2, $3, $4, $5, $6, 'pending', $7, $8)
+            VALUES ($1, $2, $3, $4, $5, $6, 'pending', $7, $8, $9)
             RETURNING *
         `;
 
@@ -40,7 +41,8 @@ class VisitModel {
             type || 'walk_in',
             priority || 'normal',
             doctorId || null,
-            visitCode
+            visitCode,
+            scheduledTime || null
         ];
         const result = await pool.query(query, values);
         return result.rows[0];

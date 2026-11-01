@@ -86,8 +86,8 @@ async function snapshot(client) {
     };
 }
 
-test('actual private-schema 017 to 025 upgrade preserves data and exact target replay is a no-op', { skip: !enabled, timeout: 120000 }, async () => disposable(async client => {
-    assert.equal(migrations.length, 25);
+test('actual private-schema upgrade preserves data and exact target replay is a no-op', { skip: !enabled, timeout: 120000 }, async () => disposable(async client => {
+    assert.ok(migrations.length >= 25);
     const sql = buildBrowserUpgradeSql({ from: '017' });
     await client.query(sql);
     assert.deepEqual((await client.query('SELECT id,file_hash FROM healthcare._migrations ORDER BY id')).rows,
@@ -129,7 +129,8 @@ test('unknown, drifted, missing and partial/wrong ledgers reject before any sche
 test('a late pending migration failure rolls the entire incremental batch and ledger back to 017', { skip: !enabled, timeout: 120000 }, async () => disposable(async client => {
     const sql = 'CREATE TABLE healthcare.upgrade_failure_probe(id integer); SELECT nonexistent_incremental_upgrade_fixture();';
     const before = await snapshot(client);
-    await assert.rejects(client.query(buildBrowserUpgradeSql({ from: '017', migrations: [...migrations, { id: '026_fixture_failure', sql, hash: hash(sql) }] })), /nonexistent_incremental_upgrade_fixture/);
+    const nextId = `${String(migrations.length+1).padStart(3,'0')}_fixture_failure`;
+    await assert.rejects(client.query(buildBrowserUpgradeSql({ from: '017', migrations: [...migrations, { id: nextId, sql, hash: hash(sql) }] })), /nonexistent_incremental_upgrade_fixture/);
     await client.query('ROLLBACK');
     assert.deepEqual(await snapshot(client), before);
     assert.equal((await client.query("SELECT to_regclass('healthcare.upgrade_failure_probe') AS name")).rows[0].name, null);
@@ -166,7 +167,7 @@ test('incremental upgrade waits for the existing migrator advisory lock before a
         assert.equal((await peer.query("SELECT to_regclass('healthcare.privacy_breaches') AS name")).rows[0].name, null);
         await peer.query('SELECT pg_advisory_unlock($1)', [LOCK_KEY]); released = true;
         await upgrade;
-        assert.equal((await client.query('SELECT count(*)::int AS count FROM healthcare._migrations')).rows[0].count, 25);
+        assert.equal((await client.query('SELECT count(*)::int AS count FROM healthcare._migrations')).rows[0].count, migrations.length);
     } finally {
         if (!released) await peer.query('SELECT pg_advisory_unlock($1)', [LOCK_KEY]).catch(() => {});
         if (upgrade) await upgrade.catch(() => {});
