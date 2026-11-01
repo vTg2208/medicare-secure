@@ -1,5 +1,8 @@
 const assert = require('node:assert/strict');
 const { Client } = require('pg');
+const fs = require('node:fs/promises');
+const os = require('node:os');
+const path = require('node:path');
 
 async function withApplication(name, callback) {
     assert.equal(process.env.NODE_ENV, 'test');
@@ -13,7 +16,8 @@ async function withApplication(name, callback) {
     await admin.query(`CREATE DATABASE ${database}`);
     process.env.DB_NAME = database;
     process.env.RATE_LIMIT_MAX_REQUESTS = '10000';
-    process.env.UPLOAD_PATH = '/scratch/fixture-uploads';
+    const uploads = await fs.mkdtemp(path.join(os.tmpdir(), 'healthcare-fixture-'));
+    process.env.UPLOAD_PATH = uploads;
     let db; let server;
     try {
         const migrator = new Client({ ...connection, database });
@@ -50,6 +54,9 @@ async function withApplication(name, callback) {
         if (db) await db.pool.end();
         await admin.query(`DROP DATABASE ${database} WITH (FORCE)`);
         await admin.end();
+        assert.equal(path.dirname(uploads), path.resolve(os.tmpdir()));
+        assert.ok(path.basename(uploads).startsWith('healthcare-fixture-'));
+        await fs.rm(uploads, {recursive:true,force:true});
     }
 }
 module.exports = { withApplication };
