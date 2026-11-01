@@ -1,7 +1,5 @@
 import React, { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { isDemoMode } from '../config/demoMode';
-import DemoUnavailable from '../pages/demo/DemoUnavailable';
 const Login = lazy(() => import('../pages/auth/Login'));
 const Register = lazy(() => import('../pages/auth/Register'));
 
@@ -87,8 +85,8 @@ function AppRoutes() {
         <Routes>
             {/* Public Routes */}
             <Route path="/login" element={<Login />} />
-            <Route path="/register" element={isDemoMode ? <DemoUnavailable feature="Registration" /> : <Register />} />
-            <Route path="/staff/invitation/:token" element={isDemoMode ? <DemoUnavailable feature="Invitation verification" /> : <AcceptInvitation />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/staff/invitation/:token" element={<AcceptInvitation />} />
 
             {/* Protected Routes */}
             <Route path="/patient/privacy" element={<ProtectedRoute allowedRoles={['patient']}><PrivacyCenter /></ProtectedRoute>} />
@@ -106,7 +104,7 @@ function AppRoutes() {
                 path="/patient/chatbot"
                 element={
                     <ProtectedRoute allowedRoles={['patient']}>
-                        {isDemoMode ? <DemoUnavailable feature="AI assistance" /> : <AIChatbot />}
+                        {<AIChatbot />}
                     </ProtectedRoute>
                 }
             />
@@ -186,7 +184,7 @@ function AppRoutes() {
                 path="/staff/registration"
                 element={
                     <ProtectedRoute allowedRoles={['receptionist', 'nurse', 'staff']}>
-                        {isDemoMode ? <DemoUnavailable feature="Patient registration" /> : <PatientRegistration />}
+                        {<PatientRegistration />}
                     </ProtectedRoute>
                 }
             />
@@ -348,7 +346,7 @@ function AppRoutes() {
                 path="/radiology/upload"
                 element={
                     <ProtectedRoute allowedRoles={['radiologist']}>
-                        {isDemoMode ? <DemoUnavailable feature="Report upload" /> : <ReportUpload />}
+                        {<ReportUpload />}
                     </ProtectedRoute>
                 }
             />
@@ -384,7 +382,7 @@ function AppRoutes() {
                 path="/patient/visits/verify-otp"
                 element={
                     <ProtectedRoute allowedRoles={['patient']}>
-                        {isDemoMode ? <DemoUnavailable feature="Visit verification" /> : <VerifyVisitOTP />}
+                        {<VerifyVisitOTP />}
                     </ProtectedRoute>
                 }
             />
@@ -438,7 +436,7 @@ function AppRoutes() {
                 path="/admin/doctor-registration"
                 element={
                     <ProtectedRoute allowedRoles={['admin', 'hospital_admin', 'system_admin']}>
-                        {isDemoMode ? <DemoUnavailable feature="Doctor registration" /> : <DoctorRegistration />}
+                        {<DoctorRegistration />}
                     </ProtectedRoute>
                 }
             />
@@ -447,7 +445,7 @@ function AppRoutes() {
                 path="/admin/doctor-verification"
                 element={
                     <ProtectedRoute allowedRoles={['admin', 'hospital_admin', 'system_admin']}>
-                        {isDemoMode ? <DemoUnavailable feature="Doctor verification" /> : <DoctorVerification />}
+                        {<DoctorVerification />}
                     </ProtectedRoute>
                 }
             />

@@ -4,7 +4,6 @@ import { AuthContext } from '../../context/AuthContext';
 import { authApi } from '../../api/authApi';
 import { startAuthentication } from '@simplewebauthn/browser';
 import ThemeToggle from '../../components/common/ThemeToggle';
-import { isDemoMode } from '../../config/demoMode';
 import Brand from '../../components/common/Brand';
 import './Login.css';
 
@@ -185,8 +184,8 @@ function Login() {
                             <button type="submit" className="login-submit" disabled={busy}>{passkeyLoading ? 'Authenticating…' : 'Sign in with passkey'}<span className="material-symbols-outlined" aria-hidden="true">fingerprint</span></button>
                         </form>
                     )}
-                    <p className="login-access-note"><span className="material-symbols-outlined" aria-hidden="true">lock</span>{isDemoMode ? 'Use an assigned demo account. This space contains synthetic patient data only.' : 'Your records are available according to your role and sharing permissions.'}</p>
-                    {!isDemoMode && <p className="login-signup">New to Medicare? <Link to="/register">Create a patient account</Link></p>}
+                    <p className="login-access-note"><span className="material-symbols-outlined" aria-hidden="true">lock</span>Your records are available according to your role and sharing permissions.</p>
+                    <p className="login-signup">New to Medicare? <Link to="/register">Create a patient account</Link></p>
                 </div>
                 <footer className="login-footer">© {new Date().getFullYear()} Medicare. Your care, connected.</footer>
             </section>

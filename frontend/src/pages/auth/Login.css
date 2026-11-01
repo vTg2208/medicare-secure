@@ -12,7 +12,6 @@
     color: var(--login-ink);
     font-family: var(--mc-font);
 }
-.demo-content > .medicare-login { min-height: 100%; }
 .login-story { background: var(--mc-surface-muted); padding: 44px clamp(32px, 5vw, 84px); display: flex; flex-direction: column; position: relative; overflow: hidden; }
 .login-story-content { margin: auto 0; padding: 56px 0 36px; max-width: 470px; }
 .login-eyebrow { display: flex; align-items: center; gap: 9px; text-transform: uppercase; letter-spacing: 2px; font-size: 11px; font-weight: 700; color: var(--mc-accent); margin: 0 0 23px; }
@@ -71,7 +70,6 @@
     .medicare-login { display: block; }
     .login-story { display: none; }
     .login-form-side { min-height: 100vh; min-height: 100dvh; padding: 24px; }
-    .demo-content .login-form-side { min-height: 100%; }
     .login-form-content { padding: 38px 0; }
     .login-mobile-brand { display: inline-flex; margin-bottom: 40px; }
     .login-form-heading h2 { font-size: 28px; }

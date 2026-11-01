@@ -10,15 +10,13 @@ import Login from './Login';
 
 vi.mock('../../api/authApi', () => ({ authApi: { login: vi.fn(), passkeyLoginOptions: vi.fn(), passkeyLoginVerify: vi.fn() } }));
 vi.mock('@simplewebauthn/browser', () => ({ startAuthentication: vi.fn() }));
-const demo = vi.hoisted(() => ({ isDemoMode: false }));
-vi.mock('../../config/demoMode', () => demo);
 
 function setup() {
     const login = vi.fn();
     render(<MemoryRouter initialEntries={['/login']}><ThemeProvider><AuthContext.Provider value={{ login }}><Routes><Route path="/login" element={<Login />} /><Route path="/patient/dashboard" element={<h1>Patient dashboard</h1>} /></Routes></AuthContext.Provider></ThemeProvider></MemoryRouter>);
     return { user: userEvent.setup(), login };
 }
-beforeEach(() => { vi.clearAllMocks(); demo.isDemoMode = false; });
+beforeEach(() => { vi.clearAllMocks(); });
 
 test('signs in through labelled fields and routes to the patient dashboard', async () => {
     authApi.login.mockResolvedValue({ data: { user: { role: 'PATIENT' }, accessToken: 'test-token' } });
@@ -59,9 +57,8 @@ test('only exposes the active form and preserves passkey sign in', async () => {
     expect(startAuthentication).toHaveBeenCalledWith({ optionsJSON: { challenge: 'test' } });
 });
 
-test('demo login directs visitors to assigned accounts without offering registration', () => {
-    demo.isDemoMode = true;
+test('offers account creation and explains role-based access', () => {
     setup();
-    expect(screen.getByText(/Use an assigned demo account/)).toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'Create a patient account' })).not.toBeInTheDocument();
+    expect(screen.getByText('Your records are available according to your role and sharing permissions.')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Create a patient account' })).toHaveAttribute('href', '/register');
 });

@@ -23,12 +23,12 @@ function Dashboard() {
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                const [statsData, demoData] = await Promise.all([
+                const [statsData, demographicData] = await Promise.all([
                     researchApi.getStats(),
                     researchApi.getDemographics()
                 ]);
                 if (statsData.success) setStats(statsData.data);
-                if (demoData.success) setDemographics(demoData.data);
+                if (demographicData.success) setDemographics(demographicData.data);
             } catch (error) {
                 setLoadError('Unable to load research data. Please reload and retry.');
             } finally {

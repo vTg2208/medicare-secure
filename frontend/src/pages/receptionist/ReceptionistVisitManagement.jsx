@@ -21,7 +21,6 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { visitApi } from '../../api/visitApi';
-import { isDemoMode } from '../../config/demoMode';
 import { AuthContext } from '../../context/AuthContext';
 
 /* ─────────────────── helpers ─────────────────── */
@@ -280,7 +279,7 @@ function ApproveVisitsTab() {
                                     {nurses.map(n => <option key={n.id} value={n.id}>{n.name || `${n.first_name} ${n.last_name}`}</option>)}
                                 </select>
                             </div>
-                            <p className="text-xs text-slate-400">{isDemoMode ? 'Email is unavailable in this demo. Share the visit code after approval.' : 'The visit code is shown after approval. An email is sent when delivery is available.'}</p>
+                            <p className="text-xs text-slate-400">The visit code is shown after approval. An email is sent when delivery is available.</p>
                         </div>
                         <div className="flex gap-3">
                             <button onClick={() => setShowApprovalModal(false)} className="flex-1 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">Cancel</button>

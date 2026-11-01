@@ -46,7 +46,7 @@ function WorkflowDashboard() {
     };
 
     const handleAllocateBed = async () => {
-        // Simple prompt for demo - in real app would be a modal
+        // Request a concise reason before updating the workflow
         const visitId = prompt("Enter Patient Visit ID:");
         if (!visitId) return;
 

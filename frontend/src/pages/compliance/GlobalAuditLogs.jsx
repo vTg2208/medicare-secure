@@ -117,7 +117,7 @@ const GlobalAuditLogs = () => {
                 {/* Scrollable Content Container */}
                 <div className="flex-1 overflow-y-auto px-8 py-4 pb-20 scrollbar-hide flex flex-col">
 
-                    {/* Filters & Actions Area (Mock) */}
+                    {/* Filters & Actions */}
                     <div className="flex gap-4 mb-6">
                         <div className="flex-1 relative">
                             <input
