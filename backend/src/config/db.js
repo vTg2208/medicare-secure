@@ -1,6 +1,8 @@
 const { Pool, types } = require('pg');
 const logger = require('../utils/logger');
 const config = require('./env');
+const { getRequestContext } = require('../services/request-context');
+const { recordAuditError } = require('../middleware/metrics');
 
 // Database configuration from environment variables
 const pool = new Pool({
@@ -33,30 +35,50 @@ pool.on('error', (err) => {
 const query = async (text, params) => {
     const start = Date.now();
     try {
-        const result = await pool.query(text, params);
+        // Every request-bound statement uses a transaction-local identity. This
+        // includes CTE writes without relying on a fragile SQL verb parser.
+        const result = getRequestContext()
+            ? await transaction(client => client.query(text, params))
+            : await pool.query(text, params);
         const duration = Date.now() - start;
         logger.debug('Executed query', { duration, rows: result.rowCount });
         return result;
     } catch (error) {
+        if (!getRequestContext() && error.code === 'P7501') recordAuditError();
         logger.error('Database query failed', { code: error.code });
         throw error;
     }
 };
 
 // Helper function for transactions
-const transaction = async (callback) => {
+const transaction = async (callback, { isolationLevel } = {}) => {
+    const beginnings = { 'read committed': 'BEGIN ISOLATION LEVEL READ COMMITTED',
+        'repeatable read': 'BEGIN ISOLATION LEVEL REPEATABLE READ',
+        serializable: 'BEGIN ISOLATION LEVEL SERIALIZABLE' };
+    if (isolationLevel && !Object.prototype.hasOwnProperty.call(beginnings,isolationLevel)) throw new Error('Unsupported transaction isolation level');
     const client = await pool.connect();
     try {
-        await client.query('BEGIN');
+        await client.query(isolationLevel ? beginnings[isolationLevel] : 'BEGIN');
+        await applyRequestContext(client);
         const result = await callback(client);
         await client.query('COMMIT');
         return result;
     } catch (error) {
         await client.query('ROLLBACK');
+        if (error.code === 'P7501') recordAuditError();
         throw error;
     } finally {
         client.release();
     }
+};
+
+const applyRequestContext = async (client) => {
+    const context = getRequestContext();
+    // Always clear local settings on explicit transactions too. SET LOCAL never
+    // survives COMMIT/ROLLBACK or leaks the previous borrower of a pooled client.
+    await client.query(`SELECT set_config('shms.actor_id',$1,true),
+        set_config('shms.request_id',$2,true), set_config('shms.request_method',$3,true)`,
+    [context?.actorId || '', context?.requestId || '', context?.method || '']);
 };
 
 // Test connection function
@@ -75,5 +97,6 @@ module.exports = {
     pool,
     query,
     transaction,
+    applyRequestContext,
     testConnection,
 };

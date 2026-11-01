@@ -40,6 +40,13 @@ const activeConnections = new promClient.Gauge({
   registers: [register]
 });
 
+const auditLogErrors = new promClient.Counter({
+  name: 'audit_log_errors_total',
+  help: 'Audit insert failures, including clinical transactions rolled back by audit enforcement',
+  registers: [register],
+});
+const recordAuditError = () => auditLogErrors.inc();
+
 // ═══════════════════════════════════════════════════════
 // Middleware
 // ═══════════════════════════════════════════════════════
@@ -76,5 +83,6 @@ module.exports = {
   register,
   metricsMiddleware,
   trackConnections,
-  metricsEndpoint
+  metricsEndpoint,
+  recordAuditError
 };

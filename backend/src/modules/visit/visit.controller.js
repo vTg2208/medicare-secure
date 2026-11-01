@@ -1,6 +1,6 @@
 const VisitModel = require('../../models/visit.model');
 const VisitConsentService = require('../../services/visit-consent.service');
-const { pool } = require('../../config/db'); // for direct querying if needed
+const pool = require('../../config/db');
 const logger = require('../../utils/logger');
 const { sendVisitApprovalEmail, sendVisitClosureEmail } = require('../../config/mail');
 
@@ -133,7 +133,7 @@ const VisitController = {
                 data: queueInfo
             });
         } catch (error) {
-            console.error('Get queue status failed:', error);
+            logger.error('Get queue status failed:', error);
             res.status(500).json({ success: false, message: 'Failed to fetch queue status' });
         }
     },
@@ -264,7 +264,7 @@ const VisitController = {
                     scheduled_date: visitDetails.created_at
                 });
                 emailSent = true;
-                logger.info(`Visit approval email sent to ${visitDetails.patient_email}`);
+                logger.info('Visit approval email sent');
             } catch (emailError) {
                 logger.error('Failed to send visit approval email:', emailError);
                 // Don't fail the request if email fails
@@ -284,8 +284,8 @@ const VisitController = {
             });
 
         } catch (error) {
-            console.error('=== APPROVE VISIT ERROR ===');
-            console.error('Error details:', error);
+            logger.error('=== APPROVE VISIT ERROR ===');
+            logger.error('Error details:', error);
             logger.error('Approve visit failed:', error);
             res.status(error.statusCode || 500).json({ success: false, message: error.statusCode ? error.message : 'Failed to approve visit' });
         }
@@ -430,7 +430,7 @@ const VisitController = {
             });
 
         } catch (error) {
-            console.error('Check-in failed:', error);
+            logger.error('Check-in failed:', error);
             res.status(500).json({
                 success: false,
                 message: error.message || 'Failed to check in',
@@ -480,7 +480,7 @@ const VisitController = {
                     hospital_name: visitDetails.organization_name,
                     status: status
                 });
-                logger.info(`Visit closure email sent to ${visitDetails.patient_email}`);
+                logger.info('Visit closure email sent');
             } catch (emailError) {
                 logger.error('Failed to send visit closure email:', emailError);
             }
@@ -578,4 +578,3 @@ const VisitController = {
 };
 
 module.exports = VisitController;
-

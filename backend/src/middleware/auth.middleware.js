@@ -8,6 +8,7 @@ const logger = require('../utils/logger');
 const { query } = require('../config/db');
 const { createHash } = require('crypto');
 const config = require('../config/env');
+const { bindAuthenticatedActor } = require('../services/request-context');
 
 /**
  * Authenticate JWT token
@@ -189,6 +190,8 @@ const authenticate = async (req, res, next) => {
             id: session.id,
             deviceInfo,
         };
+
+        bindAuthenticatedActor(user.id);
 
         next();
     } catch (error) {

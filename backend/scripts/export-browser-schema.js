@@ -39,6 +39,9 @@ ${migration.sql}
 INSERT INTO _migrations(id,file_hash,execution_time_ms)
 VALUES (${sqlLiteral(migration.id)}, ${sqlLiteral(migration.hash)}, 0);
 `).join('')}
+-- Keep private integrity state private even under broad owner default grants.
+REVOKE ALL PRIVILEGES ON healthcare.audit_chain_head FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION healthcare.chain_audit_insert() FROM PUBLIC;
 COMMIT;
 `;
 }

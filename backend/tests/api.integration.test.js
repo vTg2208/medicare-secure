@@ -165,6 +165,20 @@ test('real API: registration, sessions, patient boundaries, administration, and 
             expectStatus(await send('get', `/api/emr/medical-records/${record}`, tokens.doctor), 403);
         });
 
+        await t.test('clinical JSON is withheld when durable audit storage rejects the event', async () => {
+            await db.query(`CREATE FUNCTION simulated_audit_failure() RETURNS trigger LANGUAGE plpgsql AS $$
+                BEGIN IF NEW.action='view_medical_record' THEN RAISE EXCEPTION 'simulated audit outage'; END IF; RETURN NEW; END $$`);
+            await db.query('CREATE TRIGGER simulated_audit_failure BEFORE INSERT ON audit_logs FOR EACH ROW EXECUTE FUNCTION simulated_audit_failure()');
+            try {
+                const response = await send('get', `/api/emr/medical-records/${record}`, tokens.patient);
+                expectStatus(response, 503);
+                assert.deepEqual(response.body, { success: false, message: 'Auditing is unavailable. Please try again later.' });
+            } finally {
+                await db.query('DROP TRIGGER simulated_audit_failure ON audit_logs');
+                await db.query('DROP FUNCTION simulated_audit_failure()');
+            }
+        });
+
         await t.test('encrypted report bytes require patient access and appear in the patient audit trail', async () => {
             const fs = require('fs/promises'); const path = require('path');
             const { encryptBuffer } = require('../src/services/file.crypto');
@@ -175,7 +189,7 @@ test('real API: registration, sessions, patient boundaries, administration, and 
             const directory = FileUploadService.getStoragePath(users.patient, 'lab_results');
             const location = path.join(directory, name);
             await fs.mkdir(directory, { recursive: true });
-            await fs.writeFile(location, encryptBuffer(original));
+            await fs.writeFile(location, encryptBuffer(original, FileUploadService.encryptionContext(location)));
             try {
                 await db.query(`INSERT INTO lab_results(record_id,test_name,file_url,ordered_by,performed_by) VALUES($1,'Synthetic',$2,$3,$3)`, [record, url, users.doctor]);
                 const response = await send('get', url, tokens.patient);

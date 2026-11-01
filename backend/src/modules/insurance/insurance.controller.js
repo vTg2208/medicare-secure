@@ -1,4 +1,4 @@
-const { pool } = require('../../config/db');
+const pool = require('../../config/db');
 const { consentSql } = require('../../middleware/clinical-access.middleware');
 
 const getDashboardStats = async (req, res, next) => {

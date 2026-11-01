@@ -22,6 +22,11 @@ async function main() {
         await client.query(`GRANT USAGE,SELECT ON ALL SEQUENCES IN SCHEMA public TO ${identifier}`);
         await client.query(`REVOKE INSERT,UPDATE,DELETE ON _migrations FROM ${identifier}`);
         await client.query(`REVOKE UPDATE,DELETE ON audit_logs FROM ${identifier}`);
+        await client.query(`REVOKE TRUNCATE,TRIGGER,REFERENCES ON audit_logs FROM ${identifier}`);
+        await client.query(`REVOKE ALL PRIVILEGES ON audit_chain_head FROM ${identifier}`);
+        await client.query(`REVOKE ALL PRIVILEGES (singleton,last_hash) ON audit_chain_head FROM ${identifier}`);
+        await client.query(`GRANT SELECT ON audit_chain_head TO ${identifier}`);
+        await client.query(`REVOKE EXECUTE ON FUNCTION chain_audit_insert() FROM ${identifier}`);
         await client.query('COMMIT');
         console.log('Application database role provisioned with data access and no schema administration privileges');
     } catch (error) { await client.query('ROLLBACK'); throw error; }

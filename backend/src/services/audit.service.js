@@ -1,6 +1,7 @@
 const { query } = require('../config/db');
 const { redactSensitive } = require('../utils/redact');
 const logger = require('../utils/logger');
+const { recordAuditError } = require('../middleware/metrics');
 
 /**
  * Create audit log entry
@@ -18,7 +19,7 @@ const logger = require('../utils/logger');
  * @param {Object} logData.metadata - Additional metadata
  * @returns {Promise<Object>} Created audit log
  */
-const createAuditLog = async (logData) => {
+const logAuditEvent = async (logData, client = null) => {
     try {
         const {
             userId,
@@ -44,7 +45,8 @@ const createAuditLog = async (logData) => {
       RETURNING *
     `;
 
-        const result = await query(insertQuery, [
+        const execute = client ? client.query.bind(client) : query;
+        const result = await execute(insertQuery, [
             userId || null,
             action,
             entityType || null,
@@ -60,7 +62,19 @@ const createAuditLog = async (logData) => {
 
         logger.debug('Audit log created', { action, userId, entityType });
 
+        if (!result.rows[0]?.id) throw new Error('Audit event was not stored');
         return result.rows[0];
+    } catch (error) {
+        recordAuditError();
+        throw error;
+    }
+};
+
+// Legacy callers retain their return-null contract. Security-sensitive responses
+// and transaction writers use logAuditEvent, which never suppresses failures.
+const createAuditLog = async (logData) => {
+    try {
+        return await logAuditEvent(logData);
     } catch (error) {
         logger.error('Failed to create audit log:', error);
         // Don't throw error to prevent audit logging from breaking the main flow
@@ -283,6 +297,11 @@ const verifyAuditLogIntegrity = async () => {
             previousHash = log.current_hash;
         }
 
+        const head = await query('SELECT last_hash FROM audit_chain_head WHERE singleton=1');
+        if (head.rows.length !== 1 || (head.rows[0].last_hash || '') !== (previousHash || '')) {
+            return { verified: false, message: 'Audit chain head does not match retained evidence', totalLogs: logs.length };
+        }
+
         if (tamperedLogs.length > 0) {
             logger.warn('Audit log integrity check failed', { tamperedLogs });
             return {
@@ -314,29 +333,13 @@ const getPatientRecordAccessLogs = async (patientId, options = {}) => {
     try {
         const { limit = 50, offset = 0, action, startDate, endDate } = options;
 
-        let conditions = [`(a.user_id = $1 OR a.entity_id = $1 OR a.metadata->>'patientId' = $1::text)`];
+        let conditions = [`(a.user_id = $1 OR a.entity_id = $1 OR a.metadata->>'patientId' = $1::text OR a.metadata->'patientIds' ? $1::text)`];
         let params = [patientId];
         let paramIndex = 2;
-
-        const relevantActions = [
-            'view_medical_record', 'create_medical_record', 'update_medical_record', 'view_patient_records', 'download_medical_file', 'emergency_access', 'emergency_access_revoked',
-            'consent_grant', 'consent_revoke', 'consent_expired', 'consent_view',
-            'create_diagnosis', 'create_prescription', 'upload_lab_result', 'upload_imaging_report',
-            'user_login', 'user_register',
-            // Visit Actions
-            'create_visit', 'approve_visit', 'update_visit', 'verify_visit_otp',
-            // Clinical Workflow Actions
-            'create_lab_order', 'create_imaging_order', 'create_medication_order'
-        ];
-
 
         if (action) {
             conditions.push(`a.action = $${paramIndex}`);
             params.push(action);
-            paramIndex++;
-        } else {
-            conditions.push(`a.action = ANY($${paramIndex})`);
-            params.push(relevantActions);
             paramIndex++;
         }
 
@@ -377,7 +380,13 @@ const getPatientRecordAccessLogs = async (patientId, options = {}) => {
         const result = await query(selectQuery, params);
 
         return {
-            logs: result.rows,
+            logs: result.rows.map(row => {
+                if (!row.metadata || typeof row.metadata !== 'object') return row;
+                const metadata = { ...row.metadata };
+                if (Array.isArray(metadata.patientIds)) metadata.patientIds = metadata.patientIds.filter(id => id === patientId);
+                if (metadata.patientId && metadata.patientId !== patientId) delete metadata.patientId;
+                return { ...row, metadata };
+            }),
             pagination: { total, limit, offset, pages: Math.ceil(total / limit) }
         };
     } catch (error) {
@@ -387,6 +396,7 @@ const getPatientRecordAccessLogs = async (patientId, options = {}) => {
 };
 
 module.exports = {
+    logAuditEvent,
     createAuditLog,
     getUserAuditLogs,
     getEntityAuditLogs,

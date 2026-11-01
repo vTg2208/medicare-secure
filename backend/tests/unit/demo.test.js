@@ -48,7 +48,13 @@ describe.each(['/api', '/api/v1'])('demo guards at %s', (prefix) => {
     it('does not bypass auth or disable JSON clinical workflows', async () => {
         const result = await request(app).post(prefix + '/emr/medical-records').send({});
         expect(result.status).toBe(401);
-        expect(query).not.toHaveBeenCalled();
+        // Denied requests retain evidence without touching clinical data or
+        // creating an authenticated session in the synthetic demo.
+        expect(query).toHaveBeenCalledTimes(1);
+        const [sql, values] = query.mock.calls[0];
+        expect(sql).toMatch(/^\s*INSERT INTO audit_logs/);
+        expect(values[0]).toBeNull();
+        expect(values[9]).toBe(401);
     });
     it('keeps password login and OTP verification validation available', async () => {
         for (const path of ['/auth/login', '/auth/verify-otp', '/auth/otp/verify']) {
