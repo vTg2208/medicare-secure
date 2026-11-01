@@ -82,20 +82,7 @@ Role membership alone does not grant unrestricted record access. Server-side che
 
 ## Architecture
 
-```mermaid
-flowchart LR
-    U[Patient and care-team browsers] --> F[React application]
-    F -->|Same-origin /api requests| P[Vercel or nginx proxy]
-    P --> A[Express API]
-    A --> G[Session, role, care-context and consent checks]
-    G --> D[(PostgreSQL)]
-    G --> S[Upload scanning]
-    S --> E[(Encrypted file storage)]
-    G --> H[Audit and governance evidence]
-    H --> D
-    A -. configured integration .-> M[SMTP delivery]
-    A -. optional integration .-> I[AI intake service]
-```
+![Medicare architecture: browser and React interface, API proxy, authorization and consent, PostgreSQL, scanned encrypted files, audit evidence, and configured integrations](docs/assets/medicare-architecture.svg)
 
 The API enforces authorization at the data boundary. Database migrations run separately from the restricted runtime account. In the hosted configuration, application tables live in a private `healthcare` schema and the public database Data API is disabled.
 
