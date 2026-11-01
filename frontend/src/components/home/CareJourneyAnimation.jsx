@@ -17,7 +17,6 @@ function Icon({ name, ...props }) {
         person: <><circle cx="12" cy="7" r="4" /><path d="M4 21v-3a8 8 0 0 1 16 0v3" /></>,
         clinician: <><path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6Z" /></>,
         lock: <><rect x="5" y="10" width="14" height="11" rx="3" /><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3" /></>,
-        unlock: <><rect x="5" y="10" width="14" height="11" rx="3" /><path d="M8 10V7a4 4 0 0 1 7.5-2M12 14v3" /></>,
         check: <path d="m5 12 4 4L19 6" />,
         shield: <><path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6Z" /><path d="m8 12 3 3 5-6" /></>,
         arrow: <path d="M4 12h15m-6-6 6 6-6 6" />,
@@ -26,6 +25,14 @@ function Icon({ name, ...props }) {
         replay: <><path d="M3 10a9 9 0 1 1 1 8M3 4v6h6" /></>,
     };
     return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.65" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}>{paths[name]}</svg>;
+}
+
+function MovingLock({ className = '' }) {
+    return <svg className={`mc-care-moving-lock ${className}`} viewBox="0 0 32 40" fill="none" aria-hidden="true">
+        <g className="mc-care-shackle"><path d="M8 19V11a8 8 0 0 1 16 0v8" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" /></g>
+        <rect x="3" y="17" width="26" height="21" rx="6" fill="currentColor" />
+        <path d="M16 25v5" stroke="var(--mc-surface)" strokeWidth="3" strokeLinecap="round" />
+    </svg>;
 }
 
 export default function CareJourneyAnimation() {
@@ -111,7 +118,7 @@ export default function CareJourneyAnimation() {
             </header>
 
             <div className="mc-care-permission">
-                <span className="mc-care-permission-icon"><Icon name={connected ? 'unlock' : 'lock'} /></span>
+                <span className="mc-care-permission-icon"><MovingLock /></span>
                 <div><strong>Care team access</strong><small>Try the sharing control</small></div>
                 <span className="mc-care-permission-state">{connected ? 'Allowed' : 'Private'}</span>
                 <button type="button" className="mc-care-switch" role="switch" aria-checked={connected} aria-label="Allow care team access" aria-describedby="mc-care-explainer" onClick={changeAccess}><span /></button>
@@ -121,18 +128,19 @@ export default function CareJourneyAnimation() {
             <div className="mc-care-scene">
                 <article className="mc-care-personal" aria-label="Your private medical records">
                     <div className="mc-care-card-top"><span className="mc-care-avatar"><Icon name="person" /></span><div><strong>You</strong><small>Your health workspace</small></div><Icon name="lock" className="mc-care-small-lock" /></div>
-                    <div className="mc-care-report"><span className="mc-care-paper"><Icon name="document" /><span /><span /><span /></span><span className="mc-care-ready"><Icon name="check" />Ready</span><strong>Lab report</strong><small>In your medical records</small></div>
+                    <div className="mc-care-report"><span className="mc-care-paper"><Icon name="document" /><span /><span /><span /><MovingLock className="mc-care-report-lock" /></span><span className="mc-care-ready"><Icon name="check" />Ready</span><strong>Lab report</strong><small>In your medical records</small></div>
                 </article>
 
-                <div className="mc-care-connection" aria-hidden="true"><span className="mc-care-track" /><span className="mc-care-track-active" /><span className="mc-care-packet"><Icon name="document" /></span><Icon name="arrow" className="mc-care-route-arrow" /></div>
+                <div className="mc-care-connection" aria-hidden="true"><span className="mc-care-track" /><span className="mc-care-track-active" /><Icon name="arrow" className="mc-care-route-arrow" /><span className="mc-care-gate"><MovingLock /></span></div>
 
                 <article className="mc-care-team" aria-label="Care team access">
                     <div className="mc-care-card-top"><span className="mc-care-avatar"><Icon name="clinician" /></span><div><strong>Care team</strong><small>Clinical workspace</small></div></div>
-                    <div className="mc-care-access-icon" aria-hidden="true"><span className="mc-care-icon-locked"><Icon name="lock" /></span><span className="mc-care-icon-open"><Icon name="unlock" /></span></div>
+                    <div className="mc-care-access-icon" aria-hidden="true"><MovingLock /><span className="mc-care-received-report"><Icon name="document" /></span></div>
                     <strong className="mc-care-team-status">{connected ? (viewed ? 'Report viewed' : 'Access approved') : (phase === 5 ? 'Access withdrawn' : 'Waiting for access')}</strong>
                     <span className="mc-care-team-detail">{connected ? 'Shared with your permission' : (phase === 5 ? 'New requests are blocked' : 'Your permission is needed')}</span>
                     <button className="mc-care-open" disabled={!connected} onClick={event => select(3, event)}><Icon name={connected ? 'document' : 'lock'} />{connected ? 'View report' : 'Report protected'}</button>
                 </article>
+                <span className="mc-care-flying-report" aria-hidden="true"><Icon name="document" /><span /><span /><span /></span>
             </div>
 
             <div className="mc-care-history" aria-label="Illustrated access history">
