@@ -1,20 +1,20 @@
 # Medicare
 
-Private source snapshot of the repaired healthcare management application, configured for a synthetic-data demonstration on free hosting.
+Medicare brings patient records, visits, prescriptions, laboratory and imaging results, consent and care teams into one healthcare management application. It uses React, Express on Node 24 and PostgreSQL, with role-based access, encrypted files, durable audit evidence and privacy casework.
 
-**Live demo:** https://medicare-vtg.vercel.app. See [deployment details and verification](DEPLOYMENT.md).
-
-The React frontend, Express API, role and consent controls, audit trail, immutable migrations, and automated tests are included as ordinary source files. Legacy Git history, uploaded identity documents, runtime credentials, patient snapshots, logs, and local databases are excluded.
+**Website:** [medicare-vtg.vercel.app](https://medicare-vtg.vercel.app). The hosted production release is separate from this review branch.
 
 ## Hosting
 
-- Render: Free Node web service, Node 24, root `backend`, build `npm ci --omit=dev`, start `npm start`, health check `/readyz`. Set `NODE_ENV=production`, `DEMO_MODE=true`, `AI_ENABLED=false`, and the private database/signing settings in the hosting environment.
-- Supabase: dedicated Free PostgreSQL project. The application uses a private `healthcare` schema and a restricted server database role. The Supabase public Data API is disabled. Browser SQL exports are generated with `node backend/scripts/export-browser-schema.js` and, only with `DEMO_MODE=true`, `node backend/scripts/hosted-demo-seed.js`. Their output belongs in ignored `.local` files, never in Git.
-- Vercel: Hobby static frontend, Node 24, root `frontend`, build `npm run build`, output `build`. Set `REACT_APP_DEMO_MODE=true` and `REACT_APP_API_TIMEOUT_MS=90000`. The same-origin `/api` proxy points to the Render service.
+- Render: Free Node web service, root `backend`, build `npm ci --omit=dev`, start `npm start`, readiness `/readyz`. Set `NODE_ENV=production` and supply the private database, verified TLS, signing, encryption and origin settings through the host's secret store.
+- Supabase: the application uses a private `healthcare` schema and a restricted server database role. Keep the public Data API disabled. Use `export-browser-schema.js` only for a fresh installation. The existing migration-017 installation requires the guarded upgrade described in [the release procedure](docs/requirements-release.md).
+- Vercel: Hobby static frontend, Node 24, root `frontend`, build `npm run build`, output `build`. The checked-in configuration supplies the same-origin API proxy and the API timeout.
 
-Only synthetic patient information belongs in this deployment. Public registration, staff onboarding and invitations, passkey enrollment, document uploads, outbound email, and external AI are unavailable in demo mode. Existing-account authentication, authorization, consent, and audit enforcement remain enabled. A visible application notice explains these limits.
+The application has one standard interface and normal feature routes. SMTP is optional at startup; account verification returns an explicit availability error until delivery is configured. Document processing still requires malware scanning and durable encrypted storage. AI remains disabled unless its service and token are configured.
 
-Free hosting can sleep, pause, or reach quotas; it does not provide the availability, backups, storage, or operational guarantees needed for real clinical use. This demonstration is not a regulatory certification or a clinically validated system.
+Bundled sample records and existing private account credentials are retained. Initial-data tooling is separate from application behavior: `ALLOW_SAMPLE_DATA=true node backend/scripts/seed-workspace.js` creates SQL and private account material under ignored `.local` paths without connecting to the database. It refuses populated databases and mismatched migration ledgers. Never publish the private account files or reuse their passwords.
+
+Free hosting can sleep, pause or reach quotas. Actual clinical operation requires appropriate provider arrangements, encrypted infrastructure, verified TLS, retention procedures, monitoring and tested recovery. This source does not certify the organization or clinically validate AI output.
 
 ## Local checks
 
@@ -22,12 +22,12 @@ Backend: `cd backend`, `npm ci`, `npm test`, `npm run check`.
 
 Frontend: `cd frontend`, `npm ci`, `npm test`, `npm run lint`, `npm run build`.
 
-The native database integration suites run only when explicitly enabled against a disposable loopback PostgreSQL database. Credentials and generated synthetic account passwords must stay private.
+Run `npm run test:integration` only with the documented opt-in settings against a migrated, disposable loopback PostgreSQL database and matching PostgreSQL dump/restore tools. Enable both database and private-browser checks; skipped recovery cases are not release evidence.
 
-Interface conventions and theme verification are documented in [STYLEGUIDE.md](STYLEGUIDE.md).
+See [STYLEGUIDE.md](STYLEGUIDE.md) for the shared Medicare theme. Source excludes runtime credentials, uploaded identity documents, local databases and private logs.
 
-## Requirement completion review — 2026-11-01
+## Review and release
 
-The `codex/requirements-completion` branch closes source-confirmed gaps in the supplied H1 problem statement. Start with [the requirement matrix](docs/requirements-traceability.md), [architecture/threat model](docs/architecture-threat-model.md), and [audit guarantees](docs/clinical-audit-integrity.md). Privacy requests/exports, breach assessment and notice evidence, clinical contract/state fixes, identity-bound file encryption, encrypted backup/restore and legacy file migration are implemented with regression coverage.
+Start with [requirement coverage](docs/requirements-traceability.md), [architecture and threats](docs/architecture-threat-model.md), [audit guarantees](docs/clinical-audit-integrity.md) and [application cleanup](docs/application-cleanup.md).
 
-This branch is for owner inspection before deployment. It adds ordered migrations 018–025; do not deploy its API against the old 17-migration schema. The existing hosted site remains a synthetic-only demonstration. Legal/provider arrangements, verified encrypted infrastructure, retention policy and actual monitoring/notice delivery are separate operational prerequisites. See the matrix for exact boundaries; no HIPAA/GDPR certification is claimed.
+The current branch includes ordered migrations 018–025. Review and apply them before upgrading the API; production has not been promoted by this change. Follow [the release procedure](docs/requirements-release.md), preserving database privileges, encrypted-file recovery and operational readiness requirements.
