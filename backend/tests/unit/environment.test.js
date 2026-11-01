@@ -10,22 +10,18 @@ const safe = () => ({
 it('accepts a complete production configuration', () => {
     expect(validateEnvironment(safe())).toEqual([]);
 });
-it('permits missing SMTP configuration only in explicit demo mode', () => {
+it('permits an unconfigured optional SMTP integration', () => {
     const env = { ...safe(), EMAIL_HOST: '', EMAIL_FROM: '' };
-    expect(validateEnvironment({ ...env, DEMO_MODE: 'true', AI_ENABLED: 'false' })).toEqual([]);
-    for (const demo of [undefined, 'false']) {
-        expect(validateEnvironment({ ...env, DEMO_MODE: demo })).toEqual(expect.arrayContaining(['EMAIL_HOST is required', 'EMAIL_FROM is required']));
-    }
+    expect(validateEnvironment(env)).toEqual([]);
 });
-it.each(['1', 'yes', 'TRUE', ''])('rejects nonboolean DEMO_MODE %s', (value) => {
-    expect(validateEnvironment({ ...safe(), DEMO_MODE: value })).toContain('DEMO_MODE must be true or false');
+it.each(['EMAIL_HOST', 'EMAIL_FROM'])('rejects incomplete SMTP configuration missing %s', key => {
+    expect(validateEnvironment({ ...safe(), [key]: '' })).toContain(`${key} is required`);
 });
-it('rejects AI in demo mode even with a valid service token', () => {
-    expect(validateEnvironment({ ...safe(), DEMO_MODE: 'true', AI_ENABLED: 'true', AI_SERVICE_TOKEN: 'a'.repeat(64) }))
-        .toContain('AI_ENABLED must be false in demo mode');
+it('enables AI independently when its service token is configured', () => {
+    expect(validateEnvironment({ ...safe(), AI_ENABLED: 'true', AI_SERVICE_TOKEN: 'a'.repeat(64) })).toEqual([]);
 });
-it('keeps encryption and WebAuthn production requirements in demo mode', () => {
-    expect(validateEnvironment({ ...safe(), DEMO_MODE: 'true', ENCRYPTION_KEY: '', WEBAUTHN_ORIGIN: '' }))
+it('keeps encryption and WebAuthn production requirements without SMTP', () => {
+    expect(validateEnvironment({ ...safe(), EMAIL_HOST: '', EMAIL_FROM: '', ENCRYPTION_KEY: '', WEBAUTHN_ORIGIN: '' }))
         .toEqual(expect.arrayContaining(['ENCRYPTION_KEY is required', 'WEBAUTHN_ORIGIN is required']));
 });
 it.each([

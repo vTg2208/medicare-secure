@@ -14,7 +14,7 @@ const { HTTP_STATUS, SUCCESS_MESSAGES, ERROR_MESSAGES, ROLES, OTP_PURPOSE, AUDIT
 const { isValidEmail, isValidPhone, validatePassword, validateRequiredFields } = require('../../utils/validators');
 const logger = require('../../utils/logger');
 const config = require('../../config/env');
-const { verifyAadhaar, verifyDoctorReg } = require('../../services/mockVerification.service');
+const { validateGovernmentIdFormat } = require('../../services/credential-validation.service');
 const { sendDoctorRegistrationNotification } = require('../../config/mail');
 const DoctorVerificationService = require('../../services/doctor.verification.service');
 
@@ -117,11 +117,11 @@ const registerPatient = async (req, res) => {
         const isReRegistering = existingUser && existingUser.status === 'pending';
         const userId = isReRegistering ? existingUser.id : null;
 
-        // Verify Aadhaar with Mock Service
+        // Validate the supplied identity reference format
         if (govtId) { // check if govtId is provided first, though usually required for patients
             try {
-                // Verify against mock DB including email and phone check
-                await verifyAadhaar(govtId, email, phone);
+                // Ownership requires authorized review; format validation does not establish identity
+                await validateGovernmentIdFormat(govtId);
             } catch (error) {
                 return res.status(HTTP_STATUS.BAD_REQUEST).json({
                     success: false,

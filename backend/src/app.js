@@ -7,7 +7,6 @@ const { query } = require('./config/db');
 const { assertSchemaReady } = require('./services/readiness.service');
 const { errorHandler, notFoundHandler, asyncHandler } = require('./middleware/error.middleware');
 const { apiLimiter } = require('./middleware/rateLimit.middleware');
-const { demoGuard, deploymentInfo } = require('./middleware/demo.middleware');
 const { metricsMiddleware, trackConnections, metricsEndpoint } = require('./middleware/metrics');
 const { auditLog } = require('./middleware/audit.middleware');
 const { requestContext } = require('./services/request-context');
@@ -46,8 +45,6 @@ app.get('/metrics', (req, res, next) => {
 }, metricsEndpoint);
 
 app.use('/api', apiLimiter);
-app.use('/api', demoGuard);
-app.get(['/api/public/deployment', `/api/${config.apiVersion}/public/deployment`], deploymentInfo);
 const routes = {
     auth: './modules/auth/auth.routes', users: './modules/users/user.routes',
     consent: './modules/consent/consent.routes', emr: './modules/emr/emr.routes',

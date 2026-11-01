@@ -5,7 +5,6 @@ const config = {
     nodeEnv: process.env.NODE_ENV || 'development',
     port: process.env.PORT || 5000,
     apiVersion: process.env.API_VERSION || 'v1',
-    demo: process.env.DEMO_MODE === 'true',
 
     // Database
     database: {

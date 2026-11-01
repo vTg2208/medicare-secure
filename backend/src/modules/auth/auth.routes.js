@@ -5,6 +5,13 @@ const { authenticate } = require('../../middleware/auth.middleware');
 const { auditActions } = require('../../middleware/audit.middleware');
 const { loginLimiter, otpLimiter, registrationLimiter } = require('../../middleware/rateLimit.middleware');
 const { asyncHandler } = require('../../middleware/error.middleware');
+const { assertEmailAvailable } = require('../../config/mail');
+
+// Verification needs a working delivery configuration before creating an
+// account or accepting credentials. Existing-account login stays independent.
+const requireEmailDelivery = (req, res, next) => {
+    try { assertEmailAvailable(); next(); } catch (error) { next(error); }
+};
 
 /**
  * @route   POST /api/auth/register/patient
@@ -21,6 +28,7 @@ const upload = require('../../middleware/upload.middleware');
 router.post(
     '/register/patient',
     registrationLimiter,
+    requireEmailDelivery,
     asyncHandler(authController.registerPatient)
 );
 
@@ -32,6 +40,7 @@ router.post(
 router.post(
     '/register/doctor',
     registrationLimiter,
+    requireEmailDelivery,
     upload.fields([
         { name: 'degreeCertificate', maxCount: 1 },
         { name: 'medicalRegCertificate', maxCount: 1 }
@@ -47,6 +56,7 @@ router.post(
 router.post(
     '/register/organization',
     registrationLimiter,
+    requireEmailDelivery,
     upload.single('licenseDocument'),
     asyncHandler(authController.registerOrganization)
 );
@@ -81,6 +91,7 @@ router.post(
 router.post(
     '/resend-otp',
     otpLimiter,
+    requireEmailDelivery,
     asyncHandler(authController.resendOTP)
 );
 

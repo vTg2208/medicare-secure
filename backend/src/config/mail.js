@@ -1,10 +1,10 @@
 const nodemailer = require('nodemailer');
 const logger = require('../utils/logger');
-const demo = process.env.DEMO_MODE === 'true';
+const emailConfigured = process.env.NODE_ENV === 'test' || Boolean(process.env.EMAIL_HOST && process.env.EMAIL_FROM);
 
 // Email transporter configuration
-const transporter = demo ? null : nodemailer.createTransport(process.env.NODE_ENV === 'test' ? { jsonTransport: true } : {
-  host: process.env.EMAIL_HOST || 'smtp.gmail.com',
+const transporter = !emailConfigured ? null : nodemailer.createTransport(process.env.NODE_ENV === 'test' ? { jsonTransport: true } : {
+  host: process.env.EMAIL_HOST,
   port: process.env.EMAIL_PORT || 587,
   secure: process.env.EMAIL_SECURE === 'true', // true for 465, false for other ports
   ...(process.env.EMAIL_USER && { auth: {
@@ -17,7 +17,7 @@ const transporter = demo ? null : nodemailer.createTransport(process.env.NODE_EN
 });
 
 // Verify transporter configuration (disabled in development)
-if (!demo && process.env.NODE_ENV === 'production') {
+if (transporter && process.env.NODE_ENV === 'production') {
   transporter.verify((error, success) => {
     if (error) {
       logger.error('Email transporter configuration error:', error);
@@ -25,7 +25,7 @@ if (!demo && process.env.NODE_ENV === 'production') {
       logger.info('Email server is ready to send messages');
     }
   });
-} else if (!demo) {
+} else if (transporter) {
   logger.info('Email verification skipped in development mode');
 }
 
@@ -38,13 +38,17 @@ if (!demo && process.env.NODE_ENV === 'production') {
  * @param {String} options.html - HTML content
  * @returns {Promise} Send result
  */
-const sendEmail = async ({ to, subject, text, html }) => {
-  if (demo) {
-    throw Object.assign(new Error('Email delivery is unavailable in the public demo'), {
+const assertEmailAvailable = () => {
+  if (!transporter) {
+    throw Object.assign(new Error('Email delivery is not configured. Please contact your administrator.'), {
       statusCode: 503,
-      code: 'DEMO_FEATURE_DISABLED',
+      code: 'EMAIL_UNAVAILABLE',
     });
   }
+};
+
+const sendEmail = async ({ to, subject, text, html }) => {
+  assertEmailAvailable();
   try {
     const mailOptions = {
       from: process.env.EMAIL_FROM || 'noreply@healthcare.com',
@@ -269,6 +273,7 @@ const sendDoctorAcceptanceEmail = async (email, userData) => {
 
 module.exports = {
   transporter,
+  assertEmailAvailable,
   sendEmail,
   sendOTPEmail,
   sendVisitApprovalEmail,
