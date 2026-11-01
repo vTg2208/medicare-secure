@@ -15,7 +15,11 @@ The homepage must answer three questions before asking visitors to read further:
 
 ## Motion
 
-The six-phase loop takes 7.25 seconds, down from the initial 12.4-second concept. Phases last 1300 / 650 / 1250 / 1600 / 650 / 1800ms: report ready, approve, share, view logged, withdraw, future access blocked. Transitions use opacity and transforms; surfaces and borders change color to communicate state. No layout properties animate.
+The six-phase loop takes 7.25 seconds, down from the initial 12.4-second concept. Phases last 1300 / 650 / 1250 / 1600 / 650 / 1800ms: report ready, approve, share, view logged, withdraw, future access blocked.
+
+Permission now has a physical representation. A lock stays attached to the original report; its shackle lifts and rotates open over 340ms. A gate lifts out of the connector. After a 200ms lead-in, a larger report copy travels from the patient's card to the clinician's card over a 950ms sequence and settles into a document icon. The original report remains in place. Withdrawing access lowers the gate and closes the lock while retaining the recorded view.
+
+The transfer uses container-relative transform distances, so it crosses the cards on both desktop and phone layouts instead of moving a few pixels inside the connector. Lock transitions remain interruptible. The automatic file sequence pauses with playback; reduced-motion and keyboard interactions show the resulting state immediately. Movement uses transforms and opacity; no layout properties animate.
 
 ## References and interpretation
 
@@ -31,6 +35,8 @@ Medicare retains its own identity. No customer statistics, certification badges,
 
 This branch implements the redesigned homepage and reusable care-journey illustration. It does not claim a completed usability audit of every authenticated clinical screen. Existing workflow functionality remains behind the same account routes.
 
-The local preview uses isolated sources and no production account data. This work is not a production deployment. Interaction tests, theme checks, lint and builds provide code-level evidence; the browser bridge was unavailable for the final visual review, so screenshots, real-device wrapping and perceived motion quality have not been verified.
+The local preview uses isolated sources and no production account data. This work is not a production deployment. Browser review now covers the actual built homepage at desktop size and a 390px viewport, including intermediate file positions and the settled light/dark states. Physical-device testing and a complete accessibility audit remain outside this review.
 
 Verification on 2026-11-01: all 99 frontend tests across 19 files passed in an isolated sequential run, including the 11 care-journey cases and homepage entry-route integration. ESLint passed. The shared-theme check passed for 75 stylesheets, 128 components/pages and 37 shared tokens. Both the application and standalone concept built successfully. An earlier concurrent run exceeded the default five-second timeout in one test; without simultaneous lint/build jobs, the unchanged test passed in 675ms. No test timeout was relaxed.
+
+Object-motion follow-up on 2026-11-01: the 11 care-journey tests, component lint, shared-theme check and production application build passed in the existing isolated dependency image with networking disabled. Browser samples measured about 419px of horizontal file travel on desktop and 194px at 390px viewport width. The file stayed inside the phone scene with no horizontal page overflow. Screenshots show the open shackle, intermediate transfer, received report and closed gate. No new dependency was added.
