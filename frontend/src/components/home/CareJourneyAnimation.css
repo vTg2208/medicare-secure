@@ -19,7 +19,6 @@
 .mc-care-card-top small { display: block; color: var(--mc-text-muted); font-size: 11px; margin-top: 3px; }
 .mc-care-avatar { display: grid; place-items: center; color: var(--mc-accent); background: var(--mc-brand-soft); width: 30px; height: 30px; border-radius: 50%; }
 .mc-care-avatar svg { width: 17px; height: 17px; }
-.mc-care-small-lock { margin-left: auto; color: var(--mc-text-muted); width: 13px !important; height: 13px !important; }
 .mc-care-report { position: relative; padding: 17px 14px 13px; opacity: 1; transform: translateY(0); }
 .mc-care-paper { position: relative; display: grid; gap: 4px; width: 64px; height: 78px; padding: 10px; background: var(--mc-surface-muted); border: 1px solid var(--mc-border); border-radius: 7px; color: var(--mc-accent); margin-bottom: 12px; }
 .mc-care-paper svg { width: 21px; height: 21px; }
@@ -38,8 +37,7 @@
 .mc-care-journey[data-connected=true] .mc-care-shackle { transform: translateY(-6px) rotate(-28deg); }
 .mc-care-moving-lock { overflow: visible; }
 .mc-care-paper .mc-care-report-lock { position: absolute; right: -13px; bottom: -3px; width: 34px; height: 42px; padding: 3px; border-radius: 8px; background: var(--mc-surface); }
-.mc-care-gate { display: grid; place-items: center; position: absolute; z-index: 2; left: 50%; top: 0; width: 32px; height: 46px; margin: -23px 0 0 -16px; color: var(--mc-accent); background: var(--mc-surface-muted); border-radius: 9px; opacity: 1; transform: translateY(0) rotate(0); transition: transform 360ms cubic-bezier(.22,1,.36,1), opacity 220ms ease; }
-.mc-care-gate svg { width: 26px; height: 34px; }
+.mc-care-gate { position: absolute; z-index: 2; left: 50%; top: 0; width: 4px; height: 28px; margin: -14px 0 0 -2px; background: var(--mc-accent); border-radius: 3px; opacity: 1; transform: translateY(0) rotate(0); transition: transform 360ms cubic-bezier(.22,1,.36,1), opacity 220ms ease; }
 .mc-care-journey[data-connected=true] .mc-care-gate { opacity: 0; transform: translateY(-28px) rotate(-14deg); }
 .mc-care-flying-report { position: absolute; z-index: 3; left: 28px; top: 95px; display: grid; gap: 4px; width: 48px; height: 62px; padding: 9px; border-radius: 7px; background: var(--mc-surface); border: 1px solid var(--mc-brand); box-shadow: var(--mc-shadow-panel); color: var(--mc-accent); opacity: 0; pointer-events: none; }
 .mc-care-flying-report svg { width: 23px; height: 25px; }
@@ -49,11 +47,9 @@
 .mc-care-journey[data-connected=true] .mc-care-team { border-color: var(--mc-brand); }
 .mc-care-team .mc-care-card-top { text-align: left; }
 .mc-care-access-icon { position: relative; display: grid; place-items: center; width: 58px; height: 58px; margin: 17px auto 11px; border-radius: 14px; background: var(--mc-surface-muted); color: var(--mc-text-muted); transition: color 160ms ease, background-color 160ms ease; }
-.mc-care-access-icon > .mc-care-moving-lock { width: 34px; height: 43px; opacity: 1; transform: translateY(0); transition: opacity 180ms ease, transform 300ms cubic-bezier(.22,1,.36,1); }
-.mc-care-received-report { position: absolute; inset: 0; display: grid; place-items: center; opacity: 0; transform: translateY(9px); transition: opacity 160ms ease, transform 280ms cubic-bezier(.22,1,.36,1); }
+.mc-care-received-report { position: absolute; inset: 0; display: grid; place-items: center; opacity: .4; transform: translateY(0); transition: opacity 160ms ease; }
 .mc-care-received-report svg { width: 32px; height: 39px; }
 .mc-care-journey[data-connected=true] .mc-care-access-icon { color: var(--mc-accent); background: var(--mc-brand-soft); }
-.mc-care-journey[data-connected=true] .mc-care-access-icon > .mc-care-moving-lock { opacity: 0; transform: translateY(-12px); transition-delay: 380ms; }
 .mc-care-journey[data-connected=true] .mc-care-received-report { opacity: 1; transform: translateY(0); transition-delay: 850ms; }
 .mc-care-team-status { display: block; font-size: 13px; font-weight: 700; margin: 0 6px; }
 .mc-care-team-detail { display: block; font-size: 11px; line-height: 1.7; color: var(--mc-text-muted); margin: 5px 8px 12px; }
@@ -62,7 +58,6 @@
 .mc-care-open:not(:disabled) { color: var(--mc-on-brand); background: var(--mc-brand); border-color: var(--mc-brand); }
 .mc-care-permission { position: relative; display: flex; align-items: center; gap: 11px; margin: 0 26px; padding: 15px; border-radius: 13px; border: 1px solid transparent; background: var(--mc-text); color: var(--mc-surface); transition: background-color 160ms ease; }
 .mc-care-journey:is([data-phase=choose], [data-phase=withdraw]) .mc-care-permission { background: var(--mc-brand-hover); color: var(--mc-on-brand); }
-.mc-care-permission-icon { color: inherit; }
 .mc-care-permission strong { font-size: 12px; font-weight: 700; display: block; }
 .mc-care-permission small { font-size: 11px; color: inherit; opacity: .85; display: block; margin-top: 4px; }
 .mc-care-permission-state { margin-left: auto; color: inherit; font-size: 11px; font-weight: 600; padding: 5px 7px; border: 1px solid var(--mc-border-strong); border-radius: 6px; }
@@ -119,7 +114,6 @@
     .mc-care-card-top strong { font-size: 10px; }
     .mc-care-card-top small { font-size: 10px; }
     .mc-care-avatar { width: 23px; height: 23px; }
-    .mc-care-small-lock { display: none; }
     .mc-care-personal, .mc-care-team { min-height: 214px; }
     .mc-care-report { padding: 15px 11px 12px; }
     .mc-care-report > strong { font-size: 12px; }
@@ -129,7 +123,6 @@
     .mc-care-paper { width: 44px; height: 55px; padding: 8px; }
     .mc-care-paper .mc-care-report-lock { width: 28px; height: 35px; right: -13px; }
     .mc-care-access-icon { width: 42px; height: 48px; margin: 13px auto 9px; }
-    .mc-care-access-icon > .mc-care-moving-lock { width: 29px; height: 37px; }
     .mc-care-received-report svg { width: 26px; height: 33px; }
     .mc-care-team-status { font-size: 10px; }
     .mc-care-team-detail { font-size: 10px; min-height: 24px; }
@@ -137,10 +130,7 @@
     .mc-care-route-arrow { left: 6px; }
     .mc-care-flying-report { left: 18px; top: 81px; width: 38px; height: 50px; padding: 6px; }
     .mc-care-flying-report svg { width: 19px; height: 22px; }
-    .mc-care-gate { width: 27px; height: 38px; margin-left: -13px; margin-top: -19px; }
-    .mc-care-gate svg { width: 23px; height: 30px; }
     .mc-care-permission { margin: 0 15px; padding: 13px 11px; gap: 8px; }
-    .mc-care-permission-icon { display: none; }
     .mc-care-permission strong { font-size: 10px; }
     .mc-care-permission small { font-size: 10px; }
     .mc-care-permission-state { font-size: 10px; padding: 4px 5px; }

@@ -21,6 +21,8 @@ Permission now has a physical representation. A lock stays attached to the origi
 
 The transfer uses container-relative transform distances, so it crosses the cards on both desktop and phone layouts instead of moving a few pixels inside the connector. Lock transitions remain interruptible. The automatic file sequence pauses with playback; reduced-motion and keyboard interactions show the resulting state immediately. Movement uses transforms and opacity; no layout properties animate.
 
+The report carries the scene's only lock. The permission header, patient header, clinician preview, button and history avoid repeating it; the connector uses a simple moving barrier. The sharing switch separates its 48×28px pill track and 20px thumb from its 48×44px button hit area. This preserves the standard switch shape under the application's global minimum button height. Desktop and 390px browser checks verified both thumb positions, one lock and no phone-width horizontal overflow.
+
 ## References and interpretation
 
 Public first-party pages informed the design direction; these are design interpretations rather than reproduced layouts or assets:

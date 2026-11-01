@@ -16,7 +16,6 @@ function Icon({ name, ...props }) {
         document: <><path d="M14 3H5v18h14V8L14 3Z" /><path d="M14 3v5h5M8 12h8M8 16h5" /></>,
         person: <><circle cx="12" cy="7" r="4" /><path d="M4 21v-3a8 8 0 0 1 16 0v3" /></>,
         clinician: <><path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6Z" /></>,
-        lock: <><rect x="5" y="10" width="14" height="11" rx="3" /><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3" /></>,
         check: <path d="m5 12 4 4L19 6" />,
         shield: <><path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6Z" /><path d="m8 12 3 3 5-6" /></>,
         arrow: <path d="M4 12h15m-6-6 6 6-6 6" />,
@@ -118,7 +117,6 @@ export default function CareJourneyAnimation() {
             </header>
 
             <div className="mc-care-permission">
-                <span className="mc-care-permission-icon"><MovingLock /></span>
                 <div><strong>Care team access</strong><small>Try the sharing control</small></div>
                 <span className="mc-care-permission-state">{connected ? 'Allowed' : 'Private'}</span>
                 <button type="button" className="mc-care-switch" role="switch" aria-checked={connected} aria-label="Allow care team access" aria-describedby="mc-care-explainer" onClick={changeAccess}><span /></button>
@@ -127,18 +125,18 @@ export default function CareJourneyAnimation() {
 
             <div className="mc-care-scene">
                 <article className="mc-care-personal" aria-label="Your private medical records">
-                    <div className="mc-care-card-top"><span className="mc-care-avatar"><Icon name="person" /></span><div><strong>You</strong><small>Your health workspace</small></div><Icon name="lock" className="mc-care-small-lock" /></div>
+                    <div className="mc-care-card-top"><span className="mc-care-avatar"><Icon name="person" /></span><div><strong>You</strong><small>Your health workspace</small></div></div>
                     <div className="mc-care-report"><span className="mc-care-paper"><Icon name="document" /><span /><span /><span /><MovingLock className="mc-care-report-lock" /></span><span className="mc-care-ready"><Icon name="check" />Ready</span><strong>Lab report</strong><small>In your medical records</small></div>
                 </article>
 
-                <div className="mc-care-connection" aria-hidden="true"><span className="mc-care-track" /><span className="mc-care-track-active" /><Icon name="arrow" className="mc-care-route-arrow" /><span className="mc-care-gate"><MovingLock /></span></div>
+                <div className="mc-care-connection" aria-hidden="true"><span className="mc-care-track" /><span className="mc-care-track-active" /><Icon name="arrow" className="mc-care-route-arrow" /><span className="mc-care-gate" /></div>
 
                 <article className="mc-care-team" aria-label="Care team access">
                     <div className="mc-care-card-top"><span className="mc-care-avatar"><Icon name="clinician" /></span><div><strong>Care team</strong><small>Clinical workspace</small></div></div>
-                    <div className="mc-care-access-icon" aria-hidden="true"><MovingLock /><span className="mc-care-received-report"><Icon name="document" /></span></div>
+                    <div className="mc-care-access-icon" aria-hidden="true"><span className="mc-care-received-report"><Icon name="document" /></span></div>
                     <strong className="mc-care-team-status">{connected ? (viewed ? 'Report viewed' : 'Access approved') : (phase === 5 ? 'Access withdrawn' : 'Waiting for access')}</strong>
                     <span className="mc-care-team-detail">{connected ? 'Shared with your permission' : (phase === 5 ? 'New requests are blocked' : 'Your permission is needed')}</span>
-                    <button className="mc-care-open" disabled={!connected} onClick={event => select(3, event)}><Icon name={connected ? 'document' : 'lock'} />{connected ? 'View report' : 'Report protected'}</button>
+                    <button className="mc-care-open" disabled={!connected} onClick={event => select(3, event)}><Icon name="document" />{connected ? 'View report' : 'Report protected'}</button>
                 </article>
                 <span className="mc-care-flying-report" aria-hidden="true"><Icon name="document" /><span /><span /><span /></span>
             </div>
@@ -147,7 +145,7 @@ export default function CareJourneyAnimation() {
                 <div><Icon name="shield" /><span className="mc-care-history-label">Access history</span><span className="mc-care-history-private" data-shown={phase < 2} aria-hidden={phase >= 2}>Your report stays private.</span></div>
                 <p className="mc-care-history-event" data-shown={phase >= 2} aria-hidden={phase < 2}><Icon name="check" />You approved access</p>
                 <p className="mc-care-history-event" data-shown={viewed} aria-hidden={!viewed}><Icon name="check" />Care team viewed your report</p>
-                <p className="mc-care-history-event" data-shown={phase === 5} aria-hidden={phase !== 5}><Icon name="lock" />You withdrew future access</p>
+                <p className="mc-care-history-event" data-shown={phase === 5} aria-hidden={phase !== 5}><Icon name="check" />You withdrew future access</p>
             </div>
 
             <footer className="mc-care-controls">
