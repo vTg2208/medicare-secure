@@ -28,7 +28,7 @@ jobs:
         run: |
           set -euo pipefail
           docker pull postgres:17-bookworm
-          docker run -d --name healthcare-backup-recovery \
+          docker run -d --log-driver none --name healthcare-backup-recovery \
             --read-only --user 999:999 --cpus 1 --memory 1536m --pids-limit 256 \
             --cap-drop ALL --security-opt no-new-privileges \
             --tmpfs /var/lib/postgresql/data:rw,nosuid,nodev,size=1024m,uid=999,gid=999 \
