@@ -55,14 +55,14 @@ const sendEmail = async ({ to, subject, text, html }) => {
     };
 
     const info = await transporter.sendMail(mailOptions);
-    logger.info('Email sent successfully:', { to, subject, messageId: info.messageId });
+    logger.info('Email sent successfully');
     return info;
   } catch (error) {
     if (process.env.NODE_ENV === 'development') {
       logger.warn('Email delivery failed; configure a local SMTP server for development');
       throw error;
     }
-    logger.error('Email sending failed:', { to, subject, error: error.message });
+    logger.error('Email sending failed', error);
     throw error;
   }
 };

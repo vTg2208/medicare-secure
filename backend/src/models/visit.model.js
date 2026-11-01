@@ -1,5 +1,6 @@
 const pool = require('../config/db');
 const crypto = require('crypto');
+const logger = require('../utils/logger');
 const VisitConsentService = require('../services/visit-consent.service');
 const { organizationSql, assignmentSql } = require('../middleware/clinical-access.middleware');
 
@@ -501,7 +502,7 @@ class VisitModel {
             // Assuming 'logger' is defined elsewhere or will be handled by a global error handler
             // If not, this would cause a ReferenceError.
             // For this task, I'm inserting the code as provided.
-            console.error('Error calculating queue position:', error); // Changed logger.error to console.error for standalone execution
+            logger.error('Error calculating queue position', error);
             throw error;
         }
     }

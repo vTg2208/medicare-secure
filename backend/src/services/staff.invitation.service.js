@@ -89,7 +89,7 @@ class StaffInvitationService {
                 html: mailOptions.html,
                 text: `Hello ${user.first_name}, Your account has been successfully created and activated. You can now log in at ${loginUrl}`
             });
-            logger.info(`Welcome email sent to ${user.email}`);
+            logger.info('Staff welcome email sent');
         } catch (error) {
             logger.error('Error sending welcome email:', error);
             // Don't throw - non-critical
@@ -200,7 +200,7 @@ class StaffInvitationService {
                 metadata: { email, role, targetUserId: userId }
             });
 
-            logger.info(`Staff invitation created for ${email} by ${invitedBy}. Pre-created user ${userId}.`);
+            logger.info('Staff invitation created');
             return invitation;
         } catch (error) {
             logger.error('Error inviting staff:', error);
@@ -290,7 +290,7 @@ class StaffInvitationService {
             invitation.deliveryStatus = await this.sendInvitationEmail(invitation, inviterName) ? 'sent' : 'failed';
             invitation.invitationUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/staff/invitation/${invitation.token}`;
 
-            logger.info(`Invitation resent to ${invitation.email}`);
+            logger.info('Staff invitation resent');
             return invitation;
         } catch (error) {
             logger.error('Error resending invitation:', error);

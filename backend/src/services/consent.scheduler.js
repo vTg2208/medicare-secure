@@ -88,7 +88,7 @@ const notifyExpiringConsents = async () => {
             // TODO: Send email notifications to patients
             // For now, just log the notifications
             for (const consent of expiringConsents) {
-                logger.info(`Consent ${consent.id} expiring on ${consent.end_time} for patient ${consent.patient_email}`);
+                logger.info('Consent expiration notification queued');
             }
         }
 

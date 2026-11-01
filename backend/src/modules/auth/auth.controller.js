@@ -292,7 +292,7 @@ const registerPatient = async (req, res) => {
             statusCode: HTTP_STATUS.CREATED,
         });
 
-        logger.info('Patient registered successfully:', { userId: result.user.id, email, phone });
+        logger.info('Patient registered successfully');
 
         res.status(HTTP_STATUS.CREATED).json({
             success: true,
@@ -851,4 +851,3 @@ module.exports = {
     logout,
     resendOTP,
 };
-
