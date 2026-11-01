@@ -1,5 +1,7 @@
 # Encrypted backup and recovery drill
 
+For automatic capture with uploaded files, use the [coordinated file backup command and rollout procedure](coordinated-file-backups.md). It acquires a real shared-writer/exclusive-backup lock and imports one PostgreSQL snapshot. The manual tools below remain available for a deployment whose writes have actually been stopped.
+
 The manual tools back up the PostgreSQL database and the application's encrypted upload tree together. They do not configure a host, cloud service or scheduler. A scheduler can invoke the same backup command after it has stopped writes and loaded secrets into the process environment.
 
 For the hosted demonstration with no external files, the explicit [scheduled database-only snapshot mode](scheduled-backups.md) uses an exported PostgreSQL snapshot and refuses external-file references. It does not require application downtime or claim that writes were quiesced. Its authenticated custom dump uses the same restore tooling described here, including supported extension namespace provisioning. Consult the release evidence for the actual activation status.

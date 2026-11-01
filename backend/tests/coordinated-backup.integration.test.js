@@ -206,6 +206,24 @@ test('coordinated capture restores one database instant with its encrypted files
    assert.equal((await fs.readdir(root)).some(name=>name.includes('.partial-')),false);
    await coordination.withFileMutation(async()=>{}, {env});
   });
+  await t.test('scheduled coordinated archives verify files from a cloud download before pruning',async()=>{
+   const {runScheduledBackup}=require('../scripts/scheduled-backup');
+   const objects=new Map();let removed=0,corrupt=false;
+   const store={
+    async list(){return [...objects.values()].map(({bytes,...file})=>file);},
+    async upload(fileName,input){const bytes=await fs.readFile(input),fileId=crypto.randomUUID();const file={fileName,fileId,action:'upload',contentLength:bytes.length,uploadTimestamp:Date.now()};objects.set(fileId,{...file,bytes});return file;},
+    async download(file,destination){const bytes=Buffer.from(objects.get(file.fileId).bytes);if(corrupt)bytes[bytes.length-1]^=1;await fs.writeFile(destination,bytes,{flag:'wx'});},
+    async remove(file){removed++;objects.delete(file.fileId);}
+   };
+   const operator={...env,BACKUP_MODE:'coordinated',RESTORE_DB_HOST:config.host,RESTORE_DB_PORT:String(config.port),RESTORE_DB_USER:config.user,RESTORE_DB_PASSWORD:config.password,RESTORE_ADMIN_DB:config.database};
+   const result=await runScheduledBackup({env:operator,store});
+   assert.equal(result.mode,'coordinated');assert.equal(result.filesVerified,4);assert.equal(result.restoreVerified,true);assert.equal(result.uploaded,2);assert.equal(removed,0);
+   const previous=new Set(objects.keys());corrupt=true;
+   await assert.rejects(runScheduledBackup({env:operator,store}),/Backup failed/);
+   assert.equal(removed,0);for(const id of previous)assert.ok(objects.has(id));
+   assert.equal((await admin.query("SELECT count(*)::int AS n FROM pg_database WHERE datname LIKE 'healthcare_restore_scheduled_%'")).rows[0].n,0);
+   await assert.rejects(runScheduledBackup({env:{...operator,BACKUP_MODE:'misspelled'},store}),/mode/i);
+  });
  }finally{
   if(target)await target.end();if(source)await source.end();
   for(const name of [targetName,sourceName,...extraTargets])await admin.query(`DROP DATABASE IF EXISTS "${name}" WITH (FORCE)`);

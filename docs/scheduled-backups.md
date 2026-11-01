@@ -8,7 +8,7 @@ The private demo's scheduler is `.github/workflows/encrypted-backup.yml`. It is 
 
 The custom dump includes the application schema and its three required extensions. Their namespaces and per-table row counts are authenticated inside the existing SHMSBKP1 envelope. Required supported extension namespaces are created in a fresh disposable restore database before pg_restore. The snapshot deliberately omits PostgreSQL login roles and provider-owned schemas; an operational promotion must provision the intended restricted roles separately.
 
-Once file uploads are introduced, this mode must stop and report failure until a coordinated database/file backup is configured. Do not enable `BACKUP_QUIESCED` merely to suppress that failure.
+Once file uploads are introduced, database-only mode stops and reports failure. A worker with the application's real persistent upload volume can use the implemented [coordinated database/file backup mode](coordinated-file-backups.md) with BACKUP_MODE=coordinated. Deploy the shared mutation gate to all writers before activating it. The current remote GitHub worker remains database-only. Do not enable `BACKUP_QUIESCED` merely to suppress a failure.
 
 ## Credentials and privileges
 
