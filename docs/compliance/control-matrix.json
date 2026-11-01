@@ -364,6 +364,46 @@
           "evidence": []
         }
       ]
+    },
+    {
+      "id": "TRANSPARENCY-01",
+      "principles": [
+        "GDPR Articles 12,13 transparency",
+        "Accountability and patient information engineering"
+      ],
+      "ownerRole": "privacy_officer",
+      "implementation": {
+        "status": "implemented",
+        "sources": [
+          "backend/src/modules/privacy/notices.service.js",
+          "backend/src/modules/privacy/notices.routes.js",
+          "backend/src/database/ordered/033_privacy_notices.sql"
+        ],
+        "limitations": [
+          "Publication does not establish legal applicability or provider assurance. Acknowledgement is nonblocking and grants no medical-data consent. No production notice is seeded."
+        ]
+      },
+      "verification": {
+        "scenarios": [
+          {
+            "file": "backend/tests/privacy-notices.integration.test.js",
+            "title": "published privacy notices preserve exact patient provenance without granting consent"
+          },
+          {
+            "file": "backend/tests/privacy-notice-runtime.integration.test.js",
+            "title": "private notice runtime grants preserve immutable timestamps and reader-only backup access"
+          }
+        ],
+        "observations": []
+      },
+      "externalRequirements": [
+        {
+          "id": "accurate_reviewed_operator_notice",
+          "status": "pending",
+          "ownerRole": "responsible_organization",
+          "evidence": []
+        }
+      ]
     }
   ]
 }

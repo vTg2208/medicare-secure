@@ -1301,6 +1301,100 @@
       }
     },
     {
+      "name": "privacy_notice_acknowledgements",
+      "columns": [
+        "id",
+        "patient_id",
+        "version_id",
+        "notice_hash",
+        "acknowledged_at"
+      ],
+      "classification": "governance",
+      "purposes": [
+        "Published privacy transparency and exact patient acknowledgement provenance; no medical consent grant"
+      ],
+      "ownerRole": "privacy_officer",
+      "audience": [
+        "public_published_content_only",
+        "patient_owned_receipts",
+        "authorized_officer_review"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Immutable notice/receipt evidence; preserve exact historical provenance. No automatic purge is implemented; approved governance retention is an owner responsibility.",
+      "columnOverrides": {
+        "patient_id": {
+          "classification": "identity",
+          "protection": "Authenticated acknowledgement owner; never exposed by anonymous notice reads."
+        }
+      }
+    },
+    {
+      "name": "privacy_notice_current",
+      "columns": [
+        "singleton",
+        "version_id"
+      ],
+      "classification": "governance",
+      "purposes": [
+        "Published privacy transparency and exact patient acknowledgement provenance; no medical consent grant"
+      ],
+      "ownerRole": "privacy_officer",
+      "audience": [
+        "public_published_content_only",
+        "patient_owned_receipts",
+        "authorized_officer_review"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Immutable notice/receipt evidence; preserve exact historical provenance. No automatic purge is implemented; approved governance retention is an owner responsibility.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "privacy_notice_versions",
+      "columns": [
+        "id",
+        "version_number",
+        "content",
+        "content_hash",
+        "review_basis_ciphertext",
+        "published_by",
+        "published_at"
+      ],
+      "classification": "governance",
+      "purposes": [
+        "Published privacy transparency and exact patient acknowledgement provenance; no medical consent grant"
+      ],
+      "ownerRole": "privacy_officer",
+      "audience": [
+        "public_published_content_only",
+        "patient_owned_receipts",
+        "authorized_officer_review"
+      ],
+      "applicationEncryption": "selected_fields",
+      "encryptedColumns": [
+        "review_basis_ciphertext"
+      ],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Immutable notice/receipt evidence; preserve exact historical provenance. No automatic purge is implemented; approved governance retention is an owner responsibility.",
+      "columnOverrides": {
+        "content": {
+          "classification": "public",
+          "protection": "Explicitly officer-published plain-text processing information; never a public draft."
+        },
+        "review_basis_ciphertext": {
+          "classification": "governance",
+          "protection": "Identity-bound application ciphertext for the private officer publication basis."
+        },
+        "published_by": {
+          "classification": "identity",
+          "protection": "Responsible publisher identity; excluded from public notice projection."
+        }
+      }
+    },
+    {
       "name": "privacy_rights_history",
       "columns": [
         "id",
