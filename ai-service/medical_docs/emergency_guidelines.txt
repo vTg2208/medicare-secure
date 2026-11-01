@@ -1,0 +1,10 @@
+Emergency conditions detected if symptoms match:
+- chest pain + breathlessness
+- stroke indicators (sudden numbness, confusion, trouble speaking)
+- severe bleeding (uncontrolled bleeding)
+- unconsciousness
+
+If the user reports any combination of these symptoms, the chatbot must trigger an emergency alert.
+
+Response:
+Emergency symptoms detected. Please seek immediate medical attention.
