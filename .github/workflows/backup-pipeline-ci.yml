@@ -1,0 +1,62 @@
+name: Backup pipeline with container clients
+on:
+  push:
+    branches: [main]
+    paths: ['backend/scripts/**', 'backend/tests/*backup*', 'backend/tests/*snapshot*', 'backend/tests/*archive*', '.github/workflows/backup-pipeline-ci.yml']
+  pull_request:
+    paths: ['backend/scripts/**', 'backend/tests/*backup*', 'backend/tests/*snapshot*', 'backend/tests/*archive*', '.github/workflows/backup-pipeline-ci.yml']
+permissions:
+  contents: read
+jobs:
+  container-client-recovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:17-bookworm
+        env:
+          POSTGRES_DB: healthcare_test
+          POSTGRES_PASSWORD: disposable-fixture-only
+        ports: ['127.0.0.1:55432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres -d healthcare_test"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      NODE_ENV: test
+      DB_HOST: 127.0.0.1
+      DB_PORT: '55432'
+      DB_NAME: healthcare_test
+      DB_USER: postgres
+      DB_PASSWORD: disposable-fixture-only
+      DB_SSL: 'false'
+      PGSSLMODE: disable
+      RUN_DB_TESTS: 'true'
+      RUN_BACKUP_DB_TESTS: 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+        working-directory: backend
+      - name: Use the actual scheduled job's PostgreSQL client wrapper
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker pull postgres:17-bookworm
+          mkdir -p "$RUNNER_TEMP/backup-pg-tools"
+          printf 'Unused public CA fixture; loopback PostgreSQL uses sslmode=disable\n' > "$RUNNER_TEMP/backup-pg-tools/ca.crt"
+          chmod 444 "$RUNNER_TEMP/backup-pg-tools/ca.crt"
+          chmod 700 backend/scripts/pg-container-tool.sh
+          for tool in pg_dump pg_restore; do
+            printf '#!/bin/sh\nexec "%s/backend/scripts/pg-container-tool.sh" %s "$@"\n' "$GITHUB_WORKSPACE" "$tool" > "$RUNNER_TEMP/backup-pg-tools/$tool"
+            chmod 700 "$RUNNER_TEMP/backup-pg-tools/$tool"
+          done
+          echo "PG_DUMP_BIN=$RUNNER_TEMP/backup-pg-tools/pg_dump" >> "$GITHUB_ENV"
+          echo "PG_RESTORE_BIN=$RUNNER_TEMP/backup-pg-tools/pg_restore" >> "$GITHUB_ENV"
+          echo "PGSSLROOTCERT=$RUNNER_TEMP/backup-pg-tools/ca.crt" >> "$GITHUB_ENV"
+      - name: Exercise real dump stdin, snapshot, encrypted bundle and restore paths
+        working-directory: backend
+        run: node --test --test-concurrency=1 tests/archive.integration.test.js tests/backup.integration.test.js tests/database-snapshot.integration.test.js
