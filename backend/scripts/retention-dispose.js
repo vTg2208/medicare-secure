@@ -1,5 +1,6 @@
 // Operator-only tool: no dotenv loading, no background job, and dry run by default.
 const {uuid,evaluateRetention}=require('../src/modules/privacy/retention-policy');
+const {withFileMutation}=require('../src/services/file-coordination');
 const fail=message=>{throw Object.assign(new Error(message),{safeForOutput:true});};
 
 async function executeDisposal(client,decisionId,{apply=false,quiesced=false}={}) {
@@ -47,7 +48,7 @@ async function executeDisposal(client,decisionId,{apply=false,quiesced=false}={}
     } catch(error) {if(apply)await client.query('ROLLBACK');throw error;}
 }
 
-async function cleanupDisposalFiles(client,decisionId,{uploadPath,apply=false,quiesced=false}={}) {
+async function cleanupDisposalFilesUnlocked(client,decisionId,{uploadPath,apply=false,quiesced=false}={}) {
     if(!uuid(decisionId))fail('A valid disposal decision is required');
     const decision=(await client.query('SELECT status FROM retention_disposals WHERE id=$1',[decisionId])).rows[0];
     if(!decision||decision.status==='approved')fail('Database disposal must finish before attachment cleanup');
@@ -104,4 +105,11 @@ async function main(args=process.argv.slice(2),env=process.env) {
     }finally{await client.end();}
 }
 if(require.main===module)main().catch(error=>{process.stderr.write((error.safeForOutput?error.message:'Retention operation failed; no success is assumed. Inspect protected operator evidence and retry the dry run.')+'\n');process.exitCode=1;});
+// The caller's dedicated session remains owned by the caller. Hold this lock
+// through filesystem deletion and the cleanup ledger commit, including retries.
+async function cleanupDisposalFiles(client,decisionId,options={}) {
+    return options.apply
+        ? withFileMutation(()=>cleanupDisposalFilesUnlocked(client,decisionId,options),{client})
+        : cleanupDisposalFilesUnlocked(client,decisionId,options);
+}
 module.exports={executeDisposal,cleanupDisposalFiles,main};

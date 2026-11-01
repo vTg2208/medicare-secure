@@ -1,9 +1,11 @@
 const fs = require('fs/promises');
 const path = require('path');
+const crypto = require('node:crypto');
 const { encryptBuffer, decryptBuffer } = require('./file.crypto');
 const Scanner = require('./malware.scanner.service');
 const { scanBuffer } = require('./antivirus.service');
 const config = require('../config/env');
+const { withFileMutation } = require('./file-coordination');
 function credentialContext(file) {
     const relative = path.relative(path.resolve(config.upload.uploadPath), path.resolve(file));
     if (relative.startsWith('..') || path.isAbsolute(relative)) throw new Error('Invalid credential location');
@@ -19,7 +21,21 @@ async function secureCredential(file) {
     const valid = await Scanner.validateMagicNumber(bytes, file.originalname || file.path);
     if (!valid.passed || !['application/pdf', 'image/png', 'image/jpeg'].includes(file.mimetype)) throw Object.assign(new Error('Invalid credential document'), { statusCode: 400 });
     await scanBuffer(bytes);
-    if (magic !== 'SHMSENC2') await fs.writeFile(file.path, encryptBuffer(bytes, credentialContext(file.path)), { mode: 0o600, ...(file.buffer && { flag: 'wx' }) });
+    if (magic !== 'SHMSENC2') await withFileMutation(async () => {
+        const encrypted = encryptBuffer(bytes, credentialContext(file.path));
+        if (file.buffer) return fs.writeFile(file.path, encrypted, { mode: 0o600, flag: 'wx' });
+        // A legacy replacement must leave the previous file intact on failure.
+        // The temporary file is on the same filesystem for atomic publication.
+        const temporary = path.join(path.dirname(file.path), `.credential-rewrite-${crypto.randomUUID()}`);
+        try {
+            if (!(await fs.readFile(file.path)).equals(stored)) throw new Error('Credential changed before replacement');
+            await fs.writeFile(temporary, encrypted, { mode: 0o600, flag: 'wx' });
+            const handle = await fs.open(temporary, 'r+');
+            try { await handle.sync(); } finally { await handle.close(); }
+            if (!(await fs.readFile(file.path)).equals(stored)) throw new Error('Credential changed before replacement');
+            await fs.rename(temporary, file.path);
+        } finally { await fs.unlink(temporary).catch(error => { if (error.code !== 'ENOENT') throw error; }); }
+    });
 }
 async function readCredential(file) {
     const root = await fs.realpath(path.resolve(config.upload.uploadPath));

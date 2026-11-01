@@ -5,13 +5,14 @@ const crypto=require('node:crypto');
 const {Client}=require('pg');
 const {readMigrations}=require('../src/database/migrate');
 const {createDatabaseSnapshot}=require('./database-snapshot');
+const {createCoordinatedBackup}=require('./coordinated-backup');
 const {archiveBackup}=require('./backup-archive');
 const {inspectBundle,encryptionKey,restoreBackup}=require('./backup-helper');
 const quote=value=>`"${value.replaceAll('"','""')}"`;
 
-async function verifyRestoredSnapshot(client,manifest){
+async function verifyRestoredSnapshot(client,manifest,{uploads}={}){
  const consistency=manifest.consistency;
- if(consistency?.mode!=='database-only'||!['public','healthcare'].includes(consistency.schema)||!Array.isArray(consistency.tables)||!consistency.tables.length||consistency.tables.length>200)throw Error('Unsupported recovery manifest');
+ if(!['database-only','coordinated'].includes(consistency?.mode)||!['public','healthcare'].includes(consistency.schema)||!Array.isArray(consistency.tables)||!consistency.tables.length||consistency.tables.length>200)throw Error('Unsupported recovery manifest');
  const schema=quote(consistency.schema);
  const actual=(await client.query(`SELECT c.relname AS name FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname=$1 AND c.relkind IN('r','p') ORDER BY c.relname`,[consistency.schema])).rows.map(row=>row.name);
  if(JSON.stringify(actual)!==JSON.stringify(consistency.tables.map(t=>t.name)))throw Error('Restored table inventory differs from snapshot');
@@ -28,7 +29,8 @@ async function verifyRestoredSnapshot(client,manifest){
  const head=(await client.query(`SELECT last_hash FROM ${schema}.audit_chain_head WHERE singleton=1`)).rows;
  const tail=(await client.query(`SELECT current_hash FROM ${schema}.audit_logs ORDER BY sequence DESC LIMIT 1`)).rows[0]?.current_hash||null;
  if(head.length!==1||head[0].last_hash!==tail)throw Error('Restored audit head differs from retained evidence');
- return {tables:actual.length,auditVerified:true,ledgerVerified:true};
+ const files=consistency.mode==='coordinated'?await require('./backup-file-references').verifySnapshotFiles(client,manifest,uploads):{};
+ return {tables:actual.length,auditVerified:true,ledgerVerified:true,...files};
 }
 
 async function drillRecovery(input,env,parent){
@@ -40,7 +42,7 @@ async function drillRecovery(input,env,parent){
   const manifest=await inspectBundle(input,encryptionKey(env));
   await restoreBackup({input,uploads,env:restoreEnv});created=true;
   client=new Client({host:env.RESTORE_DB_HOST,port:Number(env.RESTORE_DB_PORT),database:name,user:env.RESTORE_DB_USER,password:env.RESTORE_DB_PASSWORD,ssl:false,connectionTimeoutMillis:10000});await client.connect();
-  return await verifyRestoredSnapshot(client,manifest);
+  return await verifyRestoredSnapshot(client,manifest,{uploads});
  }finally{
   if(client)await client.end();
   if(created){
@@ -52,6 +54,8 @@ async function drillRecovery(input,env,parent){
 }
 
 async function runScheduledBackup({env=process.env,store}={}){
+ const mode=env.BACKUP_MODE||'database-only';
+ if(!['database-only','coordinated'].includes(mode))throw Error('Unsupported BACKUP_MODE');
  if(!['127.0.0.1','localhost','::1'].includes(env.RESTORE_DB_HOST)||!Number.isInteger(Number(env.RESTORE_DB_PORT))||Number(env.RESTORE_DB_PORT)<1||Number(env.RESTORE_DB_PORT)>65535||!env.RESTORE_DB_USER)throw Error('Explicit loopback recovery database is required');
  encryptionKey(env);
  const directory=await fs.mkdtemp(path.join(os.tmpdir(),'shms-scheduled-'));await fs.chmod(directory,0o700);
@@ -62,17 +66,17 @@ async function runScheduledBackup({env=process.env,store}={}){
    const ca=path.join(directory,'postgres-ca.crt');await fs.writeFile(ca,env.DB_SSL_CA.replace(/\\n/g,'\n'),{mode:0o444});configured.PGSSLROOTCERT=ca;configured.DB_SSL_CA_FILE=ca;
   }
   const input=path.join(directory,'snapshot.shmsbkp');
-  await createDatabaseSnapshot({output:input,env:configured});
+  await (mode==='coordinated'?createCoordinatedBackup:createDatabaseSnapshot)({output:input,env:configured});
   const manifest=await inspectBundle(input,encryptionKey(env));
   stage='cloud upload or recovery';let recovery;
   const archive=await archiveBackup({input,env:configured,store,verifyRecovery:async downloaded=>{recovery=await drillRecovery(downloaded,configured,directory);}});
   if(!recovery)throw Error('Fresh cloud recovery was not verified');
-  return {createdAt:manifest.createdAt,mode:'database-only',restoreVerified:true,auditVerified:recovery.auditVerified,tables:recovery.tables,...archive};
+  return {createdAt:manifest.createdAt,mode,restoreVerified:true,auditVerified:recovery.auditVerified,tables:recovery.tables,...(mode==='coordinated'&&{filesVerified:recovery.filesVerified}),...archive};
  }catch(error){throw Object.assign(Error(`Backup failed during ${stage}; previous recovery points were not intentionally removed`),{code:'BACKUP_FAILED',cause:error});}
  finally{await fs.rm(directory,{recursive:true,force:true});}
 }
 if(require.main===module)runScheduledBackup().then(async result=>{
  process.stdout.write(JSON.stringify(result)+'\n');
- if(process.env.GITHUB_STEP_SUMMARY)await fs.appendFile(process.env.GITHUB_STEP_SUMMARY,`### Verified encrypted backup\n\nCaptured: ${result.createdAt}\n\nRestored ${result.tables} tables from the fresh cloud download; migration ledger and audit chain passed. Uploaded ${result.uploaded} copies; removed ${result.pruned} expired versions.\n\n${result.objects.map(f=>`- \`${f.fileName}\``).join('\n')}\n`);
+ if(process.env.GITHUB_STEP_SUMMARY)await fs.appendFile(process.env.GITHUB_STEP_SUMMARY,`### Verified encrypted backup\n\nCaptured: ${result.createdAt}\n\nRestored ${result.tables} tables from the fresh cloud download; migration ledger and audit chain passed.${result.mode==='coordinated'?` Verified ${result.filesVerified} encrypted uploaded files and their database references.`:''} Uploaded ${result.uploaded} copies; removed ${result.pruned} expired versions.\n\n${result.objects.map(f=>`- \`${f.fileName}\``).join('\n')}\n`);
 }).catch(error=>{const code=/^[A-Z0-9_]{1,40}$/.test(error.cause?.code||'')?error.cause.code:'VERIFICATION_FAILED';process.stderr.write(`Scheduled backup failed (${code}). Check database connectivity, external-file policy, credentials and recovery service. Required recovery points remain protected.\n`);process.exitCode=1;});
 module.exports={runScheduledBackup,verifyRestoredSnapshot,drillRecovery};

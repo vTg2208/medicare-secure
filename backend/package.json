@@ -18,6 +18,7 @@
     "backup": "node scripts/backup.js",
     "backup:archive": "node scripts/backup-archive.js",
     "backup:online": "node scripts/database-snapshot.js",
+    "backup:coordinated": "node scripts/coordinated-backup.js",
     "backup:scheduled": "node scripts/scheduled-backup.js",
     "backup:restore-drill": "node scripts/restore-backup.js",
     "files:migrate-encryption": "node scripts/migrate-file-encryption.js",
