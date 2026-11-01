@@ -1,0 +1,696 @@
+AI MEDICAL CHATBOT IMPLEMENTATION DOCUMENT
+(Interactive Pre-Screening Chatbot for Secure Healthcare Management System)
+
+---
+
+1. FEATURE OVERVIEW
+
+---
+
+Feature Name:
+AI Medical Chatbot for Patient Pre-Screening
+
+Purpose:
+The AI chatbot assists patients before scheduling a medical visit by collecting symptoms through an interactive conversation, retrieving relevant medical knowledge from trusted documents, generating a structured medical summary, and recommending the appropriate medical department.
+
+The chatbot DOES NOT diagnose diseases or prescribe medication.
+It only performs pre-screening and triage assistance.
+
+Benefits:
+
+• Improves hospital triage efficiency
+• Helps doctors review patient condition before consultation
+• Prioritizes urgent cases
+• Reduces workload on medical staff
+• Improves patient interaction with the system
+
+---
+
+2. SYSTEM OBJECTIVES
+
+---
+
+1. Provide an interactive chatbot interface for patients.
+2. Extract symptoms from natural language conversation.
+3. Retrieve medical knowledge from trusted documents.
+4. Ask dynamic follow-up questions.
+5. Suggest the appropriate medical department.
+6. Generate structured SOAP medical summaries.
+7. Store triage sessions for doctor review.
+8. Log chatbot decisions for audit and compliance.
+
+---
+
+3. SYSTEM WORKFLOW
+
+---
+
+Patient Login
+↓
+Open AI Chatbot
+↓
+Interactive Symptom Conversation
+↓
+Medical Knowledge Retrieval
+↓
+AI Reasoning Engine
+↓
+Follow-up Questions
+↓
+SOAP Summary Generation
+↓
+Department Recommendation
+↓
+Doctor Reviews Summary
+↓
+EMR Creation
+↓
+Audit Logging
+
+---
+
+4. SYSTEM ARCHITECTURE
+
+---
+
+Frontend Layer
+React Chat Interface
+
+Backend Layer
+Node.js API Gateway
+
+AI Processing Layer
+Python AI Service (FastAPI)
+
+Knowledge Layer
+Medical Documents + Vector Database
+
+Architecture Flow
+
+Patient UI
+│
+▼
+React Chat Interface
+│
+▼
+Node Backend API
+│
+▼
+AI Chat Service (Python)
+│
+├── LLM Reasoning Engine
+├── Vector Database
+├── Conversation Memory
+└── Triage Engine
+│
+▼
+Medical Knowledge Documents
+
+---
+
+5. PROJECT DIRECTORY STRUCTURE
+
+---
+
+Secure_Healthcare_Management_System
+
+backend/
+frontend/
+mock-backend/
+ai-service/
+
+AI Service Structure
+
+ai-service/
+
+app.py
+chatbot.py
+vector_store.py
+document_loader.py
+memory.py
+triage_engine.py
+soap_generator.py
+
+medical_docs/
+cardiology.txt
+neurology.txt
+infectious_disease.txt
+emergency_guidelines.txt
+
+requirements.txt
+
+---
+
+6. TECHNOLOGY STACK
+
+---
+
+Frontend
+React
+Vite
+JavaScript
+CSS / Tailwind
+
+Backend
+Node.js
+Express
+
+AI Service
+Python
+FastAPI
+
+AI Libraries
+
+LangChain
+SentenceTransformers
+OpenAI GPT or Llama
+ChromaDB
+
+Database
+
+PostgreSQL
+
+---
+
+7. REQUIRED PYTHON LIBRARIES
+
+---
+
+The AI service requires the following Python packages.
+
+requirements.txt
+
+fastapi
+uvicorn
+langchain
+chromadb
+sentence-transformers
+pydantic
+python-dotenv
+openai
+
+These libraries enable conversational reasoning, vector storage, and document retrieval.
+
+---
+
+8. MEDICAL KNOWLEDGE BASE
+
+---
+
+The chatbot does not use hardcoded symptoms.
+
+Instead it retrieves knowledge from medical documents.
+
+Possible sources:
+
+WHO clinical guidelines
+PubMed abstracts
+CDC symptom documentation
+ICD-10 disease descriptions
+Hospital triage guidelines
+
+Example document chunk
+
+Chest pain associated with shortness of breath
+may indicate a cardiac emergency.
+
+Recommended department: Cardiology.
+
+---
+
+9. DOCUMENT PROCESSING PIPELINE
+
+---
+
+Step 1
+Load medical documents.
+
+Step 2
+Split documents into smaller text chunks.
+
+Step 3
+Generate embeddings for each chunk.
+
+Step 4
+Store embeddings in vector database.
+
+Processing Flow
+
+Medical Document
+↓
+Text Chunking
+↓
+Embedding Generation
+↓
+Vector Storage
+
+---
+
+10. VECTOR DATABASE
+
+---
+
+Vector databases allow semantic search of medical knowledge.
+
+Supported options:
+
+FAISS
+ChromaDB
+Pinecone
+Weaviate
+
+Recommended option for the project:
+
+ChromaDB
+
+Example retrieval process
+
+User symptom query
+↓
+Convert query to embedding
+↓
+Search vector database
+↓
+Retrieve most relevant medical document
+
+---
+
+11. CHATBOT CONVERSATION ENGINE
+
+---
+
+The chatbot maintains conversation context using memory.
+
+Example conversation
+
+Patient:
+I have stomach pain.
+
+Bot:
+How long have you experienced the pain?
+
+Patient:
+Since yesterday.
+
+Bot:
+Do you have nausea or vomiting?
+
+Patient:
+Yes.
+
+Bot:
+Based on your symptoms you may need consultation with Gastroenterology.
+
+Conversation memory ensures the chatbot asks relevant follow-up questions.
+
+---
+
+12. AI REASONING PIPELINE
+
+---
+
+Chatbot reasoning pipeline
+
+User Message
+↓
+Conversation Memory
+↓
+Embedding Generation
+↓
+Vector Database Retrieval
+↓
+Relevant Medical Documents
+↓
+LLM Reasoning
+↓
+Follow-up Question OR Department Recommendation
+↓
+SOAP Summary Generation
+
+---
+
+13. SOAP MEDICAL SUMMARY GENERATION
+
+---
+
+After the conversation the chatbot generates a SOAP report.
+
+SOAP format
+
+S – Subjective
+Patient symptoms and complaints.
+
+O – Objective
+Observed or measurable information.
+
+A – Assessment
+Possible condition or risk category.
+
+P – Plan
+Recommended department or next step.
+
+Example
+
+Subjective:
+Patient reports chest pain and shortness of breath.
+
+Objective:
+Symptoms present for two hours.
+
+Assessment:
+Possible cardiac condition.
+
+Plan:
+Recommend cardiology consultation.
+
+---
+
+14. DATABASE DESIGN
+
+---
+
+Table: triage_sessions
+
+id
+patient_id
+conversation
+soap_summary
+recommended_department
+priority
+confidence_score
+status
+created_at
+updated_at
+
+Purpose
+
+Store chatbot interactions
+Provide doctor review summaries
+Maintain triage history
+
+---
+
+15. API ENDPOINTS
+
+---
+
+Chatbot API endpoints
+
+POST /api/chatbot/start
+Start chatbot session.
+
+POST /api/chatbot/message
+Send patient message to chatbot.
+
+POST /api/chatbot/analyze
+Analyze symptoms and retrieve knowledge.
+
+GET /api/chatbot/summary/:id
+Retrieve generated SOAP summary.
+
+Example request
+
+POST /api/chatbot/message
+
+{
+"patient_id": 123,
+"message": "I have fever and cough"
+}
+
+Example response
+
+{
+"reply": "How long have you had the fever?"
+}
+
+---
+
+16. FRONTEND IMPLEMENTATION
+
+---
+
+Create chatbot page
+
+frontend/src/pages/Patient/AIChatbot.jsx
+
+UI Components
+
+Chat message window
+Message input box
+Conversation history
+Generate summary button
+
+Example Chat UI
+
+AI Health Assistant
+
+Bot: What symptoms are you experiencing?
+
+Patient: I have severe headache.
+
+Bot: Do you have nausea?
+
+---
+
+17. BACKEND INTEGRATION
+
+---
+
+Node backend acts as an API gateway.
+
+Communication flow
+
+React Frontend
+↓
+Node.js Backend
+↓
+Python AI Service
+
+Example call
+
+POST http://localhost:8000/chat
+
+---
+
+18. EMERGENCY DETECTION
+
+---
+
+The chatbot must detect emergency symptoms.
+
+Examples
+
+Chest pain
+Stroke indicators
+Severe breathing difficulty
+Uncontrolled bleeding
+
+If detected the chatbot triggers an emergency alert.
+
+Example message
+
+Emergency symptoms detected.
+Please seek immediate medical attention.
+
+---
+
+19. ERROR HANDLING
+
+---
+
+If AI service unavailable
+→ return fallback message.
+
+If vector database empty
+→ recommend general physician.
+
+If confidence score below threshold
+→ ask additional follow-up questions.
+
+---
+
+20. SECURITY AND COMPLIANCE
+
+---
+
+Healthcare data protection measures
+
+Encrypt chatbot conversation data
+Use TLS encryption for communication
+Restrict chatbot access to authenticated users
+Log all chatbot decisions in audit logs
+Prevent sensitive patient data exposure in prompts
+
+---
+
+21. AUDIT LOGGING
+
+---
+
+All chatbot interactions must be recorded.
+
+Example audit record
+
+user_id
+action = CHATBOT_TRIAGE
+purpose = PRE_SCREENING
+timestamp
+ip_address
+
+This ensures regulatory compliance and traceability.
+
+---
+
+22. TESTING STRATEGY
+
+---
+
+Unit Testing
+
+test_vector_search.py
+test_triage_engine.py
+test_chat_memory.py
+
+API Testing
+
+/chat endpoint
+/chatbot/start
+/chatbot/message
+
+End-to-End Testing
+
+Patient → Chatbot conversation → SOAP summary → Doctor dashboard
+
+---
+
+23. FUTURE ENHANCEMENTS
+
+---
+
+AI severity scoring
+Multilingual chatbot support
+Voice-based chatbot interaction
+Integration with wearable health devices
+Advanced disease probability prediction
+
+---
+
+2. Mention Docker (Optional but Nice)
+
+Since your project already has:
+
+docker-compose.yml
+
+Add:
+
+AI Service runs as a separate container
+
+Example:
+
+services:
+ backend
+ frontend
+ ai-service
+
+This shows the system is deployable.
+
+3. Add Security Note (Important for Healthcare)
+
+Your system is HIPAA/GDPR focused, so add a short section:
+
+Security Considerations
+
+• Encrypt chatbot conversations
+• Restrict chatbot to authenticated patients
+• Log all triage decisions in audit_logs
+• Mask sensitive patient identifiers in AI prompts
+• Ensure TLS encryption between services
+
+Just 4–5 lines is enough.
+
+4. Clarify LLM Choice
+
+You asked:
+
+OpenAI or Llama?
+
+For a project, this is the safest default:
+
+OpenAI GPT-4 via LangChain
+
+Because:
+
+• easier
+• better reasoning
+• no GPU needed
+
+But keep architecture flexible so you can switch to:
+
+Llama 3
+Mistral
+
+later.
+
+
+1 Add AI Reasoning Pipeline Section
+
+Right now it is implied but not explicitly written.
+
+Add something like:
+
+AI Processing Pipeline
+
+User Message
+     ↓
+Conversation Memory
+     ↓
+Embedding Generation
+     ↓
+Vector Search (ChromaDB)
+     ↓
+Relevant Medical Documents
+     ↓
+LLM Reasoning (GPT-4)
+     ↓
+Follow-up Question OR Department Recommendation
+     ↓
+SOAP Summary Generation
+
+This makes the RAG flow very clear.
+
+Retrieval-Augmented Generation (RAG) allows the chatbot to retrieve relevant medical knowledge from documents before generating responses using the LLM. This ensures responses are grounded in trusted medical sources rather than relying solely on the language model.
+
+2 Mention Confidence Threshold
+
+You included:
+
+confidence_score
+
+But the logic should be defined.
+
+Example:
+
+If confidence_score < 0.6
+→ recommend General Physician
+
+This improves medical safety.
+
+3 Add Emergency Detection Rule Example
+
+You mention emergency detection but not examples.
+
+Add something like:
+
+Emergency conditions detected if symptoms match:
+
+• chest pain + breathlessness
+• stroke indicators
+• severe bleeding
+• unconsciousness
+
+Response:
+
+Emergency symptoms detected.
+Please seek immediate medical attention.
+
+## END OF DOCUMENT

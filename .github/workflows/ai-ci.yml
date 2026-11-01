@@ -1,0 +1,37 @@
+name: AI service CI
+on:
+  push:
+    branches: [main]
+    paths: ['ai-service/**', '.github/workflows/ai-ci.yml']
+  pull_request:
+    paths: ['ai-service/**', '.github/workflows/ai-ci.yml']
+permissions:
+  contents: read
+jobs:
+  offline-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12']
+    defaults:
+      run:
+        working-directory: ai-service
+    env:
+      AI_RAG_ENABLED: 'false'
+      GROQ_API_KEY: ''
+      AI_SERVICE_TOKEN: ''
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: ai-service/requirements*.txt
+      - run: python -m pip install -r requirements-dev.txt
+      - run: python -m pip check
+      - name: Run offline tests (external network forbidden by conftest)
+        run: python -m pytest -q
+      - name: Build minimal production image
+        if: matrix.python-version == '3.12'
+        working-directory: .
+        run: docker build --tag secure-healthcare-ai:ci ./ai-service

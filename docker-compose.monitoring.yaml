@@ -1,0 +1,136 @@
+# Docker Compose for Monitoring Stack
+# Prometheus + Grafana + Exporters
+# Usage: docker compose -f docker-compose.monitoring.yaml up -d
+
+services:
+  # ── Prometheus ──────────────────────────────────────────
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: healthcare_prometheus
+    restart: unless-stopped
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    ports:
+      - "127.0.0.1:9090:9090"
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/prometheus/alerts:/etc/prometheus/alerts:ro
+      - prometheus_data:/prometheus
+    networks:
+      - healthcare_dev
+      - monitoring
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # ── Grafana ─────────────────────────────────────────────
+  grafana:
+    image: grafana/grafana:latest
+    container_name: healthcare_grafana
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:?Generate a local monitoring password with setup-local.js}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_ROOT_URL=http://localhost:3001
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel,grafana-clock-panel
+      - GF_AUTH_ANONYMOUS_ENABLED=false
+      - GF_LOG_LEVEL=info
+      - GF_DATABASE_TYPE=sqlite3
+    ports:
+      - "127.0.0.1:3001:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+    depends_on:
+      - prometheus
+    networks:
+      - monitoring
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # ── PostgreSQL Exporter ─────────────────────────────────
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:latest
+    container_name: healthcare_postgres_exporter
+    restart: unless-stopped
+    environment:
+      DATA_SOURCE_NAME: "postgresql://${DB_USER:-healthcare_owner}:${DB_PASSWORD:?Configure local database credentials}@postgres:5432/${DB_NAME:-healthcare}?sslmode=disable"
+      PG_EXPORTER_EXTEND_QUERY_PATH: /etc/postgres_exporter/queries.yaml
+    ports:
+      - "127.0.0.1:9187:9187"
+    volumes:
+      - ./monitoring/exporters/postgres-queries.yaml:/etc/postgres_exporter/queries.yaml:ro
+    depends_on:
+      - prometheus
+    networks:
+      - healthcare_dev
+      - monitoring
+
+  # ── Node Exporter (System Metrics) ──────────────────────
+  node-exporter:
+    profiles: [host-metrics]
+    image: prom/node-exporter:latest
+    container_name: healthcare_node_exporter
+    restart: unless-stopped
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/rootfs'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    ports:
+      - "127.0.0.1:9100:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    networks:
+      - monitoring
+
+  # ── cAdvisor (Container Metrics) ────────────────────────
+  cadvisor:
+    profiles: [host-metrics]
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: healthcare_cadvisor
+    restart: unless-stopped
+    privileged: true
+    ports:
+      - "127.0.0.1:8081:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - /dev/disk:/dev/disk:ro
+    devices:
+      - /dev/kmsg
+    networks:
+      - monitoring
+    command:
+      - '--docker_only=true'
+      - '--housekeeping_interval=30s'
+
+networks:
+  healthcare_dev:
+    external: true
+    name: ${COMPOSE_PROJECT_NAME:-medicare}_healthcare_dev
+  monitoring:
+    driver: bridge
+
+volumes:
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local

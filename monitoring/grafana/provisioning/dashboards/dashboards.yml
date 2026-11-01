@@ -1,0 +1,10 @@
+# Grafana Dashboard Provisioning
+# Create dashboards manually in the UI or import from grafana.com
+# Recommended community dashboards:
+# - Node Exporter Full (ID: 1860)
+# - PostgreSQL Database (ID: 9628)
+# - Docker & Container metrics (ID: 193)
+
+apiVersion: 1
+
+providers: []

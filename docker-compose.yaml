@@ -1,0 +1,3 @@
+# Default stack is local development; requires Docker Compose 2.20+.
+include:
+  - docker-compose.dev.yaml

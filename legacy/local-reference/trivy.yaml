@@ -1,0 +1,33 @@
+# Trivy Security Scanner Configuration
+# Docs: https://aquasecurity.github.io/trivy/latest/docs/configuration/
+
+# Severity levels to report (comma-separated)
+severity: CRITICAL,HIGH,MEDIUM
+
+scan:
+  security-checks:
+    - vuln    # CVE vulnerabilities in dependencies
+    - config  # IaC misconfigurations
+    - secret  # Exposed credentials/keys
+  
+# Report unfixed vulns (set true to ignore, false for strict mode)
+ignore-unfixed: false
+
+# Database settings
+db:
+  repository: ghcr.io/aquasecurity/trivy-db
+  
+# Output format (table, json, sarif)
+format: table
+
+# Exit with error code 1 if vulnerabilities found (fails CI/CD)
+exit-code: 1
+
+# Max scan duration
+timeout: 10m
+
+# Vulnerability types to scan
+vulnerability:
+  type:
+    - os      # Base image OS packages
+    - library # Application dependencies

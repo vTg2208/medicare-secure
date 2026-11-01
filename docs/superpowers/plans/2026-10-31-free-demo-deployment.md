@@ -1,0 +1,16 @@
+# Free demo deployment
+
+Goal: publish the repaired application as a clearly labeled synthetic-data demo using the user's browser-authenticated free Vercel, Render and Supabase accounts.
+
+Authorization: deploy requested; no paid services or upgrades. Hosting account actions use the user's Chrome session. The user subsequently authorized terminal source uploads; the GitHub CLI was verified as vTg2208 before pushing the clean snapshot. Connected account plugins belong to other people and must never be used. Existing projects/data stay intact. Source publication excludes history, credentials, snapshots, logs, uploaded documents and local inspection data.
+
+Architecture: Vercel serves the static frontend and proxies /api to a Render free Node service. A new, isolated Supabase PostgreSQL database stores application data in a private schema. Free demo configuration disables public registration, outbound email, AI and new uploads when required providers/scanning are unavailable; it never bypasses patient consent, token validation, encryption or production scanning. No persistent attachment adapter is needed for this deployment because uploads are unavailable.
+
+- [x] Export isolated managed database schema with migration checksums and local regressions; verify hosted schema isolation. Restricted runtime role setup remains below.
+- [x] Add explicit demo policy, safe synthetic seed export and demo notices with regressions.
+- [x] Configure Vercel/Render hosting and export a clean private deployment repository without legacy history.
+- [x] Provision isolated free Supabase project through the browser; user handles credential entry if required by browser policy.
+- [x] Deploy database/backend/frontend, seed synthetic accounts, and run external end-to-end checks.
+- [x] Record URLs, private demo credentials, free-plan limits, disabled integrations and executed verification.
+
+Completed 2026-11-01 (Asia/Calcutta). Frontend https://medicare-ebon-seven.vercel.app; API https://medicare-secure-api.onrender.com; clean private source vTg2208/medicare-secure, final backend revision940639f. Vercel Hobby, Render Free Singapore, and new Supabase Free medicare project ghselatqszqnoteqwyef are configured. All17 migrations/43 private tables verified; anon/authenticated schema usage false. Owner-created healthcare_api login has restricted application grants, no schema administration and no audit/migration mutation. Sixteen private synthetic accounts seeded. Added official Supabase CA for strict TLS; initial missing-CA startup failed closed and subsequent deployment/readiness succeeded. Live patient/doctor login, records, role denial, consent discovery/create/update/scope restoration, audit, logout, demo notices and queue correction verified. Live tests found and repaired timestamp precision and missing patient-header fields; red regressions observed, then120 backend+57 frontend+33 HTTP/Postgres+4 managed DB checks passed. Independent final reviews approved the scoped fixes. No connected account plugins were used for deployment; no paid plan or real patient data was added. Full evidence and limits: docs/free-hosting-deployment.md. Existing unrelated resources and original Git history preserved.

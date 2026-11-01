@@ -1,0 +1,13 @@
+# Trivy Ignore File - Security Exception Tracking
+# Add CVE IDs that are accepted risks or false positives
+# Format: CVE-YYYY-NNNNN  # Required: Business justification
+#
+# All exceptions must be:
+# 1. Documented with reason
+# 2. Reviewed quarterly
+# 3. Approved by security team for HIPAA compliance
+#
+# Example:
+# CVE-2023-12345  # Not applicable: Windows-only vuln, we use Linux containers
+
+# Add your exceptions below:
