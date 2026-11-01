@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const MalwareScannerService = require('./malware.scanner.service');
 const { encryptBuffer, decryptBuffer } = require('./file.crypto');
 const config = require('../config/env');
+const { withFileMutation } = require('./file-coordination');
 
 class FileUploadService {
     /**
@@ -30,7 +31,7 @@ class FileUploadService {
 
             if (!scanResults.safe) {
                 // Quarantine suspicious file
-                if (file.path) await fs.unlink(file.path).catch(() => {});
+                if (file.path) await withFileMutation(() => fs.unlink(file.path)).catch(() => {});
 
                 throw new Error(`File failed security scan: ${scanResults.threats.join(', ')}`);
             }
@@ -43,6 +44,7 @@ class FileUploadService {
         const storagePath = this.getStoragePath(patientId, fileType);
 
         // Create directory if it doesn't exist
+        return withFileMutation(async () => {
         await fs.mkdir(storagePath, { recursive: true });
 
         // Final file path
@@ -66,6 +68,7 @@ class FileUploadService {
             fileHash,
             uploadedAt: new Date()
         };
+        });
     }
 
     /**
@@ -147,6 +150,7 @@ class FileUploadService {
      * @returns {Promise<void>}
      */
     static async deleteFile(filePath) {
+        return withFileMutation(async () => {
         try {
             await fs.unlink(filePath);
         } catch (error) {
@@ -155,6 +159,7 @@ class FileUploadService {
             }
             // File doesn't exist, ignore
         }
+        });
     }
 
     /**

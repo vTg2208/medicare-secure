@@ -106,7 +106,7 @@ async function backupLocation(uploadRoot, requested) {
     return backup;
 }
 
-async function migrateFileEncryption({ uploads, apply = false, backupDirectory, env = process.env } = {}) {
+async function migrateFileEncryptionUnlocked({ uploads, apply = false, backupDirectory, env = process.env } = {}) {
     if (!/^[a-f\d]{64}$/i.test(env.ENCRYPTION_KEY || '')) throw fault('KEY_REQUIRED', 'A valid existing application encryption key is required');
     const key = Buffer.from(env.ENCRYPTION_KEY, 'hex');
     const requested = uploads || env.UPLOAD_PATH;
@@ -155,6 +155,15 @@ async function migrateFileEncryption({ uploads, apply = false, backupDirectory, 
         } finally { verified.plaintext.fill(0); await fs.unlink(temporary).catch(error => { if (error.code !== 'ENOENT') throw error; }); }
     }
     return summary;
+}
+
+async function migrateFileEncryption(options = {}) {
+    if (!options.apply) return migrateFileEncryptionUnlocked(options);
+    // Preflight remains side-effect free and preserves the operator's existing
+    // key/path/quiescence errors before acquiring a database lock.
+    await migrateFileEncryptionUnlocked({ ...options, apply: false });
+    return require('../src/services/file-coordination').withFileMutation(
+        () => migrateFileEncryptionUnlocked(options), { env: { ...process.env, ...options.env } });
 }
 
 function argumentsFor(argv) {

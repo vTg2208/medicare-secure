@@ -13,6 +13,7 @@ mock('src/config/env', config);
 mock('src/utils/logger', { debug() {}, error() {}, warn() {} });
 const dbFailure = new Error('audit storage unavailable');
 mock('src/config/db', { query: async () => { throw dbFailure; } });
+mock('src/services/file-coordination', { withFileMutation: run => run() });
 let scannerError;
 mock('src/services/antivirus.service', { scanBuffer: async () => { if (scannerError) throw scannerError; } });
 const auditService = require(path.join(root, 'src/services/audit.service'));

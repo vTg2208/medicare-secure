@@ -7,6 +7,9 @@ const mockModule = (modulePath, exports) => {
 };
 const config = { upload: { uploadPath: '', maxFileSizeMB: 10 }, security: { encryptionKey: 'ab'.repeat(32) } };
 mockModule('../../src/config/env', config);
+// This suite isolates scanning/encryption; PostgreSQL lock exclusion is covered
+// by coordinated-backup.integration.test.js against independent real sessions.
+mockModule('../../src/services/file-coordination', { withFileMutation: run => run() });
 const scanBuffer = vi.fn().mockResolvedValue(undefined);
 mockModule('../../src/services/antivirus.service', { scanBuffer });
 for (const modulePath of ['../../src/services/file.crypto', '../../src/services/file.upload.service']) delete require.cache[require.resolve(modulePath)];

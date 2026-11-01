@@ -1,4 +1,5 @@
 const fs = require('fs/promises');
+const { withFileMutation } = require('../../services/file-coordination');
 const { transaction } = require('../../config/db');
 const { createUser, userExists } = require('../../models/user.model');
 const { createDoctorProfile } = require('../../models/doctor.model');
@@ -44,6 +45,6 @@ module.exports = async (req, res) => {
         return res.status(error.code === '23505' ? 409 : error.statusCode || 500).json({ success: false,
             message: error.statusCode ? error.message : 'Doctor registration could not be completed' });
     } finally {
-        if (!committed) for (const file of files) await fs.unlink(file.path).catch(() => {});
+        if (!committed) for (const file of files) await withFileMutation(() => fs.unlink(file.path)).catch(() => {});
     }
 };

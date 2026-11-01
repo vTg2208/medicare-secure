@@ -66,7 +66,7 @@ const uploadResult = async (req, res, next) => {
         req.auditEventRecorded = true;
         res.status(201).json({ success: true, data: result, message: 'Lab result uploaded successfully' });
     } catch (error) {
-        if (fileInfo?.filePath) await require('fs/promises').unlink(fileInfo.filePath).catch(() => {});
+        if (fileInfo?.filePath) await FileUploadService.deleteFile(fileInfo.filePath).catch(() => {});
         next(error);
     }
 };
