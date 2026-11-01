@@ -74,6 +74,7 @@ Role membership alone does not grant unrestricted record access. Server-side che
 | --- | --- |
 | Web application | React 19, React Router, Vite 8, Tailwind CSS, and shared Medicare theme tokens. |
 | API | Node.js 24, Express 4, and PostgreSQL via `pg`. |
+| Optional AI service | Python, FastAPI, Groq integration, and separately enabled retrieval. |
 | Authentication | bcrypt, JWT access and refresh tokens, database-backed sessions, and WebAuthn passkeys. |
 | Protected data | AES-256-GCM application encryption and ClamAV upload scanning. |
 | Verification | Vitest, React Testing Library, Supertest, Node.js test runner, and ESLint. |
@@ -100,6 +101,8 @@ These safeguards support compliance-aware engineering grounded in GDPR and HIPAA
 - **PostgreSQL 18** for parity with the production Compose template and CI, with an empty local database and a migration-capable owner account.
 - **Git** and access to this repository.
 - An SMTP service for email verification and invitations. ClamAV is required for document upload workflows. Neither integration is necessary just to start the API and frontend.
+
+Docker Compose 2.20 or later can supply the local dependencies. After cloning, Windows users can run `./scripts/dev-bootstrap.ps1` in PowerShell to install locked Node dependencies, generate missing local secrets, validate configuration, and start PostgreSQL, Mailpit, ClamAV, the API and frontend. Existing environment files and database volumes are preserved. Continue with administrator setup once the stack is ready; follow the numbered configuration steps below for native development. See [DEVOPS.md](DEVOPS.md) for both approaches.
 
 ### 1. Clone and install
 
@@ -196,6 +199,8 @@ npm run build
 
 The frontend build includes the shared-theme check. GitHub Actions also runs dependency audits and production container checks; the backend workflow provisions PostgreSQL for database verification.
 
+The optional AI service has its own [setup and offline test guide](ai-service/README.md). Its CI runs on Python 3.11 and 3.12, blocks external provider calls in tests, and builds the minimal service image.
+
 Integration tests use `npm run test:integration` from `backend`. They require an explicitly selected, migrated, disposable loopback PostgreSQL database on port `55432`, a database name containing `test`, a role allowed to create test databases, `NODE_ENV=test`, `RUN_DB_TESTS=true`, and `RUN_BROWSER_DB_TESTS=true`. Recovery cases also require matching `pg_dump` and `pg_restore` tools. See the [backend CI workflow](.github/workflows/backend-ci.yml) for the complete environment; never target a hosted or working application database.
 
 ## Deployment
@@ -215,14 +220,17 @@ For self-managed infrastructure, [docker-compose.prod.yaml](docker-compose.prod.
 ```text
 .
 ├── frontend/                    # React application, shared theme, and UI tests
+├── ai-service/                  # Optional FastAPI intake service and offline tests
 ├── backend/
 │   ├── src/modules/             # Clinical, identity, consent, and governance APIs
 │   ├── src/database/ordered/    # Checksum-tracked SQL migrations
 │   ├── scripts/                # Provisioning, backup, and operator tools
 │   └── tests/                  # Unit, HTTP, database, and recovery tests
 ├── deployment/                  # Infrastructure entrypoints and TLS support
+├── scripts/                     # Local setup, validation, and migration helpers
 ├── monitoring/                  # Monitoring and alert configuration
 ├── docs/                        # Architecture, requirements, and operations
+├── legacy/                      # Historical reference material, outside runtime builds
 ├── .github/workflows/           # Backend and frontend CI
 ├── docker-compose.prod.yaml     # Self-managed production services
 └── STYLEGUIDE.md                 # Shared Medicare design system
@@ -233,6 +241,9 @@ For self-managed infrastructure, [docker-compose.prod.yaml](docker-compose.prod.
 | Guide | Use it for |
 | --- | --- |
 | [Problem statement](docs/problem-statement.md) | Project objectives and required scope. |
+| [Operations runbook](DEVOPS.md) | Local Docker setup, environment validation, and service operations. |
+| [AI service guide](ai-service/README.md) | Optional provider setup, retrieval, and offline verification. |
+| [Repository preservation](docs/repository-preservation.md) | Recreating the checkout and keeping private recovery material separate. |
 | [Requirement coverage](docs/requirements-traceability.md) | Implementation evidence, optional scope, and operational obligations. |
 | [Architecture and threat model](docs/architecture-threat-model.md) | Trust boundaries, authorization, and tested threat responses. |
 | [Audit integrity](docs/clinical-audit-integrity.md) | Clinical evidence, append-only history, and integrity guarantees. |

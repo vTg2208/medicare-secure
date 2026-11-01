@@ -1,0 +1,214 @@
+name: Security Scanning
+
+on:
+  push:
+    branches: [main, develop, staging]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    # Run security scan daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:  # Manual trigger
+
+permissions:
+  contents: read
+  security-events: write  # For uploading SARIF results
+
+jobs:
+  trivy-scan:
+    name: Trivy Security Scan
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target: [backend, frontend]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Build ${{ matrix.target }} image
+        run: |
+          docker compose -f docker-compose.dev.yaml build ${{ matrix.target }}
+      
+      - name: Run Trivy vulnerability scanner (Image)
+        uses: aquasecurity/trivy-action@master
+        continue-on-error: true
+        with:
+          image-ref: 'healthcare_${{ matrix.target }}_dev:latest'
+          format: 'sarif'
+          output: 'trivy-${{ matrix.target }}-image.sarif'
+          severity: 'CRITICAL,HIGH'
+          ignore-unfixed: false
+          timeout: '10m'
+      
+      - name: Check if image scan SARIF was generated
+        id: check-image
+        run: |
+          if [ -f "trivy-${{ matrix.target }}-image.sarif" ]; then
+            echo "file_exists=true" >> $GITHUB_OUTPUT
+            echo "✓ Image scan SARIF file generated"
+          else
+            echo "file_exists=false" >> $GITHUB_OUTPUT
+            echo "⚠ No image scan SARIF file generated"
+          fi
+        shell: bash
+      
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && steps.check-image.outputs.file_exists == 'true'
+        with:
+          sarif_file: 'trivy-${{ matrix.target }}-image.sarif'
+          category: 'trivy-${{ matrix.target }}-image'
+      
+      - name: Run Trivy vulnerability scanner (Filesystem)
+        uses: aquasecurity/trivy-action@master
+        continue-on-error: true
+        with:
+          scan-type: 'fs'
+          scan-ref: './${{ matrix.target }}'
+          format: 'sarif'
+          output: 'trivy-${{ matrix.target }}-fs.sarif'
+          severity: 'CRITICAL,HIGH,MEDIUM'
+          ignore-unfixed: false
+      
+      - name: Check if filesystem scan SARIF was generated
+        id: check-fs
+        run: |
+          if [ -f "trivy-${{ matrix.target }}-fs.sarif" ]; then
+            echo "file_exists=true" >> $GITHUB_OUTPUT
+            echo "✓ Filesystem scan SARIF file generated"
+          else
+            echo "file_exists=false" >> $GITHUB_OUTPUT
+            echo "⚠ No filesystem scan SARIF file generated"
+          fi
+        shell: bash
+      
+      - name: Upload Filesystem scan results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && steps.check-fs.outputs.file_exists == 'true'
+        with:
+          sarif_file: 'trivy-${{ matrix.target }}-fs.sarif'
+          category: 'trivy-${{ matrix.target }}-dependencies'
+      
+      - name: Generate detailed report
+        uses: aquasecurity/trivy-action@master
+        continue-on-error: true
+        with:
+          image-ref: 'healthcare_${{ matrix.target }}_dev:latest'
+          format: 'json'
+          output: 'trivy-${{ matrix.target }}-report.json'
+          severity: 'CRITICAL,HIGH,MEDIUM,LOW'
+      
+      - name: Upload scan report as artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: trivy-${{ matrix.target }}-reports
+          path: |
+            trivy-${{ matrix.target }}-*.json
+            trivy-${{ matrix.target }}-*.sarif
+          retention-days: 30
+
+  trivy-config-scan:
+    name: Trivy IaC & Config Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Run Trivy config scanner
+        uses: aquasecurity/trivy-action@master
+        continue-on-error: true
+        with:
+          scan-type: 'config'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-config.sarif'
+          severity: 'CRITICAL,HIGH,MEDIUM'
+          skip-dirs: 'node_modules,build'
+      
+      - name: Check if config scan SARIF was generated
+        id: check-config
+        run: |
+          if [ -f "trivy-config.sarif" ]; then
+            echo "file_exists=true" >> $GITHUB_OUTPUT
+            echo "✓ Config scan SARIF file generated"
+          else
+            echo "file_exists=false" >> $GITHUB_OUTPUT
+            echo "⚠ No config scan SARIF file generated"
+          fi
+        shell: bash
+      
+      - name: Upload config scan results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && steps.check-config.outputs.file_exists == 'true'
+        with:
+          sarif_file: 'trivy-config.sarif'
+          category: 'trivy-config'
+      
+      - name: Run Trivy secret scanner
+        uses: aquasecurity/trivy-action@master
+        continue-on-error: true
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-secrets.sarif'
+          scanners: 'secret'
+          severity: 'CRITICAL,HIGH'
+          skip-dirs: 'node_modules,build'
+      
+      - name: Check if secret scan SARIF was generated
+        id: check-secrets
+        run: |
+          if [ -f "trivy-secrets.sarif" ]; then
+            echo "file_exists=true" >> $GITHUB_OUTPUT
+            echo "✓ Secret scan SARIF file generated"
+          else
+            echo "file_exists=false" >> $GITHUB_OUTPUT
+            echo "⚠ No secret scan SARIF file (no secrets found or scan error)"
+          fi
+        shell: bash
+      
+      - name: Upload secret scan results
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() && steps.check-secrets.outputs.file_exists == 'true'
+        with:
+          sarif_file: 'trivy-secrets.sarif'
+          category: 'trivy-secrets'
+
+  security-summary:
+    name: Security Summary
+    runs-on: ubuntu-latest
+    needs: [trivy-scan, trivy-config-scan]
+    if: always()
+    
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+      
+      - name: Generate security summary
+        run: |
+          echo "#  Security Scan Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Scan Date:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> $GITHUB_STEP_SUMMARY
+          echo "**Repository:** ${{ github.repository }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Scan Results" >> $GITHUB_STEP_SUMMARY
+          echo "-  Container Image Scanning: Completed" >> $GITHUB_STEP_SUMMARY
+          echo "-  Dependency Scanning: Completed" >> $GITHUB_STEP_SUMMARY
+          echo "-  IaC Configuration Scanning: Completed" >> $GITHUB_STEP_SUMMARY
+          echo "-  Secret Scanning: Completed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Next Steps" >> $GITHUB_STEP_SUMMARY
+          echo "1. Review findings in GitHub Security → Code scanning" >> $GITHUB_STEP_SUMMARY
+          echo "2. Prioritize CRITICAL vulnerabilities for immediate remediation" >> $GITHUB_STEP_SUMMARY
+          echo "3. Create issues for tracking vulnerability fixes" >> $GITHUB_STEP_SUMMARY
+          echo "4. Update .trivyignore with documented exceptions (if needed)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**HIPAA Compliance:** Address all CRITICAL issues within 24 hours" >> $GITHUB_STEP_SUMMARY
