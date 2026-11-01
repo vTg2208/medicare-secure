@@ -12,6 +12,8 @@ Create a normal application key restricted to this bucket and **exactly** `medic
 
 The browser's Read and Write preset is therefore unsuitable. Use the [official B2 Native API](https://www.backblaze.com/apidocs/b2-create-key) once under an administrator principal with writeKeys to request exactly those five capabilities, bucketIds containing only this bucket, and namePrefix=medicare-backups/. The administrator credential is solely for provisioning and must never be installed in the backup job. Existing key capabilities cannot be edited in place. Generating/replacing an administrator credential in the browser is a user handoff step.
 
+On Windows, run `backend/scripts/setup-b2-file-key.ps1` without arguments to review the exact request. Run it with `-Create` to enter the administrator key ID and hidden secret at local prompts. It saves only the restricted replacement in `.local/backup-secrets/b2-files-only.dpapi`, encrypted using Windows DPAPI for the current user. It refuses an existing output file. The folder grants access only to that user; no administrator elevation is needed. The Windows regression exercises access permissions, DPAPI read/write and safe retries under Windows PowerShell 5.1 and PowerShell 7, without a network request or real credentials.
+
 Load B2_KEY_ID, B2_APPLICATION_KEY, B2_BUCKET_ID, BACKUP_ENCRYPTION_KEY and the original ENCRYPTION_KEY from the backup operator's protected secret store. Optionally set B2_PREFIX=medicare-backups/. Keys are never command arguments and no dotenv file is automatically loaded. Keep both encryption keys outside the bucket and preserve them in a separate protected recovery location. Do not put credentials in chat, source control, screenshots or the backup itself.
 
 ## Archive and retention

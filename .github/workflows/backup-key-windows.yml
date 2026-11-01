@@ -1,0 +1,21 @@
+name: Backup key setup on Windows
+on:
+  push:
+    branches: [main]
+    paths: ['backend/scripts/setup-b2-file-key.ps1', 'backend/tests/b2-key-setup.windows.ps1', '.github/workflows/backup-key-windows.yml']
+  pull_request:
+    paths: ['backend/scripts/setup-b2-file-key.ps1', 'backend/tests/b2-key-setup.windows.ps1', '.github/workflows/backup-key-windows.yml']
+permissions:
+  contents: read
+jobs:
+  local-credential-storage:
+    runs-on: windows-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Windows PowerShell credential directory regression
+        shell: powershell
+        run: ./backend/tests/b2-key-setup.windows.ps1
+      - name: PowerShell 7 credential directory regression
+        shell: pwsh
+        run: ./backend/tests/b2-key-setup.windows.ps1
