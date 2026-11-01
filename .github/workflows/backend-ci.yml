@@ -2,9 +2,9 @@ name: Backend CI
 on:
   push:
     branches: [main]
-    paths: ['backend/**', 'scripts/**', 'docker-compose*.yaml', '.github/workflows/backend-ci.yml']
+    paths: ['backend/**', 'docs/compliance/**', 'docs/devops/data-classification.md', 'docs/architecture-threat-model.md', 'scripts/**', 'docker-compose*.yaml', '.github/workflows/backend-ci.yml']
   pull_request:
-    paths: ['backend/**', 'scripts/**', 'docker-compose*.yaml', '.github/workflows/backend-ci.yml']
+    paths: ['backend/**', 'docs/compliance/**', 'docs/devops/data-classification.md', 'docs/architecture-threat-model.md', 'scripts/**', 'docker-compose*.yaml', '.github/workflows/backend-ci.yml']
 permissions:
   contents: read
 jobs:
@@ -53,6 +53,7 @@ jobs:
           }
           NODE
       - run: npm run check
+      - run: npm run governance:check
       - run: npm test
       - name: Audit all installed dependencies
         run: npm audit --audit-level=moderate

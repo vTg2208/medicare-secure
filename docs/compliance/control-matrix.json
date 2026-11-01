@@ -1,0 +1,369 @@
+{
+  "schemaVersion": 1,
+  "frameworkSources": [
+    "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32016R0679",
+    "https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html"
+  ],
+  "interpretation": "Engineering mapping for owner review; references do not establish legal applicability or certification. Observation revisions and reports are historical, not results of the structural checker.",
+  "controls": [
+    {
+      "id": "ACCESS-01",
+      "principles": [
+        "GDPR Articles 5,25,32",
+        "HIPAA Security Rule access control"
+      ],
+      "ownerRole": "platform_operator",
+      "implementation": {
+        "status": "implemented",
+        "sources": [
+          "backend/src/middleware/auth.middleware.js",
+          "backend/src/middleware/clinical-access.middleware.js"
+        ],
+        "limitations": [
+          "Application compromise/database-owner authority are separate threats. Shift-based policy helpers are not the active clinical authorization contract."
+        ]
+      },
+      "verification": {
+        "scenarios": [
+          {
+            "file": "backend/tests/access.integration.test.js",
+            "title": "clinical workflows enforce patient, role, care and tenant boundaries"
+          }
+        ],
+        "observations": [
+          {
+            "revision": "3f3d3a9c533b910cf4538188b4555d7cb32f42e1",
+            "observedAt": "2026-11-01T17:48:49Z",
+            "kind": "automated_execution",
+            "evidence": "docs/releases/2026-11-01-durable-backup-activation.md"
+          }
+        ]
+      },
+      "externalRequirements": [
+        {
+          "id": "workforce_access_review",
+          "status": "pending",
+          "ownerRole": "responsible_organization",
+          "evidence": []
+        }
+      ]
+    },
+    {
+      "id": "INTEGRITY-01",
+      "principles": [
+        "GDPR Articles 5,32",
+        "HIPAA Security Rule audit/integrity controls"
+      ],
+      "ownerRole": "platform_operator",
+      "implementation": {
+        "status": "implemented",
+        "sources": [
+          "backend/src/services/audit.service.js",
+          "backend/src/database/ordered/020_clinical_change_audit.sql"
+        ],
+        "limitations": [
+          "Database-owner tampering needs separate recovery/monitoring evidence. Hash chaining does not encrypt retained clinical snapshots."
+        ]
+      },
+      "verification": {
+        "scenarios": [
+          {
+            "file": "backend/tests/clinical-change-audit.integration.test.js",
+            "title": "clinical mutations and actor evidence commit or roll back together"
+          }
+        ],
+        "observations": [
+          {
+            "revision": "3f3d3a9c533b910cf4538188b4555d7cb32f42e1",
+            "observedAt": "2026-11-01T17:48:49Z",
+            "kind": "automated_execution",
+            "evidence": "docs/releases/2026-11-01-durable-backup-activation.md"
+          }
+        ]
+      },
+      "externalRequirements": [
+        {
+          "id": "independent_incident_monitoring",
+          "status": "pending",
+          "ownerRole": "responsible_organization",
+          "evidence": []
+        }
+      ]
+    },
+    {
+      "id": "PRIVACY-01",
+      "principles": [
+        "GDPR Articles 12,15,16,17,18,20,21"
+      ],
+      "ownerRole": "platform_operator",
+      "implementation": {
+        "status": "partial",
+        "sources": [
+          "backend/src/modules/privacy/privacy-rights.service.js",
+          "backend/src/modules/privacy/privacy-fulfillment.service.js"
+        ],
+        "limitations": [
+          "Erasure review does not execute disposal. Access/portability case status is not linked to a delivery artifact. Requests use one initial review target, without a full extension/escalation workflow."
+        ]
+      },
+      "verification": {
+        "scenarios": [
+          {
+            "file": "backend/tests/privacy-rights.integration.test.js",
+            "title": "privacy requests and exports enforce owner, reviewer, encryption and durable evidence boundaries"
+          }
+        ],
+        "observations": [
+          {
+            "revision": "3f3d3a9c533b910cf4538188b4555d7cb32f42e1",
+            "observedAt": "2026-11-01T17:48:49Z",
+            "kind": "automated_execution",
+            "evidence": "docs/releases/2026-11-01-durable-backup-activation.md"
+          }
+        ]
+      },
+      "externalRequirements": [
+        {
+          "id": "reviewed_request_policy",
+          "status": "pending",
+          "ownerRole": "responsible_organization",
+          "evidence": []
+        }
+      ]
+    },
+    {
+      "id": "RETENTION-01",
+      "principles": [
+        "GDPR Article 5 storage limitation"
+      ],
+      "ownerRole": "platform_operator",
+      "implementation": {
+        "status": "partial",
+        "sources": [
+          "backend/src/modules/privacy/retention-policy.js",
+          "backend/scripts/retention-dispose.js"
+        ],
+        "limitations": [
+          "Only medical_record,care_message,triage_session disposal is supported. Retained workflow dependencies can block disposal. Other categories require explicit lifecycle decisions."
+        ]
+      },
+      "verification": {
+        "scenarios": [
+          {
+            "file": "backend/tests/retention.integration.test.js",
+            "title": "retention requires a policy, released holds, review approval and a privileged operator"
+          }
+        ],
+        "observations": [
+          {
+            "revision": "3f3d3a9c533b910cf4538188b4555d7cb32f42e1",
+            "observedAt": "2026-11-01T17:48:49Z",
+            "kind": "automated_execution",
+            "evidence": "docs/releases/2026-11-01-durable-backup-activation.md"
+          }
+        ]
+      },
+      "externalRequirements": [
+        {
+          "id": "jurisdiction_category_retention_policy",
+          "status": "pending",
+          "ownerRole": "responsible_organization",
+          "evidence": []
+        },
+        {
+          "id": "restored_disposal_ledger_reconciliation",
+          "status": "pending",
+          "ownerRole": "responsible_organization",
+          "evidence": []
+        }
+      ]
+    },
+    {
+      "id": "CONFIDENTIALITY-01",
+      "principles": [
+        "GDPR Articles 25,32",
+        "HIPAA Security Rule transmission security"
+      ],
+      "ownerRole": "platform_operator",
+      "implementation": {
+        "status": "implemented",
+        "sources": [
+          "backend/src/services/file.crypto.js",
+          "backend/src/services/encrypted-file-store.js",
+          "backend/src/config/db.js"
+        ],
+        "limitations": [
+          "Application encryption covers selected fields/payloads, not every ordinary database column. Key rotation and provider storage assurances remain separate."
+        ]
+      },
+      "verification": {
+        "scenarios": [
+          {
+            "file": "backend/tests/postgres-upload.integration.test.js",
+            "title": "durable encrypted uploads survive ephemeral filesystem loss and enforce clinical access"
+          }
+        ],
+        "observations": [
+          {
+            "revision": "3f3d3a9c533b910cf4538188b4555d7cb32f42e1",
+            "observedAt": "2026-11-01T17:48:49Z",
+            "kind": "automated_execution",
+            "evidence": "docs/releases/2026-11-01-durable-backup-activation.md"
+          }
+        ]
+      },
+      "externalRequirements": [
+        {
+          "id": "provider_storage_encryption",
+          "status": "pending",
+          "ownerRole": "responsible_organization",
+          "evidence": []
+        },
+        {
+          "id": "key_custody_and_rotation",
+          "status": "pending",
+          "ownerRole": "responsible_organization",
+          "evidence": []
+        },
+        {
+          "id": "live_malware_scanning",
+          "status": "pending",
+          "ownerRole": "responsible_organization",
+          "evidence": []
+        }
+      ]
+    },
+    {
+      "id": "INCIDENT-01",
+      "principles": [
+        "GDPR Articles 33,34",
+        "HIPAA breach assessment/notification engineering"
+      ],
+      "ownerRole": "platform_operator",
+      "implementation": {
+        "status": "implemented",
+        "sources": [
+          "backend/src/modules/compliance/breach.service.js",
+          "backend/src/modules/compliance/breach.policy.js"
+        ],
+        "limitations": [
+          "Human assessment determines applicability. A notice log records supplied evidence; it is not an automatic sender or proof of actual receipt."
+        ]
+      },
+      "verification": {
+        "scenarios": [
+          {
+            "file": "backend/tests/breach-governance.integration.test.js",
+            "title": "breach governance protects assessments, decisions and immutable notification evidence"
+          }
+        ],
+        "observations": [
+          {
+            "revision": "3f3d3a9c533b910cf4538188b4555d7cb32f42e1",
+            "observedAt": "2026-11-01T17:48:49Z",
+            "kind": "automated_execution",
+            "evidence": "docs/releases/2026-11-01-durable-backup-activation.md"
+          }
+        ]
+      },
+      "externalRequirements": [
+        {
+          "id": "incident_owner_and_delivery_procedure",
+          "status": "pending",
+          "ownerRole": "responsible_organization",
+          "evidence": []
+        }
+      ]
+    },
+    {
+      "id": "MINIMIZATION-01",
+      "principles": [
+        "GDPR Article 5 minimization and purpose limitation",
+        "HIPAA minimum-necessary engineering"
+      ],
+      "ownerRole": "platform_operator",
+      "implementation": {
+        "status": "partial",
+        "sources": [
+          "backend/src/modules/research/research.routes.js",
+          "backend/src/utils/log-sanitizer.js"
+        ],
+        "limitations": [
+          "Small-cohort suppression is not formal anonymity. Per-field collection necessity and retained identifiers still need organization review."
+        ]
+      },
+      "verification": {
+        "scenarios": [
+          {
+            "file": "backend/tests/unit/log-sanitizer.test.js",
+            "title": "does not copy nested clinical payloads, raw SQL or error details"
+          }
+        ],
+        "observations": [
+          {
+            "revision": "3f3d3a9c533b910cf4538188b4555d7cb32f42e1",
+            "observedAt": "2026-11-01T17:48:49Z",
+            "kind": "automated_execution",
+            "evidence": "docs/releases/2026-11-01-durable-backup-activation.md"
+          }
+        ]
+      },
+      "externalRequirements": [
+        {
+          "id": "collection_necessity_and_study_review",
+          "status": "pending",
+          "ownerRole": "responsible_organization",
+          "evidence": []
+        }
+      ]
+    },
+    {
+      "id": "RECOVERY-01",
+      "principles": [
+        "GDPR Article 32 availability/recovery",
+        "HIPAA Security Rule contingency engineering"
+      ],
+      "ownerRole": "platform_operator",
+      "implementation": {
+        "status": "implemented",
+        "sources": [
+          "backend/scripts/coordinated-backup.js",
+          "backend/scripts/scheduled-backup.js"
+        ],
+        "limitations": [
+          "Two manual main-branch cloud/recovery drills passed; a future timed execution is not claimed as observed. Free-host availability, operator alerts and recovery promotion remain separate."
+        ]
+      },
+      "verification": {
+        "scenarios": [
+          {
+            "file": "backend/tests/postgres-upload.integration.test.js",
+            "title": "a remote coordinated worker captures durable bytes without the source filesystem or application key"
+          }
+        ],
+        "observations": [
+          {
+            "revision": "3f3d3a9c533b910cf4538188b4555d7cb32f42e1",
+            "observedAt": "2026-11-01T17:48:49Z",
+            "kind": "automated_execution",
+            "evidence": "docs/releases/2026-11-01-durable-backup-activation.md"
+          }
+        ]
+      },
+      "externalRequirements": [
+        {
+          "id": "recovery_objectives_and_promotion",
+          "status": "pending",
+          "ownerRole": "responsible_organization",
+          "evidence": []
+        },
+        {
+          "id": "operator_failure_notifications",
+          "status": "pending",
+          "ownerRole": "responsible_organization",
+          "evidence": []
+        }
+      ]
+    }
+  ]
+}

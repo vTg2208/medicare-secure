@@ -1,0 +1,2022 @@
+{
+  "schemaVersion": 1,
+  "scope": "Application catalog metadata only; classification is reviewed documentation, not provider assurance. Column overrides refine each table default.",
+  "tables": [
+    {
+      "name": "_migrations",
+      "columns": [
+        "id",
+        "file_hash",
+        "applied_at",
+        "applied_by",
+        "execution_time_ms"
+      ],
+      "classification": "operational",
+      "purposes": [
+        "schema integrity, care scheduling, storage accounting or scoped inventory operations"
+      ],
+      "ownerRole": "platform_operator",
+      "audience": [
+        "authorized_operational_role"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Retain migration integrity ledger for installation/recovery lifetime; never rewrite applied hashes.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "access_policies",
+      "columns": [
+        "id",
+        "role_id",
+        "resource",
+        "action",
+        "conditions",
+        "is_allowed",
+        "created_at",
+        "updated_at"
+      ],
+      "classification": "security",
+      "purposes": [
+        "authentication, authorization and security investigation"
+      ],
+      "ownerRole": "platform_operator",
+      "audience": [
+        "authorized_security_administration",
+        "account_owner_where_supported"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "account_actions",
+      "columns": [
+        "id",
+        "user_id",
+        "action_type",
+        "action_by",
+        "reason",
+        "notes",
+        "metadata",
+        "created_at"
+      ],
+      "classification": "security",
+      "purposes": [
+        "authentication, authorization and security investigation"
+      ],
+      "ownerRole": "platform_operator",
+      "audience": [
+        "authorized_security_administration",
+        "account_owner_where_supported"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "appointment_calendars",
+      "columns": [
+        "organization_id",
+        "doctor_id",
+        "time_zone",
+        "weekdays",
+        "start_time",
+        "end_time",
+        "slot_minutes"
+      ],
+      "classification": "operational",
+      "purposes": [
+        "schema integrity, care scheduling, storage accounting or scoped inventory operations"
+      ],
+      "ownerRole": "platform_operator",
+      "audience": [
+        "authorized_operational_role"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Current clinic scheduling configuration; no automatic history/expiry policy implemented.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "appointment_reservations",
+      "columns": [
+        "visit_id",
+        "doctor_id",
+        "starts_at",
+        "ends_at"
+      ],
+      "classification": "clinical",
+      "purposes": [
+        "authorized treatment or explicitly scoped insurance/research processing"
+      ],
+      "ownerRole": "clinical_data_owner",
+      "audience": [
+        "patient_owner",
+        "authorized_care_or_insurance_role",
+        "scoped_research_aggregates_only"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "audit_chain_head",
+      "columns": [
+        "singleton",
+        "last_hash"
+      ],
+      "classification": "governance",
+      "purposes": [
+        "accountability, patient rights, consent, incident and retention governance"
+      ],
+      "ownerRole": "platform_operator",
+      "audience": [
+        "authorized_governance_role",
+        "patient_owned_subject_export_where_supported"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "audit_logs",
+      "columns": [
+        "id",
+        "user_id",
+        "action",
+        "entity_type",
+        "entity_id",
+        "purpose",
+        "ip_address",
+        "user_agent",
+        "request_method",
+        "request_path",
+        "status_code",
+        "metadata",
+        "previous_hash",
+        "current_hash",
+        "timestamp",
+        "sequence",
+        "hash_version",
+        "hash_payload"
+      ],
+      "classification": "governance",
+      "purposes": [
+        "accountability, patient rights, consent, incident and retention governance"
+      ],
+      "ownerRole": "platform_operator",
+      "audience": [
+        "authorized_governance_role",
+        "patient_owned_subject_export_where_supported"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {
+        "metadata": {
+          "classification": "clinical",
+          "protection": "May retain selected clinical change snapshots and identifiers; hash chaining supplies integrity, not confidentiality encryption."
+        },
+        "hash_payload": {
+          "classification": "clinical",
+          "protection": "May retain selected clinical change snapshots and identifiers; hash chaining supplies integrity, not confidentiality encryption."
+        }
+      }
+    },
+    {
+      "name": "bed_allocations",
+      "columns": [
+        "id",
+        "visit_id",
+        "ward",
+        "room",
+        "bed",
+        "bed_type",
+        "allocated_by",
+        "allocated_at",
+        "released_by",
+        "released_at",
+        "status",
+        "notes",
+        "created_at",
+        "updated_at",
+        "organization_id"
+      ],
+      "classification": "clinical",
+      "purposes": [
+        "authorized treatment or explicitly scoped insurance/research processing"
+      ],
+      "ownerRole": "clinical_data_owner",
+      "audience": [
+        "patient_owner",
+        "authorized_care_or_insurance_role",
+        "scoped_research_aggregates_only"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "breach_assessment_history",
+      "columns": [
+        "id",
+        "incident_id",
+        "version",
+        "assessment_ciphertext",
+        "recorded_by",
+        "recorded_at"
+      ],
+      "classification": "governance",
+      "purposes": [
+        "accountability, patient rights, consent, incident and retention governance"
+      ],
+      "ownerRole": "platform_operator",
+      "audience": [
+        "authorized_governance_role",
+        "patient_owned_subject_export_where_supported"
+      ],
+      "applicationEncryption": "selected_fields",
+      "encryptedColumns": [
+        "assessment_ciphertext"
+      ],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {
+        "assessment_ciphertext": {
+          "classification": "governance",
+          "protection": "Application AES-GCM ciphertext with identity context; preserve the original application key."
+        }
+      }
+    },
+    {
+      "name": "breach_notification_log",
+      "columns": [
+        "id",
+        "incident_id",
+        "assessment_version",
+        "regime",
+        "audience",
+        "status",
+        "occurred_at",
+        "channel",
+        "evidence_ciphertext",
+        "recorded_by",
+        "recorded_at",
+        "event_sequence"
+      ],
+      "classification": "governance",
+      "purposes": [
+        "accountability, patient rights, consent, incident and retention governance"
+      ],
+      "ownerRole": "platform_operator",
+      "audience": [
+        "authorized_governance_role",
+        "patient_owned_subject_export_where_supported"
+      ],
+      "applicationEncryption": "selected_fields",
+      "encryptedColumns": [
+        "evidence_ciphertext"
+      ],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {
+        "evidence_ciphertext": {
+          "classification": "governance",
+          "protection": "Application AES-GCM ciphertext with identity context; preserve the original application key."
+        }
+      }
+    },
+    {
+      "name": "care_message_threads",
+      "columns": [
+        "id",
+        "patient_id",
+        "provider_id",
+        "created_at"
+      ],
+      "classification": "clinical",
+      "purposes": [
+        "authorized treatment or explicitly scoped insurance/research processing"
+      ],
+      "ownerRole": "clinical_data_owner",
+      "audience": [
+        "patient_owner",
+        "authorized_care_or_insurance_role",
+        "scoped_research_aggregates_only"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Thread metadata retained independently of message disposal; no automatic thread expiry.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "care_messages",
+      "columns": [
+        "id",
+        "sequence",
+        "thread_id",
+        "patient_id",
+        "sender_id",
+        "body_cipher",
+        "created_at"
+      ],
+      "classification": "clinical",
+      "purposes": [
+        "authorized treatment or explicitly scoped insurance/research processing"
+      ],
+      "ownerRole": "clinical_data_owner",
+      "audience": [
+        "patient_owner",
+        "authorized_care_or_insurance_role",
+        "scoped_research_aggregates_only"
+      ],
+      "applicationEncryption": "selected_fields",
+      "encryptedColumns": [
+        "body_cipher"
+      ],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Versioned care_message policy and legal holds; privileged per-message disposal.",
+      "columnOverrides": {
+        "body_cipher": {
+          "classification": "clinical",
+          "protection": "Application AES-GCM ciphertext with identity context; preserve the original application key."
+        }
+      }
+    },
+    {
+      "name": "care_team_assignments",
+      "columns": [
+        "id",
+        "visit_id",
+        "staff_user_id",
+        "role",
+        "assigned_by",
+        "assigned_at",
+        "removed_by",
+        "removed_at",
+        "notes",
+        "created_at",
+        "updated_at"
+      ],
+      "classification": "clinical",
+      "purposes": [
+        "authorized treatment or explicitly scoped insurance/research processing"
+      ],
+      "ownerRole": "clinical_data_owner",
+      "audience": [
+        "patient_owner",
+        "authorized_care_or_insurance_role",
+        "scoped_research_aggregates_only"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "consents",
+      "columns": [
+        "id",
+        "patient_id",
+        "recipient_user_id",
+        "data_category",
+        "purpose",
+        "access_level",
+        "start_time",
+        "end_time",
+        "status",
+        "created_at",
+        "updated_at",
+        "recipient_organization_id",
+        "revoked_at",
+        "revocation_reason",
+        "visit_id",
+        "source"
+      ],
+      "classification": "governance",
+      "purposes": [
+        "accountability, patient rights, consent, incident and retention governance"
+      ],
+      "ownerRole": "platform_operator",
+      "audience": [
+        "authorized_governance_role",
+        "patient_owned_subject_export_where_supported"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "diagnoses",
+      "columns": [
+        "id",
+        "record_id",
+        "icd_code",
+        "description",
+        "severity",
+        "status",
+        "version",
+        "is_primary",
+        "notes",
+        "diagnosed_by",
+        "diagnosed_at",
+        "created_at",
+        "updated_at"
+      ],
+      "classification": "clinical",
+      "purposes": [
+        "authorized treatment or explicitly scoped insurance/research processing"
+      ],
+      "ownerRole": "clinical_data_owner",
+      "audience": [
+        "patient_owner",
+        "authorized_care_or_insurance_role",
+        "scoped_research_aggregates_only"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "doctor_profiles",
+      "columns": [
+        "id",
+        "user_id",
+        "specialization",
+        "license_number",
+        "experience_years",
+        "bio",
+        "consultation_fee",
+        "availability",
+        "reg_year",
+        "state_medical_council",
+        "degree_certificate_url",
+        "medical_reg_certificate_url",
+        "created_at",
+        "updated_at"
+      ],
+      "classification": "identity",
+      "purposes": [
+        "account provisioning, patient identification and reviewed care administration"
+      ],
+      "ownerRole": "platform_operator",
+      "audience": [
+        "self",
+        "authorized_administration_or_care"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "emergency_access",
+      "columns": [
+        "id",
+        "doctor_id",
+        "patient_id",
+        "justification",
+        "status",
+        "start_time",
+        "end_time",
+        "approved_by",
+        "created_at"
+      ],
+      "classification": "security",
+      "purposes": [
+        "authentication, authorization and security investigation"
+      ],
+      "ownerRole": "platform_operator",
+      "audience": [
+        "authorized_security_administration",
+        "account_owner_where_supported"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "emergency_access_grants",
+      "columns": [
+        "id",
+        "user_id",
+        "patient_id",
+        "justification",
+        "status",
+        "expires_at",
+        "created_at",
+        "visit_id",
+        "organization_id"
+      ],
+      "classification": "security",
+      "purposes": [
+        "authentication, authorization and security investigation"
+      ],
+      "ownerRole": "platform_operator",
+      "audience": [
+        "authorized_security_administration",
+        "account_owner_where_supported"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "encrypted_upload_budget",
+      "columns": [
+        "singleton",
+        "max_bytes",
+        "bytes_used"
+      ],
+      "classification": "operational",
+      "purposes": [
+        "schema integrity, care scheduling, storage accounting or scoped inventory operations"
+      ],
+      "ownerRole": "platform_operator",
+      "audience": [
+        "authorized_operational_role"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "encrypted_upload_objects",
+      "columns": [
+        "relative_key",
+        "ciphertext",
+        "byte_length",
+        "cipher_sha256",
+        "created_at"
+      ],
+      "classification": "clinical",
+      "purposes": [
+        "authorized treatment or explicitly scoped insurance/research processing"
+      ],
+      "ownerRole": "clinical_data_owner",
+      "audience": [
+        "patient_owner",
+        "authorized_care_or_insurance_role",
+        "scoped_research_aggregates_only"
+      ],
+      "applicationEncryption": "selected_fields",
+      "encryptedColumns": [
+        "ciphertext"
+      ],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Referenced objects follow approved clinical attachment cleanup; staged/orphan objects need owner reconciliation; quota is not a retention policy.",
+      "columnOverrides": {
+        "ciphertext": {
+          "classification": "clinical",
+          "protection": "Application AES-GCM ciphertext with identity context; preserve the original application key."
+        }
+      }
+    },
+    {
+      "name": "imaging_orders",
+      "columns": [
+        "id",
+        "patient_id",
+        "ordering_physician_id",
+        "organization_id",
+        "study_type",
+        "body_part",
+        "clinical_indication",
+        "priority",
+        "status",
+        "scheduled_at",
+        "completed_at",
+        "notes",
+        "created_at",
+        "updated_at",
+        "visit_id",
+        "ordered_by",
+        "imaging_type",
+        "routed_to_department",
+        "contrast_used",
+        "scheduled_time",
+        "performed_at",
+        "ordered_at",
+        "imaging_report_id"
+      ],
+      "classification": "clinical",
+      "purposes": [
+        "authorized treatment or explicitly scoped insurance/research processing"
+      ],
+      "ownerRole": "clinical_data_owner",
+      "audience": [
+        "patient_owner",
+        "authorized_care_or_insurance_role",
+        "scoped_research_aggregates_only"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "imaging_reports",
+      "columns": [
+        "id",
+        "record_id",
+        "imaging_type",
+        "body_part",
+        "file_url",
+        "file_name",
+        "file_type",
+        "file_size",
+        "is_dicom",
+        "dicom_metadata",
+        "findings",
+        "impression",
+        "radiologist_notes",
+        "ordered_by",
+        "performed_by",
+        "reported_by",
+        "uploaded_at",
+        "study_date",
+        "created_at"
+      ],
+      "classification": "clinical",
+      "purposes": [
+        "authorized treatment or explicitly scoped insurance/research processing"
+      ],
+      "ownerRole": "clinical_data_owner",
+      "audience": [
+        "patient_owner",
+        "authorized_care_or_insurance_role",
+        "scoped_research_aggregates_only"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "insurance_claims",
+      "columns": [
+        "id",
+        "visit_id",
+        "patient_id",
+        "policy_id",
+        "diagnosis",
+        "amount",
+        "status",
+        "notes",
+        "submitted_at",
+        "updated_at"
+      ],
+      "classification": "clinical",
+      "purposes": [
+        "authorized treatment or explicitly scoped insurance/research processing"
+      ],
+      "ownerRole": "clinical_data_owner",
+      "audience": [
+        "patient_owner",
+        "authorized_care_or_insurance_role",
+        "scoped_research_aggregates_only"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "insurance_policies",
+      "columns": [
+        "id",
+        "patient_id",
+        "member_name",
+        "type",
+        "status",
+        "coverage_start",
+        "coverage_end",
+        "copay",
+        "deductible_used",
+        "deductible_total",
+        "created_at",
+        "updated_at"
+      ],
+      "classification": "clinical",
+      "purposes": [
+        "authorized treatment or explicitly scoped insurance/research processing"
+      ],
+      "ownerRole": "clinical_data_owner",
+      "audience": [
+        "patient_owner",
+        "authorized_care_or_insurance_role",
+        "scoped_research_aggregates_only"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "lab_orders",
+      "columns": [
+        "id",
+        "visit_id",
+        "ordered_by",
+        "test_name",
+        "test_code",
+        "test_category",
+        "priority",
+        "status",
+        "routed_to_department",
+        "clinical_indication",
+        "notes",
+        "specimen_collected_at",
+        "result_available_at",
+        "lab_result_id",
+        "ordered_at",
+        "created_at",
+        "updated_at"
+      ],
+      "classification": "clinical",
+      "purposes": [
+        "authorized treatment or explicitly scoped insurance/research processing"
+      ],
+      "ownerRole": "clinical_data_owner",
+      "audience": [
+        "patient_owner",
+        "authorized_care_or_insurance_role",
+        "scoped_research_aggregates_only"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "lab_results",
+      "columns": [
+        "id",
+        "record_id",
+        "test_name",
+        "test_code",
+        "test_category",
+        "file_url",
+        "file_name",
+        "file_type",
+        "file_size",
+        "results_data",
+        "interpretation",
+        "reference_range",
+        "abnormal_flag",
+        "immutable",
+        "ordered_by",
+        "performed_by",
+        "uploaded_at",
+        "result_date",
+        "created_at"
+      ],
+      "classification": "clinical",
+      "purposes": [
+        "authorized treatment or explicitly scoped insurance/research processing"
+      ],
+      "ownerRole": "clinical_data_owner",
+      "audience": [
+        "patient_owner",
+        "authorized_care_or_insurance_role",
+        "scoped_research_aggregates_only"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "medical_record_corrections",
+      "columns": [
+        "id",
+        "record_id",
+        "patient_id",
+        "request_id",
+        "created_by",
+        "text_cipher",
+        "created_at"
+      ],
+      "classification": "clinical",
+      "purposes": [
+        "authorized treatment or explicitly scoped insurance/research processing"
+      ],
+      "ownerRole": "clinical_data_owner",
+      "audience": [
+        "patient_owner",
+        "authorized_care_or_insurance_role",
+        "scoped_research_aggregates_only"
+      ],
+      "applicationEncryption": "selected_fields",
+      "encryptedColumns": [
+        "text_cipher"
+      ],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {
+        "text_cipher": {
+          "classification": "clinical",
+          "protection": "Application AES-GCM ciphertext with identity context; preserve the original application key."
+        }
+      }
+    },
+    {
+      "name": "medical_records",
+      "columns": [
+        "id",
+        "patient_id",
+        "visit_id",
+        "type",
+        "title",
+        "description",
+        "created_by",
+        "immutable_flag",
+        "created_at",
+        "updated_at"
+      ],
+      "classification": "clinical",
+      "purposes": [
+        "authorized treatment or explicitly scoped insurance/research processing"
+      ],
+      "ownerRole": "clinical_data_owner",
+      "audience": [
+        "patient_owner",
+        "authorized_care_or_insurance_role",
+        "scoped_research_aggregates_only"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Versioned category/clinic policy, activity clock and legal holds; privileged reviewed disposal. Linked workflows can block disposal.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "medication_orders",
+      "columns": [
+        "id",
+        "visit_id",
+        "prescription_id",
+        "medication",
+        "dosage",
+        "route",
+        "frequency",
+        "ordered_by",
+        "ordered_at",
+        "status",
+        "dispensed_by",
+        "dispensed_at",
+        "administered_by",
+        "administered_at",
+        "discontinued_by",
+        "discontinued_at",
+        "discontinuation_reason",
+        "notes",
+        "created_at",
+        "updated_at",
+        "refused_by",
+        "refused_at",
+        "refusal_reason"
+      ],
+      "classification": "clinical",
+      "purposes": [
+        "authorized treatment or explicitly scoped insurance/research processing"
+      ],
+      "ownerRole": "clinical_data_owner",
+      "audience": [
+        "patient_owner",
+        "authorized_care_or_insurance_role",
+        "scoped_research_aggregates_only"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "notifications",
+      "columns": [
+        "id",
+        "user_id",
+        "type",
+        "title",
+        "message",
+        "priority",
+        "channels",
+        "related_entity_type",
+        "related_entity_id",
+        "metadata",
+        "read",
+        "read_at",
+        "created_at"
+      ],
+      "classification": "clinical",
+      "purposes": [
+        "authorized treatment or explicitly scoped insurance/research processing"
+      ],
+      "ownerRole": "clinical_data_owner",
+      "audience": [
+        "patient_owner",
+        "authorized_care_or_insurance_role",
+        "scoped_research_aggregates_only"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "nurse_profiles",
+      "columns": [
+        "id",
+        "user_id",
+        "address",
+        "emergency_contact_name",
+        "emergency_contact_phone",
+        "emergency_contact_relation",
+        "created_at",
+        "updated_at"
+      ],
+      "classification": "identity",
+      "purposes": [
+        "account provisioning, patient identification and reviewed care administration"
+      ],
+      "ownerRole": "platform_operator",
+      "audience": [
+        "self",
+        "authorized_administration_or_care"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "one_time_tokens",
+      "columns": [
+        "id",
+        "token_hash",
+        "user_id",
+        "created_by",
+        "scope",
+        "expires_at",
+        "used_at",
+        "used_by_ip",
+        "created_at"
+      ],
+      "classification": "security",
+      "purposes": [
+        "authentication, authorization and security investigation"
+      ],
+      "ownerRole": "platform_operator",
+      "audience": [
+        "authorized_security_administration",
+        "account_owner_where_supported"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {
+        "token_hash": {
+          "classification": "security",
+          "protection": "Token/OTP verifier hash; expiration and replay checks remain necessary."
+        }
+      }
+    },
+    {
+      "name": "organizations",
+      "columns": [
+        "id",
+        "name",
+        "type",
+        "license_number",
+        "license_document_url",
+        "address",
+        "city",
+        "state",
+        "country",
+        "postal_code",
+        "phone",
+        "email",
+        "verified",
+        "admin_user_id",
+        "status",
+        "created_at",
+        "updated_at",
+        "hospital_code"
+      ],
+      "classification": "identity",
+      "purposes": [
+        "account provisioning, patient identification and reviewed care administration"
+      ],
+      "ownerRole": "platform_operator",
+      "audience": [
+        "self",
+        "authorized_administration_or_care"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "otp_verifications",
+      "columns": [
+        "id",
+        "user_id",
+        "email",
+        "phone",
+        "otp_hash",
+        "purpose",
+        "attempts",
+        "is_verified",
+        "expires_at",
+        "created_at"
+      ],
+      "classification": "security",
+      "purposes": [
+        "authentication, authorization and security investigation"
+      ],
+      "ownerRole": "platform_operator",
+      "audience": [
+        "authorized_security_administration",
+        "account_owner_where_supported"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {
+        "otp_hash": {
+          "classification": "security",
+          "protection": "Token/OTP verifier hash; expiration and replay checks remain necessary."
+        }
+      }
+    },
+    {
+      "name": "passkey_credentials",
+      "columns": [
+        "id",
+        "user_id",
+        "credential_id",
+        "public_key",
+        "counter",
+        "device_type",
+        "backed_up",
+        "transports",
+        "credential_name",
+        "created_at",
+        "last_used_at"
+      ],
+      "classification": "security",
+      "purposes": [
+        "authentication, authorization and security investigation"
+      ],
+      "ownerRole": "platform_operator",
+      "audience": [
+        "authorized_security_administration",
+        "account_owner_where_supported"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {
+        "credential_id": {
+          "classification": "security",
+          "protection": "WebAuthn public verification material, not the authenticator private key."
+        },
+        "public_key": {
+          "classification": "security",
+          "protection": "WebAuthn public verification material, not the authenticator private key."
+        }
+      }
+    },
+    {
+      "name": "patient_processing_controls",
+      "columns": [
+        "id",
+        "patient_id",
+        "request_id",
+        "purpose",
+        "created_by",
+        "created_at",
+        "released_at",
+        "released_by"
+      ],
+      "classification": "governance",
+      "purposes": [
+        "accountability, patient rights, consent, incident and retention governance"
+      ],
+      "ownerRole": "platform_operator",
+      "audience": [
+        "authorized_governance_role",
+        "patient_owned_subject_export_where_supported"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "patient_profiles",
+      "columns": [
+        "id",
+        "user_id",
+        "unique_health_id",
+        "govt_id_hash",
+        "date_of_birth",
+        "gender",
+        "blood_group",
+        "emergency_contact_name",
+        "emergency_contact_phone",
+        "emergency_contact_relation",
+        "address",
+        "city",
+        "state",
+        "country",
+        "postal_code",
+        "insurance_provider",
+        "insurance_policy_number",
+        "created_at",
+        "updated_at"
+      ],
+      "classification": "identity",
+      "purposes": [
+        "account provisioning, patient identification and reviewed care administration"
+      ],
+      "ownerRole": "platform_operator",
+      "audience": [
+        "self",
+        "authorized_administration_or_care"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {
+        "govt_id_hash": {
+          "classification": "identity",
+          "protection": "Deterministic government-ID hash; format/reference processing does not verify identity."
+        }
+      }
+    },
+    {
+      "name": "pharmacy_inventory",
+      "columns": [
+        "id",
+        "name",
+        "generic_name",
+        "category",
+        "location",
+        "stock_quantity",
+        "reorder_level",
+        "unit",
+        "created_at",
+        "updated_at",
+        "organization_id"
+      ],
+      "classification": "operational",
+      "purposes": [
+        "schema integrity, care scheduling, storage accounting or scoped inventory operations"
+      ],
+      "ownerRole": "platform_operator",
+      "audience": [
+        "authorized_operational_role"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "prescriptions",
+      "columns": [
+        "id",
+        "record_id",
+        "medication",
+        "generic_name",
+        "drug_code",
+        "dosage",
+        "frequency",
+        "route",
+        "duration",
+        "quantity",
+        "refills",
+        "instructions",
+        "status",
+        "prescribed_by",
+        "prescribed_at",
+        "dispensed_at",
+        "dispensed_by",
+        "created_at",
+        "updated_at"
+      ],
+      "classification": "clinical",
+      "purposes": [
+        "authorized treatment or explicitly scoped insurance/research processing"
+      ],
+      "ownerRole": "clinical_data_owner",
+      "audience": [
+        "patient_owner",
+        "authorized_care_or_insurance_role",
+        "scoped_research_aggregates_only"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "privacy_breaches",
+      "columns": [
+        "incident_id",
+        "discovered_at",
+        "assessment_version",
+        "assessment_ciphertext",
+        "created_by",
+        "created_at",
+        "updated_at"
+      ],
+      "classification": "governance",
+      "purposes": [
+        "accountability, patient rights, consent, incident and retention governance"
+      ],
+      "ownerRole": "platform_operator",
+      "audience": [
+        "authorized_governance_role",
+        "patient_owned_subject_export_where_supported"
+      ],
+      "applicationEncryption": "selected_fields",
+      "encryptedColumns": [
+        "assessment_ciphertext"
+      ],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {
+        "assessment_ciphertext": {
+          "classification": "governance",
+          "protection": "Application AES-GCM ciphertext with identity context; preserve the original application key."
+        }
+      }
+    },
+    {
+      "name": "privacy_rights_history",
+      "columns": [
+        "id",
+        "request_id",
+        "actor_id",
+        "previous_status",
+        "status",
+        "event_cipher",
+        "created_at",
+        "event_sequence"
+      ],
+      "classification": "governance",
+      "purposes": [
+        "accountability, patient rights, consent, incident and retention governance"
+      ],
+      "ownerRole": "platform_operator",
+      "audience": [
+        "authorized_governance_role",
+        "patient_owned_subject_export_where_supported"
+      ],
+      "applicationEncryption": "selected_fields",
+      "encryptedColumns": [
+        "event_cipher"
+      ],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {
+        "event_cipher": {
+          "classification": "governance",
+          "protection": "Application AES-GCM ciphertext with identity context; preserve the original application key."
+        }
+      }
+    },
+    {
+      "name": "privacy_rights_requests",
+      "columns": [
+        "id",
+        "patient_id",
+        "request_type",
+        "status",
+        "detail_cipher",
+        "outcome_cipher",
+        "due_at",
+        "resolved_at",
+        "resolved_by",
+        "created_at",
+        "updated_at"
+      ],
+      "classification": "governance",
+      "purposes": [
+        "accountability, patient rights, consent, incident and retention governance"
+      ],
+      "ownerRole": "platform_operator",
+      "audience": [
+        "authorized_governance_role",
+        "patient_owned_subject_export_where_supported"
+      ],
+      "applicationEncryption": "selected_fields",
+      "encryptedColumns": [
+        "detail_cipher",
+        "outcome_cipher"
+      ],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {
+        "detail_cipher": {
+          "classification": "governance",
+          "protection": "Application AES-GCM ciphertext with identity context; preserve the original application key."
+        },
+        "outcome_cipher": {
+          "classification": "governance",
+          "protection": "Application AES-GCM ciphertext with identity context; preserve the original application key."
+        }
+      }
+    },
+    {
+      "name": "radiology_reports",
+      "columns": [
+        "id",
+        "imaging_order_id",
+        "patient_id",
+        "radiologist_id",
+        "organization_id",
+        "report_title",
+        "findings",
+        "impression",
+        "recommendations",
+        "file_path",
+        "file_name",
+        "file_size",
+        "status",
+        "finalized_at",
+        "created_at",
+        "updated_at"
+      ],
+      "classification": "clinical",
+      "purposes": [
+        "authorized treatment or explicitly scoped insurance/research processing"
+      ],
+      "ownerRole": "clinical_data_owner",
+      "audience": [
+        "patient_owner",
+        "authorized_care_or_insurance_role",
+        "scoped_research_aggregates_only"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "retention_disposals",
+      "columns": [
+        "id",
+        "record_id",
+        "patient_id",
+        "resource_type",
+        "policy_id",
+        "basis_cipher",
+        "approved_by",
+        "approved_at",
+        "status",
+        "executed_at",
+        "executed_by",
+        "superseded_at",
+        "superseded_by"
+      ],
+      "classification": "governance",
+      "purposes": [
+        "accountability, patient rights, consent, incident and retention governance"
+      ],
+      "ownerRole": "platform_operator",
+      "audience": [
+        "authorized_governance_role",
+        "patient_owned_subject_export_where_supported"
+      ],
+      "applicationEncryption": "selected_fields",
+      "encryptedColumns": [
+        "basis_cipher"
+      ],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {
+        "basis_cipher": {
+          "classification": "governance",
+          "protection": "Application AES-GCM ciphertext with identity context; preserve the original application key."
+        }
+      }
+    },
+    {
+      "name": "retention_file_cleanup",
+      "columns": [
+        "id",
+        "disposal_id",
+        "patient_id",
+        "file_type",
+        "file_name",
+        "cleaned_at"
+      ],
+      "classification": "governance",
+      "purposes": [
+        "accountability, patient rights, consent, incident and retention governance"
+      ],
+      "ownerRole": "platform_operator",
+      "audience": [
+        "authorized_governance_role",
+        "patient_owned_subject_export_where_supported"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Retryable cleanup ledger retained as operational evidence; no automatic ledger expiry.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "retention_holds",
+      "columns": [
+        "id",
+        "patient_id",
+        "basis_cipher",
+        "created_by",
+        "created_at",
+        "released_at",
+        "released_by"
+      ],
+      "classification": "governance",
+      "purposes": [
+        "accountability, patient rights, consent, incident and retention governance"
+      ],
+      "ownerRole": "platform_operator",
+      "audience": [
+        "authorized_governance_role",
+        "patient_owned_subject_export_where_supported"
+      ],
+      "applicationEncryption": "selected_fields",
+      "encryptedColumns": [
+        "basis_cipher"
+      ],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {
+        "basis_cipher": {
+          "classification": "governance",
+          "protection": "Application AES-GCM ciphertext with identity context; preserve the original application key."
+        }
+      }
+    },
+    {
+      "name": "retention_policies",
+      "columns": [
+        "id",
+        "organization_id",
+        "record_type",
+        "retention_days",
+        "jurisdiction",
+        "basis_cipher",
+        "created_by",
+        "active",
+        "created_at"
+      ],
+      "classification": "governance",
+      "purposes": [
+        "accountability, patient rights, consent, incident and retention governance"
+      ],
+      "ownerRole": "platform_operator",
+      "audience": [
+        "authorized_governance_role",
+        "patient_owned_subject_export_where_supported"
+      ],
+      "applicationEncryption": "selected_fields",
+      "encryptedColumns": [
+        "basis_cipher"
+      ],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {
+        "basis_cipher": {
+          "classification": "governance",
+          "protection": "Application AES-GCM ciphertext with identity context; preserve the original application key."
+        }
+      }
+    },
+    {
+      "name": "roles",
+      "columns": [
+        "id",
+        "name",
+        "description",
+        "created_at"
+      ],
+      "classification": "security",
+      "purposes": [
+        "authentication, authorization and security investigation"
+      ],
+      "ownerRole": "platform_operator",
+      "audience": [
+        "authorized_security_administration",
+        "account_owner_where_supported"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "security_events",
+      "columns": [
+        "id",
+        "user_id",
+        "event_type",
+        "severity",
+        "description",
+        "ip_address",
+        "metadata",
+        "resolved",
+        "resolved_at",
+        "resolved_by",
+        "created_at",
+        "status"
+      ],
+      "classification": "security",
+      "purposes": [
+        "authentication, authorization and security investigation"
+      ],
+      "ownerRole": "platform_operator",
+      "audience": [
+        "authorized_security_administration",
+        "account_owner_where_supported"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "sessions",
+      "columns": [
+        "id",
+        "user_id",
+        "token_hash",
+        "refresh_token_hash",
+        "ip_address",
+        "user_agent",
+        "device_info",
+        "last_activity",
+        "expires_at",
+        "is_active",
+        "created_at"
+      ],
+      "classification": "security",
+      "purposes": [
+        "authentication, authorization and security investigation"
+      ],
+      "ownerRole": "platform_operator",
+      "audience": [
+        "authorized_security_administration",
+        "account_owner_where_supported"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {
+        "token_hash": {
+          "classification": "security",
+          "protection": "Token/OTP verifier hash; expiration and replay checks remain necessary."
+        },
+        "refresh_token_hash": {
+          "classification": "security",
+          "protection": "Token/OTP verifier hash; expiration and replay checks remain necessary."
+        }
+      }
+    },
+    {
+      "name": "staff_invitations",
+      "columns": [
+        "id",
+        "email",
+        "role",
+        "token",
+        "invited_by",
+        "invitation_message",
+        "expires_at",
+        "status",
+        "accepted_by",
+        "accepted_at",
+        "cancelled_by",
+        "cancelled_at",
+        "cancellation_reason",
+        "created_at",
+        "updated_at",
+        "organization_id"
+      ],
+      "classification": "identity",
+      "purposes": [
+        "account provisioning, patient identification and reviewed care administration"
+      ],
+      "ownerRole": "platform_operator",
+      "audience": [
+        "self",
+        "authorized_administration_or_care"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {
+        "token": {
+          "classification": "security",
+          "protection": "Stored invitation bearer token; protected by access, expiry and one-time acceptance; not application-encrypted."
+        }
+      }
+    },
+    {
+      "name": "staff_org_mapping",
+      "columns": [
+        "id",
+        "user_id",
+        "organization_id",
+        "role_id",
+        "professional_license",
+        "license_verified",
+        "shift_start",
+        "shift_end",
+        "status",
+        "assigned_at",
+        "deactivated_at",
+        "employee_id",
+        "department",
+        "assigned_wards",
+        "shift_preference"
+      ],
+      "classification": "identity",
+      "purposes": [
+        "account provisioning, patient identification and reviewed care administration"
+      ],
+      "ownerRole": "platform_operator",
+      "audience": [
+        "self",
+        "authorized_administration_or_care"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "triage_sessions",
+      "columns": [
+        "id",
+        "patient_id",
+        "conversation",
+        "soap_summary",
+        "recommended_department",
+        "priority",
+        "confidence_score",
+        "status",
+        "created_at",
+        "updated_at"
+      ],
+      "classification": "clinical",
+      "purposes": [
+        "authorized treatment or explicitly scoped insurance/research processing"
+      ],
+      "ownerRole": "clinical_data_owner",
+      "audience": [
+        "patient_owner",
+        "authorized_care_or_insurance_role",
+        "scoped_research_aggregates_only"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Completed intake only: versioned triage_session policy and legal holds; active sessions cannot be disposed.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "users",
+      "columns": [
+        "id",
+        "email",
+        "phone",
+        "password_hash",
+        "first_name",
+        "last_name",
+        "role_id",
+        "is_verified",
+        "status",
+        "last_login",
+        "failed_login_attempts",
+        "account_locked_until",
+        "profile_photo",
+        "created_at",
+        "updated_at",
+        "account_status",
+        "verification_status",
+        "suspended_at",
+        "verified_at",
+        "address",
+        "suspended_by",
+        "suspension_reason",
+        "verified_by",
+        "verification_notes",
+        "department"
+      ],
+      "classification": "identity",
+      "purposes": [
+        "account provisioning, patient identification and reviewed care administration"
+      ],
+      "ownerRole": "platform_operator",
+      "audience": [
+        "self",
+        "authorized_administration_or_care"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {
+        "password_hash": {
+          "classification": "security",
+          "protection": "bcrypt password hash; not reversible encryption."
+        }
+      }
+    },
+    {
+      "name": "verification_documents",
+      "columns": [
+        "id",
+        "user_id",
+        "document_type",
+        "document_url",
+        "status",
+        "uploaded_at",
+        "verified_at",
+        "verified_by",
+        "rejection_reason"
+      ],
+      "classification": "identity",
+      "purposes": [
+        "account provisioning, patient identification and reviewed care administration"
+      ],
+      "ownerRole": "platform_operator",
+      "audience": [
+        "self",
+        "authorized_administration_or_care"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "visit_notes",
+      "columns": [
+        "id",
+        "visit_id",
+        "author_id",
+        "note_type",
+        "subjective",
+        "objective",
+        "assessment",
+        "plan",
+        "is_locked",
+        "locked_at",
+        "created_at",
+        "updated_at"
+      ],
+      "classification": "clinical",
+      "purposes": [
+        "authorized treatment or explicitly scoped insurance/research processing"
+      ],
+      "ownerRole": "clinical_data_owner",
+      "audience": [
+        "patient_owner",
+        "authorized_care_or_insurance_role",
+        "scoped_research_aggregates_only"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "visit_staff_assignments",
+      "columns": [
+        "id",
+        "visit_id",
+        "staff_user_id",
+        "role",
+        "assigned_at",
+        "revoked_at",
+        "revoked_by",
+        "access_level"
+      ],
+      "classification": "clinical",
+      "purposes": [
+        "authorized treatment or explicitly scoped insurance/research processing"
+      ],
+      "ownerRole": "clinical_data_owner",
+      "audience": [
+        "patient_owner",
+        "authorized_care_or_insurance_role",
+        "scoped_research_aggregates_only"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "visits",
+      "columns": [
+        "id",
+        "patient_id",
+        "organization_id",
+        "status",
+        "visit_code",
+        "visit_type",
+        "chief_complaint",
+        "check_in_time",
+        "check_out_time",
+        "created_at",
+        "updated_at",
+        "type",
+        "priority",
+        "reason",
+        "symptoms",
+        "assigned_doctor_id",
+        "assigned_nurse_id",
+        "scheduled_time",
+        "otp_code",
+        "otp_expires_at",
+        "otp_verified",
+        "access_level",
+        "closed_at",
+        "closed_by",
+        "status_history",
+        "checked_in_at",
+        "started_at",
+        "completed_at",
+        "cancelled_at",
+        "no_show_at"
+      ],
+      "classification": "clinical",
+      "purposes": [
+        "authorized treatment or explicitly scoped insurance/research processing"
+      ],
+      "ownerRole": "clinical_data_owner",
+      "audience": [
+        "patient_owner",
+        "authorized_care_or_insurance_role",
+        "scoped_research_aggregates_only"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "workflow_logs",
+      "columns": [
+        "id",
+        "visit_id",
+        "user_id",
+        "action",
+        "entity_type",
+        "entity_id",
+        "old_state",
+        "new_state",
+        "metadata",
+        "ip_address",
+        "user_agent",
+        "created_at"
+      ],
+      "classification": "clinical",
+      "purposes": [
+        "authorized treatment or explicitly scoped insurance/research processing"
+      ],
+      "ownerRole": "clinical_data_owner",
+      "audience": [
+        "patient_owner",
+        "authorized_care_or_insurance_role",
+        "scoped_research_aggregates_only"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Requires an approved category-specific policy. No automatic disposal is implemented for this table; retained clinical dependencies and governance evidence must be reviewed separately.",
+      "columnOverrides": {}
+    }
+  ],
+  "stores": [
+    {
+      "id": "encrypted_upload_stage",
+      "classification": "clinical",
+      "purpose": "Bounded upload scanning/encryption and coordinated ciphertext materialization",
+      "protection": "Memory-first intake; encrypted payloads in private temporary staging; no plaintext database dump files",
+      "retention": "Request/job-scoped cleanup; process crash can leave orphaned ciphertext for reviewed reconciliation",
+      "assurance": "Scanner availability/signatures, host temporary storage and quota monitoring need owner evidence"
+    },
+    {
+      "id": "backblaze_archives",
+      "classification": "clinical",
+      "purpose": "Off-host database/file recovery",
+      "protection": "Authenticated SHMSBKP1 envelope under a separate backup key; file-only bucket credential; exact-cloud-download recovery gate",
+      "retention": "Latest daily point for seven distinct UTC dates and first successful snapshot for three UTC monthly periods; older PGP snapshot is outside managed names",
+      "assurance": "Completed November 1 cloud/application drills are recorded; preserve both keys separately and observe future timed executions"
+    },
+    {
+      "id": "application_logs",
+      "classification": "security",
+      "purpose": "Operational diagnosis without clinical request payloads",
+      "protection": "Allowlisted/sanitized metadata; finite rotated logs; no guarantee supplied for provider log-store encryption",
+      "retention": "Application transport rotation is bounded; hosting log retention needs provider/operator policy",
+      "assurance": "Owner must verify provider logging destination, access, encryption and expiry"
+    },
+    {
+      "id": "monitoring",
+      "classification": "operational",
+      "purpose": "Private metrics and operational alerts",
+      "protection": "Dedicated metrics bearer secret and private observability overlay; no clinical scrape payload",
+      "retention": "Bounded configured metrics retention; provider deployment and receiver configuration remain pending",
+      "assurance": "Actual alert delivery/recovery is unverified"
+    },
+    {
+      "id": "email",
+      "classification": "identity",
+      "purpose": "Account verification, invitations and selected notifications",
+      "protection": "Configured SMTP requires verified TLS in production; recipient delivery is separate evidence",
+      "retention": "Mailbox/provider retention and deletion follow approved provider/organization policy, not clinical disposal code",
+      "assurance": "No actual SMTP receipt is claimed; configure reviewed recipients and provider arrangements"
+    },
+    {
+      "id": "ai_working_memory",
+      "classification": "clinical",
+      "purpose": "Optional patient-initiated bounded intake",
+      "protection": "Authenticated internal service with process-local bounded session state; external model calls require explicit configuration/review",
+      "retention": "Short-lived process-local memory; separately persisted triage rows need approved retention policy",
+      "assurance": "AI provider operation, data handling, clinical validation and multi-instance behavior require owner review"
+    },
+    {
+      "id": "recovery_key_custody",
+      "classification": "security",
+      "purpose": "Decrypt application fields and independently encrypted archives",
+      "protection": "Keys remain separate from B2 payloads; backup worker has only the application-key fingerprint",
+      "retention": "Preserve original keys for retained ciphertext; rotation/re-encryption is an outstanding operational engineering concern",
+      "assurance": "Protected off-host key custody and recovery/rotation evidence require the operator"
+    }
+  ]
+}

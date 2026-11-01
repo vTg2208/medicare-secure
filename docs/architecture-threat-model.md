@@ -15,7 +15,7 @@ flowchart LR
   D --> J[Atomic mutation evidence and retained hash chain]
   A --> G[Officer-only breach / privacy governance]
   G --> D
-  D --> B[Quiesced encrypted backup]
+  D --> B[Coordinated encrypted snapshot and cloud recovery gate]
   S --> B
   K[Separate recovery key store] -. preserve keys separately .-> B
   A --> M[Private authenticated metrics]
@@ -38,7 +38,9 @@ Application envelopes protect reports, credentials, governance narratives and ba
 | Concurrent audit writers or stale export snapshots | Serialized hash-chain head row and repeatable-read serialization rejection/retry. | Actual concurrency/hash integrity tests. Database-owner tampering or destruction requires external backup/monitoring evidence. |
 | Temporary relation/function shadowing | Schema-qualified audit state/functions and locked clinical-trigger search path. | Actual shadow-table regression; API principal has no schema DDL privilege. |
 | Research re-identification | Explicit research consent, no row-level/identity output, suppressed small distinct-patient aggregates. | Cohort threshold/revocation tests. No differential privacy or formal anonymity proof; differencing and auxiliary-data risks remain subject to study governance. |
-| Backup loss, tamper or unsafe restoration | Independent backup key, authenticated manifest/checksums, no plaintext dump files, strict paths and fresh disposable restore targets. | Actual PostgreSQL dump/restore, encrypted-file decryption, tamper/refusal/partial-restore cleanup tests. A recurring external backup and real-host recovery drill remain operational requirements. |
+| Backup loss, tamper or unsafe restoration | Independent backup key, one coordinated exported snapshot, authenticated manifest/checksums, strict paths and fresh disposable restore targets. | Actual live B2 downloads, database/file recovery, application decryption and same-day rotation passed; the daily schedule is enabled. Recovery objectives, promotion/failover acceptance and operator alert delivery remain external requirements. |
 | Log or telemetry growth | Finite file rotation, no clinical payloads in request audit, bounded monitoring retention and real failure metrics. | Log transport test and Prometheus rule validation. Alert receiver and actual delivery require explicit deployment configuration. |
 
 The API is designed to demonstrate compliance-aware controls. It does not make a medical decision, determine legal applicability automatically or certify the hosting environment.
+
+The checked [control matrix](compliance/control-evidence.md), exact [catalog inventory](compliance/data-inventory.json), [data lifecycle](compliance/data-lifecycle.md) and [external-assurance checklist](compliance/operational-assurance.md) separate current implementation from historical test results and provider/owner responsibilities. Render's logical upload root is not a persistent disk: current durable ciphertext is held in the private PostgreSQL object table. The remote worker reads those objects in the same snapshot as their database references.
