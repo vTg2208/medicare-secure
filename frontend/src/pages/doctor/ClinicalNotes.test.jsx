@@ -1,0 +1,30 @@
+import React from 'react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
+import { ThemeProvider } from '../../context/ThemeContext';
+import ClinicalNotes from './ClinicalNotes';
+import { visitApi } from '../../api/visitApi';
+import { emrApi } from '../../api/emrApi';
+
+test('reuses the persisted consultation after selecting a visit and cancels prescriptions on the server', async () => {
+    const user = userEvent.setup();
+    vi.spyOn(visitApi, 'getActiveVisits').mockResolvedValue({ data: [{ id: 'visit', patient_id: 'patient', patient_first_name: 'Patient', patient_last_name: 'One' }] });
+    vi.spyOn(emrApi, 'getVisitPrescriptions').mockResolvedValue({ success: true, data: [{ id: 'old-rx', medication: 'Medication A', status: 'pending' }] });
+    vi.spyOn(emrApi, 'getVisitDiagnoses').mockResolvedValue({ success: true, data: [] });
+    vi.spyOn(emrApi, 'getPatientMedicalRecords').mockResolvedValue({ data: { records: [{ id: 'wrong-visit-record', visit_id: 'other-visit' }, { id: 'consultation', visit_id: 'visit' }] } });
+    const prescribe = vi.spyOn(emrApi, 'createPrescription').mockResolvedValue({ success: true, data: { id: 'new-rx', medication: 'Amoxicillin' } });
+    const cancel = vi.spyOn(emrApi, 'updatePrescriptionStatus').mockResolvedValue({ success: true, data: { id: 'old-rx', medication: 'Medication A', status: 'cancelled' } });
+    render(<MemoryRouter><ThemeProvider><ClinicalNotes /></ThemeProvider></MemoryRouter>);
+    await user.click(await screen.findByRole('button', { name: /Patient One/ }));
+    await user.click(screen.getByRole('button', { name: /^Prescriptions/ }));
+    await user.click(screen.getByRole('button', { name: '+ Add Prescription' }));
+    await user.type(screen.getByPlaceholderText('e.g., Amoxicillin'), 'Amoxicillin');
+    await user.type(screen.getByPlaceholderText('e.g., 500mg'), '500mg');
+    await user.selectOptions(screen.getAllByRole('combobox')[0], 'Once daily');
+    await user.click(screen.getByRole('button', { name: 'Add Prescription' }));
+    await waitFor(() => expect(prescribe).toHaveBeenCalledWith(expect.objectContaining({ recordId: 'consultation', visitId: 'visit', patientId: 'patient', route: 'oral' })));
+    await user.click(screen.getByRole('button', { name: 'Cancel Medication A prescription' }));
+    await waitFor(() => expect(cancel).toHaveBeenCalledWith('old-rx', 'cancelled'));
+    expect(await screen.findByText('cancelled')).toBeInTheDocument();
+});

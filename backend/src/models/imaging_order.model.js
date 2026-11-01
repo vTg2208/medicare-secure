@@ -84,50 +84,35 @@ class ImagingOrderModel {
      * @returns {Promise<Object>} Updated order
      */
     static async updateStatus(orderId, status, additionalData = {}) {
-        try {
-            let query = 'UPDATE imaging_orders SET status = $1, updated_at = NOW()';
-            const params = [status];
-            let paramIndex = 2;
-
-            // Add timestamp fields based on status
-            if (status === 'scheduled' && additionalData.scheduledTime) {
-                query += `, scheduled_time = $${paramIndex}`;
-                params.push(additionalData.scheduledTime);
-                paramIndex++;
-            }
-
-            if (status === 'completed' && !additionalData.performed_at) {
-                query += `, performed_at = $${paramIndex}`;
-                params.push(new Date());
-                paramIndex++;
-            }
-
-            // Add imaging_report_id if provided
-            if (additionalData.imagingReportId) {
-                query += `, imaging_report_id = $${paramIndex}`;
-                params.push(additionalData.imagingReportId);
-                paramIndex++;
-            }
-
-            query += ` WHERE id = $${paramIndex} RETURNING *`;
-            params.push(orderId);
-
-            const result = await pool.query(query, params);
-
-            if (result.rows.length === 0) {
-                throw new Error('Imaging order not found');
-            }
-
-            logger.info('Imaging order status updated', {
-                orderId,
-                status
-            });
-
-            return result.rows[0];
-        } catch (error) {
-            logger.error('Failed to update imaging order status:', error);
-            throw error;
+        const transitions = {
+            ordered: ['scheduled', 'in_progress', 'completed', 'cancelled'],
+            scheduled: ['in_progress', 'completed', 'cancelled'],
+            in_progress: ['completed', 'cancelled'],
+        };
+        if (!['scheduled', 'in_progress', 'completed', 'cancelled'].includes(status)) {
+            throw Object.assign(new Error('Invalid imaging order status'), { statusCode: 400 });
         }
+        if (additionalData.scheduledTime && !Number.isFinite(Date.parse(additionalData.scheduledTime))) {
+            throw Object.assign(new Error('Invalid imaging scheduled time'), { statusCode: 400 });
+        }
+        return pool.transaction(async client => {
+            const order = (await client.query('SELECT id,visit_id,status,imaging_report_id FROM imaging_orders WHERE id=$1 FOR UPDATE', [orderId])).rows[0];
+            if (!order) throw Object.assign(new Error('Imaging order not found'), { statusCode: 404 });
+            if (!transitions[order.status]?.includes(status)) throw Object.assign(new Error(`Cannot transition imaging order from ${order.status} to ${status}`), { statusCode: 409 });
+            const reportId = additionalData.imagingReportId || order.imaging_report_id;
+            if (status === 'completed' && !reportId) throw Object.assign(new Error('A published imaging report is required before completion'), { statusCode: 409 });
+            if (reportId) {
+                const linked = await client.query(`SELECT ir.id FROM imaging_reports ir JOIN medical_records mr ON mr.id=ir.record_id
+                    WHERE ir.id=$1 AND mr.visit_id=$2`, [reportId, order.visit_id]);
+                if (!linked.rows.length) throw Object.assign(new Error('Imaging report does not belong to this visit'), { statusCode: 400 });
+            }
+            const values = [status, reportId || null, orderId];
+            let scheduled = '';
+            if (status === 'scheduled' && additionalData.scheduledTime) { scheduled = ',scheduled_time=$4'; values.push(additionalData.scheduledTime); }
+            const result = await client.query(`UPDATE imaging_orders SET status=$1,imaging_report_id=$2,updated_at=NOW()
+                ${status === 'completed' ? ',performed_at=NOW(),completed_at=NOW()' : ''}${scheduled} WHERE id=$3 RETURNING *`, values);
+            return result.rows[0];
+        });
     }
 
     /**

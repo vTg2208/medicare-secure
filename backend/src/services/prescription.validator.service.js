@@ -128,8 +128,10 @@ class PrescriptionValidatorService {
         const validPatterns = [
             /^\d+\s*times?\s*(daily|per day|a day)$/i,
             /^(once|twice|thrice)\s*(daily|per day|a day)$/i,
+            /^(three|four)\s+times\s+daily$/i,
             /^every\s+\d+\s*(hours?|hrs?)$/i,
             /^(morning|evening|night|bedtime)$/i,
+            /^(before meals|after meals|at bedtime)$/i,
             /^as\s+needed$/i,
             /^prn$/i,
             /^q\d+h$/i, // Medical abbreviation (e.g., q6h = every 6 hours)
@@ -251,15 +253,7 @@ class PrescriptionValidatorService {
             };
         }
 
-        const validTransitions = {
-            'pending': ['active', 'cancelled'],
-            'active': ['completed', 'cancelled', 'expired'],
-            'completed': [],
-            'cancelled': [],
-            'expired': []
-        };
-
-        const allowedStatuses = validTransitions[prescription.status] || [];
+        const allowedStatuses = PrescriptionModel.allowedStatuses(prescription.status);
 
         if (!allowedStatuses.includes(newStatus)) {
             return {

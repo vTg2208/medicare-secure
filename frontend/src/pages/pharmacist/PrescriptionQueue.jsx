@@ -15,15 +15,18 @@ const PrescriptionQueue = () => {
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('all'); // all, pending, dispensed
     const [processingId, setProcessingId] = useState(null);
+    const [error, setError] = useState('');
 
     const fetchPrescriptions = useCallback(async () => {
         try {
             setLoading(true);
+            setError('');
             const response = await pharmacistApi.getPrescriptions(filter);
             if (response && response.success) {
                 setPrescriptions(response.data);
             }
         } catch (error) {
+            setError(error.response?.data?.message || 'Unable to load prescriptions. Please retry.');
         } finally {
             setLoading(false);
         }
@@ -34,12 +37,14 @@ const PrescriptionQueue = () => {
     const handleDispense = async (id) => {
         try {
             setProcessingId(id);
+            setError('');
             const response = await pharmacistApi.dispensePrescription(id);
             if (response && response.success) {
                 // Refresh list
                 fetchPrescriptions();
             }
         } catch (error) {
+            setError(error.response?.data?.message || 'Unable to dispense this prescription. Please retry.');
         } finally {
             setProcessingId(null);
         }
@@ -150,6 +155,7 @@ const PrescriptionQueue = () => {
                     </div>
 
                     {/* Prescriptions List */}
+                    {error && <p role="alert" className="mb-4 text-[var(--mc-danger)]">{error}</p>}
                     <div className="bg-surface dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800/80 rounded-3xl overflow-hidden shadow-sm flex-1 flex flex-col relative z-10">
                         {loading && prescriptions.length > 0 && (
                             <div className="absolute inset-0 bg-surface dark:bg-slate-900/50 z-20 flex items-center justify-center">
@@ -206,7 +212,7 @@ const PrescriptionQueue = () => {
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-4 text-right">
-                                                    {rx.status === 'pending' ? (
+                                                    {['pending', 'active'].includes(rx.status) ? (
                                                         <button
                                                             onClick={() => handleDispense(rx.id)}
                                                             disabled={processingId === rx.id}
@@ -219,7 +225,7 @@ const PrescriptionQueue = () => {
                                                             )}
                                                         </button>
                                                     ) : (
-                                                        <span className="text-slate-400 dark:text-slate-500 material-symbols-outlined" title="Already dispensed">check_circle</span>
+                                                        <span className="text-slate-400 dark:text-slate-500">{rx.status}</span>
                                                     )}
                                                 </td>
                                             </tr>

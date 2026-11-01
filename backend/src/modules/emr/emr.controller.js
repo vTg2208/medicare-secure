@@ -11,6 +11,8 @@ const PrescriptionValidatorService = require('../../services/prescription.valida
 const DrugInteractionService = require('../../services/drug.interaction.service');
 const { checkConsent } = require('../../models/consent.model');
 const auditService = require('../../services/audit.service');
+const db = require('../../config/db');
+const logger = require('../../utils/logger');
 
 class EmrController {
     // ==================== Medical Records ====================
@@ -46,7 +48,7 @@ class EmrController {
                 data: record
             });
         } catch (error) {
-            console.error('Create medical record error:', error);
+            logger.error('Create medical record error:', error);
             res.status(500).json({
                 success: false,
                 message: error.message || 'Failed to create medical record'
@@ -81,7 +83,7 @@ class EmrController {
                 data: record
             });
         } catch (error) {
-            console.error('Get medical record error:', error);
+            logger.error('Get medical record error:', error);
             res.status(500).json({
                 success: false,
                 message: 'Failed to retrieve medical record'
@@ -96,7 +98,7 @@ class EmrController {
     static async getPatientMedicalRecords(req, res) {
         try {
             const { patientId } = req.params;
-            const { type, limit, offset } = req.query;
+            const { type, visitId, limit, offset } = req.query;
             const userId = req.user.id;
             const userRole = req.user.roleName.toUpperCase();
 
@@ -110,11 +112,12 @@ class EmrController {
 
             const records = await MedicalRecordModel.findByPatientId(patientId, {
                 type,
+                visitId,
                 limit: parseInt(limit) || 50,
                 offset: parseInt(offset) || 0
             });
 
-            const count = await MedicalRecordModel.countByPatient(patientId, type);
+            const count = await MedicalRecordModel.countByPatient(patientId, type, visitId);
 
             // Create audit log ONLY if accessing user is NOT the patient owner
             // Patients don't need to see their own "viewed records" dashboard refresh clutter
@@ -146,7 +149,7 @@ class EmrController {
                 }
             });
         } catch (error) {
-            console.error('Get patient medical records error:', error);
+            logger.error('Get patient medical records error:', error);
             res.status(500).json({
                 success: false,
                 message: 'Failed to retrieve medical records'
@@ -189,7 +192,7 @@ class EmrController {
                 data: diagnosis
             });
         } catch (error) {
-            console.error('Create diagnosis error:', error);
+            logger.error('Create diagnosis error:', error);
             res.status(500).json({
                 success: false,
                 message: error.message || 'Failed to create diagnosis'
@@ -216,7 +219,7 @@ class EmrController {
                 data: newVersion
             });
         } catch (error) {
-            console.error('Create diagnosis addendum error:', error);
+            logger.error('Create diagnosis addendum error:', error);
             res.status(500).json({
                 success: false,
                 message: error.message || 'Failed to create diagnosis addendum'
@@ -240,7 +243,7 @@ class EmrController {
                 data: diagnosis
             });
         } catch (error) {
-            console.error('Update diagnosis status error:', error);
+            logger.error('Update diagnosis status error:', error);
             res.status(500).json({
                 success: false,
                 message: error.message || 'Failed to update diagnosis status'
@@ -255,25 +258,14 @@ class EmrController {
         try {
             const { visitId } = req.params;
 
-            // First find a medical record for this visit
-            const records = await MedicalRecordModel.findByVisitId(visitId);
-            if (!records || records.length === 0) {
-                return res.json({
-                    success: true,
-                    data: []
-                });
-            }
-
-            // Get diagnoses for the most recent record of this visit
-            const recordId = records[0].id;
-            const diagnoses = await DiagnosisModel.findByRecordId(recordId);
+            const diagnoses = await DiagnosisModel.findByVisitId(visitId);
 
             res.json({
                 success: true,
                 data: diagnoses
             });
         } catch (error) {
-            console.error('Get diagnoses error:', error);
+            logger.error('Get diagnoses error:', error);
             res.status(500).json({
                 success: false,
                 message: 'Failed to retrieve diagnoses'
@@ -331,7 +323,7 @@ class EmrController {
                 }
             });
         } catch (error) {
-            console.error('Create prescription error:', error);
+            logger.error('Create prescription error:', error);
             res.status(500).json({
                 success: false,
                 message: error.message || 'Failed to create prescription'
@@ -352,7 +344,7 @@ class EmrController {
                 data: prescriptions
             });
         } catch (error) {
-            console.error('Get prescriptions error:', error);
+            logger.error('Get prescriptions error:', error);
             res.status(500).json({
                 success: false,
                 message: 'Failed to retrieve prescriptions'
@@ -377,7 +369,7 @@ class EmrController {
                 data: result
             });
         } catch (error) {
-            console.error('Check drug interactions error:', error);
+            logger.error('Check drug interactions error:', error);
             res.status(500).json({
                 success: false,
                 message: 'Failed to check drug interactions'
@@ -392,6 +384,12 @@ class EmrController {
         try {
             const { prescriptionId } = req.params;
             const { status } = req.body;
+
+            const allowedActions = req.user.roleName === 'pharmacist' ? ['completed']
+                : req.user.roleName === 'doctor' ? ['active', 'cancelled', 'expired'] : [];
+            if (!allowedActions.includes(status)) return res.status(403).json({
+                success: false, message: 'Your role cannot perform this prescription action'
+            });
 
             // Validate status transition
             const validation = await PrescriptionValidatorService.validateStatusUpdate(
@@ -419,8 +417,8 @@ class EmrController {
                 data: prescription
             });
         } catch (error) {
-            console.error('Update prescription status error:', error);
-            res.status(500).json({
+            logger.error('Update prescription status error:', error);
+            res.status(error.statusCode || 500).json({
                 success: false,
                 message: error.message || 'Failed to update prescription status'
             });
@@ -496,7 +494,7 @@ class EmrController {
                 data: labResult
             });
         } catch (error) {
-            console.error('Upload lab result error:', error);
+            logger.error('Upload lab result error:', error);
             res.status(500).json({
                 success: false,
                 message: error.message || 'Failed to upload lab result'
@@ -529,7 +527,7 @@ class EmrController {
                 data: order
             });
         } catch (error) {
-            console.error('Create lab order error:', error);
+            logger.error('Create lab order error:', error);
             res.status(500).json({
                 success: false,
                 message: error.message || 'Failed to create lab order'
@@ -550,7 +548,7 @@ class EmrController {
                 data: orders
             });
         } catch (error) {
-            console.error('Get lab orders error:', error);
+            logger.error('Get lab orders error:', error);
             res.status(500).json({
                 success: false,
                 message: 'Failed to retrieve lab orders'
@@ -562,10 +560,11 @@ class EmrController {
 
     /**
      * Upload imaging report
-     * Accepts either recordId directly, or visitId (auto-resolves to recordId).
+     * Accepts a record, visit or order and publishes the report atomically.
      * If orderId is provided, the imaging order is marked as completed.
      */
     static async uploadImagingReport(req, res) {
+        let fileInfo;
         try {
             if (!req.file) {
                 return res.status(400).json({
@@ -574,65 +573,10 @@ class EmrController {
                 });
             }
 
-            let {
-                recordId,
-                visitId,
-                orderId,
-                imagingType,
-                bodyPart,
-                findings,
-                impression,
-                radiologistNotes,
-                performedBy,
-                reportedBy,
-                studyDate
-            } = req.body;
-
-            // Resolve recordId from visitId if not provided directly
-            let record = null;
-            if (recordId) {
-                record = await MedicalRecordModel.findById(recordId);
-            } else if (visitId) {
-                // Look up the most recent medical record for this visit
-                const records = await MedicalRecordModel.findByVisitId
-                    ? await MedicalRecordModel.findByVisitId(visitId)
-                    : null;
-
-                if (records && records.length > 0) {
-                    record = records[0];
-                    recordId = record.id;
-                } else {
-                    // Auto-create a medical record for this visit so the report can be stored
-                    try {
-                        record = await MedicalRecordModel.create({
-                            visitId,
-                            patientId: req.clinicalContext.patient_id,
-                            type: 'imaging',
-                            title: `Imaging Report - ${imagingType || 'General'}`,
-                            description: `Auto-created for imaging report upload`,
-                            createdBy: req.user.id,
-                            immutableFlag: true
-                        });
-                        recordId = record.id;
-                    } catch (createErr) {
-                        console.warn('Auto-create medical record failed:', createErr.message);
-                        return res.status(400).json({
-                            success: false,
-                            message: 'Could not resolve medical record. Please provide a valid recordId or visitId.'
-                        });
-                    }
-                }
-            }
-
-            if (!record) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Medical record not found. Provide a valid recordId or visitId.'
-                });
-            }
+            const { orderId, imagingType, bodyPart, findings, impression, radiologistNotes, studyDate } = req.body;
 
             // Check if file is DICOM
-            const fileBuffer = await require('fs/promises').readFile(req.file.path);
+            const fileBuffer = req.file.buffer || await require('fs/promises').readFile(req.file.path);
             const isDicom = DicomService.isDicomFile(fileBuffer);
 
             let dicomMetadata = null;
@@ -640,49 +584,53 @@ class EmrController {
                 try {
                     dicomMetadata = DicomService.extractMetadata(fileBuffer);
                 } catch (error) {
-                    console.warn('DICOM metadata extraction failed:', error.message);
+                    logger.warn('DICOM metadata extraction failed', error);
                 }
             }
 
             // Process file upload
-            const fileInfo = await FileUploadService.processUpload(req.file, {
-                patientId: record.patient_id,
-                recordId,
+            fileInfo = await FileUploadService.processUpload(req.file, {
+                patientId: req.clinicalContext.patient_id,
                 fileType: 'imaging',
                 scanForMalware: true
             });
-
-            // Create imaging report record
-            const imagingReport = await ImagingReportModel.create({
-                recordId,
-                imagingType,
-                bodyPart,
-                fileUrl: fileInfo.fileUrl,
-                fileName: fileInfo.fileName,
-                fileType: fileInfo.fileType,
-                fileSize: fileInfo.fileSize,
-                isDicom,
-                dicomMetadata,
-                findings,
-                impression,
-                radiologistNotes,
-                orderedBy: req.user.id,
-                performedBy: req.user.id,
-                reportedBy: req.user.id,
-                studyDate
-            });
-
-            // If an orderId was provided, mark the imaging order as completed
-            if (orderId) {
-                try {
-                    await ImagingOrderModel.updateStatus(orderId, 'completed', {
-                        imagingReportId: imagingReport.id
-                    });
-                } catch (orderErr) {
-                    console.warn('Failed to update imaging order status:', orderErr.message);
-                    // Non-fatal — the report was still uploaded successfully
+            const imagingReport = await db.transaction(async client => {
+                let order;
+                if (orderId) {
+                    order = (await client.query(`SELECT io.*,v.patient_id FROM imaging_orders io JOIN visits v ON v.id=io.visit_id
+                        WHERE io.id=$1 FOR UPDATE OF io`, [orderId])).rows[0];
+                    if (!order) throw Object.assign(new Error('Imaging order not found'), { statusCode: 404 });
+                    if (['completed', 'cancelled'].includes(order.status)) throw Object.assign(new Error('Imaging order is not open'), { statusCode: 409 });
+                    if (order.patient_id !== req.clinicalContext.patient_id) throw Object.assign(new Error('Imaging order does not match the patient'), { statusCode: 400 });
                 }
-            }
+                const visitId = req.body.visitId || order?.visit_id || req.clinicalContext.visit_id;
+                const typeMap = { 'x-ray': 'x-ray', xray: 'x-ray', ct: 'ct_scan', 'ct scan': 'ct_scan', ct_scan: 'ct_scan',
+                    mri: 'mri', ultrasound: 'ultrasound', pet: 'pet_scan', pet_scan: 'pet_scan', mammogram: 'mammogram', mammography: 'mammogram', dicom: 'dicom' };
+                const reportType = typeMap[String(imagingType || order?.imaging_type || (isDicom ? 'dicom' : 'other')).toLowerCase()] || 'other';
+                let record;
+                if (req.body.recordId) {
+                    record = (await client.query('SELECT id,patient_id,visit_id FROM medical_records WHERE id=$1', [req.body.recordId])).rows[0];
+                    if (!record) throw Object.assign(new Error('Medical record not found'), { statusCode: 404 });
+                } else if (visitId) {
+                    record = await MedicalRecordModel.create({
+                        patientId: req.clinicalContext.patient_id, visitId, type: 'imaging',
+                        title: `Imaging Report - ${imagingType || 'General'}`, description: findings || impression || null,
+                        createdBy: req.user.id, immutableFlag: true
+                    }, client);
+                } else throw Object.assign(new Error('A valid record, visit or order is required'), { statusCode: 400 });
+                if (record.patient_id !== req.clinicalContext.patient_id || (order && record.visit_id !== order.visit_id)) {
+                    throw Object.assign(new Error('Medical record does not match the imaging order'), { statusCode: 400 });
+                }
+                const report = await ImagingReportModel.create({
+                    recordId: record.id, imagingType: reportType, bodyPart: bodyPart || order?.body_part,
+                    fileUrl: fileInfo.fileUrl, fileName: fileInfo.fileName, fileType: fileInfo.fileType, fileSize: fileInfo.fileSize,
+                    isDicom, dicomMetadata, findings, impression, radiologistNotes,
+                    orderedBy: order?.ordered_by || req.user.id, performedBy: req.user.id, reportedBy: req.user.id, studyDate
+                }, client);
+                if (order) await client.query(`UPDATE imaging_orders SET status='completed',imaging_report_id=$1,
+                    performed_at=NOW(),completed_at=NOW(),updated_at=NOW() WHERE id=$2`, [report.id, orderId]);
+                return report;
+            });
 
             res.status(201).json({
                 success: true,
@@ -691,8 +639,9 @@ class EmrController {
                 isDicom
             });
         } catch (error) {
-            console.error('Upload imaging report error:', error);
-            res.status(500).json({
+            if (fileInfo?.filePath) await FileUploadService.deleteFile(fileInfo.filePath).catch(() => {});
+            logger.error('Upload imaging report error:', error);
+            res.status(error.statusCode || 500).json({
                 success: false,
                 message: error.message || 'Failed to upload imaging report'
             });
@@ -724,7 +673,7 @@ class EmrController {
                 data: order
             });
         } catch (error) {
-            console.error('Create imaging order error:', error);
+            logger.error('Create imaging order error:', error);
             res.status(500).json({
                 success: false,
                 message: error.message || 'Failed to create imaging order'
@@ -745,7 +694,7 @@ class EmrController {
                 data: orders
             });
         } catch (error) {
-            console.error('Get imaging orders error:', error);
+            logger.error('Get imaging orders error:', error);
             res.status(500).json({
                 success: false,
                 message: 'Failed to retrieve imaging orders'
@@ -773,7 +722,7 @@ class EmrController {
                 data: orders
             });
         } catch (error) {
-            console.error('Get radiologist imaging orders error:', error);
+            logger.error('Get radiologist imaging orders error:', error);
             res.status(500).json({
                 success: false,
                 message: 'Failed to retrieve imaging orders'

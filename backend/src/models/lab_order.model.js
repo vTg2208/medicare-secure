@@ -80,50 +80,30 @@ class LabOrderModel {
      * @returns {Promise<Object>} Updated order
      */
     static async updateStatus(orderId, status, additionalData = {}) {
-        try {
-            let query = 'UPDATE lab_orders SET status = $1, updated_at = NOW()';
-            const params = [status];
-            let paramIndex = 2;
-
-            // Add timestamp fields based on status
-            if (status === 'collected' && !additionalData.specimen_collected_at) {
-                query += `, specimen_collected_at = $${paramIndex}`;
-                params.push(new Date());
-                paramIndex++;
-            }
-
-            if (status === 'completed' && !additionalData.result_available_at) {
-                query += `, result_available_at = $${paramIndex}`;
-                params.push(new Date());
-                paramIndex++;
-            }
-
-            // Add lab_result_id if provided
-            if (additionalData.labResultId) {
-                query += `, lab_result_id = $${paramIndex}`;
-                params.push(additionalData.labResultId);
-                paramIndex++;
-            }
-
-            query += ` WHERE id = $${paramIndex} RETURNING *`;
-            params.push(orderId);
-
-            const result = await pool.query(query, params);
-
-            if (result.rows.length === 0) {
-                throw new Error('Lab order not found');
-            }
-
-            logger.info('Lab order status updated', {
-                orderId,
-                status
-            });
-
-            return result.rows[0];
-        } catch (error) {
-            logger.error('Failed to update lab order status:', error);
-            throw error;
+        const transitions = {
+            ordered: ['collected', 'in_progress', 'completed', 'cancelled'],
+            collected: ['in_progress', 'completed', 'cancelled'],
+            in_progress: ['completed', 'cancelled'],
+        };
+        if (!['collected', 'in_progress', 'completed', 'cancelled'].includes(status)) {
+            throw Object.assign(new Error('Invalid lab order status'), { statusCode: 400 });
         }
+        return pool.transaction(async client => {
+            const order = (await client.query('SELECT id,visit_id,status,lab_result_id FROM lab_orders WHERE id=$1 FOR UPDATE', [orderId])).rows[0];
+            if (!order) throw Object.assign(new Error('Lab order not found'), { statusCode: 404 });
+            if (!transitions[order.status]?.includes(status)) throw Object.assign(new Error(`Cannot transition lab order from ${order.status} to ${status}`), { statusCode: 409 });
+            const resultId = additionalData.labResultId || order.lab_result_id;
+            if (status === 'completed' && !resultId) throw Object.assign(new Error('A published lab result is required before completion'), { statusCode: 409 });
+            if (resultId) {
+                const linked = await client.query(`SELECT lr.id FROM lab_results lr JOIN medical_records mr ON mr.id=lr.record_id
+                    WHERE lr.id=$1 AND mr.visit_id=$2`, [resultId, order.visit_id]);
+                if (!linked.rows.length) throw Object.assign(new Error('Lab result does not belong to this visit'), { statusCode: 400 });
+            }
+            const result = await client.query(`UPDATE lab_orders SET status=$1,lab_result_id=$2,updated_at=NOW()
+                ${status === 'collected' ? ',specimen_collected_at=NOW()' : ''}
+                ${status === 'completed' ? ',result_available_at=NOW()' : ''} WHERE id=$3 RETURNING *`, [status, resultId || null, orderId]);
+            return result.rows[0];
+        });
     }
 
     /**

@@ -13,7 +13,7 @@ const { clinicalScopeSql } = require('../../middleware/clinical-access.middlewar
 const getStats = async (req, res) => {
     try {
         const pendingRes = await pool.query(
-            `SELECT COUNT(*) FROM prescriptions p JOIN medical_records mr ON p.record_id=mr.id WHERE p.status = 'pending' AND ${clinicalScopeSql('mr.patient_id','mr.visit_id','$1',req.user.roleName,'prescriptions')}`, [req.user.id]
+            `SELECT COUNT(*) FROM prescriptions p JOIN medical_records mr ON p.record_id=mr.id WHERE p.status IN ('pending','active') AND ${clinicalScopeSql('mr.patient_id','mr.visit_id','$1',req.user.roleName,'prescriptions')}`, [req.user.id]
         );
         const dispensedTodayRes = await pool.query(
             `SELECT COUNT(*) FROM prescriptions p JOIN medical_records mr ON p.record_id=mr.id WHERE p.status = 'completed' AND p.dispensed_at >= CURRENT_DATE AND ${clinicalScopeSql('mr.patient_id','mr.visit_id','$1',req.user.roleName,'prescriptions')}`, [req.user.id]
@@ -83,9 +83,12 @@ const getPrescriptions = async (req, res) => {
 
         if (status && status !== 'all') {
             // Map frontend 'dispensed' → DB 'completed'
-            const dbStatus = status === 'dispensed' ? 'completed' : status;
-            query += ` AND p.status = $${values.length + 1}`;
-            values.push(dbStatus);
+            if (status === 'pending') query += " AND p.status IN ('pending','active')";
+            else {
+                const dbStatus = status === 'dispensed' ? 'completed' : status;
+                query += ` AND p.status = $${values.length + 1}`;
+                values.push(dbStatus);
+            }
         }
 
         query += ` ORDER BY p.prescribed_at DESC LIMIT $${values.length + 1} OFFSET $${values.length + 2}`;
@@ -124,7 +127,7 @@ const dispensePrescription = async (req, res) => {
         });
     } catch (error) {
         logger.error('Pharmacist dispensePrescription error:', error);
-        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+        res.status(error.statusCode || HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: error.message || 'Failed to dispense prescription'
         });

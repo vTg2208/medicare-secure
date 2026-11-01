@@ -3,10 +3,10 @@ import './DiagnosisSelector.css';
 
 function DiagnosisSelector({ onAdd, onCancel }) {
     const [diagnosis, setDiagnosis] = useState({
-        code: '',
+        icdCode: '',
         description: '',
-        type: 'PRIMARY',
-        status: 'CONFIRMED',
+        isPrimary: true,
+        status: 'active',
         notes: '',
     });
 
@@ -26,21 +26,21 @@ function DiagnosisSelector({ onAdd, onCancel }) {
     const handleQuickSelect = (item) => {
         setDiagnosis({
             ...diagnosis,
-            code: item.code,
+            icdCode: item.code,
             description: item.description,
         });
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (diagnosis.code && diagnosis.description) {
+        if (diagnosis.icdCode && diagnosis.description) {
             onAdd && onAdd(diagnosis);
             // Reset form
             setDiagnosis({
-                code: '',
+                icdCode: '',
                 description: '',
-                type: 'PRIMARY',
-                status: 'CONFIRMED',
+                isPrimary: true,
+                status: 'active',
                 notes: '',
             });
         }
@@ -85,8 +85,8 @@ function DiagnosisSelector({ onAdd, onCancel }) {
                                 type="text"
                                 className="form-input"
                                 placeholder="e.g., J06.9"
-                                value={diagnosis.code}
-                                onChange={(e) => setDiagnosis({ ...diagnosis, code: e.target.value })}
+                                value={diagnosis.icdCode}
+                                onChange={(e) => setDiagnosis({ ...diagnosis, icdCode: e.target.value })}
                                 required
                             />
                         </div>
@@ -108,12 +108,11 @@ function DiagnosisSelector({ onAdd, onCancel }) {
                             <label>Type</label>
                             <select
                                 className="form-select"
-                                value={diagnosis.type}
-                                onChange={(e) => setDiagnosis({ ...diagnosis, type: e.target.value })}
+                                value={diagnosis.isPrimary ? 'primary' : 'secondary'}
+                                onChange={(e) => setDiagnosis({ ...diagnosis, isPrimary: e.target.value === 'primary' })}
                             >
-                                <option value="PRIMARY">Primary</option>
-                                <option value="SECONDARY">Secondary</option>
-                                <option value="DIFFERENTIAL">Differential</option>
+                                <option value="primary">Primary</option>
+                                <option value="secondary">Secondary</option>
                             </select>
                         </div>
                         <div className="form-group">
@@ -123,10 +122,10 @@ function DiagnosisSelector({ onAdd, onCancel }) {
                                 value={diagnosis.status}
                                 onChange={(e) => setDiagnosis({ ...diagnosis, status: e.target.value })}
                             >
-                                <option value="CONFIRMED">Confirmed</option>
-                                <option value="PROVISIONAL">Provisional</option>
-                                <option value="SUSPECTED">Suspected</option>
-                                <option value="RULED_OUT">Ruled Out</option>
+                                <option value="active">Active</option>
+                                <option value="resolved">Resolved</option>
+                                <option value="chronic">Chronic</option>
+                                <option value="ruled_out">Ruled Out</option>
                             </select>
                         </div>
                     </div>

@@ -6,7 +6,7 @@ class ImagingReportModel {
      * @param {Object} imagingData - Imaging report data
      * @returns {Promise<Object>} Created imaging report
      */
-    static async create(imagingData) {
+    static async create(imagingData, client = pool) {
         const {
             recordId,
             imagingType,
@@ -42,7 +42,7 @@ class ImagingReportModel {
             orderedBy, performedBy, reportedBy, studyDate
         ];
 
-        const result = await pool.query(query, values);
+        const result = await client.query(query, values);
         return result.rows[0];
     }
 

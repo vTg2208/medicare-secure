@@ -7,7 +7,7 @@ function PrescriptionForm({ onAdd, onCancel }) {
         dosage: '',
         frequency: '',
         duration: '',
-        route: 'ORAL',
+        route: 'oral',
         instructions: '',
     });
 
@@ -17,7 +17,10 @@ function PrescriptionForm({ onAdd, onCancel }) {
         'As needed', 'Before meals', 'After meals', 'At bedtime'
     ];
 
-    const routes = ['ORAL', 'IV', 'IM', 'SC', 'TOPICAL', 'INHALATION', 'RECTAL', 'SUBLINGUAL'];
+    const routes = [
+        ['oral', 'Oral'], ['intravenous', 'IV'], ['intramuscular', 'IM'],
+        ['subcutaneous', 'SC'], ['topical', 'Topical'], ['inhalation', 'Inhalation'], ['other', 'Other'],
+    ];
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -29,7 +32,7 @@ function PrescriptionForm({ onAdd, onCancel }) {
                 dosage: '',
                 frequency: '',
                 duration: '',
-                route: 'ORAL',
+                route: 'oral',
                 instructions: '',
             });
         }
@@ -103,8 +106,8 @@ function PrescriptionForm({ onAdd, onCancel }) {
                             value={prescription.route}
                             onChange={(e) => setPrescription({ ...prescription, route: e.target.value })}
                         >
-                            {routes.map(route => (
-                                <option key={route} value={route}>{route}</option>
+                            {routes.map(([value, label]) => (
+                                <option key={value} value={value}>{label}</option>
                             ))}
                         </select>
                     </div>

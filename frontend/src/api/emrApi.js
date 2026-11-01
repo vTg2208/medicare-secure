@@ -8,8 +8,8 @@ export const emrApi = {
         return response.data;
     },
 
-    getMedicalRecord: async (recordId) => {
-        const response = await apiClient.get(`/emr/medical-records/${recordId}`);
+    getMedicalRecord: async (recordId, params = {}) => {
+        const response = await apiClient.get(`/emr/medical-records/${recordId}`, { params });
         return response.data;
     },
 

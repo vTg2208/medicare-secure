@@ -7,7 +7,7 @@ class MedicalRecordModel {
      * @param {Object} recordData - Medical record data
      * @returns {Promise<Object>} Created medical record
      */
-    static async create(recordData) {
+    static async create(recordData, client = pool) {
         const {
             patientId,
             visitId,
@@ -28,7 +28,7 @@ class MedicalRecordModel {
         `;
 
         const values = [patientId, visitId, type, title, description, createdBy, immutableFlag];
-        const result = await pool.query(query, values);
+        const result = await client.query(query, values);
         return result.rows[0];
     }
 
@@ -66,7 +66,7 @@ class MedicalRecordModel {
      * @returns {Promise<Array>} Medical records
      */
     static async findByPatientId(patientId, options = {}) {
-        const { type, limit = 50, offset = 0 } = options;
+        const { type, visitId, limit = 50, offset = 0 } = options;
 
         let query = `
             SELECT 
@@ -89,6 +89,10 @@ class MedicalRecordModel {
         if (type) {
             query += ` AND mr.type = $${values.length + 1}`;
             values.push(type);
+        }
+        if (visitId) {
+            query += ` AND mr.visit_id = $${values.length + 1}`;
+            values.push(visitId);
         }
 
         query += ` ORDER BY mr.created_at DESC LIMIT $${values.length + 1} OFFSET $${values.length + 2}`;
@@ -246,13 +250,17 @@ class MedicalRecordModel {
      * @param {string} type - Optional record type filter
      * @returns {Promise<number>} Count of records
      */
-    static async countByPatient(patientId, type = null) {
+    static async countByPatient(patientId, type = null, visitId = null) {
         let query = 'SELECT COUNT(*) FROM medical_records WHERE patient_id = $1';
         const values = [patientId];
 
         if (type) {
             query += ' AND type = $2';
             values.push(type);
+        }
+        if (visitId) {
+            query += ` AND visit_id = $${values.length + 1}`;
+            values.push(visitId);
         }
 
         const result = await pool.query(query, values);

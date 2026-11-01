@@ -39,11 +39,7 @@ class DiagnosisModel {
      * @returns {Promise<Object>} New diagnosis version
      */
     static async createAddendum(originalDiagnosisId, addendumData) {
-        const client = await pool.pool.connect();
-
-        try {
-            await client.query('BEGIN');
-
+        return await pool.transaction(async client => {
             // Get original diagnosis
             await client.query('SELECT id FROM medical_records WHERE id=(SELECT record_id FROM diagnoses WHERE id=$1) FOR UPDATE',[originalDiagnosisId]);
             const originalQuery = 'SELECT * FROM diagnoses WHERE id = $1';
@@ -88,15 +84,8 @@ class DiagnosisModel {
 
             const result = await client.query(insertQuery, values);
 
-            await client.query('COMMIT');
             return result.rows[0];
-
-        } catch (error) {
-            await client.query('ROLLBACK');
-            throw error;
-        } finally {
-            client.release();
-        }
+        });
     }
 
     /**
@@ -139,6 +128,15 @@ class DiagnosisModel {
         `;
 
         const result = await pool.query(query, [recordId]);
+        return result.rows;
+    }
+
+    static async findByVisitId(visitId) {
+        const result = await pool.query(`SELECT d.*, u.first_name || ' ' || u.last_name AS diagnosed_by_name,
+            r.name AS diagnosed_by_role FROM diagnoses d
+            JOIN medical_records mr ON mr.id = d.record_id
+            JOIN users u ON u.id = d.diagnosed_by JOIN roles r ON r.id = u.role_id
+            WHERE mr.visit_id = $1 ORDER BY d.is_primary DESC, d.created_at DESC, d.version DESC`, [visitId]);
         return result.rows;
     }
 

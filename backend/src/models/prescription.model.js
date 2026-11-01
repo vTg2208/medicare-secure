@@ -179,11 +179,18 @@ class PrescriptionModel {
      * @param {string} userId - User making the update (optional)
      * @returns {Promise<Object>} Updated prescription
      */
+    static allowedStatuses(status) {
+        return {
+            pending: ['active', 'completed', 'cancelled', 'expired'],
+            active: ['completed', 'cancelled', 'expired'],
+        }[status] || [];
+    }
+
     static async updateStatus(prescriptionId, status, userId = null) {
         const validStatuses = ['pending', 'active', 'completed', 'cancelled', 'expired'];
 
         if (!validStatuses.includes(status)) {
-            throw new Error(`Invalid status. Must be one of: ${validStatuses.join(', ')}`);
+            throw Object.assign(new Error(`Invalid status. Must be one of: ${validStatuses.join(', ')}`), { statusCode: 400 });
         }
 
         let query = `
@@ -204,6 +211,11 @@ class PrescriptionModel {
         values.push(prescriptionId);
 
         return pool.transaction(async client => {
+        const current = (await client.query('SELECT id, status FROM prescriptions WHERE id = $1 FOR UPDATE', [prescriptionId])).rows[0];
+        if (!current) throw Object.assign(new Error('Prescription not found'), { statusCode: 404 });
+        if (!this.allowedStatuses(current.status).includes(status)) {
+            throw Object.assign(new Error(`Cannot transition from ${current.status} to ${status}`), { statusCode: 409 });
+        }
         const result = await client.query(query, values);
 
         if (result.rows.length === 0) {

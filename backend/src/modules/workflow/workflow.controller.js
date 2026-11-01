@@ -235,7 +235,7 @@ const updateLabOrderStatus = async (req, res) => {
         });
     } catch (error) {
         logger.error('Update lab order status failed:', error);
-        res.status(HTTP_STATUS.BAD_REQUEST).json({
+        res.status(error.statusCode || HTTP_STATUS.BAD_REQUEST).json({
             success: false,
             message: error.message
         });
@@ -316,7 +316,7 @@ const updateImagingOrderStatus = async (req, res) => {
         });
     } catch (error) {
         logger.error('Update imaging order status failed:', error);
-        res.status(HTTP_STATUS.BAD_REQUEST).json({
+        res.status(error.statusCode || HTTP_STATUS.BAD_REQUEST).json({
             success: false,
             message: error.message
         });

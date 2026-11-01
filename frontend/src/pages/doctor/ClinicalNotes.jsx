@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import { visitApi } from '../../api/visitApi';
@@ -32,10 +32,14 @@ function ClinicalNotes() {
     const [showPrescriptionForm, setShowPrescriptionForm] = useState(false);
     const [showDiagnosisForm, setShowDiagnosisForm] = useState(false);
     const [saveSuccess, setSaveSuccess] = useState(false);
+    const [clinicalError, setClinicalError] = useState('');
+    const selectionVersion = useRef(0);
 
     // Fetch the doctor's active/assigned visits
     const handleSelectVisit = useCallback(async (visit) => {
+        const version = ++selectionVersion.current;
         setSelectedVisit(visit);
+        setClinicalError('');
         const vId = visit.id || visit.visit_id || '';
         const pId = visit.patient_id || visit.patientId || '';
         setVisitId(vId);
@@ -49,12 +53,21 @@ function ClinicalNotes() {
         // Fetch existing records for this visit
         if (vId) {
             try {
-                const [rxRes, dxRes] = await Promise.all([
+                const [rxResult, dxResult, recordResult] = await Promise.allSettled([
                     emrApi.getVisitPrescriptions(vId),
-                    emrApi.getVisitDiagnoses(vId)
+                    emrApi.getVisitDiagnoses(vId),
+                    emrApi.getPatientMedicalRecords(pId, { type: 'consultation', visitId: vId, limit: 1 })
                 ]);
-                if (rxRes.success) setPrescriptions(rxRes.data || []);
-                if (dxRes.success) setDiagnoses(dxRes.data || []);
+                if (version !== selectionVersion.current) return;
+                if (rxResult.status === 'fulfilled' && rxResult.value.success) setPrescriptions(rxResult.value.data || []);
+                if (dxResult.status === 'fulfilled' && dxResult.value.success) setDiagnoses(dxResult.value.data || []);
+                if (recordResult.status === 'fulfilled') {
+                    const record = recordResult.value.data?.records?.find(item => item.visit_id === vId);
+                    if (record) setSelectedVisit(current => current && !current.record_id ? { ...current, record_id: record.id } : current);
+                }
+                if ([rxResult, dxResult, recordResult].some(result => result.status === 'rejected')) {
+                    setClinicalError('Some clinical records could not be loaded. Verify your consent access and select the visit again to retry.');
+                }
             } catch (error) {
             }
         }
@@ -84,6 +97,7 @@ function ClinicalNotes() {
     }, [preVisitId, handleSelectVisit]);
 
     const handleChangePatient = () => {
+        selectionVersion.current++;
         setSelectedVisit(null);
         setVisitId('');
         setPatientId('');
@@ -93,13 +107,15 @@ function ClinicalNotes() {
         // If the editor returned the created record, store its ID so
         // subsequent prescriptions / diagnoses can be linked to it.
         if (savedRecord?.id && selectedVisit) {
-            setSelectedVisit(prev => ({ ...prev, record_id: savedRecord.id }));
+            setSelectedVisit(current => !current || (savedRecord.visit_id && savedRecord.visit_id !== (current.id || current.visit_id))
+                ? current : { ...current, record_id: savedRecord.id });
         }
         setSaveSuccess(true);
         setTimeout(() => setSaveSuccess(false), 4000);
     };
 
     const handleAddPrescription = async (prescription) => {
+        const version = selectionVersion.current;
         try {
             const res = await emrApi.createPrescription({
                 ...prescription,
@@ -107,20 +123,27 @@ function ClinicalNotes() {
                 patientId,
                 recordId: selectedVisit?.record_id // Usually needs a recordId from the visit
             });
+            if (version !== selectionVersion.current) return;
             if (res.success) {
                 setPrescriptions([...prescriptions, res.data]);
                 setShowPrescriptionForm(false);
             }
         } catch (error) {
-            alert(error.response?.data?.message || 'Failed to add prescription');
+            if (version === selectionVersion.current) setClinicalError(error.response?.data?.message || 'Failed to add prescription');
         }
     };
 
-    const handleRemovePrescription = (id) => {
-        setPrescriptions(prescriptions.filter(p => p.id !== id));
+    const handleRemovePrescription = async (id) => {
+        const version = selectionVersion.current;
+        setClinicalError('');
+        try {
+            const result = await emrApi.updatePrescriptionStatus(id, 'cancelled');
+            if (version === selectionVersion.current && result.success) setPrescriptions(items => items.map(item => item.id === id ? result.data : item));
+        } catch (error) { if (version === selectionVersion.current) setClinicalError(error.response?.data?.message || 'Unable to cancel prescription. Please retry.'); }
     };
 
     const handleAddDiagnosis = async (diagnosis) => {
+        const version = selectionVersion.current;
         try {
             const res = await emrApi.createDiagnosis({
                 ...diagnosis,
@@ -128,17 +151,23 @@ function ClinicalNotes() {
                 patientId,
                 recordId: selectedVisit?.record_id
             });
+            if (version !== selectionVersion.current) return;
             if (res.success) {
                 setDiagnoses([...diagnoses, res.data]);
                 setShowDiagnosisForm(false);
             }
         } catch (error) {
-            alert(error.response?.data?.message || 'Failed to add diagnosis');
+            if (version === selectionVersion.current) setClinicalError(error.response?.data?.message || 'Failed to add diagnosis');
         }
     };
 
-    const handleRemoveDiagnosis = (id) => {
-        setDiagnoses(diagnoses.filter(d => d.id !== id));
+    const handleRemoveDiagnosis = async (id) => {
+        const version = selectionVersion.current;
+        setClinicalError('');
+        try {
+            const result = await emrApi.updateDiagnosisStatus(id, 'ruled_out');
+            if (version === selectionVersion.current && result.success) setDiagnoses(items => items.map(item => item.id === id ? result.data : item));
+        } catch (error) { if (version === selectionVersion.current) setClinicalError(error.response?.data?.message || 'Unable to update diagnosis. Please retry.'); }
     };
 
     const getPatientName = (visit) => {
@@ -327,6 +356,8 @@ function ClinicalNotes() {
 
                         {/* Tab contents */}
                         <div className="cn-tab-content">
+                            {clinicalError && <p role="alert" className="cn-error-box">{clinicalError}</p>}
+                            {!selectedVisit.record_id && <p className="cn-notes-box">Save a SOAP note for this visit before adding a prescription or diagnosis.</p>}
                             {/* Notes */}
                             {activeTab === 'notes' && (
                                 <div className="cn-glass-card" style={{ padding: 24 }}>
@@ -346,7 +377,7 @@ function ClinicalNotes() {
                                         <>
                                             <div className="cn-section-header">
                                                 <h3>Prescriptions for this Visit</h3>
-                                                <button className="cn-btn-primary" onClick={() => setShowPrescriptionForm(true)}>+ Add Prescription</button>
+                                                <button className="cn-btn-primary" disabled={!selectedVisit.record_id} onClick={() => setShowPrescriptionForm(true)}>+ Add Prescription</button>
                                             </div>
                                             {prescriptions.length === 0 ? (
                                                 <div className="cn-empty-state">
@@ -359,13 +390,14 @@ function ClinicalNotes() {
                                                         <div key={rx.id} className="cn-detail-card cn-glass-card">
                                                             <div className="cn-detail-header">
                                                                 <h4 className="cn-detail-title">{rx.medication}</h4>
-                                                                <button className="cn-btn-icon" onClick={() => handleRemovePrescription(rx.id)}>
+                                                                {['pending', 'active'].includes(rx.status) && <button className="cn-btn-icon" aria-label={`Cancel ${rx.medication} prescription`} onClick={() => handleRemovePrescription(rx.id)}>
                                                                     <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-                                                                </button>
+                                                                </button>}
                                                             </div>
                                                             <div className="cn-detail-grid">
                                                                 <div className="cn-detail-item"><label>Dosage</label><p>{rx.dosage}</p></div>
                                                                 <div className="cn-detail-item"><label>Frequency</label><p>{rx.frequency}</p></div>
+                                                                <div className="cn-detail-item"><label>Status</label><p>{rx.status}</p></div>
                                                                 {rx.duration && <div className="cn-detail-item"><label>Duration</label><p>{rx.duration}</p></div>}
                                                                 <div className="cn-detail-item"><label>Route</label><p>{rx.route}</p></div>
                                                                 {rx.instructions && <div className="cn-detail-item full"><label>Instructions</label><p>{rx.instructions}</p></div>}
@@ -388,7 +420,7 @@ function ClinicalNotes() {
                                         <>
                                             <div className="cn-section-header">
                                                 <h3>Diagnoses for this Visit</h3>
-                                                <button className="cn-btn-primary" onClick={() => setShowDiagnosisForm(true)}>+ Add Diagnosis</button>
+                                                <button className="cn-btn-primary" disabled={!selectedVisit.record_id} onClick={() => setShowDiagnosisForm(true)}>+ Add Diagnosis</button>
                                             </div>
                                             {diagnoses.length === 0 ? (
                                                 <div className="cn-empty-state">
@@ -401,16 +433,16 @@ function ClinicalNotes() {
                                                         <div key={dx.id} className="cn-detail-card cn-glass-card">
                                                             <div className="cn-detail-header">
                                                                 <div>
-                                                                    <div className="cn-dx-code">{dx.code}</div>
+                                                                    <div className="cn-dx-code">{dx.icd_code}</div>
                                                                     <h4 className="cn-detail-title">{dx.description}</h4>
                                                                     <div style={{ marginTop: 8, display: 'flex', gap: 6 }}>
-                                                                        <span className="cn-badge">{dx.type}</span>
+                                                                        <span className="cn-badge">{dx.is_primary ? 'Primary' : 'Secondary'}</span>
                                                                         <span className="cn-badge" style={{ background: "var(--mc-success-bg)", color: "var(--mc-success)", borderColor: "var(--mc-success-border)" }}>{dx.status}</span>
                                                                     </div>
                                                                 </div>
-                                                                <button className="cn-btn-icon" onClick={() => handleRemoveDiagnosis(dx.id)}>
+                                                                {dx.status !== 'ruled_out' && <button className="cn-btn-icon" aria-label={`Rule out ${dx.description} diagnosis`} onClick={() => handleRemoveDiagnosis(dx.id)}>
                                                                     <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-                                                                </button>
+                                                                </button>}
                                                             </div>
                                                             {dx.notes && <div className="cn-notes-box"><strong>Notes:</strong> {dx.notes}</div>}
                                                         </div>
