@@ -64,8 +64,9 @@ jobs:
           DB_SSL_CA: ${{ secrets.BACKUP_DB_SSL_CA }}
           PGSSLMODE: verify-full
           BACKUP_DATABASE_SCHEMA: healthcare
-          # This remote runner cannot access the application's local upload volume.
-          BACKUP_MODE: database-only
+          BACKUP_MODE: ${{ vars.BACKUP_MODE || 'database-only' }}
+          FILE_STORAGE_BACKEND: ${{ vars.BACKUP_FILE_STORAGE_BACKEND || 'filesystem' }}
+          UPLOAD_PATH: ${{ vars.BACKUP_UPLOAD_ROOT }}
           BACKUP_ENCRYPTION_KEY: ${{ secrets.BACKUP_ENCRYPTION_KEY }}
           BACKUP_APPLICATION_KEY_SHA256: ${{ secrets.BACKUP_APPLICATION_KEY_SHA256 }}
           B2_KEY_ID: ${{ secrets.BACKUP_B2_KEY_ID }}

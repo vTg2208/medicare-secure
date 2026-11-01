@@ -1,8 +1,13 @@
 const {test}=require('node:test');
+process.env.ENCRYPTION_KEY='f'.repeat(64);
+process.env.JWT_SECRET||='8'.repeat(64);
+process.env.JWT_REFRESH_SECRET||='9'.repeat(64);
 const assert=require('node:assert/strict');
 const fs=require('node:fs/promises');
 const path=require('node:path');
 const crypto=require('node:crypto');
+const os=require('node:os');
+const {Client}=require('pg');
 const {withApplication}=require('./helpers/application-fixture');
 
 test('durable encrypted uploads survive ephemeral filesystem loss and enforce clinical access', {skip:process.env.RUN_DB_TESTS!=='true',timeout:120000},async t=>{
@@ -42,7 +47,7 @@ test('durable encrypted uploads survive ephemeral filesystem loss and enforce cl
    }finally{process.env.NODE_ENV=previous;}
   });
   await t.test('a minimally privileged writer obeys a serialized storage budget under concurrent inserts',async()=>{
-   const role=`healthcare_upload_fixture_${process.pid}`;assert.match(role,/^healthcare_upload_fixture_\d+$/);
+   const role=`healthcare_upload_fixture_${process.pid}_${crypto.randomBytes(4).toString('hex')}`;assert.match(role,/^healthcare_upload_fixture_\d+_[a-f\d]+$/);
    await db.query(`CREATE ROLE ${role} NOLOGIN; GRANT USAGE ON SCHEMA healthcare,extensions TO ${role}; GRANT SELECT,INSERT,DELETE ON encrypted_upload_objects TO ${role}`);
    const clients=[];
    try{
@@ -72,6 +77,38 @@ test('durable encrypted uploads survive ephemeral filesystem loss and enforce cl
    assert.equal((await db.query('SELECT status FROM retention_disposals WHERE id=$1',[decision])).rows[0].status,'completed');
    await assert.rejects(Files.getFile(pending.filePath),{code:'ENOENT'});
    assert.equal((await db.query('SELECT bytes_used=(SELECT sum(byte_length) FROM encrypted_upload_objects) AS valid FROM encrypted_upload_budget')).rows[0].valid,true);
+  });
+  await t.test('a remote coordinated worker captures durable bytes without the source filesystem or application key',async()=>{
+   const {createCoordinatedBackup}=require('../scripts/coordinated-backup');
+   const {inspectBundle,restoreBackup}=require('../scripts/backup-helper');
+   const {verifyRestoredSnapshot,runScheduledBackup}=require('../scripts/scheduled-backup');
+   const directory=await fs.mkdtemp(path.join(os.tmpdir(),'shms-durable-recovery-'));
+   const input=path.join(directory,'durable.shmsbkp'),uploads=path.join(directory,'recovered');
+   const name=`healthcare_restore_durable_${process.pid}`;let reader,roleCreated=false;
+   const operator={...process.env,UPLOAD_PATH:config.upload.uploadPath,BACKUP_DATABASE_SCHEMA:'healthcare',BACKUP_MODE:'coordinated',FILE_STORAGE_BACKEND:'postgres',BACKUP_ENCRYPTION_KEY:'d'.repeat(64),BACKUP_APPLICATION_KEY_SHA256:crypto.createHash('sha256').update(Buffer.from(process.env.ENCRYPTION_KEY,'hex')).digest('hex'),RESTORE_DISPOSABLE:'true',RESTORE_DB_HOST:process.env.DB_HOST,RESTORE_DB_PORT:process.env.DB_PORT,RESTORE_DB_NAME:name,RESTORE_DB_USER:process.env.DB_USER,RESTORE_DB_PASSWORD:process.env.DB_PASSWORD,RESTORE_ADMIN_DB:'healthcare_test'};delete operator.ENCRYPTION_KEY;
+   try{
+    const password='synthetic-durable-backup-reader-password-only-1234567890';
+    await db.query((await fs.readFile(path.join(__dirname,'../scripts/backup-reader-role.sql'),'utf8')).replaceAll('__BACKUP_READER_PASSWORD__',password));roleCreated=true;
+    operator.DB_USER='healthcare_backup';operator.DB_PASSWORD=password;
+    await createCoordinatedBackup({output:input,env:operator});
+    const manifest=await inspectBundle(input,Buffer.from(operator.BACKUP_ENCRYPTION_KEY,'hex'));
+    assert.equal(manifest.consistency.storageBackend,'postgres');assert.equal(manifest.sourceUploadRoot,config.upload.uploadPath);assert.equal(manifest.entries.length,2);
+    await restoreBackup({input,uploads,env:operator});
+    reader=new Client({host:operator.RESTORE_DB_HOST,port:Number(operator.RESTORE_DB_PORT),database:name,user:operator.RESTORE_DB_USER,password:operator.RESTORE_DB_PASSWORD,ssl:false,options:'-c search_path=healthcare,extensions,public'});await reader.connect();
+    assert.equal((await verifyRestoredSnapshot(reader,manifest,{uploads})).filesVerified,1);
+    const recovered=await fs.readFile(path.join(uploads,...relative.split('/')));assert.deepEqual(recovered,ciphertext);
+    assert.deepEqual(require('../src/services/file.crypto').decryptBuffer(recovered,relative),bytes);
+    const objects=new Map();const store={async list(){return [];},async upload(fileName,source){const data=await fs.readFile(source),file={fileName,fileId:crypto.randomUUID(),action:'upload',contentLength:data.length,uploadTimestamp:Date.now()};objects.set(file.fileId,data);return file;},async download(file,destination){await fs.writeFile(destination,objects.get(file.fileId),{flag:'wx'});},async remove(){assert.fail('No previous backup exists');}};
+    const result=await runScheduledBackup({env:operator,store});assert.equal(result.mode,'coordinated');assert.equal(result.filesVerified,1);assert.equal(result.restoreVerified,true);assert.equal(result.uploaded,2);
+    await reader.query('ALTER TABLE encrypted_upload_objects DISABLE TRIGGER account_encrypted_upload_bytes');
+    await reader.query('UPDATE encrypted_upload_objects SET ciphertext=set_byte(ciphertext,byte_length::int-1,get_byte(ciphertext,byte_length::int-1)#1) WHERE relative_key=$1',[relative]);
+    await assert.rejects(verifyRestoredSnapshot(reader,manifest,{uploads}),/checksum|ciphertext|object/i);
+   }finally{
+    if(reader)await reader.end();
+    await db.query(`DROP DATABASE IF EXISTS ${name} WITH (FORCE)`);
+    if(roleCreated){await db.query('DROP OWNED BY healthcare_backup');await db.query('DROP ROLE healthcare_backup');}
+    await fs.rm(directory,{recursive:true,force:true});
+   }
   });
  },{schema:'healthcare'});
 });

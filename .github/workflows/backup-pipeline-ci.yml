@@ -2,9 +2,9 @@ name: Backup pipeline with container clients
 on:
   push:
     branches: [main]
-    paths: ['backend/scripts/**', 'backend/tests/*backup*', 'backend/tests/*snapshot*', 'backend/tests/*archive*', '.github/workflows/backup-pipeline-ci.yml']
+    paths: ['backend/scripts/**', 'backend/tests/*backup*', 'backend/tests/*snapshot*', 'backend/tests/*archive*', 'backend/tests/*upload*', '.github/workflows/backup-pipeline-ci.yml']
   pull_request:
-    paths: ['backend/scripts/**', 'backend/tests/*backup*', 'backend/tests/*snapshot*', 'backend/tests/*archive*', '.github/workflows/backup-pipeline-ci.yml']
+    paths: ['backend/scripts/**', 'backend/tests/*backup*', 'backend/tests/*snapshot*', 'backend/tests/*archive*', 'backend/tests/*upload*', '.github/workflows/backup-pipeline-ci.yml']
 permissions:
   contents: read
 jobs:
@@ -59,4 +59,4 @@ jobs:
           echo "PGSSLROOTCERT=$RUNNER_TEMP/backup-pg-tools/ca.crt" >> "$GITHUB_ENV"
       - name: Exercise real dump stdin, snapshot, encrypted bundle and restore paths
         working-directory: backend
-        run: node --test --test-concurrency=1 tests/archive.integration.test.js tests/backup.integration.test.js tests/database-snapshot.integration.test.js tests/coordinated-backup.integration.test.js
+        run: node --test --test-concurrency=1 tests/archive.integration.test.js tests/backup.integration.test.js tests/database-snapshot.integration.test.js tests/coordinated-backup.integration.test.js tests/postgres-upload.integration.test.js
