@@ -121,7 +121,7 @@ test('real API: registration, sessions, patient boundaries, administration, and 
             expectStatus(granted, 201);
             expectStatus(await send('get', `/api/emr/medical-records/${record}`, tokens.doctor), 200);
             const created = await send('post', '/api/emr/medical-records', tokens.doctor, {
-                patientId: users.patient, visitId: visit, type: 'consultation', title: 'Clinical workflow fixture', description: 'Synthetic only',
+                patientId: users.patient, visitId: visit, type: 'consultation', title: 'Clinical workflow fixture', description: 'Fixture only',
             });
             expectStatus(created, 201);
             const consentId = (await db.query('SELECT id FROM consents WHERE patient_id=$1 AND recipient_user_id=$2', [users.patient, users.doctor])).rows[0].id;
@@ -153,12 +153,12 @@ test('real API: registration, sessions, patient boundaries, administration, and 
         });
 
         await t.test('emergency grants are patient-specific, read-only, audited, notified, and revocable', async () => {
-            const activated = await send('post', '/api/emergency/activate', tokens.doctor, { patientId: users.patient, justification: 'Synthetic emergency fixture requiring immediate record review' });
+            const activated = await send('post', '/api/emergency/activate', tokens.doctor, { patientId: users.patient, justification: 'Fixture emergency fixture requiring immediate record review' });
             expectStatus(activated, 201);
             const grant = activated.body.data;
             expectStatus(await send('get', `/api/emr/medical-records/${record}`, tokens.doctor), 200);
             expectStatus(await send('post', '/api/emr/medical-records', tokens.doctor, { patientId: users.patient, visitId: visit, type: 'consultation', title: 'Must deny emergency write' }), 403);
-            expectStatus(await send('post', '/api/emergency/activate', tokens.doctor, { patientId: otherPatient, justification: 'Synthetic emergency at another organization must be denied' }), 403);
+            expectStatus(await send('post', '/api/emergency/activate', tokens.doctor, { patientId: otherPatient, justification: 'Fixture emergency at another organization must be denied' }), 403);
             const notified = await db.query("SELECT id FROM notifications WHERE user_id=$1 AND related_entity_id=$2 AND type='emergency_access'", [users.patient, grant.id]);
             assert.equal(notified.rowCount, 1);
             expectStatus(await send('post', `/api/emergency/${grant.id}/revoke`, tokens.doctor, {}), 200);
@@ -183,7 +183,7 @@ test('real API: registration, sessions, patient boundaries, administration, and 
             const fs = require('fs/promises'); const path = require('path');
             const { encryptBuffer } = require('../src/services/file.crypto');
             const FileUploadService = require('../src/services/file.upload.service');
-            const original = Buffer.from('%PDF-1.4 synthetic-only report');
+            const original = Buffer.from('%PDF-1.4 fixture-only report');
             const name = '1000000000_0123456789abcdef.pdf';
             const url = `/api/files/${users.patient}/lab_results/${name}`;
             const directory = FileUploadService.getStoragePath(users.patient, 'lab_results');
@@ -191,7 +191,7 @@ test('real API: registration, sessions, patient boundaries, administration, and 
             await fs.mkdir(directory, { recursive: true });
             await fs.writeFile(location, encryptBuffer(original, FileUploadService.encryptionContext(location)));
             try {
-                await db.query(`INSERT INTO lab_results(record_id,test_name,file_url,ordered_by,performed_by) VALUES($1,'Synthetic',$2,$3,$3)`, [record, url, users.doctor]);
+                await db.query(`INSERT INTO lab_results(record_id,test_name,file_url,ordered_by,performed_by) VALUES($1,'Fixture',$2,$3,$3)`, [record, url, users.doctor]);
                 const response = await send('get', url, tokens.patient);
                 expectStatus(response, 200);
                 assert.deepEqual(response.body, original);
@@ -209,8 +209,8 @@ test('real API: registration, sessions, patient boundaries, administration, and 
             expectStatus(stats, 200); assert.equal(stats.body.data.totalRecords, null);
             assert.deepEqual((await send('get', '/api/research/symptoms', tokens.researcher)).body.data, []);
             assert.deepEqual((await send('get', '/api/research/demographics', tokens.researcher)).body.data, { ageGroups: [], gender: [] });
-            const profile = await send('put', '/api/research/profile', tokens.researcher, { department: 'Synthetic department' });
-            expectStatus(profile, 200); assert.equal(profile.body.data.department, 'Synthetic department');
+            const profile = await send('put', '/api/research/profile', tokens.researcher, { department: 'Fixture department' });
+            expectStatus(profile, 200); assert.equal(profile.body.data.department, 'Fixture department');
             const otherEvent = await audit.createAuditLog({ userId: users.system_admin, action: 'cross_org_fixture', entityType: 'organization', entityId: otherOrg });
             const hospitalLogs = await send('get', '/api/audit/logs', tokens.hospital_admin);
             expectStatus(hospitalLogs, 200);

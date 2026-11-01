@@ -22,7 +22,7 @@ test('security regressions against current source', async t => {
     config.upload.uploadPath = await fs.mkdtemp(path.join(require('node:os').tmpdir(), 'shms-reliability-'));
     t.after(() => fs.rm(config.upload.uploadPath, { recursive: true, force: true }));
     await t.test('AES-GCM binds ciphertext to one patient/file and rejects legacy downgrade', () => {
-        const bytes = Buffer.from('synthetic clinical bytes');
+        const bytes = Buffer.from('fixture clinical bytes');
         const stored = encryptBuffer(bytes, 'patient-a/result.pdf');
         assert.deepEqual(decryptBuffer(stored, 'patient-a/result.pdf'), bytes);
         assert.throws(() => decryptBuffer(stored, 'patient-b/result.pdf'));
@@ -40,7 +40,7 @@ test('security regressions against current source', async t => {
     let calls;
     mock('src/services/audit.service', { logAuditEvent: (...args) => { calls.push(args[0]); return append(); } });
     const { auditLog, collectPatientIds } = require(path.join(root, 'src/middleware/audit.middleware'));
-    const request = () => ({ user: { id: '11111111-1111-1111-1111-111111111111' }, params: {}, query: {}, body: { notes: 'private synthetic text' }, headers: {}, method: 'GET', path: '/records', connection: {} });
+    const request = () => ({ user: { id: '11111111-1111-1111-1111-111111111111' }, params: {}, query: {}, body: { notes: 'private fixture text' }, headers: {}, method: 'GET', path: '/records', connection: {} });
     const response = () => ({ statusCode: 200, status(code) { this.statusCode = code; return this; }, json(data) { this.data = data; return this; } });
     const tick = () => new Promise(resolve => setImmediate(resolve));
     await t.test('clinical JSON is withheld until evidence commits and carries server consent context only', async () => {
@@ -51,7 +51,7 @@ test('security regressions against current source', async t => {
         const res = response();
         await auditLog(null, 'emr')(req, res, () => {});
         await auditLog('view_record', 'medical_record')(req, res, () => {});
-        res.json({ success: true, data: 'synthetic clinical data' });
+        res.json({ success: true, data: 'fixture clinical data' });
         assert.equal(res.data, undefined);
         release({ id: 'recorded' }); await tick();
         assert.equal(res.data.success, true);
@@ -64,7 +64,7 @@ test('security regressions against current source', async t => {
         calls = []; append = async () => { throw dbFailure; };
         const req = request(); const res = response();
         await auditLog('view_record')(req, res, () => {});
-        res.json({ success: true, data: 'private synthetic data' }); await tick();
+        res.json({ success: true, data: 'private fixture data' }); await tick();
         assert.equal(res.statusCode, 503); assert.equal(res.data.data, undefined);
     });
     await t.test('patient list evidence excludes clinical values and fails closed instead of truncating identities', () => {
@@ -83,7 +83,7 @@ test('security regressions against current source', async t => {
         assert.equal(denied.statusCode, 403); assert.equal(denied.data.success, false);
     });
     await t.test('medical upload stores only bound ciphertext and scanner outage stores nothing', async () => {
-        const bytes = Buffer.from('%PDF-1.4 synthetic clinical test');
+        const bytes = Buffer.from('%PDF-1.4 fixture clinical test');
         const file = { buffer: bytes, originalname: 'result.pdf', mimetype: 'application/pdf', size: bytes.length };
         const options = { patientId: '11111111-1111-1111-1111-111111111111', fileType: 'lab_results' };
         const saved = await Files.processUpload(file, options);
@@ -98,7 +98,7 @@ test('security regressions against current source', async t => {
     });
     await t.test('credential storage scans memory before persisting and contextual download verifies identity', async () => {
         const upload = require(path.join(root, 'src/middleware/upload.middleware'));
-        const bytes = Buffer.from('%PDF-1.4 synthetic credential');
+        const bytes = Buffer.from('%PDF-1.4 fixture credential');
         const file = { originalname: 'degree.pdf', mimetype: 'application/pdf', stream: Readable.from(bytes) };
         const saved = await new Promise((resolve, reject) => upload.storage._handleFile({}, file, (error, result) => error ? reject(error) : resolve(result)));
         const { readCredential } = require(path.join(root, 'src/services/credential-file.service'));

@@ -2,8 +2,8 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const { breachObligations, normalizeAssessment, obligationStatus } = require('../src/modules/compliance/breach.policy');
 const fixture = extra => ({ discoveredAt: '2026-01-01T10:00:00Z', regimes: ['gdpr','hipaa'], affectedCount: 500,
-    facts: 'Synthetic incident facts', consequences: 'Synthetic consequences', measures: 'Synthetic containment measures',
-    contact: 'Privacy response office', rationale: 'Synthetic assessment rationale', hipaaFactors: 'Nature, recipient, acquisition and mitigation reviewed', ...extra });
+    facts: 'Fixture incident facts', consequences: 'Fixture consequences', measures: 'Fixture containment measures',
+    contact: 'Privacy response office', rationale: 'Fixture assessment rationale', hipaaFactors: 'Nature, recipient, acquisition and mitigation reviewed', ...extra });
 test('risk-sensitive GDPR reminders use actual awareness plus72h and high risk individual notice', () => {
     const obligations = breachObligations(normalizeAssessment(fixture({ riskLevel: 'high' })));
     assert.equal(obligations.find(o=>o.regime==='gdpr'&&o.audience==='authority').dueAt, '2026-01-04T10:00:00.000Z');

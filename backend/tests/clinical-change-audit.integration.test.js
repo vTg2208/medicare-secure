@@ -52,7 +52,7 @@ test('clinical mutations and actor evidence commit or roll back together', {
         });
         let record;
         await t.test('real authenticated HTTP writes record actor and server request correlation', async () => {
-            const response = await send('post','/api/emr/medical-records',tokens.doctor,{ patientId:patient,visitId:visit,type:'note',title:'Synthetic vitals',description:'Never retain this clinical content in audit metadata' });
+            const response = await send('post','/api/emr/medical-records',tokens.doctor,{ patientId:patient,visitId:visit,type:'note',title:'Fixture vitals',description:'Never retain this clinical content in audit metadata' });
             assert.equal(response.status,201,JSON.stringify(response.body)); record=response.body.data.id;
             const event=(await fixture.query("SELECT user_id,metadata FROM audit_logs WHERE action='clinical_change' AND entity_id=$1",[record])).rows[0];
             assert.equal(event.user_id,actor); assert.equal(event.metadata.patientId,patient);
@@ -67,10 +67,10 @@ test('clinical mutations and actor evidence commit or roll back together', {
         });
         await t.test('consent revocation rolls back on audit outage and records the patient actor on success', async () => {
             const consent=(await fixture.query('SELECT id FROM consents WHERE patient_id=$1 AND recipient_user_id=$2',[patient,actor])).rows[0].id;
-            await fixture.query(`CREATE FUNCTION refuse_consent_change_audit() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.action='clinical_change' AND NEW.entity_type='consents' THEN RAISE EXCEPTION 'synthetic consent audit outage'; END IF; RETURN NEW; END $$`);
+            await fixture.query(`CREATE FUNCTION refuse_consent_change_audit() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.action='clinical_change' AND NEW.entity_type='consents' THEN RAISE EXCEPTION 'fixture consent audit outage'; END IF; RETURN NEW; END $$`);
             await fixture.query('CREATE TRIGGER refuse_consent_change_audit BEFORE INSERT ON audit_logs FOR EACH ROW EXECUTE FUNCTION refuse_consent_change_audit()');
             try {
-                const denied=await send('put',`/api/consent/revoke/${consent}`,tokens.patient,{reason:'Synthetic test'});
+                const denied=await send('put',`/api/consent/revoke/${consent}`,tokens.patient,{reason:'Fixture test'});
                 assert.equal(denied.status,500,JSON.stringify(denied.body));
                 assert.equal((await fixture.query('SELECT status FROM consents WHERE id=$1',[consent])).rows[0].status,'active');
                 assert.equal((await fixture.query("SELECT 1 FROM audit_logs WHERE action='clinical_change' AND entity_id=$1 AND metadata->>'operation'='UPDATE'",[consent])).rowCount,0);
@@ -78,7 +78,7 @@ test('clinical mutations and actor evidence commit or roll back together', {
                 await fixture.query('DROP TRIGGER refuse_consent_change_audit ON audit_logs');
                 await fixture.query('DROP FUNCTION refuse_consent_change_audit()');
             }
-            const response=await send('put',`/api/consent/revoke/${consent}`,tokens.patient,{reason:'Synthetic test'});
+            const response=await send('put',`/api/consent/revoke/${consent}`,tokens.patient,{reason:'Fixture test'});
             assert.equal(response.status,200,JSON.stringify(response.body));
             const event=(await fixture.query("SELECT user_id,metadata FROM audit_logs WHERE action='clinical_change' AND entity_id=$1 ORDER BY sequence DESC LIMIT 1",[consent])).rows[0];
             assert.equal(event.user_id,patient); assert.equal(event.metadata.patientId,patient);
@@ -97,7 +97,7 @@ test('clinical mutations and actor evidence commit or roll back together', {
         await t.test('failed trigger audit aborts a real HTTP clinical mutation before it commits', async () => {
             const counter=require('../src/middleware/metrics').register.getSingleMetric('audit_log_errors_total');
             const before=(await counter.get()).values[0].value;
-            await fixture.query(`CREATE FUNCTION refuse_clinical_audit() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.action='clinical_change' THEN RAISE EXCEPTION 'synthetic audit outage'; END IF; RETURN NEW; END $$`);
+            await fixture.query(`CREATE FUNCTION refuse_clinical_audit() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.action='clinical_change' THEN RAISE EXCEPTION 'fixture audit outage'; END IF; RETURN NEW; END $$`);
             await fixture.query('CREATE TRIGGER refuse_clinical_audit BEFORE INSERT ON audit_logs FOR EACH ROW EXECUTE FUNCTION refuse_clinical_audit()');
             try {
                 const response=await send('post','/api/emr/medical-records',tokens.doctor,{patientId:patient,visitId:visit,type:'note',title:'MUST-NOT-COMMIT'});
@@ -115,7 +115,7 @@ test('clinical mutations and actor evidence commit or roll back together', {
             const otherVisit=(await fixture.query("INSERT INTO visits(patient_id,organization_id,visit_code,status,assigned_doctor_id) VALUES($1,$2,'AUDIT-OTHER-VISIT','in_progress',$3) RETURNING id",[other,org,actor])).rows[0].id;
             for (const [patientId,visitId] of [[patient,visit],[other,otherVisit]]) {
                 await fixture.query("INSERT INTO consents(patient_id,recipient_user_id,data_category,purpose,access_level,start_time,end_time,status) VALUES($1,$2,'lab_results','treatment','read',NOW()-INTERVAL '1 minute',NOW()+INTERVAL '1 hour','active')",[patientId,lab]);
-                await fixture.query("INSERT INTO lab_orders(visit_id,ordered_by,test_name) VALUES($1,$2,'Synthetic CBC')",[visitId,actor]);
+                await fixture.query("INSERT INTO lab_orders(visit_id,ordered_by,test_name) VALUES($1,$2,'Fixture CBC')",[visitId,actor]);
             }
             const token=generateAccessToken({userId:lab,roleName:'lab_technician'});
             await fixture.query("INSERT INTO sessions(user_id,token_hash,expires_at) VALUES($1,$2,NOW()+INTERVAL '1 hour')",[lab,crypto.createHash('sha256').update(token).digest('hex')]);

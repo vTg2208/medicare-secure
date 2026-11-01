@@ -49,7 +49,7 @@ test('clinical workflows enforce patient, role, care and tenant boundaries', { s
         const visits = [];
         for (const [index, key] of ['patient', 'otherPatient'].entries()) visits.push((await db.query("INSERT INTO visits(patient_id,organization_id,visit_code,status,assigned_doctor_id,assigned_nurse_id) VALUES($1,$2,$3,'in_progress',$4,$5) RETURNING id", [people[key].id, orgs[index], `ACCESS-VISIT-${index}`, people[index ? 'otherDoctor' : 'doctor'].id, index ? null : people.nurse.id])).rows[0].id);
         for (const key of ['doctor', 'nurse', 'lab', 'radiologist', 'pharmacist', 'otherDoctor', 'insurer']) await db.query("INSERT INTO consents(patient_id,recipient_user_id,data_category,purpose,access_level,start_time,end_time,status) VALUES($1,$2,'all',$3,'write',NOW()-INTERVAL '1 minute',NOW()+INTERVAL '1 hour','active')", [people.patient.id, people[key].id, key === 'insurer' ? 'insurance_claim' : 'treatment']);
-        const foreignRecord = (await db.query("INSERT INTO medical_records(patient_id,visit_id,type,title,created_by,immutable_flag) VALUES($1,$2,'consultation','Foreign synthetic record',$3,true) RETURNING id", [people.otherPatient.id, visits[1], people.otherDoctor.id])).rows[0].id;
+        const foreignRecord = (await db.query("INSERT INTO medical_records(patient_id,visit_id,type,title,created_by,immutable_flag) VALUES($1,$2,'consultation','Foreign fixture record',$3,true) RETURNING id", [people.otherPatient.id, visits[1], people.otherDoctor.id])).rows[0].id;
         const app = require('../src/app');
         server = await new Promise(resolve => { const running = app.listen(0, '127.0.0.1', () => resolve(running)); });
         const base = `http://127.0.0.1:${server.address().port}/api`;
@@ -61,7 +61,7 @@ test('clinical workflows enforce patient, role, care and tenant boundaries', { s
         }
         let record; let labOrder; let imagingOrder; let prescription;
         await t.test('assigned clinician creates records; patient only reads own records', async () => {
-            const result = await request('doctor', 'POST', '/emr/medical-records', { patientId: people.patient.id, visitId: visits[0], type: 'consultation', title: 'Synthetic integration record', description: 'Synthetic fixture' }, 201);
+            const result = await request('doctor', 'POST', '/emr/medical-records', { patientId: people.patient.id, visitId: visits[0], type: 'consultation', title: 'Fixture integration record', description: 'Fixture fixture' }, 201);
             record = result.data.id;
             await request('patient', 'GET', `/emr/medical-records/${record}`);
             await request('otherPatient', 'GET', `/emr/medical-records/${record}`, undefined, 403);
@@ -169,7 +169,7 @@ test('clinical workflows enforce patient, role, care and tenant boundaries', { s
             await request('nurse', 'GET', `/nurse/patients/${people.patient.id}/records`);
             await request('nurse', 'GET', `/nurse/patients/${people.otherPatient.id}/records`, undefined, 403);
             await request('nurse', 'POST', `/nurse/patients/${people.otherPatient.id}/records`, { type: 'note', title: 'Unauthorized' }, 403);
-            const result = await request('doctor', 'POST', '/emr/prescriptions', { recordId: record, medication: 'Synthetic test medication', dosage: '1mg', frequency: 'once daily', route: 'oral', quantity: 1 }, 201);
+            const result = await request('doctor', 'POST', '/emr/prescriptions', { recordId: record, medication: 'Fixture test medication', dosage: '1mg', frequency: 'once daily', route: 'oral', quantity: 1 }, 201);
             prescription = result.data.id;
             const queue = await request('pharmacist', 'GET', '/pharmacist/prescriptions'); assert.ok(queue.data.some(row => row.id === prescription));
             await request('pharmacist', 'GET', '/pharmacist/stats'); await request('pharmacist', 'GET', '/pharmacist/inventory');
@@ -189,13 +189,13 @@ test('clinical workflows enforce patient, role, care and tenant boundaries', { s
             }
         });
         await t.test('diagnosis addenda preserve the previous version', async () => {
-            const original = (await request('doctor','POST','/emr/diagnoses',{recordId:record,icdCode:'J00',description:'Synthetic initial diagnosis'},201)).data;
-            const revised = (await request('doctor','POST',`/emr/diagnoses/${original.id}/addendum`,{description:'Synthetic amended diagnosis'},201)).data;
+            const original = (await request('doctor','POST','/emr/diagnoses',{recordId:record,icdCode:'J00',description:'Fixture initial diagnosis'},201)).data;
+            const revised = (await request('doctor','POST',`/emr/diagnoses/${original.id}/addendum`,{description:'Fixture amended diagnosis'},201)).data;
             assert.equal(revised.version,2);
-            assert.equal((await db.query('SELECT description FROM diagnoses WHERE id=$1',[original.id])).rows[0].description,'Synthetic initial diagnosis');
+            assert.equal((await db.query('SELECT description FROM diagnoses WHERE id=$1',[original.id])).rows[0].description,'Fixture initial diagnosis');
         });
         await t.test('prescription terminal states and dispensing roles prevent replay', async () => {
-            const create = async () => (await request('doctor', 'POST', '/emr/prescriptions', { recordId: record, medication: 'Synthetic transition medication', dosage: '1mg', frequency: 'once daily', route: 'oral', quantity: 1 }, 201)).data.id;
+            const create = async () => (await request('doctor', 'POST', '/emr/prescriptions', { recordId: record, medication: 'Fixture transition medication', dosage: '1mg', frequency: 'once daily', route: 'oral', quantity: 1 }, 201)).data.id;
             for (const status of ['cancelled', 'expired']) {
                 const id = await create();
                 await request('doctor', 'PATCH', `/emr/prescriptions/${id}/status`, { status });
@@ -316,7 +316,7 @@ test('clinical workflows enforce patient, role, care and tenant boundaries', { s
                 const response=await fetch(base+path,{method:'POST',headers:{Authorization:`Bearer ${people[key].token}`},body:form});
                 const payload=await response.json();assert.equal(response.status,201,JSON.stringify(payload));return payload.data;
             }
-            const result=await upload('lab','/lab/upload',{order_id:labOrder,patient_id:people.patient.id,visit_id:visits[0],notes:'Synthetic result'});
+            const result=await upload('lab','/lab/upload',{order_id:labOrder,patient_id:people.patient.id,visit_id:visits[0],notes:'Fixture result'});
             assert.match(result.file_url,/^\/api\/files\//);
             const downloaded=await fetch(base.replace(/\/api$/,'')+result.file_url,{headers:{Authorization:`Bearer ${people.patient.token}`}});
             assert.equal(downloaded.status,200);assert.deepEqual(Buffer.from(await downloaded.arrayBuffer()),bytes);
@@ -324,10 +324,10 @@ test('clinical workflows enforce patient, role, care and tenant boundaries', { s
             const store=require('../src/services/file.upload.service');
             const encrypted=await require('node:fs/promises').readFile(require('node:path').join(store.getStoragePath(people.patient.id,'lab_results'),result.file_name));
             assert.ok(!encrypted.equals(bytes));assert.ok(!encrypted.includes(Buffer.from('%PDF')));
-            const report=await upload('radiologist','/radiology/upload',{orderId:imagingOrder,patientId:people.patient.id,reportTitle:'Synthetic imaging report',findings:'Synthetic finding',impression:'Synthetic impression'});
+            const report=await upload('radiologist','/radiology/upload',{orderId:imagingOrder,patientId:people.patient.id,reportTitle:'Fixture imaging report',findings:'Fixture finding',impression:'Fixture impression'});
             assert.match(report.file_path,/^\/api\/files\//);
             const records=await request('patient','GET',`/emr/patients/${people.patient.id}/medical-records?type=imaging`);
-            const record=records.data.records.find(row=>row.title==='Synthetic imaging report');assert.ok(record);
+            const record=records.data.records.find(row=>row.title==='Fixture imaging report');assert.ok(record);
             const hydrated=await request('patient','GET',`/emr/medical-records/${record.id}?includeRelated=true`);
             assert.equal(hydrated.data.imagingReports[0].file_url,report.file_path);
             await request('radiologist','GET','/radiology/audit-logs');

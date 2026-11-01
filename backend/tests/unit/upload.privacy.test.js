@@ -17,7 +17,7 @@ beforeEach(async () => { root = await fs.mkdtemp(path.join(os.tmpdir(), 'shms-up
 afterEach(async () => { await fs.rm(root, { recursive: true, force: true }); });
 
 it('accepts an in-memory report and writes only context-bound ciphertext', async () => {
-    const original = Buffer.from('%PDF-1.4 synthetic private test');
+    const original = Buffer.from('%PDF-1.4 fixture private test');
     const saved = await Files.processUpload({ buffer: original, originalname: 'result.pdf', mimetype: 'application/pdf', size: original.length },
         { patientId: '11111111-1111-1111-1111-111111111111', fileType: 'lab_results' });
     const stored = await fs.readFile(saved.filePath);
@@ -29,7 +29,7 @@ it('accepts an in-memory report and writes only context-bound ciphertext', async
 
 it('persists no report when the required scanner is unavailable', async () => {
     scanBuffer.mockRejectedValueOnce(new Error('scanner unavailable'));
-    const bytes = Buffer.from('%PDF synthetic test');
+    const bytes = Buffer.from('%PDF fixture test');
     await expect(Files.processUpload({ buffer: bytes, originalname: 'result.pdf', mimetype: 'application/pdf', size: bytes.length },
         { patientId: '11111111-1111-1111-1111-111111111111', fileType: 'lab_results' })).rejects.toThrow('scanner unavailable');
     expect(await fs.readdir(root)).toEqual([]);

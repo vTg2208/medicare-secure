@@ -66,7 +66,7 @@ async function disposable(run) {
             await client.query(migration.sql);
             await client.query('INSERT INTO healthcare._migrations(id,file_hash,execution_time_ms) VALUES($1,$2,0)', [migration.id, migration.hash]);
         }
-        await client.query('CREATE TABLE healthcare.upgrade_sentinel(id integer PRIMARY KEY,value text); INSERT INTO healthcare.upgrade_sentinel VALUES(1,\'Synthetic existing data\'); COMMIT');
+        await client.query('CREATE TABLE healthcare.upgrade_sentinel(id integer PRIMARY KEY,value text); INSERT INTO healthcare.upgrade_sentinel VALUES(1,\'Fixture existing data\'); COMMIT');
         return await run(client);
     } finally {
         if (client) await client.end().catch(() => {});
@@ -94,7 +94,7 @@ test('actual private-schema 017 to 025 upgrade preserves data and exact target r
         migrations.map(item => ({ id: item.id, file_hash: item.hash })));
     assert.ok((await client.query("SELECT to_regclass('healthcare.privacy_breaches') AS name")).rows[0].name);
     assert.ok((await client.query("SELECT to_regclass('healthcare.audit_chain_head') AS name")).rows[0].name);
-    assert.deepEqual((await client.query('SELECT * FROM healthcare.upgrade_sentinel')).rows, [{ id: 1, value: 'Synthetic existing data' }]);
+    assert.deepEqual((await client.query('SELECT * FROM healthcare.upgrade_sentinel')).rows, [{ id: 1, value: 'Fixture existing data' }]);
     const before = await snapshot(client);
     await client.query(sql);
     assert.deepEqual(await snapshot(client), before);
@@ -129,7 +129,7 @@ test('unknown, drifted, missing and partial/wrong ledgers reject before any sche
 test('a late pending migration failure rolls the entire incremental batch and ledger back to 017', { skip: !enabled, timeout: 120000 }, async () => disposable(async client => {
     const sql = 'CREATE TABLE healthcare.upgrade_failure_probe(id integer); SELECT nonexistent_incremental_upgrade_fixture();';
     const before = await snapshot(client);
-    await assert.rejects(client.query(buildBrowserUpgradeSql({ from: '017', migrations: [...migrations, { id: '026_synthetic_failure', sql, hash: hash(sql) }] })), /nonexistent_incremental_upgrade_fixture/);
+    await assert.rejects(client.query(buildBrowserUpgradeSql({ from: '017', migrations: [...migrations, { id: '026_fixture_failure', sql, hash: hash(sql) }] })), /nonexistent_incremental_upgrade_fixture/);
     await client.query('ROLLBACK');
     assert.deepEqual(await snapshot(client), before);
     assert.equal((await client.query("SELECT to_regclass('healthcare.upgrade_failure_probe') AS name")).rows[0].name, null);

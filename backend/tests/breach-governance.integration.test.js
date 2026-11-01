@@ -33,8 +33,8 @@ test('breach governance protects assessments, decisions and immutable notificati
         const send=(method,path,body,role='compliance_officer')=>{const req=request(app)[method](`/api/compliance${path}`);if(role)req.set('Authorization',`Bearer ${tokens[role]}`);return body===undefined?req:req.send(body);};
         const status=(res,expected)=>assert.equal(res.status,expected,JSON.stringify(res.body));
         const assessment=extra=>({discoveredAt:new Date(Date.now()-4*86400000).toISOString(),regimes:['gdpr','hipaa'],affectedCount:500,
-            riskLevel:'unknown',hipaaDetermination:'pending',mediaDecision:'pending',facts:'Synthetic restricted incident facts',consequences:'Potential confidentiality loss',
-            measures:'Access revoked and environment contained',contact:'Privacy response office contact',rationale:'Synthetic documented assessment reasoning',hipaaFactors:'Identifiers, recipient, acquisition and mitigation reviewed',...extra});
+            riskLevel:'unknown',hipaaDetermination:'pending',mediaDecision:'pending',facts:'Fixture restricted incident facts',consequences:'Potential confidentiality loss',
+            measures:'Access revoked and environment contained',contact:'Privacy response office contact',rationale:'Fixture documented assessment reasoning',hipaaFactors:'Identifiers, recipient, acquisition and mitigation reviewed',...extra});
         let first;
         await t.test('only a compliance officer can read or create restricted breach casework',async()=>{
             for(const role of [null,'patient','doctor','system_admin']) {status(await send('get','/breaches',undefined,role),role?403:401);status(await send('post','/breaches',assessment(),role),role?403:401);}
@@ -47,12 +47,12 @@ test('breach governance protects assessments, decisions and immutable notificati
             const created=await send('post','/breaches',assessment());status(created,201);first=created.body.data;
             assert.equal(first.version,1);assert.equal(first.obligations.find(o=>o.regime==='gdpr'&&o.audience==='authority').status,'assessment_overdue');
             const row=(await db.query('SELECT * FROM privacy_breaches WHERE incident_id=$1',[first.id])).rows[0];
-            assert.ok(!row.assessment_ciphertext.includes('Synthetic restricted'));
+            assert.ok(!row.assessment_ciphertext.includes('Fixture restricted'));
             assert.equal((await db.query('SELECT description FROM security_events WHERE id=$1',[first.id])).rows[0].description,'Potential personal-data breach; restricted assessment available');
             await assert.rejects(db.query('UPDATE breach_assessment_history SET version=9 WHERE incident_id=$1',[first.id]),/append-only/);
             const detail=await send('get',`/breaches/${first.id}`);status(detail,200);assert.equal(detail.body.data.history.length,1);
             const listed=await send('get','/breaches');status(listed,200);
-            assert.ok(!JSON.stringify(listed.body.data).includes('Synthetic restricted incident facts'));
+            assert.ok(!JSON.stringify(listed.body.data).includes('Fixture restricted incident facts'));
             assert.ok(!JSON.stringify(listed.body.data).includes('assessment_ciphertext'));
             for(const role of ['patient','doctor','system_admin'])status(await send('get',`/breaches/${first.id}`,undefined,role),403);
             status(await send('put',`/incidents/${first.id}`,{status:'Investigating'},'system_admin'),403);
@@ -86,18 +86,18 @@ test('breach governance protects assessments, decisions and immutable notificati
         await t.test('failed attempts and late notices retain evidence without falsely completing duties',async()=>{
             const created=await send('post','/breaches',assessment({riskLevel:'high',hipaaDetermination:'notifiable',mediaDecision:'not_required'}));status(created,201);
             const current=created.body.data;const path=`/breaches/${current.id}/notifications`;
-            const notice={expectedVersion:1,regime:'gdpr',audience:'authority',status:'failed',channel:'portal',occurredAt:new Date(Date.now()-60000).toISOString(),evidence:'Synthetic failed submission receipt'};
+            const notice={expectedVersion:1,regime:'gdpr',audience:'authority',status:'failed',channel:'portal',occurredAt:new Date(Date.now()-60000).toISOString(),evidence:'Fixture failed submission receipt'};
             status(await send('post',path,notice),400);
             const failed=await send('post',path,{...notice,delayReason:'Late discovery escalation under documented investigation'});status(failed,201);
             assert.equal(failed.body.data.notifications.length,1);
             assert.equal(failed.body.data.obligations.find(o=>o.regime==='gdpr'&&o.audience==='authority').status,'overdue');
             status(await send('put',`/incidents/${current.id}`,{status:'Resolved'}),409);
             status(await send('post',path,{...notice,status:'sent',delayReason:'Documented delayed notification with initial facts supplied'}),201);
-            for(const [regime,audience] of [['gdpr','individual'],['hipaa','individual'],['hipaa','secretary']])status(await send('post',path,{...notice,regime,audience,status:'sent',evidence:'Synthetic successful delivery reference'}),201);
+            for(const [regime,audience] of [['gdpr','individual'],['hipaa','individual'],['hipaa','secretary']])status(await send('post',path,{...notice,regime,audience,status:'sent',evidence:'Fixture successful delivery reference'}),201);
             const detail=(await send('get',`/breaches/${current.id}`)).body.data;
             assert.equal(detail.notifications.length,5);assert.equal(detail.notifications[0].status,'failed');
             const stored=(await db.query('SELECT * FROM breach_notification_log WHERE incident_id=$1 ORDER BY recorded_at',[current.id])).rows;
-            assert.ok(stored.every(n=>!n.evidence_ciphertext.includes('Synthetic')));
+            assert.ok(stored.every(n=>!n.evidence_ciphertext.includes('Fixture')));
             await assert.rejects(db.query('DELETE FROM breach_notification_log WHERE incident_id=$1',[current.id]),/append-only/);
             status(await send('put',`/incidents/${current.id}`,{status:'Resolved'}),200);
             status(await send('post',path,notice),409);

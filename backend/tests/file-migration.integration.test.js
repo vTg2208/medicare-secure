@@ -8,7 +8,7 @@ const { spawn } = require('node:child_process');
 const { migrateFileEncryption, contextForFile } = require('../scripts/migrate-file-encryption');
 
 const key = 'a'.repeat(64);
-// Only synthetic test settings enter the existing runtime crypto implementation.
+// Only fixture test settings enter the existing runtime crypto implementation.
 process.env.ENCRYPTION_KEY = key;
 const { encryptBuffer, decryptBuffer } = require('../src/services/file.crypto');
 const env = { ENCRYPTION_KEY: key, FILE_MIGRATION_QUIESCED: 'true' };
@@ -33,9 +33,9 @@ async function write(root, relative, bytes) {
 }
 
 test('default dry-run authenticates legacy and current files without changing bytes or creating a backup', async () => fixture(async ({ uploads, backupDirectory }) => {
-    const legacy = encryptBuffer(Buffer.from('%PDF-1.4\nSynthetic legacy report'));
+    const legacy = encryptBuffer(Buffer.from('%PDF-1.4\nFixture legacy report'));
     const file = await write(uploads, 'documents/legacy.pdf', legacy);
-    await write(uploads, 'documents/current.pdf', encryptBuffer(Buffer.from('%PDF-1.4\nSynthetic current report'), 'documents/current.pdf'));
+    await write(uploads, 'documents/current.pdf', encryptBuffer(Buffer.from('%PDF-1.4\nFixture current report'), 'documents/current.pdf'));
     assert.deepEqual(await migrateFileEncryption({ uploads, backupDirectory, env }), { scanned: 2, legacy: 1, upToDate: 1, migrated: 0, dryRun: true });
     assert.deepEqual(await fs.readFile(file), legacy);
     await assert.rejects(fs.stat(backupDirectory), { code: 'ENOENT' });
@@ -43,7 +43,7 @@ test('default dry-run authenticates legacy and current files without changing by
 
 test('apply preserves original ciphertext and paths; both medical and credential downloads accept the new identity-bound bytes', async () => fixture(async ({ uploads, backupDirectory }) => {
     const reports = [`medical_files/${patient}/lab_results/legacy.pdf`, 'documents/legacy.pdf'];
-    const plaintext = Buffer.from('%PDF-1.4\nSynthetic recovery-only fixture');
+    const plaintext = Buffer.from('%PDF-1.4\nFixture recovery-only fixture');
     const originals = new Map();
     for (const relative of reports) {
         const original = encryptBuffer(plaintext); originals.set(relative, original); await write(uploads, relative, original);
@@ -68,8 +68,8 @@ test('apply preserves original ciphertext and paths; both medical and credential
 }));
 
 test('a tampered or wrong-key file aborts the entire preflight before any replacement', async () => fixture(async ({ uploads, backupDirectory }) => {
-    const good = encryptBuffer(Buffer.from('%PDF-1.4\nSynthetic good'));
-    const damaged = encryptBuffer(Buffer.from('%PDF-1.4\nSynthetic damaged')); damaged[damaged.length - 1] ^= 1;
+    const good = encryptBuffer(Buffer.from('%PDF-1.4\nFixture good'));
+    const damaged = encryptBuffer(Buffer.from('%PDF-1.4\nFixture damaged')); damaged[damaged.length - 1] ^= 1;
     const goodFile = await write(uploads, 'documents/a-good.pdf', good);
     await write(uploads, 'documents/z-damaged.pdf', damaged);
     await assert.rejects(migrateFileEncryption({ uploads, backupDirectory, apply: true, env }), { code: 'AUTHENTICATION_FAILED' });
@@ -81,15 +81,15 @@ test('a tampered or wrong-key file aborts the entire preflight before any replac
 }));
 
 test('a current-format file copied to a different path fails identity authentication', async () => fixture(async ({ uploads }) => {
-    await write(uploads, 'documents/copied.pdf', encryptBuffer(Buffer.from('%PDF-1.4\nSynthetic'), 'documents/original.pdf'));
+    await write(uploads, 'documents/copied.pdf', encryptBuffer(Buffer.from('%PDF-1.4\nFixture'), 'documents/original.pdf'));
     await assert.rejects(migrateFileEncryption({ uploads, env }), { code: 'AUTHENTICATION_FAILED' });
 }));
 
 test('plaintext, unsupported file types and files larger than 10 MiB are refused', async () => fixture(async ({ uploads }) => {
-    const plain = await write(uploads, 'documents/plain.pdf', Buffer.from('%PDF-1.4\nSynthetic plaintext'));
+    const plain = await write(uploads, 'documents/plain.pdf', Buffer.from('%PDF-1.4\nFixture plaintext'));
     await assert.rejects(migrateFileEncryption({ uploads, env }), { code: 'PLAINTEXT_REFUSED' });
     await fs.unlink(plain);
-    const unsupported = await write(uploads, 'documents/secret.key', encryptBuffer(Buffer.from('synthetic')));
+    const unsupported = await write(uploads, 'documents/secret.key', encryptBuffer(Buffer.from('fixture')));
     await assert.rejects(migrateFileEncryption({ uploads, env }), { code: 'UNSUPPORTED_TYPE' });
     await fs.unlink(unsupported);
     const large = await write(uploads, 'documents/large.pdf', Buffer.alloc(0)); await fs.truncate(large, 10 * 1024 * 1024 + 1);
@@ -97,7 +97,7 @@ test('plaintext, unsupported file types and files larger than 10 MiB are refused
 }));
 
 test('symlinked files/directories, traversal contexts and unsafe backup locations are refused', async () => fixture(async ({ root, uploads, backupDirectory }) => {
-    const outside = path.join(root, 'outside.pdf'); await fs.writeFile(outside, encryptBuffer(Buffer.from('synthetic')));
+    const outside = path.join(root, 'outside.pdf'); await fs.writeFile(outside, encryptBuffer(Buffer.from('fixture')));
     await fs.mkdir(path.join(uploads, 'documents'));
     const link = path.join(uploads, 'documents', 'link.pdf'); await fs.symlink(outside, link);
     await assert.rejects(migrateFileEncryption({ uploads, env }), { code: 'UNSAFE_PATH' });
@@ -112,9 +112,9 @@ test('symlinked files/directories, traversal contexts and unsafe backup location
 }));
 
 test('different existing originals are never overwritten, and an identical original can resume a prior interrupted migration', async () => fixture(async ({ uploads, backupDirectory }) => {
-    const relative = 'documents/report.pdf'; const original = encryptBuffer(Buffer.from('%PDF-1.4\nSynthetic original'));
+    const relative = 'documents/report.pdf'; const original = encryptBuffer(Buffer.from('%PDF-1.4\nFixture original'));
     const file = await write(uploads, relative, original);
-    const different = encryptBuffer(Buffer.from('%PDF-1.4\nSynthetic other'));
+    const different = encryptBuffer(Buffer.from('%PDF-1.4\nFixture other'));
     const backup = await write(backupDirectory, relative, different);
     await assert.rejects(migrateFileEncryption({ uploads, apply: true, backupDirectory, env }), { code: 'BACKUP_CONFLICT' });
     assert.deepEqual(await fs.readFile(file), original); assert.deepEqual(await fs.readFile(backup), different);
@@ -130,7 +130,7 @@ test('apply requires an existing key, stopped writes and an explicit outside bac
 }));
 
 test('the CLI defaults to dry-run and reports counts without keys, file identities or plaintext', async () => fixture(async ({ uploads }) => {
-    await write(uploads, `medical_files/${patient}/lab_results/report.pdf`, encryptBuffer(Buffer.from('%PDF-1.4\nSensitive synthetic fixture')));
+    await write(uploads, `medical_files/${patient}/lab_results/report.pdf`, encryptBuffer(Buffer.from('%PDF-1.4\nSensitive fixture fixture')));
     const child = spawn(process.execPath, [path.resolve(__dirname, '../scripts/migrate-file-encryption.js'), '--uploads', uploads], {
         shell: false, windowsHide: true, env: { ...process.env, ENCRYPTION_KEY: key }, stdio: ['ignore', 'pipe', 'pipe']
     });
@@ -138,5 +138,5 @@ test('the CLI defaults to dry-run and reports counts without keys, file identiti
     child.stdout.on('data', bytes => { output += bytes; }); child.stderr.on('data', bytes => { errors += bytes; });
     const code = await new Promise((resolve, reject) => { child.once('error', reject); child.once('close', resolve); });
     assert.equal(code, 0, errors); assert.match(output, /Dry run: scanned=1, legacy=1/);
-    for (const secret of [key, patient, uploads, 'Sensitive synthetic fixture']) assert.ok(!output.includes(secret));
+    for (const secret of [key, patient, uploads, 'Sensitive fixture fixture']) assert.ok(!output.includes(secret));
 }));

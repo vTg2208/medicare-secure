@@ -19,7 +19,7 @@ test('an assessment form collects risk decisions and does not send notices',asyn
     expect(breachApi.create).not.toHaveBeenCalled();
 });
 test('a required notification remains visible and blocked resolution errors are recoverable',async()=>{
-    const current={id:'case',version:1,status:'Open',assessment:{discoveredAt:'2026-01-01T10:00:00Z',regimes:['gdpr'],facts:'Synthetic facts'},obligations:[{regime:'gdpr',audience:'authority',status:'overdue',dueAt:'2026-01-04T10:00:00Z',explanation:'Review required'}],notifications:[],history:[]};
+    const current={id:'case',version:1,status:'Open',assessment:{discoveredAt:'2026-01-01T10:00:00Z',regimes:['gdpr'],facts:'Fixture facts'},obligations:[{regime:'gdpr',audience:'authority',status:'overdue',dueAt:'2026-01-04T10:00:00Z',explanation:'Review required'}],notifications:[],history:[]};
     breachApi.list.mockResolvedValue({cases:[current],hasMore:false});breachApi.get.mockResolvedValue(current);
     breachApi.status.mockRejectedValue({response:{data:{message:'Complete the assessment and required evidence'}}});
     render(<BreachWorkspace />);

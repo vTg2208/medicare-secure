@@ -70,7 +70,7 @@ describe('clinical workflow regressions', () => {
     });
 
     it('rejects terminal EMR imaging uploads and removes the encrypted file instead of publishing success', async () => {
-        vi.spyOn(FileUpload, 'processUpload').mockResolvedValue({ filePath: '/synthetic/report.enc', fileUrl: '/api/files/patient/imaging/report.pdf' });
+        vi.spyOn(FileUpload, 'processUpload').mockResolvedValue({ filePath: '/fixture/report.enc', fileUrl: '/api/files/patient/imaging/report.pdf' });
         const remove = vi.spyOn(FileUpload, 'deleteFile').mockResolvedValue();
         query.mockImplementation(async sql => {
             if (/FROM imaging_orders/.test(sql)) return { rows: [{ id: 'order', visit_id: 'visit', patient_id: 'patient', status: 'cancelled' }] };
@@ -79,11 +79,11 @@ describe('clinical workflow regressions', () => {
         const res = response();
         await EmrController.uploadImagingReport({ body: { orderId: 'order' }, user: { id: 'radiologist' }, clinicalContext: { patient_id: 'patient', visit_id: 'visit' }, file: { buffer: Buffer.from('%PDF-1.4') } }, res);
         expect(res.code).toBe(409);
-        expect(remove).toHaveBeenCalledWith('/synthetic/report.enc');
+        expect(remove).toHaveBeenCalledWith('/fixture/report.enc');
     });
 
     it('publishes an order-only EMR imaging upload with the original ordering physician', async () => {
-        vi.spyOn(FileUpload, 'processUpload').mockResolvedValue({ filePath: '/synthetic/report.enc', fileUrl: '/api/files/patient/imaging/report.pdf' });
+        vi.spyOn(FileUpload, 'processUpload').mockResolvedValue({ filePath: '/fixture/report.enc', fileUrl: '/api/files/patient/imaging/report.pdf' });
         query.mockImplementation(async (sql, values) => {
             if (/FROM imaging_orders/.test(sql)) return { rows: [{ id: 'order', visit_id: 'visit', patient_id: 'patient', status: 'ordered', imaging_type: 'X-Ray', ordered_by: 'doctor' }] };
             if (/INSERT INTO medical_records/.test(sql)) return { rows: [{ id: 'record', patient_id: values[0], visit_id: values[1] }] };

@@ -33,7 +33,7 @@ test('migration failures roll back DDL and metadata; applied migrations reject d
         assert.equal(await isSchemaReady(client), true);
     } finally { await client.end(); }
 });
-test('fresh provisioning supports patient, visit and clinical workflows without demo data', { skip: !enabled }, async () => {
+test('fresh provisioning supports patient, visit and clinical workflows without preloaded records', { skip: !enabled }, async () => {
     assert.equal(process.env.NODE_ENV, 'test');
     assert.ok(['localhost', '127.0.0.1', '::1'].includes(process.env.DB_HOST));
     assert.match(process.env.DB_NAME || '', /test/i);

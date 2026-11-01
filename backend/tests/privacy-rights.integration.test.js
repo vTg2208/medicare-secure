@@ -22,7 +22,7 @@ test('privacy requests and exports enforce owner, reviewer, encryption and durab
     process.env.JWT_SECRET = crypto.randomBytes(48).toString('hex');
     process.env.JWT_REFRESH_SECRET = crypto.randomBytes(48).toString('hex');
     process.env.ENCRYPTION_KEY = crypto.randomBytes(32).toString('hex');
-    process.env.AI_ENABLED = 'false'; process.env.DEMO_MODE = 'false';
+    process.env.AI_ENABLED = 'false';
     process.env.RATE_LIMIT_MAX_REQUESTS = '10000';
     let db;
     try {
@@ -197,10 +197,10 @@ test('privacy requests and exports enforce owner, reviewer, encryption and durab
             await db.query("CREATE FUNCTION fixture_reverse_privacy_clock() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN NEW.created_at := TIMESTAMPTZ '2040-01-01 00:00:00+00' - (SELECT count(*) FROM privacy_rights_history WHERE request_id=NEW.request_id) * INTERVAL '1 second'; RETURN NEW; END $$");
             await db.query('CREATE TRIGGER fixture_reverse_privacy_clock BEFORE INSERT ON privacy_rights_history FOR EACH ROW EXECUTE FUNCTION fixture_reverse_privacy_clock()');
             try {
-                const created = await send('patient', 'post', '/requests', { type: 'objection', details: 'Please record a review with a synthetic backward-moving clock.' }); status(created, 201);
+                const created = await send('patient', 'post', '/requests', { type: 'objection', details: 'Please record a review with a fixture backward-moving clock.' }); status(created, 201);
                 const id = created.body.data.id;
                 status(await send('reviewer', 'put', `/requests/${id}`, { status: 'in_review' }), 200);
-                const resolved = await send('reviewer', 'put', `/requests/${id}`, { status: 'fulfilled', resolution: 'The synthetic objection review has been completed.', retentionBasis: 'This fixture preserves the actual recorded event order.' }); status(resolved, 200);
+                const resolved = await send('reviewer', 'put', `/requests/${id}`, { status: 'fulfilled', resolution: 'The fixture objection review has been completed.', retentionBasis: 'This fixture preserves the actual recorded event order.' }); status(resolved, 200);
                 const history = resolved.body.data.history;
                 assert.deepEqual(history.map(item => item.status), ['submitted', 'in_review', 'fulfilled']);
                 assert.ok(new Date(history[0].createdAt) > new Date(history[1].createdAt));
