@@ -1,6 +1,6 @@
 # Requirements implementation and next steps
 
-Updated 2026-11-01 for `feat/healthcare-mandatory-requirements`. Scope: the [supplied problem statement](problem-statement.md). Implementation is in the source workspace and an isolated, committed checkout at `.local/mandatory-implementation`. Existing unrelated workspace edits were preserved. No production migration, external notice or real-patient disposal was performed.
+Updated 2026-11-01 for `feat/healthcare-mandatory-requirements`. Scope: the [supplied problem statement](problem-statement.md). Implementation is in the source workspace and an isolated, committed checkout at `.local/mandatory-implementation`. Existing unrelated workspace edits were preserved. The changes are now merged and deployed; see the [live release verification](releases/2026-11-01-mandatory-live-release.md) for current evidence and counts. No external notice or real-patient disposal was performed.
 
 ## Sentence-by-sentence implementation
 
@@ -43,7 +43,7 @@ The first full integration attempt used a production-only backup image missing `
 
 ## Required owner actions before real patient use
 
-1. Review migrations and deploy this branch. Verify the UTC assumption for imported legacy appointment timestamps; migration 031 conservatively restarts historical diagnosis retention clocks because earlier status edits lacked timestamps.
+1. Migrations 026–031 are deployed to the synthetic demonstration. Before importing real legacy appointments, verify their UTC assumption; migration 031 conservatively restarts historical diagnosis retention clocks because earlier status edits lacked timestamps.
 2. Supply database certificates/CA and verify HTTPS, database TLS, encrypted database/upload/backup storage, key custody/rotation and runtime credentials in the actual environment.
 3. Approve the applicable retention/category/jurisdiction policies and legal holds. Disposal requires separately authorized database-owner execution with writes stopped; approval itself never deletes data. Reconcile retained workflow dependencies and restored backups against the disposal ledger.
 4. Supply the external Alertmanager receiver, exercise delivery/recovery, schedule coordinated encrypted off-host backups and complete the intended-host restore drill. Internal responder notifications are implemented; they do not establish delivery to an external incident owner, regulator or patient.
