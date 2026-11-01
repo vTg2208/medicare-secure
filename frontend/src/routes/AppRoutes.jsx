@@ -77,6 +77,7 @@ const PatientRegistration = lazy(() => import('../pages/staff/PatientRegistratio
 const Support = lazy(() => import('../pages/patient/Support'));
 const Messages = lazy(() => import('../pages/patient/Messages'));
 const AppointmentCalendar = lazy(() => import('../pages/admin/AppointmentCalendar'));
+const RetentionGovernance = lazy(() => import('../pages/compliance/RetentionGovernance'));
 const AIChatbot = lazy(() => import('../pages/patient/AIChatbot'));
 const TriageQueue = lazy(() => import('../pages/doctor/TriageQueue'));
 
@@ -92,6 +93,7 @@ function AppRoutes() {
             {/* Protected Routes */}
             <Route path="/patient/privacy" element={<ProtectedRoute allowedRoles={['patient']}><PrivacyCenter /></ProtectedRoute>} />
             <Route path="/compliance/privacy" element={<ProtectedRoute allowedRoles={['compliance_officer']}><PrivacyCenter /></ProtectedRoute>} />
+            <Route path="/compliance/retention" element={<ProtectedRoute allowedRoles={['compliance_officer']}><RetentionGovernance /></ProtectedRoute>} />
             <Route path="/messages" element={<ProtectedRoute allowedRoles={['patient', 'doctor', 'nurse']}><Messages /></ProtectedRoute>} />
             <Route path="/admin/appointment-calendars" element={<ProtectedRoute allowedRoles={['hospital_admin', 'system_admin']}><AppointmentCalendar /></ProtectedRoute>} />
             <Route path="/doctor/messages" element={<ProtectedRoute allowedRoles={['doctor']}><Messages /></ProtectedRoute>} />
