@@ -5,7 +5,7 @@ const mockModule = (path, exports) => {
 const query = vi.fn();
 const checkConsent = vi.fn();
 mockModule('../../src/config/db', { query });
-mockModule('../../src/models/consent.model', { checkConsent });
+mockModule('../../src/models/consent.model', { checkConsent, findMatchingConsent: checkConsent });
 const { clinicalAccess, visitAccess, staffRoleAllowed } = require('../../src/middleware/clinical-access.middleware');
 const response = () => ({ status: vi.fn(function(code) { this.code = code; return this; }), json: vi.fn(function(body) { this.body = body; return this; }) });
 const patient = '11111111-1111-4111-8111-111111111111';
@@ -39,6 +39,16 @@ describe('clinical authorization boundaries', () => {
         const next = vi.fn(); const res = response();
         await clinicalAccess({ resource: 'record', id: () => visit })({ user: { id: other, roleName: 'doctor' }, body: {} }, res, next);
         expect(res.code).toBe(403); expect(next).not.toHaveBeenCalled();
+    });
+    it('binds the matched server consent and category for audit evidence', async () => {
+        query.mockResolvedValueOnce({ rows: [{ patient_id: patient, visit_id: visit }] }).mockResolvedValueOnce({ rows: [{ id: visit }] });
+        checkConsent.mockResolvedValue({ id: other, purpose: 'treatment', data_category: 'vital_signs', source: 'manual' });
+        const req = { user: { id: other, roleName: 'nurse' }, body: { purpose: 'clinical_research' } };
+        const next = vi.fn();
+        await clinicalAccess({ resource: 'record', id: () => visit, category: 'vital_signs' })(req, response(), next);
+        expect(next).toHaveBeenCalled();
+        expect(req.consentContext).toEqual({ id: other, purpose: 'treatment', dataCategory: 'vital_signs', source: 'manual', workflow: 'clinical' });
+        expect(req.clinicalCategory).toBe('vitals');
     });
     it('rejects conflicting patient and visit identifiers', async () => {
         query.mockResolvedValue({ rows: [{ patient_id: patient, visit_id: visit }] });

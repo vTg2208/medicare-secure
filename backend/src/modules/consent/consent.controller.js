@@ -10,6 +10,12 @@ const { createAuditLog } = require('../../services/audit.service');
 const { HTTP_STATUS, SUCCESS_MESSAGES, ERROR_MESSAGES, AUDIT_ACTIONS } = require('../../utils/constants');
 const { validateRequiredFields } = require('../../utils/validators');
 const logger = require('../../utils/logger');
+const scopeSnapshot = consent => ({
+    dataCategory: consent.data_category, purpose: consent.purpose, accessLevel: consent.access_level,
+    startTime: consent.start_time ? new Date(consent.start_time).toISOString() : null,
+    endTime: consent.end_time ? new Date(consent.end_time).toISOString() : null,
+    source: consent.source, visitId: consent.visit_id,
+});
 
 /**
  * Get active consents for current patient
@@ -133,14 +139,21 @@ const grantConsent = async (req, res) => {
 
         let finalEndTime = endTime;
         if (!finalEndTime && (req.body.durationHours || req.body.durationMinutes)) {
-            const hours = parseInt(req.body.durationHours || 0);
-            const minutes = parseInt(req.body.durationMinutes || 0);
+            const hours = Number(req.body.durationHours || 0);
+            const minutes = Number(req.body.durationMinutes || 0);
+            if (![hours, minutes].every(value => Number.isFinite(value) && Number.isInteger(value) && value >= 0)) {
+                return res.status(400).json({ success: false, message: 'Duration must contain nonnegative whole hours and minutes' });
+            }
             const totalMs = (hours * 60 * 60 * 1000) + (minutes * 60 * 1000);
             if (totalMs > 0) {
                 const start = startTime ? new Date(startTime) : new Date();
-                finalEndTime = new Date(start.getTime() + totalMs).toISOString();
+                const end = new Date(start.getTime() + totalMs);
+                if (!Number.isFinite(end.getTime())) return res.status(400).json({ success: false, message: 'Duration is outside the supported date range' });
+                finalEndTime = end.toISOString();
             }
         }
+        const finalValidation = validateConsentData({ ...req.body, endTime: finalEndTime });
+        if (!finalValidation.isValid) return res.status(400).json({ success: false, message: 'Invalid consent data', errors: finalValidation.errors });
 
         const consent = await createConsent({
             patientId,
@@ -308,17 +321,37 @@ const updateConsent = async (req, res) => {
             });
         }
 
-        // Validate consent data partial updates
-        // We can reuse validateConsentData but need to handle partials
-        // For simplicity, we just proceed as we are trusting the input or we can validate each field if provided
+        // Validate the resulting scope, preserving omitted fields and provenance.
+        const updates = {};
+        for (const field of ['dataCategory', 'purpose', 'accessLevel', 'endTime']) {
+            if (Object.prototype.hasOwnProperty.call(req.body, field)) updates[field] = req.body[field];
+        }
+        if (!Object.keys(updates).length) return res.status(400).json({ success: false, message: 'At least one consent field is required' });
+        if (updates.endTime === '') updates.endTime = null;
+        const merged = {
+            dataCategory: consent.data_category,
+            purpose: consent.purpose,
+            accessLevel: consent.access_level,
+            startTime: consent.start_time ? new Date(consent.start_time).toISOString() : undefined,
+            endTime: consent.end_time ? new Date(consent.end_time).toISOString() : null,
+            ...updates,
+        };
+        const generatedVisitPurpose = consent.source === 'visit' && consent.visit_id && consent.purpose === `Patient-approved care for visit ${consent.visit_id}`;
+        const validation = require('../../utils/consent.validator').validateConsentData({
+            ...merged,
+            purpose: generatedVisitPurpose && !Object.prototype.hasOwnProperty.call(updates, 'purpose') ? 'treatment' : merged.purpose,
+        });
+        if (!validation.isValid) return res.status(400).json({ success: false, message: 'Invalid consent data', errors: validation.errors });
+        const recipient = await query('SELECT r.name AS role_name FROM users u JOIN roles r ON r.id=u.role_id WHERE u.id=$1', [consent.recipient_user_id]);
+        if (!recipient.rows.length || !['doctor','nurse','lab_technician','radiologist','pharmacist','insurance_provider','researcher'].includes(recipient.rows[0].role_name)) {
+            return res.status(400).json({ success: false, message: 'This account cannot receive patient-data consent' });
+        }
+        if (recipient.rows[0].role_name === 'researcher' && (!['clinical_research','medical_study'].includes(merged.purpose) || merged.accessLevel !== 'read')) {
+            return res.status(400).json({ success: false, message: 'Research access requires a research purpose and read-only permission' });
+        }
 
         // Update consent
-        const updatedConsent = await require('../../models/consent.model').updateConsent(consentId, patientId, {
-            dataCategory,
-            purpose,
-            accessLevel,
-            endTime: endTime === '' ? null : endTime
-        });
+        const updatedConsent = await require('../../models/consent.model').updateConsent(consentId, patientId, updates);
 
         // Audit log
         await createAuditLog({
@@ -332,6 +365,11 @@ const updateConsent = async (req, res) => {
             requestMethod: req.method,
             requestPath: req.path,
             statusCode: HTTP_STATUS.OK,
+            metadata: {
+                patientId, recipientUserId: consent.recipient_user_id,
+                previousConsent: scopeSnapshot(consent),
+                updatedConsent: scopeSnapshot(updatedConsent),
+            },
         });
 
         logger.info('Consent updated:', {

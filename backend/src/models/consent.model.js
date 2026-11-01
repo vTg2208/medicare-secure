@@ -1,5 +1,6 @@
 const { query } = require('../config/db');
 const logger = require('../utils/logger');
+const { consentCategories, consentPurposeSql } = require('../utils/consent.validator');
 
 /**
  * Grant new consent
@@ -18,43 +19,8 @@ const createConsent = async (consentData) => {
             endTime,
         } = consentData;
 
-        // ── Deduplication: if an active consent already exists for this
-        //    patient+recipient pair, UPDATE it instead of inserting a new row.
-        const existing = await query(
-            `SELECT id FROM consents
-             WHERE patient_id = $1
-               AND recipient_user_id = $2
-               AND status = 'active'
-               AND (end_time IS NULL OR end_time > NOW())
-             LIMIT 1`,
-            [patientId, recipientUserId]
-        );
-
-        if (existing.rows.length > 0) {
-            const updateQuery = `
-                UPDATE consents
-                SET data_category = $1,
-                    purpose       = $2,
-                    access_level  = $3,
-                    start_time    = $4,
-                    end_time      = $5,
-                    updated_at    = NOW()
-                WHERE id = $6
-                RETURNING *
-            `;
-            const updated = await query(updateQuery, [
-                dataCategory,
-                purpose,
-                accessLevel,
-                startTime || new Date(),
-                endTime || null,
-                existing.rows[0].id,
-            ]);
-            logger.info(`[createConsent] Updated existing consent ${existing.rows[0].id} instead of inserting duplicate`);
-            return updated.rows[0];
-        }
-
-        // No existing active consent → insert fresh row
+        // A new patient decision is a separate grant. Never overwrite a different
+        // category, purpose, or visit-generated grant for the same recipient.
         const insertQuery = `
             INSERT INTO consents (
                 patient_id,
@@ -111,7 +77,7 @@ const updateConsent = async (consentId, patientId, updateData) => {
                 data_category = COALESCE($1, data_category),
                 purpose = COALESCE($2, purpose),
                 access_level = COALESCE($3, access_level),
-                end_time = $4,
+                end_time = CASE WHEN $7::boolean THEN $4::timestamptz ELSE end_time END,
                 updated_at = NOW()
             WHERE id = $5 AND patient_id = $6
             RETURNING *
@@ -123,7 +89,8 @@ const updateConsent = async (consentId, patientId, updateData) => {
             accessLevel,
             endTime, // Can be null for unlimited
             consentId,
-            patientId
+            patientId,
+            Object.prototype.hasOwnProperty.call(updateData, 'endTime')
         ]);
 
         return result.rows[0];
@@ -143,7 +110,7 @@ const revokeConsent = async (consentId, patientId) => {
     try {
         const updateQuery = `
             UPDATE consents 
-            SET status = 'revoked', updated_at = NOW()
+            SET status = 'revoked', revoked_at = NOW(), updated_at = NOW()
             WHERE id = $1 AND patient_id = $2
             RETURNING *
         `;
@@ -164,7 +131,7 @@ const revokeConsent = async (consentId, patientId) => {
 const getActiveConsents = async (patientId) => {
     try {
         const selectQuery = `
-            SELECT DISTINCT ON (c.recipient_user_id)
+            SELECT
                 c.id,
                 c.recipient_user_id as "recipientUserId",
                 c.data_category as "dataCategory",
@@ -173,6 +140,8 @@ const getActiveConsents = async (patientId) => {
                 c.start_time as "startTime",
                 c.end_time as "endTime",
                 c.status,
+                c.source,
+                c.visit_id as "visitId",
                 c.created_at,
                 u.email as recipient_email,
                 r.name as recipient_role,
@@ -185,7 +154,7 @@ const getActiveConsents = async (patientId) => {
             WHERE c.patient_id = $1 
                 AND c.status = 'active'
                 AND (c.end_time IS NULL OR c.end_time > NOW())
-            ORDER BY c.recipient_user_id, c.created_at DESC
+            ORDER BY c.created_at DESC, c.id
         `;
 
         const result = await query(selectQuery, [patientId]);
@@ -238,38 +207,39 @@ const getConsentHistory = async (patientId) => {
 };
 
 /**
- * Check if active consent exists
+ * Find current consent matching the server-selected workflow and scope.
  * @param {String} patientId - Patient ID
  * @param {String} recipientUserId - Recipient User ID
  * @param {String} dataCategory - Data Category
  * @param {String} accessLevel - Access Level ('read' or 'write')
- * @returns {Promise<Boolean>} True if consent exists
+ * @returns {Promise<Object|null>} The matched decision for authorization evidence.
  */
-const checkConsent = async (patientId, recipientUserId, dataCategory, accessLevel = 'read') => {
+const findMatchingConsent = async (patientId, recipientUserId, dataCategory, accessLevel = 'read') => {
     try {
         const checkQuery = `
-            SELECT access_level 
-            FROM consents 
+            SELECT id, purpose, data_category, source, access_level
+            FROM consents consent
             WHERE patient_id = $1 
                 AND recipient_user_id = $2
-                AND (data_category = $3 OR data_category = 'all' OR data_category = 'all_medical_data' OR data_category = '*')
+                AND (data_category = ANY($3::text[]) OR data_category IN ('all', 'all_medical_data', '*'))
                 AND status = 'active'
                 AND start_time <= NOW()
                 AND (end_time IS NULL OR end_time > NOW())
+                AND ${consentPurposeSql('consent', dataCategory)}
+                AND access_level = ANY($4::text[])
+            ORDER BY created_at DESC, id
+            LIMIT 1
         `;
 
-        const result = await query(checkQuery, [patientId, recipientUserId, dataCategory]);
-
-        if (result.rows.length === 0) {
-            return false;
-        }
-
-        return result.rows.some(row => accessLevel === 'write' ? row.access_level === 'write' : ['read', 'write'].includes(row.access_level));
+        const result = await query(checkQuery, [patientId, recipientUserId, consentCategories(dataCategory), accessLevel === 'write' ? ['write'] : ['read', 'write']]);
+        return result.rows[0] || null;
     } catch (error) {
         logger.error('Failed to check consent:', error);
         throw error;
     }
 };
+
+const checkConsent = async (...args) => Boolean(await findMatchingConsent(...args));
 
 /**
  * Find consent by ID
@@ -312,6 +282,7 @@ const getPatientsWithActiveConsent = async (doctorId) => {
             AND c.status = 'active'
             AND c.start_time <= NOW()
             AND (c.end_time IS NULL OR c.end_time > NOW())
+            AND ${consentPurposeSql('c')}
             ORDER BY u.last_name, u.first_name
         `;
 
@@ -330,6 +301,7 @@ module.exports = {
     getActiveConsents,
     getConsentHistory,
     checkConsent,
+    findMatchingConsent,
     findConsentById,
     getPatientsWithActiveConsent,
 };

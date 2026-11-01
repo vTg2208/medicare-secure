@@ -75,7 +75,7 @@ VALUES(${literal(patient)},${literal(users.researcher)},'all_medical_data','clin
     for (const role of ['doctor', 'nurse']) statements.push(`INSERT INTO visit_staff_assignments(visit_id,staff_user_id,role)
 VALUES(${literal(visit)},${literal(users[role])},${literal(role)});`);
     for (const role of ['doctor', 'nurse', 'lab_technician', 'radiologist', 'pharmacist', 'insurance_provider', 'researcher']) statements.push(`INSERT INTO consents(patient_id,recipient_user_id,data_category,purpose,access_level)
-VALUES(${literal(users.patient)},${literal(users[role])},'all_medical_data',${literal(role === 'researcher' ? 'clinical_research' : 'treatment')},${literal(role === 'researcher' ? 'read' : 'write')});`);
+VALUES(${literal(users.patient)},${literal(users[role])},'all_medical_data',${literal(role === 'researcher' ? 'clinical_research' : role === 'insurance_provider' ? 'insurance_claim' : 'treatment')},${literal(role === 'researcher' ? 'read' : 'write')});`);
     statements.push(`INSERT INTO medical_records(patient_id,visit_id,type,title,description,created_by)
 VALUES(${literal(users.patient)},${literal(visit)},'consultation','Synthetic demo record','Synthetic demonstration data only. No real patient information. Not medical advice.',${literal(users.doctor)});
 COMMIT;`);

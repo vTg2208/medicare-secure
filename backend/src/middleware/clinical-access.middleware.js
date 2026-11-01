@@ -1,6 +1,7 @@
 const { query } = require('../config/db');
-const { checkConsent } = require('../models/consent.model');
+const { findMatchingConsent } = require('../models/consent.model');
 const fs = require('fs/promises');
+const { consentCategories, consentPurposeSql } = require('../utils/consent.validator');
 
 const PROVIDERS = ['doctor', 'nurse', 'lab_technician', 'radiologist', 'pharmacist'];
 const RECORD_CATEGORIES = { diagnosis: 'diagnoses', prescription: 'prescriptions', lab_result: 'lab_results', lab_order: 'lab_results', lab_request: 'lab_results', laboratory: 'lab_results', lab: 'lab_results', imaging: 'imaging', vitals: 'vitals', consultation: 'clinical_notes', note: 'clinical_notes', treatment: 'clinical_notes', procedure: 'clinical_notes', other: 'clinical_notes', vaccination: 'clinical_notes' };
@@ -22,8 +23,9 @@ const consentSql = (patient, user, category = 'all', access = 'read') => `EXISTS
     WHERE access_consent.patient_id = ${patient} AND access_consent.recipient_user_id = ${user}
       AND access_consent.status = 'active' AND access_consent.start_time <= NOW()
       AND (access_consent.end_time IS NULL OR access_consent.end_time > NOW())
-      AND access_consent.data_category IN ('all', 'all_medical_data', '*', '${category}')
+      AND access_consent.data_category IN ('all', 'all_medical_data', '*', ${consentCategories(category).map(value => `'${value}'`).join(',')})
       AND access_consent.access_level IN (${access === 'write' ? "'write'" : "'read', 'write'"})
+      AND ${consentPurposeSql('access_consent', category)}
 )`;
 const organizationSql = (organization, user) => `EXISTS (
     SELECT 1 FROM staff_org_mapping access_mapping
@@ -95,12 +97,15 @@ const clinicalAccess = ({ resource = 'patient', id = req => req.params.patientId
         if ((roles && !roles.includes(role)) || (!PROVIDERS.includes(role) && !(role === 'patient' && access === 'read'))) return fail(req, res, 403, 'Clinical access denied');
         const context = await resolveResource(typeof resource === 'function' ? resource(req) : resource, id(req));
         await validateLinks(req, context);
-        const dataCategory = typeof category === 'function' ? category(req, context) : category;
+        const requestedCategory = typeof category === 'function' ? category(req, context) : category;
+        const dataCategory = requestedCategory === 'vital_signs' ? 'vitals' : requestedCategory;
+        req.clinicalCategory = dataCategory;
         if (!['all', 'all_medical_data', 'diagnoses', 'prescriptions', 'lab_results', 'imaging', 'clinical_notes', 'vitals', 'billing', 'insurance_claim', 'demographics'].includes(dataCategory)) return fail(req, res, 400, 'Invalid data category');
         if (role === 'patient') {
             if (context.patient_id !== req.user.id) return fail(req, res, 403, 'You can only access your own records');
         } else {
-            const consent = await checkConsent(context.patient_id, req.user.id, dataCategory, access);
+            const consent = await findMatchingConsent(context.patient_id, req.user.id, dataCategory, access);
+            if (consent) req.consentContext = { id: consent.id, purpose: consent.purpose, dataCategory: consent.data_category, source: consent.source, workflow: 'clinical' };
             let emergency;
             if (role === 'doctor' && access === 'read') {
                 emergency = (await query(`SELECT g.id FROM emergency_access_grants g JOIN visits v ON v.id=g.visit_id
