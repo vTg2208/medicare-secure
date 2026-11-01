@@ -1,11 +1,12 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { ThemeProvider } from '../../context/ThemeContext';
 import apiClient from '../../api/client';
 import Messages from './Messages';
+import Dashboard from './Dashboard';
 
 const renderPage = (role = 'patient') => render(<MemoryRouter><ThemeProvider><AuthContext.Provider value={{ user: { id: role === 'patient' ? 'patient' : 'doctor', role } }}><Messages /></AuthContext.Provider></ThemeProvider></MemoryRouter>);
 beforeEach(() => vi.restoreAllMocks());
@@ -47,4 +48,12 @@ test('an inbox outage is visible and retry loads the real empty state', async ()
     get.mockResolvedValue({ data: { data: [] } });
     await user.click(screen.getByRole('button', { name: 'Retry' }));
     await waitFor(() => expect(screen.getByText('No conversations yet.')).toBeInTheDocument());
+});
+
+test('the patient dashboard opens the real messages inbox',async()=>{
+    vi.spyOn(apiClient,'get').mockResolvedValue({data:{success:true,data:[]}});
+    const user=userEvent.setup();
+    render(<MemoryRouter initialEntries={['/patient/dashboard']}><ThemeProvider><AuthContext.Provider value={{user:{id:'patient',role:'patient',firstName:'Synthetic',lastName:'Patient'}}}><Routes><Route path="/patient/dashboard" element={<Dashboard/>}/><Route path="/patient/messages" element={<Messages/>}/></Routes></AuthContext.Provider></ThemeProvider></MemoryRouter>);
+    await user.click(screen.getByRole('link',{name:/Messages/}));
+    expect(await screen.findByText('No conversations yet.')).toBeInTheDocument();
 });
