@@ -57,12 +57,18 @@ async function cleanupDisposalFilesUnlocked(client,decisionId,{uploadPath,apply=
     if(!quiesced)fail('Quiesce writes before attachment cleanup');
     if(!uploadPath)fail('An explicit UPLOAD_PATH is required');
     const fs=require('node:fs/promises');const path=require('node:path');
-    const root=await fs.realpath(path.resolve(uploadPath));
+    const postgres=process.env.FILE_STORAGE_BACKEND==='postgres';
+    if(postgres&&!path.isAbsolute(uploadPath))fail('Durable cleanup requires an absolute logical upload root');
+    const root=postgres?path.resolve(uploadPath):await fs.realpath(path.resolve(uploadPath));
     for(const job of jobs) {
         if(!uuid(job.patient_id)||!['lab_results','imaging'].includes(job.file_type)||!/^\d+_[a-f\d]{16}\.[a-z0-9]{1,8}$/i.test(job.file_name))fail('Unsafe attachment cleanup identity');
         const directory=path.join(root,'medical_files',job.patient_id,job.file_type);
         const target=path.join(directory,job.file_name);
         await client.query(`INSERT INTO audit_logs(action,entity_type,entity_id,purpose,metadata) VALUES('retention_file_cleanup_intent','retention',$1,'Approved attachment disposal',jsonb_build_object('decisionId',$2::uuid))`,[job.id,decisionId]);
+        if(postgres){
+            const storage=require('../src/services/encrypted-file-store');
+            await storage.removeEncrypted(target,{client,root});
+        }else{
         // A missing directory indicates a wrong/unavailable mount, not prior cleanup.
         const realDirectory=await fs.realpath(directory);
         if(realDirectory!==directory)fail('Symlinked attachment paths are not supported');
@@ -74,6 +80,7 @@ async function cleanupDisposalFilesUnlocked(client,decisionId,{uploadPath,apply=
             finally{await handle.close();}
             await fs.unlink(target);
         } catch(error) {if(error.code!=='ENOENT')throw error;}
+        }
         await client.query('UPDATE retention_file_cleanup SET cleaned_at=NOW() WHERE id=$1 AND cleaned_at IS NULL',[job.id]);
     }
     await client.query('BEGIN');

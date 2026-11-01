@@ -4,7 +4,7 @@ const fs = require('fs');
 const config = require('../config/env');
 const crypto = require('crypto');
 const { secureCredential } = require('../services/credential-file.service');
-const { withFileMutation } = require('../services/file-coordination');
+const encryptedStorage = require('../services/encrypted-file-store');
 
 // Ensure upload directories exist
 const uploadDir = path.resolve(config.upload.uploadPath, 'documents');
@@ -28,13 +28,13 @@ const storage = {
                 await secureCredential({ path: filePath, originalname: file.originalname, mimetype: file.mimetype, buffer: Buffer.concat(chunks) });
                 cb(null, { destination: uploadDir, filename, path: filePath, size });
             } catch (error) {
-                await withFileMutation(() => fs.promises.unlink(filePath)).catch(() => {});
+                await encryptedStorage.removeEncrypted(filePath).catch(() => {});
                 cb(error);
             }
         });
     },
     _removeFile(req, file, cb) {
-        withFileMutation(() => fs.promises.unlink(file.path)).then(() => cb(null), cb);
+        encryptedStorage.removeEncrypted(file.path).then(() => cb(null), cb);
     },
 };
 

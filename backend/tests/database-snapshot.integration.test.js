@@ -44,7 +44,7 @@ test('online snapshots preserve one database instant, restore extensions and ref
    await restoreBackup({input:output,uploads:path.join(root,'restored-uploads'),env:{...env,RESTORE_DISPOSABLE:'true',RESTORE_DB_HOST:config.host,RESTORE_DB_PORT:String(config.port),RESTORE_DB_USER:config.user,RESTORE_DB_PASSWORD:config.password,RESTORE_ADMIN_DB:config.database,RESTORE_DB_NAME:targetName}});
    target=new Client({...config,database:targetName,options:'-c search_path=healthcare,extensions,public'});await target.connect();
    assert.deepEqual((await target.query('SELECT * FROM snapshot_fixture ORDER BY id')).rows,[{id:1,payload:'before exported snapshot'}]);
-   assert.equal((await target.query('SELECT count(*)::int AS n FROM _migrations')).rows[0].n,31);
+   assert.equal((await target.query('SELECT count(*)::int AS n FROM _migrations')).rows[0].n,require('../src/database/migrate').readMigrations().length);
    assert.equal((await target.query("SELECT encode(extensions.digest('restored crypto','sha256'),'hex') AS hash")).rows[0].hash,crypto.createHash('sha256').update('restored crypto').digest('hex'));
    assert.equal((await verifyRestoredSnapshot(target,manifest)).auditVerified,true);
    await target.query("INSERT INTO healthcare.snapshot_fixture VALUES(99,'unexpected recovery row')");

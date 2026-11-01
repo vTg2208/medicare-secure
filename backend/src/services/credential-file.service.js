@@ -6,13 +6,14 @@ const Scanner = require('./malware.scanner.service');
 const { scanBuffer } = require('./antivirus.service');
 const config = require('../config/env');
 const { withFileMutation } = require('./file-coordination');
+const storage = require('./encrypted-file-store');
 function credentialContext(file) {
     const relative = path.relative(path.resolve(config.upload.uploadPath), path.resolve(file));
     if (relative.startsWith('..') || path.isAbsolute(relative)) throw new Error('Invalid credential location');
     return relative.split(path.sep).join('/');
 }
 async function secureCredential(file) {
-    const stored = file.buffer || await fs.readFile(file.path);
+    const stored = file.buffer || await storage.readEncrypted(file.path);
     const magic = stored.subarray(0, 8).toString();
     // Legacy encryption is accepted only by this explicit migration path, never
     // by the download path. Scan before replacing it with identity-bound data.
@@ -23,7 +24,8 @@ async function secureCredential(file) {
     await scanBuffer(bytes);
     if (magic !== 'SHMSENC2') await withFileMutation(async () => {
         const encrypted = encryptBuffer(bytes, credentialContext(file.path));
-        if (file.buffer) return fs.writeFile(file.path, encrypted, { mode: 0o600, flag: 'wx' });
+        if (file.buffer) return storage.writeEncrypted(file.path, encrypted);
+        if (storage.isPostgresStorage()) throw new Error('Legacy credentials require migration before durable storage');
         // A legacy replacement must leave the previous file intact on failure.
         // The temporary file is on the same filesystem for atomic publication.
         const temporary = path.join(path.dirname(file.path), `.credential-rewrite-${crypto.randomUUID()}`);
@@ -38,6 +40,7 @@ async function secureCredential(file) {
     });
 }
 async function readCredential(file) {
+    if (storage.isPostgresStorage()) return decryptBuffer(await storage.readEncrypted(file), credentialContext(file));
     const root = await fs.realpath(path.resolve(config.upload.uploadPath));
     const target = await fs.realpath(path.resolve(file));
     const relative = path.relative(root, target);

@@ -4,7 +4,7 @@ const fs = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
 
-async function withApplication(name, callback) {
+async function withApplication(name, callback, { schema = 'public' } = {}) {
     assert.equal(process.env.NODE_ENV, 'test');
     assert.ok(['127.0.0.1', 'localhost', '::1'].includes(process.env.DB_HOST));
     assert.equal(String(process.env.DB_PORT), '55432');
@@ -22,6 +22,10 @@ async function withApplication(name, callback) {
     try {
         const migrator = new Client({ ...connection, database });
         await migrator.connect();
+        if (schema === 'healthcare') {
+            await migrator.query('CREATE SCHEMA healthcare; CREATE SCHEMA extensions; CREATE EXTENSION "uuid-ossp" SCHEMA extensions; CREATE EXTENSION pgcrypto SCHEMA extensions; CREATE EXTENSION btree_gist SCHEMA healthcare; SET search_path=healthcare,extensions,public');
+            await admin.query(`ALTER DATABASE ${database} SET search_path=healthcare,extensions,public`);
+        } else assert.equal(schema, 'public');
         try { await require('../../src/database/migrate').migrate(migrator, { log() {} }); }
         finally { await migrator.end(); }
         db = require('../../src/config/db');
