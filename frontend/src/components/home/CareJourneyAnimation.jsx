@@ -1,15 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './CareJourneyAnimation.css';
 
+const STEP_DURATION_MS = 1000;
 const steps = [
-    { id: 'ready', title: 'Your report is ready.', detail: 'Private until you choose to share.', duration: 1300, chapter: 0 },
-    { id: 'choose', title: 'You approve access.', detail: 'One clear sharing control.', duration: 650, chapter: 1 },
-    { id: 'shared', title: 'Your care team is connected.', detail: 'The right information, shared with permission.', duration: 1550, chapter: 1 },
-    { id: 'viewed', title: 'Every access is recorded.', detail: 'Keep a clear history of who viewed your report.', duration: 1300, chapter: 1 },
-    { id: 'withdraw', title: 'You can switch it off.', detail: 'Your sharing choices stay flexible.', duration: 650, chapter: 2 },
-    { id: 'revoked', title: 'Future access is blocked.', detail: 'Your records and access history stay with you.', duration: 1800, chapter: 2 },
+    { id: 'ready', title: 'Your report is ready.', detail: 'Private until you choose to share.' },
+    { id: 'choose', title: 'You approve access.', detail: 'One clear sharing control.' },
+    { id: 'shared', title: 'Your care team is connected.', detail: 'The right information, shared with permission.' },
+    { id: 'viewed', title: 'Every access is recorded.', detail: 'Keep a clear history of who viewed your report.' },
+    { id: 'withdraw', title: 'You can switch it off.', detail: 'Your sharing choices stay flexible.' },
+    { id: 'revoked', title: 'Future access is blocked.', detail: 'Your records and access history stay with you.' },
 ];
-const chapters = [{ label: 'Your records', phase: 0 }, { label: 'Share access', phase: 2 }, { label: 'Stay in control', phase: 5 }];
 
 function Icon({ name, ...props }) {
     const paths = {
@@ -85,9 +85,9 @@ export default function CareJourneyAnimation() {
             setPhase(next);
             if (next === 0) setViewed(false);
             if (next === 3) setViewed(true);
-        }, step.duration);
+        }, STEP_DURATION_MS);
         return () => window.clearTimeout(timer);
-    }, [phase, running, step.duration]);
+    }, [phase, running]);
 
     function select(next, event) {
         setPlaying(false);
@@ -141,10 +141,12 @@ export default function CareJourneyAnimation() {
 
                 <article className="mc-care-team" aria-label="Care team access">
                     <div className="mc-care-card-top"><span className="mc-care-avatar"><Icon name="clinician" /></span><div><strong>Care team</strong><small>Clinical workspace</small></div></div>
-                    <div className="mc-care-access-icon" aria-hidden="true"><span className="mc-care-received-report"><Icon name="document" /></span></div>
-                    <strong className="mc-care-team-status">{connected ? (viewed ? 'Report viewed' : 'Access approved') : (phase === 5 ? 'Access withdrawn' : 'Waiting for access')}</strong>
-                    <span className="mc-care-team-detail">{connected ? 'Shared with your permission' : (phase === 5 ? 'New requests are blocked' : 'Your permission is needed')}</span>
-                    <button className="mc-care-open" disabled={!connected} onClick={event => select(3, event)}><Icon name="document" />{connected ? 'View report' : 'Report protected'}</button>
+                    <div className="mc-care-team-content">
+                        <div className="mc-care-access-icon" aria-hidden="true"><span className="mc-care-received-report"><Icon name="document" /></span></div>
+                        <strong className="mc-care-team-status">{connected ? (viewed ? 'Report viewed' : 'Access approved') : (phase === 5 ? 'Access withdrawn' : 'Waiting for access')}</strong>
+                        <span className="mc-care-team-detail">{connected ? 'Shared with your permission' : (phase === 5 ? 'New requests are blocked' : 'Your permission is needed')}</span>
+                        <button className="mc-care-open" disabled={!connected} onClick={event => select(3, event)}><Icon name="document" />{connected ? 'View report' : 'Report protected'}</button>
+                    </div>
                 </article>
                 <span className="mc-care-flying-report" aria-hidden="true"><Icon name="document" /><span /><span /><span /></span>
             </div>
@@ -157,7 +159,6 @@ export default function CareJourneyAnimation() {
             </div>
 
             <footer className="mc-care-controls">
-                <div className="mc-care-chapters" aria-label="Explore the care journey">{chapters.map((chapter, index) => <button key={chapter.label} aria-pressed={index === step.chapter} onClick={event => select(chapter.phase, event)}><span>{index + 1}</span>{chapter.label}</button>)}</div>
                 <div className="mc-care-playback"><button className="mc-care-play" disabled={reducedMotion}
                     onPointerDown={() => { playbackIntent.current = playing; }} onClick={togglePlayback}
                     aria-label={reducedMotion ? 'Automatic animation disabled for reduced motion' : playing ? 'Pause animation' : 'Play animation'}><Icon name={playing && !reducedMotion ? 'pause' : 'play'} /><span>{reducedMotion ? 'Motion reduced' : playing ? 'Pause' : 'Play'}</span></button>

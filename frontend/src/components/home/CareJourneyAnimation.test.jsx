@@ -9,6 +9,10 @@ const advance = milliseconds => act(() => vi.advanceTimersByTime(milliseconds));
 const region = () => screen.getByRole('region', { name: 'See how Medicare sharing works' });
 const permission = () => screen.getByRole('switch', { name: 'Allow care team access' });
 const phase = () => region().getAttribute('data-phase');
+function advanceStep(current, next) {
+    advance(999); expect(phase()).toBe(current);
+    advance(1); expect(phase()).toBe(next);
+}
 const scene = () => render(<CareJourneyAnimation />);
 function setup(reduce = false) {
     preference = { matches: reduce, addEventListener: (_name, callback) => { preferenceChanged = callback; }, removeEventListener: vi.fn() };
@@ -30,25 +34,28 @@ test('shows an immediately understandable private record before the animation ad
     expect(permission()).toHaveAttribute('aria-checked', 'false');
     expect(screen.getByRole('button', { name: 'Report protected' })).toBeDisabled();
     expect(phase()).toBe('ready');
+    expect(screen.queryByLabelText('Explore the care journey')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Pause animation' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Replay care journey' })).toBeEnabled();
 });
 
 test('approval precedes care-team viewing and withdrawal blocks future access without erasing history', () => {
     setup();
-    advance(1300); expect(phase()).toBe('choose');
+    advanceStep('ready', 'choose');
     expect(permission()).toHaveAttribute('aria-checked', 'false');
-    advance(650); expect(phase()).toBe('shared');
+    advanceStep('choose', 'shared');
     expect(permission()).toHaveAttribute('aria-checked', 'true');
     expect(screen.getByRole('button', { name: 'View report' })).toBeEnabled();
     expect(region()).toHaveAttribute('data-viewed', 'false');
-    advance(1550); expect(phase()).toBe('viewed');
+    advanceStep('shared', 'viewed');
     expect(region()).toHaveAttribute('data-viewed', 'true');
-    advance(1300); expect(phase()).toBe('withdraw');
-    advance(650); expect(phase()).toBe('revoked');
+    advanceStep('viewed', 'withdraw');
+    advanceStep('withdraw', 'revoked');
     expect(permission()).toHaveAttribute('aria-checked', 'false');
     expect(screen.getByRole('button', { name: 'Report protected' })).toBeDisabled();
     expect(region()).toHaveAttribute('data-viewed', 'true');
     expect(screen.getByText('Lab report')).toBeVisible();
-    advance(1800); expect(phase()).toBe('ready');
+    advanceStep('revoked', 'ready');
     expect(region()).toHaveAttribute('data-viewed', 'false');
 });
 
@@ -100,7 +107,7 @@ test('a pointer pause retains pause intent when focus first stops automatic play
     expect(screen.getByRole('button', { name: 'Play animation' })).toBeEnabled();
     advance(20000); expect(phase()).toBe('ready');
     fireEvent.click(screen.getByRole('button', { name: 'Play animation' }));
-    advance(1300); expect(phase()).toBe('choose');
+    advance(1000); expect(phase()).toBe('choose');
 });
 
 test('offscreen and background-tab states stop the timeline and resume without skipping steps', () => {
@@ -108,7 +115,7 @@ test('offscreen and background-tab states stop the timeline and resume without s
     act(() => intersect([{ isIntersecting: false }]));
     advance(20000); expect(phase()).toBe('ready');
     act(() => intersect([{ isIntersecting: true }]));
-    advance(1300); expect(phase()).toBe('choose');
+    advance(1000); expect(phase()).toBe('choose');
     vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('hidden');
     fireEvent(document, new Event('visibilitychange'));
     advance(20000); expect(phase()).toBe('choose');
@@ -127,7 +134,7 @@ test('reduced-motion users start paused and can use all sharing controls without
 });
 
 test('a changed motion preference stops a running sequence', () => {
-    setup(); advance(1300);
+    setup(); advance(1000);
     act(() => { preference.matches = true; preferenceChanged(); });
     advance(20000); expect(phase()).toBe('choose');
     expect(region()).toHaveAttribute('data-running', 'false');
