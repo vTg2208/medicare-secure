@@ -45,6 +45,13 @@
 .mc-home-footer > span { margin-left: auto; }
 .mc-home-skip { position: absolute; z-index: 99; top: 8px; left: 12px; transform: translateY(-200%); padding: 12px; background: var(--mc-surface); color: var(--mc-accent); }
 .mc-home-skip:focus { transform: none; }
+@media (min-width: 801px) and (max-height: 850px) {
+    .mc-home-header { min-height: 88px; }
+    .mc-home-hero { padding-block: 32px; }
+    .mc-home-intro h1 { font-size: 52px; }
+    .mc-home-lede { font-size: 15px; margin-bottom: 24px; }
+    .mc-home-principle { display: none; }
+}
 @media (max-width: 1100px) {
     .mc-home-header, .mc-home-hero, .mc-home-journey, .mc-home-invitation, .mc-home-footer { width: calc(100% - 64px); }
     .mc-home-nav { gap: 20px; }
