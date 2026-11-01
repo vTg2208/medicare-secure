@@ -21,7 +21,7 @@ const hashes = Object.fromEntries(DEMO_ROLES.map(role => [role, testHash]));
 test('browser schema includes each immutable migration body and ledger hash', () => {
     const sql = buildBrowserSchemaSql();
     const migrations = readMigrations();
-    assert.equal(migrations.length, 17);
+    assert.equal(migrations.length, 25);
     assert.ok(sql.startsWith('BEGIN;\nSELECT pg_advisory_xact_lock('));
     assert.ok(sql.indexOf('healthcare schema already exists') < sql.indexOf('CREATE SCHEMA healthcare;'));
     assert.match(sql, /SET LOCAL search_path TO healthcare, public, extensions;/);
@@ -77,10 +77,14 @@ test('seed client rolls back on an execution error', async () => {
 test('fresh private browser install and guarded synthetic seed are atomic', {
     skip: process.env.RUN_BROWSER_DB_TESTS !== 'true'
 }, async () => {
-    const configuration = { host: '127.0.0.1', port: 55432, user: 'healthcare_test', password: 'local-test-only', ssl: false };
+    assert.equal(process.env.NODE_ENV,'test');
+    assert.equal(process.env.DB_HOST,'127.0.0.1');
+    assert.equal(process.env.DB_PORT,'55432');
+    assert.match(process.env.DB_NAME,/test/);
+    const configuration = { host: '127.0.0.1', port: 55432, user: process.env.DB_USER, password: process.env.DB_PASSWORD, ssl: false };
     const databaseName = `healthcare_browser_test_${process.pid}_${crypto.randomBytes(4).toString('hex')}`;
     assert.match(databaseName, /^healthcare_browser_test_\d+_[a-f0-9]{8}$/);
-    const owner = new Client({ ...configuration, database: 'healthcare_test' });
+    const owner = new Client({ ...configuration, database: process.env.DB_NAME });
     let client;
     let created = false;
     const previousMode = process.env.DEMO_MODE;
@@ -104,7 +108,7 @@ test('fresh private browser install and guarded synthetic seed are atomic', {
         await client.query(schemaSql);
         await client.query('SET search_path TO healthcare,public,extensions');
         assert.equal(await isSchemaReady(client), true);
-        assert.equal((await client.query('SELECT count(*)::int AS count FROM healthcare._migrations')).rows[0].count, 17);
+        assert.equal((await client.query('SELECT count(*)::int AS count FROM healthcare._migrations')).rows[0].count, migrations.length);
         assert.equal((await client.query("SELECT count(*)::int AS count FROM pg_tables WHERE schemaname='public'")).rows[0].count, 0);
         assert.equal((await client.query('SELECT count(*)::int AS count FROM healthcare.users')).rows[0].count, 0);
         await assert.rejects(client.query(schemaSql), /healthcare schema already exists/);

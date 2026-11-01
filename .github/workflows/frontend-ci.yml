@@ -1,0 +1,65 @@
+name: Frontend CI
+
+on:
+  push:
+    branches: [main]
+    paths: ['frontend/**', '.github/workflows/frontend-ci.yml']
+  pull_request:
+    branches: [main]
+    paths: ['frontend/**', '.github/workflows/frontend-ci.yml']
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Frontend checks
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run lint -- --max-warnings=0
+      - run: npm test
+      - run: npm run build
+      - run: npm audit --audit-level=low
+      - uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: frontend/build
+          retention-days: 7
+
+  build-docker:
+    name: Production container smoke test
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          target: production
+          push: false
+          load: true
+          tags: healthcare-frontend:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Check nginx, security headers, routing, and unprivileged user
+        run: |
+          docker run --rm --add-host backend:127.0.0.1 healthcare-frontend:ci nginx -t
+          docker run -d --name frontend-ci --add-host backend:127.0.0.1 -p 8080:8080 healthcare-frontend:ci
+          trap 'docker logs frontend-ci; docker rm -f frontend-ci' EXIT
+          curl --fail --retry 10 --retry-connrefused --retry-delay 1 http://localhost:8080/health
+          curl --fail -D /tmp/headers http://localhost:8080/login -o /tmp/page
+          grep -qi 'Content-Security-Policy:' /tmp/headers
+          grep -qi 'X-Content-Type-Options: nosniff' /tmp/headers
+          grep -q 'id="root"' /tmp/page
+          test "$(docker exec frontend-ci id -u)" != 0

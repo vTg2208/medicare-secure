@@ -1,0 +1,79 @@
+name: Backend CI
+on:
+  push:
+    branches: [main]
+    paths: ['backend/**', 'scripts/**', 'docker-compose*.yaml', '.github/workflows/backend-ci.yml']
+  pull_request:
+    paths: ['backend/**', 'scripts/**', 'docker-compose*.yaml', '.github/workflows/backend-ci.yml']
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_DB: healthcare_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ci-disposable-database-only
+        ports: ['55432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres -d healthcare_test"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      NODE_ENV: test
+      DB_HOST: 127.0.0.1
+      DB_PORT: '55432'
+      DB_NAME: healthcare_test
+      DB_USER: postgres
+      DB_PASSWORD: ci-disposable-database-only
+      DB_SSL: 'false'
+      RUN_DB_TESTS: 'true'
+      RUN_BROWSER_DB_TESTS: 'true'
+      AI_ENABLED: 'false'
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+      - name: Generate ephemeral test keys
+        run: |
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const crypto = require('node:crypto');
+          for (const key of ['JWT_SECRET', 'JWT_REFRESH_SECRET', 'ENCRYPTION_KEY']) {
+            fs.appendFileSync(process.env.GITHUB_ENV, `${key}=${crypto.randomBytes(32).toString('hex')}\n`);
+          }
+          NODE
+      - run: npm run check
+      - run: npm test
+      - name: Audit all installed dependencies
+        run: npm audit --audit-level=moderate
+      - name: Migrate disposable local database
+        run: npm run db:migrate
+      - name: Use PostgreSQL clients matching the disposable service
+        env:
+          CI_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
+        run: |
+          set -euo pipefail
+          [[ "$CI_POSTGRES_CONTAINER" =~ ^[a-f0-9]+$ ]]
+          mkdir -p "$RUNNER_TEMP/healthcare-pg-tools"
+          for tool in pg_dump pg_restore; do
+            printf '#!/bin/sh\nexec docker exec -i -e PGHOST=127.0.0.1 -e PGPORT=5432 -e PGDATABASE -e PGUSER -e PGPASSWORD -e PGSSLMODE=disable %s %s "$@"\n' "$CI_POSTGRES_CONTAINER" "$tool" > "$RUNNER_TEMP/healthcare-pg-tools/$tool"
+            chmod 700 "$RUNNER_TEMP/healthcare-pg-tools/$tool"
+          done
+          echo "PG_DUMP_BIN=$RUNNER_TEMP/healthcare-pg-tools/pg_dump" >> "$GITHUB_ENV"
+          echo "PG_RESTORE_BIN=$RUNNER_TEMP/healthcare-pg-tools/pg_restore" >> "$GITHUB_ENV"
+      - run: npm run test:integration
+      - name: Verify migrations are repeatable
+        run: npm run db:migrate
+      - name: Build production image
+        working-directory: .
+        run: docker build --target production --tag secure-healthcare-backend:ci ./backend

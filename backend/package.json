@@ -10,11 +10,14 @@
     "db:seed": "node src/database/seed.js",
     "db:setup:all": "node src/database/setup_full_db.js",
     "test": "vitest run",
-    "test:integration": "node --test tests/api.integration.test.js tests/access.integration.test.js",
+    "test:integration": "node scripts/run-integration-tests.js",
     "test:vitest": "vitest run",
     "test:vitest:watch": "vitest",
     "db:test": "node --test tests/database.integration.test.js",
     "db:bootstrap-admin": "node scripts/bootstrap-admin.js",
+    "backup": "node scripts/backup.js",
+    "backup:restore-drill": "node scripts/restore-backup.js",
+    "files:migrate-encryption": "node scripts/migrate-file-encryption.js",
     "check": "node scripts/check-syntax.js"
   },
   "keywords": [
