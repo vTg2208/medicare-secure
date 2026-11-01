@@ -4,10 +4,17 @@ const fs=require('node:fs/promises');
 const os=require('node:os');
 const path=require('node:path');
 const crypto=require('node:crypto');
-const {createBackup}=require('../scripts/backup-helper');
+const {createBackup,inspectBundle}=require('../scripts/backup-helper');
 const archive=require('../scripts/backup-archive');
 const env={BACKUP_ENCRYPTION_KEY:'b'.repeat(64),ENCRYPTION_KEY:'a'.repeat(64),B2_KEY_ID:'fixture',B2_APPLICATION_KEY:'fixture-secret',B2_BUCKET_ID:'bucket',B2_PREFIX:'medicare-backups/'};
 const file=(kind,period,id)=>({fileName:`medicare-backups/${kind}/${period}/${id}.shmsbkp`,fileId:id,action:'upload',contentLength:100,uploadTimestamp:1});
+function bundleAt(createdAt){
+ const data=Buffer.from('fixture-database');const manifest=Buffer.from(JSON.stringify({version:1,createdAt,sourceUploadRoot:'/fixture',entries:[{path:'database.dump',size:data.length,sha256:crypto.createHash('sha256').update(data).digest('hex')}]}));
+ const size=n=>{const b=Buffer.alloc(4);b.writeUInt32BE(n);return b;};const parts=[];
+ for(const [name,bytes] of [['database.dump',data],['manifest.json',manifest]]){const h=Buffer.from(JSON.stringify({path:name}));parts.push(size(h.length),h,size(bytes.length),bytes,size(0));}parts.push(size(0));
+ const header=Buffer.concat([Buffer.from('SHMSBKP1'),crypto.randomBytes(12)]);const cipher=crypto.createCipheriv('aes-256-gcm',Buffer.from(env.BACKUP_ENCRYPTION_KEY,'hex'),header.subarray(8));cipher.setAAD(header);
+ return Buffer.concat([header,cipher.update(Buffer.concat(parts)),cipher.final(),cipher.getAuthTag()]);
+}
 
 test('retention keeps seven distinct days, three months and ignores foreign or future names',()=>{
  const files=Array.from({length:9},(_,i)=>file('daily',`2026-10-${String(23+i).padStart(2,'0')}`,String(i)));
@@ -97,5 +104,12 @@ test('remote corruption, upload failure and budget overflow never prune previous
 }));
 test('an old authenticated snapshot cannot be relabeled as a current recovery point',async()=>fixture(async(root,input)=>{
  const store=memoryStore();await assert.rejects(archive.archiveBackup({input,env,store,now:new Date(Date.now()+86400000)}),/fresh backup/);
+ assert.equal(store.uploaded.length,0);assert.deepEqual(store.deleted,[]);
+}));
+test('an older same-day snapshot cannot displace a newer authenticated recovery point',async()=>fixture(async(root,input)=>{
+ const manifest=await inspectBundle(input,Buffer.from(env.BACKUP_ENCRYPTION_KEY,'hex'));
+ const newer=bundleAt(new Date(Date.parse(manifest.createdAt)+1000).toISOString());
+ const store=memoryStore();const download=store.download;store.list=async()=>[file('daily',manifest.createdAt.slice(0,10),'newer')];store.download=async(item,target)=>item.fileId==='newer'?fs.writeFile(target,newer,{flag:'wx'}):download(item,target);
+ await assert.rejects(archive.archiveBackup({input,env,store,now:new Date(new Date().setUTCHours(23,59,0,0))}),/newer snapshot/);
  assert.equal(store.uploaded.length,0);assert.deepEqual(store.deleted,[]);
 }));

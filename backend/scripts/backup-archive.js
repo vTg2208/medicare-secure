@@ -102,6 +102,11 @@ async function archiveBackup({input,env=process.env,store,now=new Date()}={}){
   const checksum=await digest(snapshot);const bytes=(await fs.stat(snapshot)).size;
   store=store||await connectB2(env);
   const files=await store.list();const date=now.toISOString();
+  for(const file of files.filter(f=>managed(f,now)?.kind==='daily'&&managed(f,now).period===date.slice(0,10))){
+   const previous=path.join(staging,`${crypto.randomUUID()}.enc`);await store.download(file,previous);
+   const prior=await inspectBundle(previous,key);await fs.unlink(previous);
+   if(!Number.isFinite(Date.parse(prior.createdAt))||Date.parse(prior.createdAt)>created)fail('A newer snapshot already exists for this day; previous backups retained');
+  }
   const monthly=files.some(f=>managed(f,now)?.kind==='monthly'&&managed(f,now).period===date.slice(0,7));
   const kinds=monthly?['daily']:['daily','monthly'];
   const total=files.reduce((sum,f)=>sum+f.contentLength,0);
