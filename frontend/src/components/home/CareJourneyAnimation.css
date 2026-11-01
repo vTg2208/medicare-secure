@@ -38,11 +38,11 @@
 .mc-care-journey[data-connected=true] .mc-care-route-channel { opacity: 1; }
 .mc-care-journey[data-connected=true] .mc-care-route-symbol { opacity: 1; stroke: var(--mc-brand); }
 /* The longer right leg remains inside the body while the released end lifts. */
-.mc-care-shackle-lift { transform: translateY(0); transition: transform 180ms cubic-bezier(.22,1,.36,1) 620ms; }
+.mc-care-shackle-lift { transform: translateY(0); transition: transform 230ms cubic-bezier(.4,0,.25,1) 490ms; }
 /* Front projection of a swivel around the vertical right leg, at SVG x=24. */
-.mc-care-shackle { transform-box: fill-box; transform-origin: 100% 50%; transform: scaleX(1); transition: transform 380ms cubic-bezier(.4,0,.2,1); }
-.mc-care-journey[data-connected=true] .mc-care-shackle-lift { transform: translateY(-7px); transition-delay: 0ms; }
-.mc-care-journey[data-connected=true] .mc-care-shackle { transform: scaleX(-1); transition-delay: 420ms; }
+.mc-care-shackle { transform-box: fill-box; transform-origin: 100% 50%; transform: scaleX(1); transition: transform 420ms cubic-bezier(.65,0,.35,1); }
+.mc-care-journey[data-connected=true] .mc-care-shackle-lift { transform: translateY(-7px); transition-duration: 240ms; transition-delay: 0ms; }
+.mc-care-journey[data-connected=true] .mc-care-shackle { transform: scaleX(-1); transition-duration: 480ms; transition-delay: 320ms; }
 .mc-care-moving-lock { overflow: visible; }
 .mc-care-paper .mc-care-report-lock { position: absolute; right: -13px; bottom: -3px; width: 34px; height: 42px; padding: 3px; border-radius: 8px; background: var(--mc-surface); }
 .mc-care-flying-report { position: absolute; z-index: 3; left: 28px; top: 95px; display: grid; gap: 4px; width: 48px; height: 62px; padding: 9px; border-radius: 7px; background: var(--mc-surface); border: 1px solid var(--mc-brand); box-shadow: var(--mc-shadow-panel); color: var(--mc-accent); opacity: 0; pointer-events: none; }
