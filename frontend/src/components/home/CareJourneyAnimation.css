@@ -66,11 +66,11 @@
 .mc-care-permission strong { font-size: 12px; font-weight: 700; display: block; }
 .mc-care-permission small { font-size: 11px; color: inherit; opacity: .85; display: block; margin-top: 4px; }
 .mc-care-permission-state { margin-left: auto; color: inherit; font-size: 11px; font-weight: 600; padding: 5px 7px; border: 1px solid var(--mc-border-strong); border-radius: 6px; }
-.mc-care-switch { flex-shrink: 0; position: relative; width: 44px; height: 28px; padding: 0; border-radius: 20px; border: 0; background: var(--mc-text-muted); transition: background-color 160ms ease; }
-.mc-care-switch::before { content: ''; position: absolute; inset: -8px -3px; }
-.mc-care-switch span { position: absolute; width: 20px; height: 20px; background: var(--mc-on-brand); border-radius: 50%; left: 4px; top: 4px; transform: translateX(0); transition: transform 170ms cubic-bezier(.25,1,.5,1); }
-.mc-care-switch[aria-checked=true] { background: var(--mc-brand-soft); }
-.mc-care-switch[aria-checked=true] span { background: var(--mc-brand); transform: translateX(16px); }
+.mc-care-switch { flex: 0 0 48px; position: relative; width: 48px; min-width: 48px; height: 44px; min-height: 44px; padding: 0; border-radius: 8px; border: 0; background: transparent; }
+.mc-care-switch::before { content: ''; position: absolute; left: 0; right: 0; top: 8px; height: 28px; border-radius: 999px; background: var(--mc-text-muted); transition: background-color 160ms ease; }
+.mc-care-switch span { position: absolute; width: 20px; height: 20px; background: var(--mc-on-brand); border-radius: 50%; left: 4px; top: 12px; transform: translateX(0); transition: transform 170ms cubic-bezier(.25,1,.5,1); }
+.mc-care-switch[aria-checked=true]::before { background: var(--mc-brand-soft); }
+.mc-care-switch[aria-checked=true] span { background: var(--mc-brand); transform: translateX(20px); }
 .mc-care-cursor { position: absolute; right: 21px; top: 31px; width: 24px !important; height: 28px !important; fill: var(--mc-text); stroke: var(--mc-surface); stroke-width: 1.4px; opacity: 0; pointer-events: none; }
 .mc-care-history { position: relative; margin: 17px 26px 13px; padding-left: 0; min-height: 67px; }
 .mc-care-history > div { display: flex; gap: 5px; align-items: center; }
