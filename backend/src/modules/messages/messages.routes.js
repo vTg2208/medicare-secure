@@ -7,11 +7,12 @@ const { asyncHandler } = require('../../middleware/error.middleware');
 const { seal, unseal } = require('../privacy/privacy-crypto');
 const { logAuditEvent } = require('../../services/audit.service');
 const rateLimit = require('express-rate-limit');
+const { processingAllowedSql } = require('../privacy/processing-policy');
 
 router.use(authenticate, authorize(['patient', 'doctor', 'nurse']));
 const fault = (statusCode, message) => Object.assign(new Error(message), { statusCode });
 const uuid = value => { if (!/^[a-f\d]{8}(?:-[a-f\d]{4}){3}-[a-f\d]{12}$/i.test(value || '')) throw fault(400, 'Invalid conversation identifier'); return value; };
-const careScope = (patient, provider) => clinicalScopeSql(patient, null, provider, 'doctor', 'clinical_notes');
+const careScope = (patient, provider) => `(${processingAllowedSql(patient,'messaging')} AND ${clinicalScopeSql(patient, null, provider, 'doctor', 'clinical_notes')})`;
 const permitted = async (client, patient, provider) => Boolean((await client.query(`SELECT u.id FROM users u JOIN roles r ON r.id=u.role_id
     WHERE u.id=$2 AND r.name IN ('doctor','nurse') AND u.status='active' AND COALESCE(u.account_status,'active')='active'
     AND ${careScope('$1', '$2')}`, [patient, provider])).rowCount);

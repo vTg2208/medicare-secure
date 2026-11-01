@@ -1,5 +1,6 @@
 const { query } = require('../config/db');
 const { findMatchingConsent } = require('../models/consent.model');
+const { processingAllowedSql, purposeForCategory } = require('../modules/privacy/processing-policy');
 const fs = require('fs/promises');
 const { consentCategories, consentPurposeSql } = require('../utils/consent.validator');
 
@@ -18,7 +19,7 @@ const fault = (status, message) => Object.assign(new Error(message), { status })
 const validId = id => { if (typeof id !== 'string' || !UUID.test(id)) throw fault(400, 'A valid resource identifier is required'); return id; };
 
 // SQL expressions are internal constants, never request values. All principals use bind parameters.
-const consentSql = (patient, user, category = 'all', access = 'read') => `EXISTS (
+const consentSql = (patient, user, category = 'all', access = 'read') => `${processingAllowedSql(patient,purposeForCategory(category))} AND EXISTS (
     SELECT 1 FROM consents access_consent
     WHERE access_consent.patient_id = ${patient} AND access_consent.recipient_user_id = ${user}
       AND access_consent.status = 'active' AND access_consent.start_time <= NOW()

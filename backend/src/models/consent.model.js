@@ -1,6 +1,7 @@
 const { query } = require('../config/db');
 const logger = require('../utils/logger');
 const { consentCategories, consentPurposeSql } = require('../utils/consent.validator');
+const { processingAllowedSql, purposeForCategory } = require('../modules/privacy/processing-policy');
 
 /**
  * Grant new consent
@@ -226,6 +227,7 @@ const findMatchingConsent = async (patientId, recipientUserId, dataCategory, acc
                 AND start_time <= NOW()
                 AND (end_time IS NULL OR end_time > NOW())
                 AND ${consentPurposeSql('consent', dataCategory)}
+                AND ${processingAllowedSql('consent.patient_id',purposeForCategory(dataCategory))}
                 AND access_level = ANY($4::text[])
             ORDER BY created_at DESC, id
             LIMIT 1

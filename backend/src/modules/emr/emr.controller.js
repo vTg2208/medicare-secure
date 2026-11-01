@@ -78,6 +78,8 @@ class EmrController {
                 });
             }
 
+            record.corrections = await require('../privacy/privacy-fulfillment.service').correctionsForRecord(recordId,db.query);
+
             res.json({
                 success: true,
                 data: record
