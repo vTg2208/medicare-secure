@@ -139,7 +139,7 @@ test('retention requires a policy, released holds, review approval and a privile
     });
     await t.test('resolving an old diagnosis restarts retention instead of allowing immediate disposal',async()=>{
         const record=await createOld('Recently resolved old diagnosis');
-        const diagnosis=(await db.query("INSERT INTO diagnoses(record_id,icd_code,description,status,diagnosed_by,created_at,diagnosed_at) VALUES($1,'FIXTURE','Synthetic historical diagnosis','active',$2,NOW()-INTERVAL '400 days',NOW()-INTERVAL '400 days') RETURNING id",[record,people.doctor.id])).rows[0].id;
+        const diagnosis=(await db.query("INSERT INTO diagnoses(record_id,icd_code,description,status,diagnosed_by,created_at,diagnosed_at,updated_at) VALUES($1,'FIXTURE','Synthetic historical diagnosis','active',$2,NOW()-INTERVAL '400 days',NOW()-INTERVAL '400 days',NOW()-INTERVAL '400 days') RETURNING id",[record,people.doctor.id])).rows[0].id;
         await require('../src/models/diagnosis.model').updateStatus(diagnosis,'resolved');
         const result=(await call('officer','GET',`/retention/eligibility?recordId=${record}`)).data;
         assert.equal(result.eligible,false);assert.match(result.reasons.join(' '),/period.*not expired/);
