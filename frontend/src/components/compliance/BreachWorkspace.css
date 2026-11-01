@@ -1,0 +1,46 @@
+.mc-breach { color: var(--mc-text); }
+.mc-breach h3 { font-size: 20px; margin: 0 0 10px; }
+.mc-breach h4 { font-size: 14px; margin: 12px 0 8px; }
+.mc-breach p { margin: 0 0 16px; color: var(--mc-text-muted); font-size: 13px; line-height: 1.8; }
+.mc-breach small { display: block; font-size: 11px; font-weight: 400; color: var(--mc-text-muted); }
+.mc-breach button { padding: 10px 14px; border: 1px solid var(--mc-border); border-radius: var(--mc-radius-control); background: var(--mc-surface); color: var(--mc-text); font-size: 12px; font-weight: 600; }
+.mc-breach button:hover { background: var(--mc-surface-hover); }
+.mc-breach button:disabled { opacity: .6; cursor: default; }
+.mc-breach .mc-breach-primary { background: var(--mc-brand); border-color: var(--mc-brand); color: var(--mc-on-brand); }
+.mc-breach .mc-breach-primary:hover { background: var(--mc-brand-hover); }
+.mc-breach-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 24px; }
+.mc-breach-heading > button { flex-shrink: 0; }
+.mc-breach-layout { display: grid; grid-template-columns: minmax(220px, 280px) minmax(0, 1fr); gap: 24px; }
+.mc-breach-layout > aside, .mc-breach-detail { background: var(--mc-surface); border: 1px solid var(--mc-border); border-radius: var(--mc-radius-panel); padding: 24px; min-width: 0; }
+.mc-breach-layout > aside { align-self: start; position: sticky; top: 16px; }
+.mc-incident-tabs button[aria-pressed='true'] { background: var(--mc-brand-soft); border-color: var(--mc-accent); font-weight: 600; }
+.mc-breach-layout aside ul { list-style: none; padding: 0; margin: 0 0 20px; }
+.mc-breach-layout aside li { margin-bottom: 8px; }
+.mc-breach-layout aside li button { display: flex; flex-direction: column; gap: 5px; text-align: left; width: 100%; }
+.mc-breach-layout aside li button[aria-pressed='true'] { border-color: var(--mc-accent); background: var(--mc-brand-soft); }
+.mc-breach-layout aside li span { font-size: 11px; font-weight: 400; color: var(--mc-text-muted); }
+.mc-breach-form { display: grid; gap: 18px; margin-bottom: 28px; }
+.mc-breach-form p { margin-bottom: 0; }
+.mc-breach-form label, .mc-breach-field { display: flex; flex-direction: column; gap: 7px; font-size: 12px; font-weight: 600; }
+.mc-breach-form input:not([type='checkbox']), .mc-breach-form select, .mc-breach-form textarea { width: 100%; min-width: 0; padding: 10px 12px; font-size: 13px; }
+.mc-breach-form textarea { resize: vertical; }
+.mc-breach-fields { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; }
+.mc-breach-form fieldset { border: 1px solid var(--mc-border); border-radius: var(--mc-radius-control); padding: 12px; }
+.mc-breach-form legend { font-size: 12px; font-weight: 600; }
+.mc-breach-form .mc-breach-check { display: inline-flex; flex-direction: row; margin-right: 20px; align-items: center; min-height: 44px; }
+.mc-breach-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.mc-breach-actions > span { font-size: 11px; color: var(--mc-text-muted); }
+.mc-breach .mc-breach-error { color: var(--mc-danger); }
+.mc-breach-callout { padding: 16px; border-radius: var(--mc-radius-control); background: var(--mc-info-bg); color: var(--mc-info); }
+.mc-breach-obligations { list-style: none; margin: 20px 0; padding: 0; }
+.mc-breach-obligations li { padding: 16px 0; border-bottom: 1px solid var(--mc-border); }
+.mc-breach-obligations strong { display: inline-block; font-size: 13px; margin-right: 16px; }
+.mc-breach-obligations span { font-size: 12px; }
+.mc-breach-obligations p { margin: 8px 0; }
+.mc-breach details { margin: 24px 0; padding: 14px 0; border-block: 1px solid var(--mc-border); }
+.mc-breach summary { font-size: 13px; font-weight: 600; cursor: pointer; min-height: 32px; }
+.mc-breach-preserve { white-space: pre-wrap; overflow-wrap: anywhere; }
+.mc-breach-history { padding-left: 20px; }
+.mc-breach-history li { border-bottom: 1px solid var(--mc-border); padding: 12px 0; font-size: 12px; }
+@media (max-width: 1100px) { .mc-breach-layout { grid-template-columns: 1fr; } .mc-breach-layout > aside { position: static; } .mc-breach-layout aside ul { display: flex; gap: 8px; overflow-x: auto; } .mc-breach-layout aside li { flex: 0 0 220px; } }
+@media (max-width: 600px) { .mc-breach-heading { flex-direction: column; gap: 12px; } .mc-breach-fields { grid-template-columns: 1fr; } .mc-breach-layout > aside, .mc-breach-detail { padding: 18px; } }

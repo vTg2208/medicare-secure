@@ -4,6 +4,7 @@ import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { complianceApi } from '../../api/complianceApi';
 import ThemeToggle from '../../components/common/ThemeToggle';
+import BreachWorkspace from '../../components/compliance/BreachWorkspace';
 import '../../pages/patient/Dashboard.css';
 
 const Incidents = () => {
@@ -14,6 +15,8 @@ const Incidents = () => {
     const [incidents, setIncidents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(null);
+    const [error, setError] = useState('');
+    const [view,setView] = useState('breaches');
 
     useEffect(() => {
         fetchIncidents();
@@ -22,11 +25,13 @@ const Incidents = () => {
     const fetchIncidents = async () => {
         try {
             setLoading(true);
+            setError('');
             const response = await complianceApi.getIncidents();
             if (response && response.success) {
                 setIncidents(response.data);
             }
         } catch (error) {
+            setError(error.response?.data?.message || 'Unable to load security events. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -35,6 +40,7 @@ const Incidents = () => {
     const handleStatusChange = async (incidentId, newStatus) => {
         try {
             setUpdating(incidentId);
+            setError('');
             const response = await complianceApi.updateIncidentStatus(incidentId, newStatus);
             if (response.success) {
                 // Update local state
@@ -43,6 +49,7 @@ const Incidents = () => {
                 ));
             }
         } catch (error) {
+            setError(error.response?.data?.message || 'Unable to update the incident. Please try again.');
         } finally {
             setUpdating(null);
         }
@@ -57,6 +64,7 @@ const Incidents = () => {
         { id: 'dashboard', label: 'Dashboard', icon: 'grid_view', path: '/compliance/dashboard' },
         { id: 'audits', label: 'Global Audits', icon: 'policy', path: '/compliance/global-audits' },
         { id: 'incidents', label: 'Incidents', icon: 'gavel', path: '/compliance/incidents' },
+        { id: 'privacy', label: 'Privacy Requests', icon: 'privacy_tip', path: '/compliance/privacy' },
         { id: 'overrides', label: 'Consent Overrides', icon: 'key_off', path: '/compliance/consent-overrides' }
     ];
 
@@ -116,33 +124,33 @@ const Incidents = () => {
 
 
                 {/* Header */}
-                <header className="px-8 py-6 flex items-center justify-between flex-shrink-0 z-10 sticky top-0 bg-[var(--background-light)]/80 dark:bg-[var(--background-dark)]/80 border-b border-transparent transition-all pr-[80px]">
-                    <div>
+                <header className="px-4 sm:px-8 py-6 flex items-center justify-between gap-4 flex-shrink-0 z-10 sticky top-0 bg-[var(--background-light)] dark:bg-[var(--background-dark)] border-b border-line">
+                    <div className="min-w-0">
                         <h2 className="text-2xl font-bold flex items-center gap-2 text-accent">
-                            <span className="material-symbols-outlined">gavel</span> Security Incidents
+                            <span className="material-symbols-outlined">gavel</span> Incident response
                         </h2>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Review, manage, and resolve reported privacy and security violations</p>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Assess breaches, document notices, and review security events</p>
                     </div>
+                    <ThemeToggle />
                 </header>
 
-                {/* Right Floating Theme Toggle */}
-                <div className="absolute top-6 right-8 z-[60]">
-                    <ThemeToggle />
-                </div>
-
                 {/* Scrollable Content Container */}
-                <div className="flex-1 overflow-y-auto px-8 py-4 pb-20 scrollbar-hide flex flex-col">
+                <div className="flex-1 overflow-y-auto px-4 sm:px-8 py-4 pb-20 scrollbar-hide flex flex-col">
 
-                    {/* Incidents List */}
-                    <div className="space-y-4">
+                    <div className="mc-incident-tabs flex flex-wrap gap-3 mb-6" aria-label="Incident workspace views">
+                        <button type="button" aria-pressed={view==='breaches'} onClick={()=>setView('breaches')} className="px-4 py-2 rounded-lg border border-line bg-surface text-accent">Breach response</button>
+                        <button type="button" aria-pressed={view==='events'} onClick={()=>setView('events')} className="px-4 py-2 rounded-lg border border-line bg-surface text-accent">Security event queue</button>
+                    </div>
+                    {view==='breaches' ? <BreachWorkspace /> : <div className="space-y-4">
+                        {error && <p role="alert" className="text-rose-700 dark:text-rose-300">{error}</p>}
                         {loading && incidents.length === 0 ? (
                             <div className="flex justify-center items-center h-40">
                                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600"></div>
                             </div>
-                        ) : incidents.length === 0 ? (
+                        ) : incidents.length === 0 && !error ? (
                             <div className="bg-surface dark:bg-slate-900/80 border border-slate-200/80 dark:border-slate-800/80 rounded-3xl p-12 text-center text-slate-500 dark:text-slate-400 shadow-sm">
                                 <span className="material-symbols-outlined text-5xl mb-4 opacity-40">verified_user</span>
-                                <h3 className="text-xl font-bold text-slate-700 dark:text-slate-300 mb-2">System Secure</h3>
+                                <h3 className="text-xl font-bold text-slate-700 dark:text-slate-300 mb-2">No events recorded</h3>
                                 <p>No security or privacy incidents are currently logged.</p>
                             </div>
                         ) : (
@@ -171,6 +179,7 @@ const Incidents = () => {
                                         <div className="flex items-center gap-3">
                                             {updating === incident.id && <span className="animate-spin h-4 w-4 border-b-2 border-slate-500 rounded-full"></span>}
                                             <select
+                                                aria-label={`Status for incident ${incident.id}`}
                                                 value={incident.status}
                                                 onChange={(e) => handleStatusChange(incident.id, e.target.value)}
                                                 disabled={updating === incident.id}
@@ -202,7 +211,7 @@ const Incidents = () => {
                                 </div>
                             ))
                         )}
-                    </div>
+                    </div>}
                 </div>
             </main>
         </div>
