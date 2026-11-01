@@ -4,6 +4,7 @@ import apiClient from '../../api/client';
 import AddMedicalRecordForm from '../../components/emr/AddMedicalRecordForm';
 import OrderTestsModal from '../../components/clinical/OrderTestsModal';
 import ThemeToggle from '../../components/common/ThemeToggle';
+import RelatedRecordDetails from '../../components/emr/RelatedRecordDetails';
 import './PatientRecords.css';
 
 function PatientMedicalRecords() {
@@ -263,6 +264,7 @@ function PatientMedicalRecords() {
                                                     <p>{record.created_by_name} ({record.created_by_role})</p>
                                                 </div>
                                             )}
+                                            <RelatedRecordDetails recordId={record.id} />
                                         </div>
                                     </div>
                                 );

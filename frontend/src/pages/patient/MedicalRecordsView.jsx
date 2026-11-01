@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import apiClient from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
+import RelatedRecordDetails from '../../components/emr/RelatedRecordDetails';
 import '../doctor/PatientRecords.css';
 
 function MedicalRecordsView() {
@@ -180,6 +181,7 @@ function MedicalRecordsView() {
                                                 <p>{record.created_by_name} ({record.created_by_role})</p>
                                             </div>
                                         )}
+                                        <RelatedRecordDetails recordId={record.id} />
                                     </div>
                                 </div>
                             );

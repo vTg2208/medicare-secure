@@ -5,6 +5,7 @@ import { AuthContext } from '../../context/AuthContext';
 import { emrApi } from '../../api/emrApi';
 import ThemeToggle from '../../components/common/ThemeToggle';
 import Toast from '../../components/common/Toast';
+import RelatedRecordDetails from '../../components/emr/RelatedRecordDetails';
 
 import '../patient/Dashboard.css';
 import './MedicalRecords.css';
@@ -353,7 +354,7 @@ function MedicalRecords() {
                             <div
                                 key={record.id}
                                 className="glass-card rounded-2xl border border-line dark:border-slate-700/50 hover:border-primary-200 dark:hover:border-primary-800/50 p-5 transition-all cursor-pointer group"
-                                onClick={() => { if (shouldShowToggle) toggleExpand(record.id); }}
+                                onClick={event => { if (!event.target.closest('button') && shouldShowToggle) toggleExpand(record.id); }}
                             >
                                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                                     <div className="flex items-center gap-4">
@@ -385,6 +386,7 @@ function MedicalRecords() {
                                         <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed">{record.summary}</p>
                                     </div>
                                 )}
+                                <RelatedRecordDetails recordId={record.id} />
                             </div>
                         );
                     })}
