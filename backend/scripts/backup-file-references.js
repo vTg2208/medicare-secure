@@ -119,6 +119,8 @@ async function verifySnapshotFiles(client,manifest,destination){
   try{await fs.lstat(contained(root,job.relative));throw Error('Previously removed cleanup file was resurrected');}
   catch(error){if(error.code!=='ENOENT')throw error;}
  }
+ if(consistency.storageBackend==='postgres')await require('./postgres-upload-snapshot').verifyPostgresObjects(client,consistency.schema,manifest.entries);
+ else if(consistency.storageBackend&&consistency.storageBackend!=='filesystem')throw Error('Unsupported recovered file storage backend');
  return {filesVerified:entries.length};
 }
-module.exports={knownFiles,fileColumnsSql,normalizeReference,collectSnapshotFiles,rebaseSnapshotReferences,verifySnapshotFiles};
+module.exports={knownFiles,fileColumnsSql,normalizeReference,collectSnapshotFiles,rebaseSnapshotReferences,verifySnapshotFiles,referenceRows,pendingCleanup};

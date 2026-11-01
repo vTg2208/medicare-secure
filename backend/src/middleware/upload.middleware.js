@@ -4,7 +4,7 @@ const fs = require('fs');
 const config = require('../config/env');
 const crypto = require('crypto');
 const { secureCredential } = require('../services/credential-file.service');
-const { withFileMutation } = require('../services/file-coordination');
+const encryptedStorage = require('../services/encrypted-file-store');
 
 // Ensure upload directories exist
 const uploadDir = path.resolve(config.upload.uploadPath, 'documents');
@@ -25,16 +25,19 @@ const storage = {
             const filePath = path.join(uploadDir, filename);
             try {
                 if (file.stream.truncated) return cb(Object.assign(new Error('Credential file exceeds the size limit'), { statusCode: 400 }));
-                await secureCredential({ path: filePath, originalname: file.originalname, mimetype: file.mimetype, buffer: Buffer.concat(chunks) });
-                cb(null, { destination: uploadDir, filename, path: filePath, size });
+                const durable = encryptedStorage.isPostgresStorage();
+                const prepared = await secureCredential({ path: filePath, originalname: file.originalname, mimetype: file.mimetype, buffer: Buffer.concat(chunks) }, { persist: !durable });
+                // An incomplete/aborted multipart request cannot permanently
+                // allocate durable objects before its controller validates it.
+                cb(null, { destination: uploadDir, filename, path: filePath, size, ...(durable && { buffer: prepared }) });
             } catch (error) {
-                await withFileMutation(() => fs.promises.unlink(filePath)).catch(() => {});
+                await encryptedStorage.removeEncrypted(filePath).catch(() => {});
                 cb(error);
             }
         });
     },
     _removeFile(req, file, cb) {
-        withFileMutation(() => fs.promises.unlink(file.path)).then(() => cb(null), cb);
+        encryptedStorage.removeEncrypted(file.path).then(() => cb(null), cb);
     },
 };
 

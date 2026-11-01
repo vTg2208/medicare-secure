@@ -433,6 +433,7 @@ class EmrController {
      * Upload lab result
      */
     static async uploadLabResult(req, res) {
+        let fileInfo, committed = false;
         try {
             if (!req.file) {
                 return res.status(400).json({
@@ -464,7 +465,7 @@ class EmrController {
             }
 
             // Process file upload
-            const fileInfo = await FileUploadService.processUpload(req.file, {
+            fileInfo = await FileUploadService.processUpload(req.file, {
                 patientId: record.patient_id,
                 recordId,
                 fileType: 'lab_results',
@@ -489,6 +490,7 @@ class EmrController {
                 performedBy: req.user.id,
                 resultDate
             });
+            committed = true;
 
             res.status(201).json({
                 success: true,
@@ -496,6 +498,7 @@ class EmrController {
                 data: labResult
             });
         } catch (error) {
+            if (!committed && fileInfo?.filePath) await FileUploadService.deleteFile(fileInfo.filePath).catch(() => {});
             logger.error('Upload lab result error:', error);
             res.status(500).json({
                 success: false,
@@ -567,6 +570,7 @@ class EmrController {
      */
     static async uploadImagingReport(req, res) {
         let fileInfo;
+        let committed = false;
         try {
             if (!req.file) {
                 return res.status(400).json({
@@ -633,6 +637,7 @@ class EmrController {
                     performed_at=NOW(),completed_at=NOW(),updated_at=NOW() WHERE id=$2`, [report.id, orderId]);
                 return report;
             });
+            committed = true;
 
             res.status(201).json({
                 success: true,
@@ -641,7 +646,7 @@ class EmrController {
                 isDicom
             });
         } catch (error) {
-            if (fileInfo?.filePath) await FileUploadService.deleteFile(fileInfo.filePath).catch(() => {});
+            if (!committed && fileInfo?.filePath) await FileUploadService.deleteFile(fileInfo.filePath).catch(() => {});
             logger.error('Upload imaging report error:', error);
             res.status(error.statusCode || 500).json({
                 success: false,

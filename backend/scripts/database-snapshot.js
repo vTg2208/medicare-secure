@@ -31,6 +31,7 @@ async function withDatabaseSnapshot({env=process.env,fileCapture}={},run){
   const cleanup=(await client.query(`SELECT to_regclass($1) AS name`,[`${schema}.retention_file_cleanup`])).rows[0].name;
   if(!fileCapture&&cleanup&&(await client.query(`SELECT 1 FROM ${quote(schema)}.retention_file_cleanup WHERE cleaned_at IS NULL LIMIT 1`)).rowCount)throw Error('Pending external file cleanup requires coordinated backup');
   const capturedFiles=fileCapture?await fileCapture(client,{schema,columns}):undefined;
+  if(!fileCapture&&(await client.query('SELECT to_regclass($1) AS name',[`${schema}.encrypted_upload_objects`])).rows[0].name&&(await client.query(`SELECT 1 FROM ${quote(schema)}.encrypted_upload_objects LIMIT 1`)).rowCount)throw Error('Durable uploaded objects require coordinated backup');
   const tables=(await client.query(`SELECT c.relname AS name,c.relkind AS kind,has_table_privilege(current_user,c.oid,'SELECT') AS readable FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname=$1 AND c.relkind IN('r','p','f','m') ORDER BY c.relname`,[schema])).rows;
   if(!tables.length||tables.length>200||tables.some(t=>!t.readable||!['r','p'].includes(t.kind)))throw Error('Unsupported or unreadable snapshot tables');
   for(const table of tables){table.rows=(await client.query(`SELECT count(*)::text AS count FROM ${quote(schema)}.${quote(table.name)}`)).rows[0].count;delete table.readable;delete table.kind;}

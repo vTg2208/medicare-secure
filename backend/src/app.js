@@ -28,6 +28,7 @@ app.get('/readyz', asyncHandler(async (req, res) => {
     try {
         await query('SELECT 1');
         await assertSchemaReady();
+        if (/^[a-f\d]{40}$/i.test(process.env.RENDER_GIT_COMMIT || '')) res.set('X-Application-Revision', process.env.RENDER_GIT_COMMIT);
         res.json({ success: true });
     } catch {
         res.status(503).json({ success: false, message: 'Service is not ready' });

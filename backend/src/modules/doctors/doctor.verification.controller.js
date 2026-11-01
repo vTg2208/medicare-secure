@@ -24,6 +24,8 @@ class DoctorVerificationController {
             {
                 documentType: req.body.documentType || 'medical_license',
                 path: req.file.path,
+                buffer: req.file.buffer,
+                originalname: req.file.originalname,
                 filename: req.file.filename,
                 size: req.file.size,
                 mimetype: req.file.mimetype,

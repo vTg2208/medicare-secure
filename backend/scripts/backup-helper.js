@@ -169,9 +169,9 @@ async function createBackup({ output, env = process.env, dumpCommand, databaseSn
             if (stat.ino !== after.ino || stat.size !== after.size || stat.mtimeMs !== after.mtimeMs || stat.ctimeMs !== after.ctimeMs) fail('Upload changed during backup');
         }
         const consistency = databaseSnapshot ? { mode:coordinated?'coordinated':'database-only', schema:databaseSnapshot.schema, requiredSchemas:[...new Set(databaseSnapshot.extensions.map(e=>e.schema).filter(s=>s!==databaseSnapshot.schema))], tables:databaseSnapshot.tables,
-            ...(coordinated && { coordination:'postgres-advisory-v1', fileReferences:databaseSnapshot.capturedFiles.references, pendingFileCleanup:databaseSnapshot.capturedFiles.cleanup }) } : {mode:'coordinated'};
+            ...(coordinated && { coordination:'postgres-advisory-v1', storageBackend:databaseSnapshot.capturedFiles.backend||'filesystem', fileReferences:databaseSnapshot.capturedFiles.references, pendingFileCleanup:databaseSnapshot.capturedFiles.cleanup }) } : {mode:'coordinated'};
         const manifest = Buffer.from(JSON.stringify({ version: 1, createdAt: databaseSnapshot?.createdAt || new Date().toISOString(), consistency, sourceDatabase: database.database,
-            sourceUploadRoot: uploads.root.replaceAll('\\', '/'), entries }));
+            sourceUploadRoot: (coordinated&&databaseSnapshot.capturedFiles.sourceRoot||uploads.root).replaceAll('\\', '/'), entries }));
         if (manifest.length > MAX_MANIFEST) fail('Backup manifest exceeds the supported size');
         await entry('manifest.json', [manifest]);
         await put(u32(0));

@@ -5,6 +5,7 @@ const MalwareScannerService = require('./malware.scanner.service');
 const { encryptBuffer, decryptBuffer } = require('./file.crypto');
 const config = require('../config/env');
 const { withFileMutation } = require('./file-coordination');
+const storage = require('./encrypted-file-store');
 
 class FileUploadService {
     /**
@@ -31,7 +32,7 @@ class FileUploadService {
 
             if (!scanResults.safe) {
                 // Quarantine suspicious file
-                if (file.path) await withFileMutation(() => fs.unlink(file.path)).catch(() => {});
+                if (file.path) await storage.removeEncrypted(file.path).catch(() => {});
 
                 throw new Error(`File failed security scan: ${scanResults.threats.join(', ')}`);
             }
@@ -45,14 +46,14 @@ class FileUploadService {
 
         // Create directory if it doesn't exist
         return withFileMutation(async () => {
-        await fs.mkdir(storagePath, { recursive: true });
+        if (!storage.isPostgresStorage()) await fs.mkdir(storagePath, { recursive: true });
 
         // Final file path
         const finalPath = path.join(storagePath, secureFileName);
 
         // Move file to final location
-        await fs.writeFile(finalPath, encryptBuffer(fileBuffer, this.encryptionContext(finalPath)), { mode: 0o600, flag: 'wx' });
-        if (file.path) await fs.unlink(file.path);
+        await storage.writeEncrypted(finalPath, encryptBuffer(fileBuffer, this.encryptionContext(finalPath)));
+        if (file.path) await storage.removeEncrypted(file.path);
 
         // Calculate file hash for integrity
         const fileHash = MalwareScannerService.calculateFileHash(fileBuffer);
@@ -77,7 +78,7 @@ class FileUploadService {
      * @returns {string} Secure filename
      */
     static generateSecureFileName(originalName) {
-        const ext = path.extname(originalName);
+        const ext = path.extname(originalName).toLowerCase();
         const timestamp = Date.now();
         const randomString = crypto.randomBytes(8).toString('hex');
 
@@ -150,16 +151,7 @@ class FileUploadService {
      * @returns {Promise<void>}
      */
     static async deleteFile(filePath) {
-        return withFileMutation(async () => {
-        try {
-            await fs.unlink(filePath);
-        } catch (error) {
-            if (error.code !== 'ENOENT') {
-                throw error;
-            }
-            // File doesn't exist, ignore
-        }
-        });
+        return storage.removeEncrypted(filePath);
     }
 
     /**
@@ -168,7 +160,7 @@ class FileUploadService {
      * @returns {Promise<Buffer>} File buffer
      */
     static async getFile(filePath) {
-        return decryptBuffer(await fs.readFile(filePath), this.encryptionContext(filePath));
+        return decryptBuffer(await storage.readEncrypted(filePath), this.encryptionContext(filePath));
     }
 
     static encryptionContext(filePath) {
@@ -184,7 +176,7 @@ class FileUploadService {
      */
     static async fileExists(filePath) {
         try {
-            await fs.access(filePath);
+            await storage.fileMetadata(filePath);
             return true;
         } catch {
             return false;
@@ -197,12 +189,7 @@ class FileUploadService {
      * @returns {Promise<Object>} File stats
      */
     static async getFileStats(filePath) {
-        const stats = await fs.stat(filePath);
-        return {
-            size: stats.size,
-            created: stats.birthtime,
-            modified: stats.mtime
-        };
+        return storage.fileMetadata(filePath);
     }
 }
 

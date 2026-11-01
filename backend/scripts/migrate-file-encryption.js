@@ -158,6 +158,7 @@ async function migrateFileEncryptionUnlocked({ uploads, apply = false, backupDir
 }
 
 async function migrateFileEncryption(options = {}) {
+    if ((options.env?.FILE_STORAGE_BACKEND || process.env.FILE_STORAGE_BACKEND) === 'postgres') throw fault('UNSUPPORTED_BACKEND', 'Durable upload objects already require identity-bound encryption; this tool migrates filesystem storage only');
     if (!options.apply) return migrateFileEncryptionUnlocked(options);
     // Preflight remains side-effect free and preserves the operator's existing
     // key/path/quiescence errors before acquiring a database lock.

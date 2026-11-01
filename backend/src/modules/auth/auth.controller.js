@@ -338,6 +338,7 @@ const registerPatient = async (req, res) => {
  * POST /api/auth/register/organization
  */
 const registerOrganization = async (req, res) => {
+    let committed = false;
     try {
         const {
             // Admin user details
@@ -407,6 +408,8 @@ const registerOrganization = async (req, res) => {
             throw new Error('Hospital admin role not found in database');
         }
 
+        if (req.file) await require('../../services/credential-file.service').secureCredential(req.file);
+
         // Hash password before transaction
         const passwordHash = await hashPassword(password);
 
@@ -435,8 +438,8 @@ const registerOrganization = async (req, res) => {
             const orgQuery = `
         INSERT INTO organizations (
           name, type, license_number, address, city, state, country,
-          postal_code, phone, email, admin_user_id, status, hospital_code
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 'pending', $12)
+          postal_code, phone, email, admin_user_id, status, hospital_code, license_document_url
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, 'pending', $12, $13)
         RETURNING *
       `;
 
@@ -453,10 +456,12 @@ const registerOrganization = async (req, res) => {
                 organizationEmail || null,
                 user.id,
                 hospitalCode,
+                req.file?.path || null,
             ]);
 
             return { user, organization: orgResult.rows[0] };
         });
+        committed = true;
 
         // Generate and send OTP
         await generateAndSendOTP({
@@ -510,6 +515,8 @@ const registerOrganization = async (req, res) => {
             message: ERROR_MESSAGES.INTERNAL_ERROR,
             error: process.env.NODE_ENV === 'development' ? error.message : undefined,
         });
+    } finally {
+        if (!committed && req.file?.path) await require('../../services/encrypted-file-store').removeEncrypted(req.file.path).catch(() => {});
     }
 };
 

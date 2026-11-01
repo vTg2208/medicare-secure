@@ -1,6 +1,7 @@
 // Validate before opening sockets or accepting traffic. Never include values in errors.
 const validateEnvironment = (env) => {
     const errors = [];
+    if (env.FILE_STORAGE_BACKEND && !['filesystem','postgres'].includes(env.FILE_STORAGE_BACKEND)) errors.push('FILE_STORAGE_BACKEND must be filesystem or postgres');
     const production = env.NODE_ENV === 'production';
     const required = ['DB_PASSWORD', 'JWT_SECRET', 'JWT_REFRESH_SECRET'];
     if (production) required.push('ENCRYPTION_KEY', 'CORS_ORIGIN', 'FRONTEND_URL', 'WEBAUTHN_RP_ID', 'WEBAUTHN_ORIGIN');

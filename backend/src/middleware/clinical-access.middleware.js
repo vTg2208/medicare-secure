@@ -1,8 +1,6 @@
 const { query } = require('../config/db');
 const { findMatchingConsent } = require('../models/consent.model');
 const { processingAllowedSql, purposeForCategory } = require('../modules/privacy/processing-policy');
-const fs = require('fs/promises');
-const { withFileMutation } = require('../services/file-coordination');
 const { consentCategories, consentPurposeSql } = require('../utils/consent.validator');
 
 const PROVIDERS = ['doctor', 'nurse', 'lab_technician', 'radiologist', 'pharmacist'];
@@ -13,7 +11,7 @@ const activeStates = "('checked_in', 'in_progress', 'active')";
 const roleOf = req => req.user?.roleName;
 const fail = async (req, res, status, message) => {
     // Multipart uploads are temporary until the resource guard authorizes them.
-    if (req.file?.path) await withFileMutation(() => fs.unlink(req.file.path)).catch(() => {});
+    if (req.file?.path) await require('../services/encrypted-file-store').removeEncrypted(req.file.path).catch(() => {});
     return res.status(status).json({ success: false, message });
 };
 const fault = (status, message) => Object.assign(new Error(message), { status });
