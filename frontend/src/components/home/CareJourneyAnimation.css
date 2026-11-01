@@ -64,7 +64,7 @@
 .mc-care-received-report { position: absolute; inset: 0; display: grid; place-items: center; opacity: .4; transform: translateY(0); transition: opacity 160ms ease; }
 .mc-care-received-report svg { width: 32px; height: 39px; }
 .mc-care-journey[data-connected=true] .mc-care-access-icon { color: var(--mc-accent); background: var(--mc-brand-soft); }
-.mc-care-journey[data-connected=true] .mc-care-received-report { opacity: 1; transform: translateY(0); transition-delay: 850ms; }
+.mc-care-journey[data-connected=true] .mc-care-received-report { opacity: 1; transform: translateY(0); transition-delay: 1820ms; }
 .mc-care-team-status { display: block; width: 100%; min-height: 1.4em; font-size: 13px; line-height: 1.4; font-weight: 700; margin: 0; }
 .mc-care-team-detail { display: block; min-height: 3.2em; font-size: 11px; line-height: 1.6; color: var(--mc-text-muted); margin: 6px 0 14px; }
 .mc-care-open { display: inline-flex; flex-shrink: 0; align-items: center; justify-content: center; gap: 5px; width: 100%; max-width: 160px; min-height: 44px; margin-top: auto; font-size: 10px !important; font-weight: 700 !important; border: 1px solid var(--mc-border); border-radius: 7px; background: var(--mc-surface-muted); color: var(--mc-text-muted); padding: 9px 12px; }
@@ -97,14 +97,15 @@
 @keyframes mc-care-report-arrive { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes mc-care-transfer {
     0% { opacity: 0; transform: translate(0, 0) rotate(-5deg); }
-    14% { opacity: 1; transform: translate(0, -8px) rotate(-5deg); }
-    72% { opacity: 1; transform: translate(calc(75cqi - 40px), -8px) rotate(0); }
-    88% { opacity: 1; transform: translate(calc(75cqi - 40px), 0) rotate(0); }
+    8% { opacity: 1; transform: translate(0, 0) rotate(-5deg); }
+    18% { opacity: 1; transform: translate(0, -8px) rotate(-5deg); }
+    82% { opacity: 1; transform: translate(calc(75cqi - 40px), -8px) rotate(0); }
+    92% { opacity: 1; transform: translate(calc(75cqi - 40px), 0) rotate(0); }
     100% { opacity: 0; transform: translate(calc(75cqi - 40px), 0) rotate(0); }
 }
 @keyframes mc-care-point { 0% { opacity: 0; transform: translate(28px, 24px); } 20% { opacity: 1; } 65% { opacity: 1; transform: translate(0, 0) scale(1); } 82% { opacity: 1; transform: translate(0, 0) scale(.88); } 95% { opacity: 1; transform: translate(0, 0) scale(1); } 100% { opacity: 0; transform: translate(0, 0) scale(1); } }
 .mc-care-journey[data-phase=ready][data-motion=true] .mc-care-report { animation: mc-care-report-arrive 420ms cubic-bezier(.22,1,.36,1) both; }
-.mc-care-journey[data-phase=shared][data-motion=true] .mc-care-flying-report { animation: mc-care-transfer 440ms cubic-bezier(.4,0,.2,1) 540ms both; }
+.mc-care-journey[data-phase=shared][data-motion=true] .mc-care-flying-report { animation: mc-care-transfer 1400ms cubic-bezier(.4,0,.2,1) 540ms both; }
 .mc-care-journey:is([data-phase=choose], [data-phase=withdraw])[data-motion=true] .mc-care-cursor { animation: mc-care-point 650ms cubic-bezier(.25,1,.5,1) both; }
 .mc-care-journey[data-running=false][data-manual=false] *, .mc-care-journey[data-running=false][data-manual=false] *::before, .mc-care-journey[data-running=false][data-manual=false] *::after { animation-play-state: paused; }
 .mc-care-journey[data-motion=false] *, .mc-care-journey[data-motion=false] *::before, .mc-care-journey[data-motion=false] *::after { animation: none !important; transition: none !important; }
