@@ -1,5 +1,7 @@
 # First verified off-host snapshot
 
+Historical first-upload report. The later [scheduled backup release](2026-11-01-scheduled-backup-release.md) supersedes the pending activation status below: fresh 57-table SHMSBKP1 recovery and recurring backups are now verified and enabled.
+
 Verified on 2026-11-01 against the user's private Backblaze B2 bucket `medicare-secure-backups-vtg2208`.
 
 - The local setup helper created an exact file-only key, stored encrypted using Windows DPAPI for the current Windows user. The administrator key is not stored by the helper or installed in the backup job.

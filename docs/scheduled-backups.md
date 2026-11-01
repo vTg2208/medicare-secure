@@ -1,6 +1,6 @@
 # Scheduled encrypted backup and recovery
 
-The private demo's scheduler is `.github/workflows/encrypted-backup.yml`. It is designed to run daily at **21:37 UTC / 03:07 Asia/Kolkata the next day**, plus manual dispatches. GitHub schedules are best-effort and may be delayed or prevented by platform/quota limits. The workflow runs only on `main`; scheduled executions require `BACKUPS_ENABLED=true`. One concurrency group serializes manual and scheduled runs.
+The private demo's scheduler is `.github/workflows/encrypted-backup.yml`. It is enabled to run daily at **21:37 UTC / 03:07 Asia/Kolkata the next day**, plus manual dispatches. Two main-branch executions passed on 2026-11-01; see [release evidence](releases/2026-11-01-scheduled-backup-release.md). GitHub schedules are best-effort and may be delayed or prevented by platform/quota limits. The workflow runs only on `main`; scheduled executions require `BACKUPS_ENABLED=true`. One concurrency group serializes manual and scheduled runs.
 
 ## Consistency and scope
 
