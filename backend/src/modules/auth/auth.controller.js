@@ -408,6 +408,8 @@ const registerOrganization = async (req, res) => {
             throw new Error('Hospital admin role not found in database');
         }
 
+        if (req.file) await require('../../services/credential-file.service').secureCredential(req.file);
+
         // Hash password before transaction
         const passwordHash = await hashPassword(password);
 

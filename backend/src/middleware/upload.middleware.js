@@ -25,8 +25,11 @@ const storage = {
             const filePath = path.join(uploadDir, filename);
             try {
                 if (file.stream.truncated) return cb(Object.assign(new Error('Credential file exceeds the size limit'), { statusCode: 400 }));
-                await secureCredential({ path: filePath, originalname: file.originalname, mimetype: file.mimetype, buffer: Buffer.concat(chunks) });
-                cb(null, { destination: uploadDir, filename, path: filePath, size });
+                const durable = encryptedStorage.isPostgresStorage();
+                const prepared = await secureCredential({ path: filePath, originalname: file.originalname, mimetype: file.mimetype, buffer: Buffer.concat(chunks) }, { persist: !durable });
+                // An incomplete/aborted multipart request cannot permanently
+                // allocate durable objects before its controller validates it.
+                cb(null, { destination: uploadDir, filename, path: filePath, size, ...(durable && { buffer: prepared }) });
             } catch (error) {
                 await encryptedStorage.removeEncrypted(filePath).catch(() => {});
                 cb(error);

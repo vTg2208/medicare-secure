@@ -15,7 +15,7 @@ class DoctorVerificationService {
     static async uploadLicenseDocument(userId, fileData) {
         let committed = false;
         try {
-            await require('./credential-file.service').secureCredential({ path: fileData.path, mimetype: fileData.mimetype });
+            await require('./credential-file.service').secureCredential({ path: fileData.path, buffer: fileData.buffer, originalname: fileData.originalname, mimetype: fileData.mimetype });
             const document = await VerificationDocument.create({
                 userId,
                 documentType: fileData.documentType || 'medical_license',

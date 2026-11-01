@@ -46,6 +46,18 @@ test('durable encrypted uploads survive ephemeral filesystem loss and enforce cl
     assert.equal((await db.query('SELECT count(*)::int AS n FROM encrypted_upload_objects')).rows[0].n,count);
    }finally{process.env.NODE_ENV=previous;}
   });
+  await t.test('credential multipart staging cannot consume durable quota before the complete request reaches its controller',async()=>{
+   const {Readable}=require('node:stream'),upload=require('../src/middleware/upload.middleware');
+   const before=(await db.query('SELECT bytes_used::text FROM encrypted_upload_budget')).rows[0].bytes_used;
+   const staged=await new Promise((resolve,reject)=>upload.storage._handleFile({}, {originalname:'staged.pdf',mimetype:'application/pdf',stream:Readable.from(bytes)},(error,value)=>error?reject(error):resolve(value)));
+   assert.equal((await db.query('SELECT bytes_used::text FROM encrypted_upload_budget')).rows[0].bytes_used,before);
+   assert.equal(staged.buffer.subarray(0,8).toString(),'SHMSENC2');
+   const credentials=require('../src/services/credential-file.service');
+   await credentials.secureCredential({...staged,originalname:'staged.pdf',mimetype:'application/pdf'});
+   assert.deepEqual(await credentials.readCredential(staged.path),bytes);
+   await require('../src/services/encrypted-file-store').removeEncrypted(staged.path);
+   assert.equal((await db.query('SELECT bytes_used::text FROM encrypted_upload_budget')).rows[0].bytes_used,before);
+  });
   await t.test('a rejected registration and malformed lab metadata reclaim unpublished durable objects',async()=>{
    const before=(await db.query('SELECT bytes_used::text FROM encrypted_upload_budget')).rows[0].bytes_used;
    const credentialPath=path.join(config.upload.uploadPath,'documents','rejected-registration.pdf');

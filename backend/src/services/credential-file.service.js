@@ -12,7 +12,7 @@ function credentialContext(file) {
     if (relative.startsWith('..') || path.isAbsolute(relative)) throw new Error('Invalid credential location');
     return relative.split(path.sep).join('/');
 }
-async function secureCredential(file) {
+async function secureCredential(file, { persist = true } = {}) {
     const stored = file.buffer || await storage.readEncrypted(file.path);
     const magic = stored.subarray(0, 8).toString();
     // Legacy encryption is accepted only by this explicit migration path, never
@@ -22,8 +22,9 @@ async function secureCredential(file) {
     const valid = await Scanner.validateMagicNumber(bytes, file.originalname || file.path);
     if (!valid.passed || !['application/pdf', 'image/png', 'image/jpeg'].includes(file.mimetype)) throw Object.assign(new Error('Invalid credential document'), { statusCode: 400 });
     await scanBuffer(bytes);
-    if (magic !== 'SHMSENC2') await withFileMutation(async () => {
-        const encrypted = encryptBuffer(bytes, credentialContext(file.path));
+    const encrypted = magic === 'SHMSENC2' ? stored : encryptBuffer(bytes, credentialContext(file.path));
+    if (!persist) return encrypted;
+    if (magic !== 'SHMSENC2' || file.buffer) await withFileMutation(async () => {
         if (file.buffer) return storage.writeEncrypted(file.path, encrypted);
         if (storage.isPostgresStorage()) throw new Error('Legacy credentials require migration before durable storage');
         // A legacy replacement must leave the previous file intact on failure.
