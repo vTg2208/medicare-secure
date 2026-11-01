@@ -35,7 +35,9 @@ test('leads with sharing, retains the feature carousel and onboarding, and route
   screen.getAllByRole('link', { name: /create patient account/i }).forEach(link => expect(link).toHaveAttribute('href', '/register'));
   expect(screen.getByRole('link', { name: /open your patient portal/i })).toHaveAttribute('href', '/login');
   expect(screen.getByRole('link', { name: /care team sign in/i })).toHaveAttribute('href', '/login');
-  expect(document.querySelector(screen.getByRole('link', { name: /see how it works/i }).getAttribute('href'))).toBeInTheDocument();
+  expect(screen.queryByRole('link', { name: /see how it works/i })).not.toBeInTheDocument();
+  expect(screen.queryByRole('list', { name: 'Your information controls' })).not.toBeInTheDocument();
+  expect(document.querySelector(screen.getByRole('link', { name: 'Explore Medicare' }).getAttribute('href'))).toBeInTheDocument();
   expect(screen.queryByRole('note')).not.toBeInTheDocument();
 });
 

@@ -27,9 +27,8 @@ export default function LandingPage() {
                         <p className="mc-home-eyebrow"><span aria-hidden="true" /> Healthcare &amp; patient management</p>
                         <h1 id="home-heading">Your medical records.<br />Your care team.<br /><em>One secure place.</em></h1>
                         <p className="mc-home-lede">Keep reports, prescriptions and visits together. Choose who can access your information.</p>
-                        <div className="mc-home-actions"><Link className="mc-home-button" to={entryPath}>{entryLabel}<Arrow /></Link><a className="mc-home-text-link" href="#your-care">See how it works <span aria-hidden="true">↘</span></a></div>
+                        <div className="mc-home-actions"><Link className="mc-home-button" to={entryPath}>{entryLabel}<Arrow /></Link></div>
                         <p className="mc-home-small">Already registered? <Link to="/login">Open your patient portal</Link></p>
-                        <ul className="mc-home-assurances" aria-label="Your information controls"><li>Role-based access</li><li>Consent controls</li><li>Access history</li></ul>
                     </div>
                     <div id="your-care" className="mc-home-showcase"><CareJourneyAnimation /></div>
                 </section>
