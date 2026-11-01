@@ -23,7 +23,11 @@ async function coordinate(mode,run,{env=process.env,client:supplied}={}){
  const controller=new AbortController();let active=false,acquired=false;
  const lost=()=>controller.abort(Error('File coordination session lost ownership'));
  const assertActive=()=>{if(!active||controller.signal.aborted)throw Error('File coordination session lost ownership');};
- const lease={mode,signal:controller.signal,assertActive,async assertHeld(){assertActive();await client.query('SELECT 1');assertActive();}};
+ const lease={mode,signal:controller.signal,assertActive,async assertHeld(){
+  assertActive();
+  const held=(await client.query(`SELECT EXISTS(SELECT 1 FROM pg_catalog.pg_locks WHERE locktype='advisory' AND pid=pg_backend_pid() AND granted AND classid=$1::oid AND objid=$2::oid AND objsubid=2 AND mode=$3 AND database=(SELECT oid FROM pg_catalog.pg_database WHERE datname=current_database())) AS held`,[...key,mode==='mutation'?'ShareLock':'ExclusiveLock'])).rows[0].held;
+  if(!held)lost();assertActive();
+ }};
  client.on('error',lost);client.on('end',lost);
  const shared=mode==='mutation'?'_shared':'';
  try{

@@ -1,4 +1,7 @@
 const {test}=require('node:test');
+// This suite must run in the clean container-client CI job as well as locally.
+// This value encrypts disposable fixtures only; never load a deployment secret.
+process.env.ENCRYPTION_KEY='e'.repeat(64);
 const assert=require('node:assert/strict');
 const {Client}=require('pg');
 const {AsyncResource}=require('node:async_hooks');
@@ -50,6 +53,12 @@ test('file mutation gate serializes backup ownership across PostgreSQL sessions'
    await coordination.withFileBackupLock(async()=>{}, {client:observer,env});
    assert.equal((await observer.query('SELECT 1 AS n')).rows[0].n,1);
   });
+  await t.test('a live session that no longer holds its advisory lock cannot claim ownership',async()=>{
+   await assert.rejects(coordination.withFileBackupLock(async lease=>{
+    await observer.query('SELECT pg_advisory_unlock_all()');
+    await lease.assertHeld();
+   },{client:observer,env}),/ownership|lock/i);
+  });
   await t.test('actual report and credential writers cannot publish while backup owns the lock',async()=>{
    const config=require('../src/config/env');const Files=require('../src/services/file.upload.service');
    const {secureCredential,readCredential}=require('../src/services/credential-file.service');
@@ -74,6 +83,16 @@ test('file mutation gate serializes backup ownership across PostgreSQL sessions'
      assert.deepEqual(await Files.getFile(saved.filePath),bytes);
     },{env});
     await Files.deleteFile(saved.filePath);await assert.rejects(fs.stat(saved.filePath),{code:'ENOENT'});
+    const legacyPath=path.join(root,'documents/legacy.pdf');
+    const legacy=require('../src/services/file.crypto').encryptBuffer(bytes);
+    await fs.writeFile(legacyPath,legacy);
+    const originalWrite=fs.writeFile;
+    try{
+     fs.writeFile=async(destination,data,options)=>{await originalWrite(destination,data.subarray(0,40),options);throw Error('synthetic interrupted credential write');};
+     await assert.rejects(secureCredential({path:legacyPath,originalname:'legacy.pdf',mimetype:'application/pdf'}),/interrupted credential write/);
+    }finally{fs.writeFile=originalWrite;}
+    assert.deepEqual(await fs.readFile(legacyPath),legacy,'an interrupted rewrite must retain the complete previous ciphertext');
+    assert.deepEqual((await fs.readdir(path.dirname(legacyPath))).sort(),['credential.pdf','legacy.pdf']);
    }finally{
     config.upload.uploadPath=previousRoot;
     if(previousTimeout===undefined)delete process.env.FILE_COORDINATION_TIMEOUT_MS;else process.env.FILE_COORDINATION_TIMEOUT_MS=previousTimeout;
@@ -84,6 +103,7 @@ test('file mutation gate serializes backup ownership across PostgreSQL sessions'
 });
 
 test('coordinated capture restores one database instant with its encrypted files', {skip:!enabled,timeout:120000},async t=>{
+ assert.equal(process.env.NODE_ENV,'test');assert.ok(['127.0.0.1','localhost','::1'].includes(process.env.DB_HOST));assert.equal(String(process.env.DB_PORT),'55432');
  const {createCoordinatedBackup}=require('../scripts/coordinated-backup');
  const {inspectBundle,restoreBackup}=require('../scripts/backup-helper');
  const {verifyRestoredSnapshot}=require('../scripts/scheduled-backup');
@@ -94,7 +114,7 @@ test('coordinated capture restores one database instant with its encrypted files
  const config={host:process.env.DB_HOST,port:Number(process.env.DB_PORT),user:process.env.DB_USER,password:process.env.DB_PASSWORD,database:process.env.DB_NAME,ssl:false};
  const admin=new Client(config);await admin.connect();
  const suffix=crypto.randomBytes(6).toString('hex'),sourceName=`healthcare_coordinated_${suffix}`,targetName=`healthcare_restore_coordinated_${suffix}`;
- let source,target;const extraTargets=[];
+ let source,target,readerRoleCreated=false;const extraTargets=[];
  const env={...process.env,DB_NAME:sourceName,BACKUP_DATABASE_SCHEMA:'healthcare',UPLOAD_PATH:uploads,BACKUP_ENCRYPTION_KEY:'d'.repeat(64)};
  const restoreEnv={...env,RESTORE_DISPOSABLE:'true',RESTORE_DB_HOST:config.host,RESTORE_DB_PORT:String(config.port),RESTORE_DB_USER:config.user,RESTORE_DB_PASSWORD:config.password,RESTORE_ADMIN_DB:config.database,RESTORE_DB_NAME:targetName};
  const plain=Buffer.from('%PDF-1.4\nSynthetic coordinated recovery content');
@@ -215,7 +235,11 @@ test('coordinated capture restores one database instant with its encrypted files
     async download(file,destination){const bytes=Buffer.from(objects.get(file.fileId).bytes);if(corrupt)bytes[bytes.length-1]^=1;await fs.writeFile(destination,bytes,{flag:'wx'});},
     async remove(file){removed++;objects.delete(file.fileId);}
    };
-   const operator={...env,BACKUP_MODE:'coordinated',RESTORE_DB_HOST:config.host,RESTORE_DB_PORT:String(config.port),RESTORE_DB_USER:config.user,RESTORE_DB_PASSWORD:config.password,RESTORE_ADMIN_DB:config.database};
+   const password='synthetic-coordinated-reader-password-only-1234567890';
+   const roleSql=(await fs.readFile(path.join(__dirname,'../scripts/backup-reader-role.sql'),'utf8')).replaceAll('__BACKUP_READER_PASSWORD__',password);
+   await source.query(roleSql);readerRoleCreated=true;
+   const operator={...env,DB_USER:'healthcare_backup',DB_PASSWORD:password,BACKUP_MODE:'coordinated',RESTORE_DB_HOST:config.host,RESTORE_DB_PORT:String(config.port),RESTORE_DB_USER:config.user,RESTORE_DB_PASSWORD:config.password,RESTORE_ADMIN_DB:config.database};
+   operator.BACKUP_APPLICATION_KEY_SHA256=crypto.createHash('sha256').update(Buffer.from(env.ENCRYPTION_KEY,'hex')).digest('hex');delete operator.ENCRYPTION_KEY;
    const result=await runScheduledBackup({env:operator,store});
    assert.equal(result.mode,'coordinated');assert.equal(result.filesVerified,4);assert.equal(result.restoreVerified,true);assert.equal(result.uploaded,2);assert.equal(removed,0);
    const previous=new Set(objects.keys());corrupt=true;
@@ -224,9 +248,34 @@ test('coordinated capture restores one database instant with its encrypted files
    assert.equal((await admin.query("SELECT count(*)::int AS n FROM pg_database WHERE datname LIKE 'healthcare_restore_scheduled_%'")).rows[0].n,0);
    await assert.rejects(runScheduledBackup({env:{...operator,BACKUP_MODE:'misspelled'},store}),/mode/i);
   });
+  await t.test('absolute lab, imaging and radiology references rebase without changing captured audit evidence',async()=>{
+   const imaging=`medical_files/${patient}/imaging/1700000000003_0123456789abcdef.pdf`;
+   const radiology=`medical_files/${patient}/imaging/1700000000004_0123456789abcdef.pdf`;
+   await write(imaging);await write(radiology);
+   await source.query('UPDATE lab_results SET file_url=$1 WHERE record_id=$2',[path.join(uploads,...medical.split('/')),record]);
+   const imagingRecord=(await source.query("INSERT INTO medical_records(patient_id,type,title,created_by) VALUES($1,'imaging','Synthetic absolute-path recovery',$1) RETURNING id",[patient])).rows[0].id;
+   await source.query("INSERT INTO imaging_reports(record_id,imaging_type,file_url,ordered_by) VALUES($1,'mri',$2,$3)",[imagingRecord,path.join(uploads,...imaging.split('/')),patient]);
+   await source.query('INSERT INTO radiology_reports(patient_id,file_path) VALUES($1,$2)',[patient,path.join(uploads,...radiology.split('/'))]);
+   const before=(await source.query('SELECT last_hash FROM audit_chain_head WHERE singleton=1')).rows[0].last_hash;
+   const input=path.join(root,'absolute-medical.shmsbkp');await createCoordinatedBackup({output:input,env});
+   const name=`healthcare_restore_absolute_${suffix}`;extraTargets.push(name);const recovered=path.join(root,'absolute-recovery');
+   await restoreBackup({input,uploads:recovered,env:{...restoreEnv,RESTORE_DB_NAME:name}});
+   const reader=new Client({...config,database:name,options:'-c search_path=healthcare,extensions,public'});await reader.connect();
+   try{
+    const manifest=await inspectBundle(input,Buffer.from(env.BACKUP_ENCRYPTION_KEY,'hex'));
+    assert.equal((await verifyRestoredSnapshot(reader,manifest,{uploads:recovered})).filesVerified,6);
+    assert.equal((await reader.query('SELECT last_hash FROM audit_chain_head WHERE singleton=1')).rows[0].last_hash,before);
+    assert.equal((await reader.query('SELECT file_url FROM lab_results WHERE record_id=$1',[record])).rows[0].file_url,path.join(recovered,...medical.split('/')));
+    assert.equal((await reader.query('SELECT file_url FROM imaging_reports')).rows[0].file_url,path.join(recovered,...imaging.split('/')));
+    assert.equal((await reader.query('SELECT file_path FROM radiology_reports')).rows[0].file_path,path.join(recovered,...radiology.split('/')));
+    const triggers=(await reader.query("SELECT c.relname,t.tgenabled FROM pg_trigger t JOIN pg_class c ON c.oid=t.tgrelid JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='healthcare' AND t.tgname='clinical_change_audit' AND c.relname IN('lab_results','imaging_reports','radiology_reports') ORDER BY c.relname")).rows;
+    assert.equal(triggers.length,3);assert.ok(triggers.every(row=>row.tgenabled==='O'));
+   }finally{await reader.end();}
+  });
  }finally{
   if(target)await target.end();if(source)await source.end();
   for(const name of [targetName,sourceName,...extraTargets])await admin.query(`DROP DATABASE IF EXISTS "${name}" WITH (FORCE)`);
+  if(readerRoleCreated)await admin.query('DROP ROLE healthcare_backup');
   await admin.end();await fs.rm(root,{recursive:true,force:true});
  }
 });

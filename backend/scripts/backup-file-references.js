@@ -73,6 +73,18 @@ const sorted=values=>values.map(value=>JSON.stringify(value)).sort();
 function assertSame(actual,expected,message){if(JSON.stringify(sorted(actual))!==JSON.stringify(sorted(expected)))throw Error(message);}
 async function rebaseSnapshotReferences(client,manifest,destination){
  const consistency=manifest.consistency;
+ const suspended=[];
+ for(const table of new Set(consistency.fileReferences.filter(r=>r.absolute).map(r=>r.table))){
+  if(!consistency.fileReferences.some(r=>r.table===table&&knownFiles.has(`${table}.${r.column}`)))throw Error('Unsupported recovery file reference');
+  const trigger=(await client.query(`SELECT t.tgenabled,p.proname,f.nspname AS function_schema FROM pg_catalog.pg_trigger t JOIN pg_catalog.pg_class c ON c.oid=t.tgrelid JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace JOIN pg_catalog.pg_proc p ON p.oid=t.tgfoid JOIN pg_catalog.pg_namespace f ON f.oid=p.pronamespace WHERE n.nspname=$1 AND c.relname=$2 AND t.tgname='clinical_change_audit' AND NOT t.tgisinternal`,[consistency.schema,table])).rows[0];
+  if(trigger&&trigger.tgenabled!=='D'){
+   if(trigger.proname!=='audit_clinical_change'||trigger.function_schema!==consistency.schema||!['O','A','R'].includes(trigger.tgenabled))throw Error('Unsupported file recovery audit trigger');
+   // Only inside the newly created disposable database and its existing restore
+   // transaction: relocating a storage root is not a new clinical amendment.
+   await client.query(`ALTER TABLE ${quote(consistency.schema)}.${quote(table)} DISABLE TRIGGER clinical_change_audit`);
+   suspended.push({table,state:trigger.tgenabled});
+  }
+ }
  for(const reference of consistency.fileReferences){
   const field=`${reference.table}.${reference.column}`;
   if(!knownFiles.has(field)||typeof reference.id!=='string')throw Error('Unsupported recovery file reference');
@@ -81,6 +93,7 @@ async function rebaseSnapshotReferences(client,manifest,destination){
   if(!row||JSON.stringify(normalizeReference(row.value,manifest.sourceUploadRoot,field))!==JSON.stringify({relative:reference.relative,absolute:reference.absolute}))throw Error('Restored file reference differs from snapshot');
   if(reference.absolute)await client.query(`UPDATE ${table} SET ${column}=$1 WHERE id=$2`,[contained(destination,reference.relative),reference.id]);
  }
+ for(const {table,state} of suspended)await client.query(`ALTER TABLE ${quote(consistency.schema)}.${quote(table)} ENABLE ${state==='A'?'ALWAYS ':state==='R'?'REPLICA ':''}TRIGGER clinical_change_audit`);
  // Re-create only the exact safe parent directories required for retrying a
  // cleanup that had unlinked its file before committing the cleanup marker.
  for(const job of consistency.pendingFileCleanup)if(!job.present)await fs.mkdir(path.dirname(contained(destination,uploadPath(job.relative))),{recursive:true,mode:0o700});
