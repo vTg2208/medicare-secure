@@ -18,9 +18,8 @@ function Icon({ name, ...props }) {
         clinician: <><path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6Z" /></>,
         check: <path d="m5 12 4 4L19 6" />,
         shield: <><path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6Z" /><path d="m8 12 3 3 5-6" /></>,
-        pause: <path d="M9 5v14M15 5v14" />,
-        play: <path d="m8 4 12 8-12 8Z" />,
-        replay: <><path d="M3 10a9 9 0 1 1 1 8M3 4v6h6" /></>,
+        previous: <path d="m14 6-6 6 6 6" />,
+        next: <path d="m10 6 6 6-6 6" />,
     };
     return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.65" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}>{paths[name]}</svg>;
 }
@@ -44,24 +43,24 @@ function SharingPath() {
 
 export default function CareJourneyAnimation() {
     const region = useRef(null);
-    const playbackIntent = useRef(null);
     const [phase, setPhase] = useState(0);
     const [viewed, setViewed] = useState(false);
     const [reducedMotion, setReducedMotion] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
     const [playing, setPlaying] = useState(() => !window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    const [focusPaused, setFocusPaused] = useState(false);
     const [visible, setVisible] = useState(() => document.visibilityState !== 'hidden');
     const [onScreen, setOnScreen] = useState(false);
     const [animate, setAnimate] = useState(true);
     const [manualInteraction, setManualInteraction] = useState(false);
     const step = steps[phase];
     const connected = phase >= 2 && phase <= 4;
-    const running = playing && visible && onScreen && !reducedMotion;
+    const running = playing && !focusPaused && visible && onScreen && !reducedMotion;
 
     useEffect(() => {
         const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
         const updatePreference = () => {
             setReducedMotion(preference.matches);
-            if (preference.matches) setPlaying(false);
+            setPlaying(!preference.matches);
         };
         const updateVisibility = () => setVisible(document.visibilityState !== 'hidden');
         preference.addEventListener('change', updatePreference);
@@ -105,20 +104,33 @@ export default function CareJourneyAnimation() {
         if (!connected) setViewed(false);
     }
 
-    function togglePlayback(event) {
-        const previous = event.detail !== 0 && playbackIntent.current !== null ? playbackIntent.current : playing;
-        playbackIntent.current = null;
+    function navigate(direction, event) {
+        const next = (phase + direction + steps.length) % steps.length;
+        setPhase(next);
+        setViewed(next >= 3);
+        setAnimate(event.detail !== 0);
         setManualInteraction(false);
-        setPlaying(!previous);
+        setPlaying(!reducedMotion);
+        // Pointer navigation continues autoplay; keyboard users keep the step
+        // still until focus leaves the illustration.
+        setFocusPaused(event.detail === 0);
     }
 
     return (
         <section className="mc-care-journey" aria-label="See how Medicare sharing works" ref={region}
             data-phase={step.id} data-connected={connected} data-viewed={viewed}
             data-running={running} data-motion={animate && !reducedMotion} data-manual={manualInteraction}
-            onFocusCapture={() => setPlaying(false)}>
+            onFocusCapture={() => setFocusPaused(true)}
+            onKeyDownCapture={() => setFocusPaused(true)}
+            onBlurCapture={event => { if (!event.currentTarget.contains(event.relatedTarget)) setFocusPaused(false); }}>
             <header className="mc-care-heading">
-                <span className="mc-care-kicker"><span />A connected care journey<span className="mc-care-count" aria-hidden="true">0{phase + 1}<span>/ 06</span></span></span>
+                <div className="mc-care-heading-row">
+                    <span className="mc-care-kicker"><span aria-hidden="true" />A connected care journey</span>
+                    <div className="mc-care-navigation" role="group" aria-label="Care journey navigation">
+                        <button type="button" aria-label="Previous care journey step" onClick={event => navigate(-1, event)}><Icon name="previous" /></button>
+                        <button type="button" aria-label="Next care journey step" onClick={event => navigate(1, event)}><Icon name="next" /></button>
+                    </div>
+                </div>
                 <div className="mc-care-caption" aria-live={running ? 'off' : 'polite'} aria-atomic="true">
                     <h2>{step.title}</h2><p>{step.detail}</p>
                 </div>
@@ -158,13 +170,6 @@ export default function CareJourneyAnimation() {
                 <p className="mc-care-history-event" data-shown={phase === 5} aria-hidden={phase !== 5}><Icon name="check" />You withdrew future access</p>
             </div>
 
-            <footer className="mc-care-controls">
-                <div className="mc-care-playback"><button className="mc-care-play" disabled={reducedMotion}
-                    onPointerDown={() => { playbackIntent.current = playing; }} onClick={togglePlayback}
-                    aria-label={reducedMotion ? 'Automatic animation disabled for reduced motion' : playing ? 'Pause animation' : 'Play animation'}><Icon name={playing && !reducedMotion ? 'pause' : 'play'} /><span>{reducedMotion ? 'Motion reduced' : playing ? 'Pause' : 'Play'}</span></button>
-                    <button aria-label="Replay care journey" onClick={event => { select(0, event); setPlaying(!reducedMotion); }}><Icon name="replay" /></button>
-                </div>
-            </footer>
             <p id="mc-care-explainer" className="mc-care-sr-only">Interactive illustration of sharing controls. These controls do not change your account permissions. Withdrawing consent blocks future access; it does not recall information already received.</p>
         </section>
     );

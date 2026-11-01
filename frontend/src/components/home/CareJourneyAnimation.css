@@ -5,10 +5,16 @@
 .mc-care-journey button:focus-visible { outline: 3px solid var(--mc-accent); outline-offset: 4px; }
 .mc-care-journey svg { width: 20px; height: 20px; flex-shrink: 0; }
 .mc-care-heading { padding: 25px 26px 0; }
-.mc-care-kicker { display: flex; align-items: center; gap: 8px; color: var(--mc-accent); font-size: 11px; text-transform: uppercase; letter-spacing: 1.6px; font-weight: 800; }
-.mc-care-kicker > span:first-child { width: 6px; height: 6px; background: var(--mc-brand); border-radius: 50%; }
-.mc-care-count { margin-left: auto; display: flex; gap: 7px; font-size: 10px; letter-spacing: 0; font-variant-numeric: tabular-nums; }
-.mc-care-count > span { color: var(--mc-text-muted); font-weight: 500; }
+.mc-care-heading-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.mc-care-kicker { display: flex; align-items: center; gap: 8px; min-width: 0; color: var(--mc-accent); font-size: 11px; line-height: 1.5; text-transform: uppercase; letter-spacing: 1.6px; font-weight: 800; }
+.mc-care-kicker > span:first-child { flex-shrink: 0; width: 6px; height: 6px; background: var(--mc-brand); border-radius: 50%; }
+.mc-care-navigation { display: flex; flex-shrink: 0; gap: 6px; }
+.mc-care-navigation button { display: grid; place-items: center; width: 48px; height: 44px; padding: 0; border: 1px solid var(--mc-border); border-radius: 8px; color: var(--mc-accent); background: var(--mc-surface); transition: background-color 160ms ease, border-color 160ms ease; }
+.mc-care-navigation button:active { background: var(--mc-brand-soft); border-color: var(--mc-brand); }
+.mc-care-navigation svg { width: 18px; height: 18px; }
+@media (hover: hover) and (pointer: fine) {
+    .mc-care-navigation button:hover { background: var(--mc-brand-soft); border-color: var(--mc-brand); }
+}
 .mc-care-caption { min-height: 114px; padding-top: 16px; }
 .mc-care-caption h2 { font-size: clamp(21px, 4.6cqi, 27px); min-height: 2.5em; font-weight: 600; letter-spacing: -.9px; line-height: 1.25; margin: 0 0 7px; }
 .mc-care-caption p { color: var(--mc-text-muted); font-size: 11px; line-height: 1.6; margin: 0; }
@@ -86,12 +92,6 @@
 .mc-care-history-event:nth-of-type(3) { top: 45px; }
 .mc-care-history-event svg { width: 11px; height: 11px; color: var(--mc-accent); }
 .mc-care-history-event[data-shown=true] { opacity: 1; transform: translateY(0); }
-.mc-care-controls { padding: 10px 20px; border-top: 1px solid var(--mc-border); background: var(--mc-surface); display: flex; align-items: center; justify-content: flex-end; }
-.mc-care-playback { display: flex; align-items: center; gap: 5px; }
-.mc-care-playback button { display: inline-flex; align-items: center; justify-content: center; gap: 5px; padding: 5px; border: 0; background: transparent; color: var(--mc-accent); min-height: 44px; min-width: 44px; }
-.mc-care-playback svg { width: 14px; height: 14px; }
-.mc-care-playback span { font-size: 10px; font-weight: 600; }
-.mc-care-playback button:disabled { color: var(--mc-text-muted); }
 .mc-care-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
 @keyframes mc-care-report-arrive { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
@@ -111,6 +111,8 @@
 
 @container (max-width: 430px) {
     .mc-care-heading { padding: 20px 17px 0; }
+    .mc-care-kicker { font-size: 10px; letter-spacing: 1.2px; }
+    .mc-care-navigation button { width: 44px; }
     .mc-care-caption { min-height: 114px; }
     .mc-care-scene { margin: 14px 9px 0; padding: 12px 7px; grid-template-columns: 1.04fr 36px 1fr; }
     .mc-care-card-top { padding: 10px 9px; gap: 6px; min-height: 64px; }
@@ -142,8 +144,6 @@
     .mc-care-history { margin: 16px 17px 11px; min-height: 81px; }
     .mc-care-history-event:nth-of-type(2) { top: 43px; left: 0; }
     .mc-care-history-event:nth-of-type(3) { top: 63px; }
-    .mc-care-controls { padding: 8px 13px; }
-    .mc-care-playback span { font-size: 10px; }
 }
 @media (prefers-reduced-motion: reduce) {
     .mc-care-journey *, .mc-care-journey *::before, .mc-care-journey *::after { animation: none !important; transition: none !important; }
