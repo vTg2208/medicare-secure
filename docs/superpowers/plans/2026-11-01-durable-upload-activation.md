@@ -18,3 +18,7 @@ The live scanner configuration must remain fail-closed. Do not bypass production
 4. Configure Render's durable file backend and logical root, switch the serialized GitHub backup workflow to coordinated/PostgreSQL mode, verify a live synthetic file read, a fresh B2 upload/download/full recovery, and application decryption. Check a second execution for safe retention, document actual source/deploy/run evidence and clean owned fixtures. Preserve existing keys and previous archives.
 
 New persistent clinical data access must remain limited to the existing authorized application and backup principals. Do not add a public maintenance endpoint, install an administrator key into a worker, upgrade billing or weaken scanning/TLS.
+
+## Completed activation
+
+All four tasks are complete. PR #8 merged as 3f3d3a9; migration 032 and effective live permissions were verified before deployment. Render uses durable PostgreSQL storage and the serialized GitHub workflow uses coordinated capture. Two real B2 upload/download/recovery runs, two separate local application-decryption drills, a Render restart and live file authorization, nurse profile, appointment availability and privacy/message reads passed. Owned database fixture containers were removed. Production ClamAV remains unconfigured, so normal scanned live uploads are not claimed. See [the release evidence](../../releases/2026-11-01-durable-backup-activation.md) for exact commits, checks and observed run links.
