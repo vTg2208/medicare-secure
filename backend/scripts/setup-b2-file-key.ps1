@@ -1,4 +1,13 @@
 param([switch]$Create)
+function Invoke-B2Json([string]$Uri,[hashtable]$Headers,[string]$Body) {
+ $options=@{Uri=$Uri;Headers=$Headers;MaximumRedirection=0;TimeoutSec=30}
+ # B2 uses an opaque Authorization value rather than an HTTP auth scheme.
+ # HttpClient in PowerShell 7 rejects that value unless header syntax checking
+ # is disabled. This does not disable TLS or certificate validation.
+ if($PSVersionTable.PSVersion.Major -ge 6){$options.SkipHeaderValidation=$true}
+ if($Body){$options.Method='Post';$options.ContentType='application/json';$options.Body=$Body}
+ Invoke-RestMethod @options
+}
 function Initialize-BackupSecretDirectory([string]$privateDir) {
 New-Item -ItemType Directory -Path $privateDir -Force | Out-Null
 $identity=[Security.Principal.WindowsIdentity]::GetCurrent().User
@@ -34,14 +43,14 @@ $pointer=[Runtime.InteropServices.Marshal]::SecureStringToBSTR($masterSecret)
 try{
  $plain=[Runtime.InteropServices.Marshal]::PtrToStringBSTR($pointer)
  $basic=[Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($masterId+':'+$plain))
- $auth=Invoke-RestMethod -Uri 'https://api.backblazeb2.com/b2api/v4/b2_authorize_account' -Headers @{Authorization='Basic '+$basic} -MaximumRedirection 0 -TimeoutSec 30
+ $auth=Invoke-B2Json -Uri 'https://api.backblazeb2.com/b2api/v4/b2_authorize_account' -Headers @{Authorization='Basic '+$basic}
  $api=$auth.apiInfo.storageApi
  if('writeKeys' -notin $api.allowed.capabilities){throw 'Administrator principal cannot create scoped keys.'}
  $apiUri=[Uri]$api.apiUrl
  if($apiUri.Scheme -ne 'https' -or -not $apiUri.IsDefaultPort -or $apiUri.UserInfo -or $apiUri.Host -notmatch '(^|\.)backblazeb2\.com$'){throw 'Untrusted provider endpoint.'}
  $request.accountId=$auth.accountId
  $headers=@{Authorization=$auth.authorizationToken}
- $created=Invoke-RestMethod -Uri ($api.apiUrl+'/b2api/v4/b2_create_key') -Method Post -Headers $headers -ContentType 'application/json' -Body ($request|ConvertTo-Json -Depth 5) -MaximumRedirection 0 -TimeoutSec 30
+ $created=Invoke-B2Json -Uri ($api.apiUrl+'/b2api/v4/b2_create_key') -Headers $headers -Body ($request|ConvertTo-Json -Depth 5)
  if($created.namePrefix -ne 'medicare-backups/' -or $created.bucketIds.Count -ne 1 -or $created.bucketIds[0] -ne $bucketId -or $created.capabilities.Count -ne 5 -or @($created.capabilities|Where-Object {$_ -notin $required}).Count -or -not $created.applicationKey){throw 'Created key scope did not match the approved request.'}
  $payload=@{B2_KEY_ID=$created.applicationKeyId;B2_APPLICATION_KEY=$created.applicationKey;B2_BUCKET_ID=$bucketId;B2_PREFIX='medicare-backups/'}|ConvertTo-Json -Compress
  $protected=ConvertFrom-SecureString (ConvertTo-SecureString $payload -AsPlainText -Force)
