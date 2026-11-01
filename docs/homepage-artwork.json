@@ -1,0 +1,27 @@
+{
+  "generation_mode": "Built-in image_gen",
+  "generated_at": "2026-11-01",
+  "style": "Warm editorial paper-cut illustrations with pale mint backgrounds, cream paper and furniture, deep teal accents, natural skin tones, and subtle tactile paper texture.",
+  "assets": [
+    {
+      "name": "records.webp",
+      "prompt": "Use case: illustration-story\nAsset type: Medicare healthcare homepage editorial illustration, first in a consistent three-image family.\nPrimary request: A woman reviewing her neatly organized medical folder at a simple desk. A thoughtful adult woman with warm brown skin, short dark hair and deep teal blouse sits comfortably, calmly looking down at a cream folder with several neatly ordered paper sheets. A small geometric leafy plant balances the scene.\nStyle/medium: refined warm editorial paper-cut illustration, simple expressive human figures, crisp cut-paper shapes with subtle fine tactile paper grain; understated, sophisticated and friendly.\nComposition/framing: landscape 4:3 canvas, centered compact scene with generous breathing room on every side. Entire figure and desk contained within canvas. Flat solid pale mint background (#edf4eb), cream desk and paper, deep teal clothing and accents, natural skin tones, muted sage foliage. Warm reassuring mood.\nConstraints: No text or letters, no numbers, no gradients, no glows, no logos, no watermark, no fake UI, no photographic rendering. Medical documents are simply blank geometric paper sheets. Restrained palette. Avoid decorative visual clutter. Render a complete standalone 4:3 landscape illustration."
+    },
+    {
+      "name": "sharing.webp",
+      "prompt": "Use case: illustration-story\nAsset type: Medicare healthcare homepage editorial illustration, second in a consistent three-image family.\nPrimary request: A patient and clinician exchanging a cream medical document across a simple table, a quiet moment of consent and trust. Adult female patient with warm brown skin and dark short hair in a deep teal blouse sits on the left; a male clinician with medium brown skin and dark hair wearing a cream medical coat with small teal stethoscope sits on the right. Their hands meet at a single sheet with a small simple teal check mark, with no other marks. A small geometric leafy plant at one edge.\nStyle/medium: refined warm editorial paper-cut illustration, simple expressive human figures, crisp cut-paper shapes with subtle fine tactile paper grain; understated, sophisticated and friendly. Match a warm teal/cream cut-paper editorial image family.\nComposition/framing: landscape 4:3 canvas, centered calm scene with generous breathing room above and at both sides. Both seated figures and table well contained. Flat solid pale mint background (#edf4eb), cream table and paper, deep teal clothing and accents, natural skin tones, muted sage foliage. Warm reassuring mood.\nConstraints: No text or letters, no numbers, no gradients, no glows, no logos, no watermark, no fake UI, no photographic rendering. Restrained palette. Avoid decorative visual clutter. Render a complete standalone 4:3 landscape illustration."
+    },
+    {
+      "name": "care.webp",
+      "prompt": "Use case: illustration-story\nAsset type: Medicare healthcare homepage editorial illustration, third in a consistent three-image family.\nPrimary request: A caring female clinician consulting an older male patient at a simple cream desk. The clinician has medium brown skin, dark hair tied back, a cream medical coat and a simple teal stethoscope. The patient has dark brown skin, short salt-and-pepper hair, and a deep teal shirt. They face one another with relaxed attentive expressions. The clinician gently indicates a small freestanding desk calendar between them, drawn as blank cream squares with one subtle teal circle, without letters or numbers. A small sage geometric leafy plant balances one edge.\nStyle/medium: refined warm editorial paper-cut illustration, simple expressive human figures, crisp cut-paper shapes with subtle fine tactile paper grain; understated, sophisticated and friendly. Match a warm teal/cream cut-paper editorial image family.\nComposition/framing: landscape 4:3 canvas, centered calm scene with generous breathing room above and at both sides. Both seated figures and desk well contained. Flat solid pale mint background (#edf4eb), cream table and paper, deep teal clothing and accents, natural skin tones, muted sage foliage. Warm reassuring mood.\nConstraints: No text or letters, no numbers, no gradients, no glows, no logos, no watermark, no fake UI, no photographic rendering. Restrained palette. Avoid decorative visual clutter. Render a complete standalone 4:3 landscape illustration."
+    }
+  ],
+  "delivery": {
+    "width": 1000,
+    "height": 750,
+    "format": "WebP",
+    "quality": 84,
+    "method": 6
+  },
+  "review": "All three outputs visually inspected: requested scenes present, consistent palette and paper-cut family, no text, no logos, no fake UI."
+}
