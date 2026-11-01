@@ -13,20 +13,20 @@ router.post('/medical-records', requireRole(['doctor', 'nurse']), clinicalAccess
 router.get('/medical-records/:recordId', record(), auditLog('view_medical_record', 'medical_record'), c.getMedicalRecord);
 router.get('/patients/:patientId/medical-records', clinicalAccess({ category: req => RECORD_CATEGORIES[req.query.type] || 'all' }), auditLog('view_patient_records', 'medical_record'), c.getPatientMedicalRecords);
 router.post('/diagnoses', record('write', doctor, 'diagnoses'), auditLog('create_diagnosis', 'diagnosis'), c.createDiagnosis);
-router.post('/diagnoses/:diagnosisId/addendum', clinicalAccess({ resource: 'diagnosis', id: req => req.params.diagnosisId, access: 'write', roles: doctor, category: 'diagnoses' }), c.createDiagnosisAddendum);
-router.patch('/diagnoses/:diagnosisId/status', clinicalAccess({ resource: 'diagnosis', id: req => req.params.diagnosisId, access: 'write', roles: doctor, category: 'diagnoses' }), c.updateDiagnosisStatus);
-router.get('/visits/:visitId/diagnoses', visit('read', undefined, 'diagnoses'), c.getDiagnoses);
+router.post('/diagnoses/:diagnosisId/addendum', clinicalAccess({ resource: 'diagnosis', id: req => req.params.diagnosisId, access: 'write', roles: doctor, category: 'diagnoses' }), auditLog('diagnosis_addendum', 'diagnosis'), c.createDiagnosisAddendum);
+router.patch('/diagnoses/:diagnosisId/status', clinicalAccess({ resource: 'diagnosis', id: req => req.params.diagnosisId, access: 'write', roles: doctor, category: 'diagnoses' }), auditLog('update_diagnosis_status', 'diagnosis'), c.updateDiagnosisStatus);
+router.get('/visits/:visitId/diagnoses', visit('read', undefined, 'diagnoses'), auditLog('view_diagnoses', 'visit'), c.getDiagnoses);
 router.post('/prescriptions', record('write', doctor, 'prescriptions'), auditLog('create_prescription', 'prescription'), c.createPrescription);
-router.post('/prescriptions/check-interactions', clinicalAccess({ access: 'read', roles: doctor }), c.checkDrugInteractions);
-router.patch('/prescriptions/:prescriptionId/status', clinicalAccess({ resource: 'prescription', id: req => req.params.prescriptionId, access: 'write', roles: ['doctor', 'pharmacist'], category: 'prescriptions' }), c.updatePrescriptionStatus);
-router.get('/visits/:visitId/prescriptions', visit('read', undefined, 'prescriptions'), c.getPrescriptions);
-router.post('/lab-results', requireRole(['lab_technician', 'doctor']), uploadSingle, handleUploadError, clinicalAccess({ resource: 'record', id: req => req.body.recordId, access: 'write', category: 'lab_results' }), c.uploadLabResult);
+router.post('/prescriptions/check-interactions', clinicalAccess({ access: 'read', roles: doctor }), auditLog('check_drug_interactions', 'patient'), c.checkDrugInteractions);
+router.patch('/prescriptions/:prescriptionId/status', clinicalAccess({ resource: 'prescription', id: req => req.params.prescriptionId, access: 'write', roles: ['doctor', 'pharmacist'], category: 'prescriptions' }), auditLog('update_prescription_status', 'prescription'), c.updatePrescriptionStatus);
+router.get('/visits/:visitId/prescriptions', visit('read', undefined, 'prescriptions'), auditLog('view_prescriptions', 'visit'), c.getPrescriptions);
+router.post('/lab-results', requireRole(['lab_technician', 'doctor']), uploadSingle, handleUploadError, clinicalAccess({ resource: 'record', id: req => req.body.recordId, access: 'write', category: 'lab_results' }), auditLog('upload_lab_result', 'lab_result'), c.uploadLabResult);
 router.post('/imaging-reports', requireRole(['radiologist', 'doctor']), uploadSingle, handleUploadError,
     clinicalAccess({ resource: req => req.body.recordId ? 'record' : req.body.visitId ? 'visit' : 'imagingOrder', id: req => req.body.recordId || req.body.visitId || req.body.orderId, access: 'write', category: 'imaging' }),
     auditLog('upload_imaging_report', 'imaging_report'), c.uploadImagingReport);
-router.get('/my-imaging-orders', requireRole(['radiologist', 'doctor']), orgContext, c.getMyImagingOrders);
-router.post('/lab-orders', visit('write', doctor, 'lab_results'), c.createLabOrder);
-router.get('/visits/:visitId/lab-orders', visit('read', undefined, 'lab_results'), c.getLabOrders);
-router.post('/imaging-orders', visit('write', doctor, 'imaging'), c.createImagingOrder);
-router.get('/visits/:visitId/imaging-orders', visit('read', undefined, 'imaging'), c.getImagingOrders);
+router.get('/my-imaging-orders', requireRole(['radiologist', 'doctor']), orgContext, auditLog('view_imaging_queue', 'imaging_order'), c.getMyImagingOrders);
+router.post('/lab-orders', visit('write', doctor, 'lab_results'), auditLog('create_lab_order', 'lab_order'), c.createLabOrder);
+router.get('/visits/:visitId/lab-orders', visit('read', undefined, 'lab_results'), auditLog('view_lab_orders', 'visit'), c.getLabOrders);
+router.post('/imaging-orders', visit('write', doctor, 'imaging'), auditLog('create_imaging_order', 'imaging_order'), c.createImagingOrder);
+router.get('/visits/:visitId/imaging-orders', visit('read', undefined, 'imaging'), auditLog('view_imaging_orders', 'visit'), c.getImagingOrders);
 module.exports = router;

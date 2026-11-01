@@ -11,3 +11,14 @@ it('encrypts report bytes and authenticates the stored ciphertext', () => {
 it('refuses unencrypted legacy files', () => {
     expect(() => decryptBuffer(Buffer.from('plaintext'))).toThrow('migrated');
 });
+it('binds encrypted reports to their patient and file identity', () => {
+    const context = 'medical_files/patient-a/imaging/report.pdf';
+    const stored = encryptBuffer(Buffer.from('private report'), context);
+    expect(decryptBuffer(stored, context).toString()).toBe('private report');
+    expect(() => decryptBuffer(stored, 'medical_files/patient-b/imaging/report.pdf')).toThrow();
+    expect(() => decryptBuffer(stored)).toThrow();
+});
+it('requires migration before an unbound legacy ciphertext can be served in a patient context', () => {
+    const stored = encryptBuffer(Buffer.from('legacy report'));
+    expect(() => decryptBuffer(stored, 'medical_files/patient-a/imaging/report.pdf')).toThrow('migrated');
+});

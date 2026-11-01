@@ -1,0 +1,111 @@
+const { test } = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('node:fs/promises');
+const path = require('node:path');
+const { Readable } = require('node:stream');
+const root = path.resolve(__dirname, '..');
+const mock = (relative, exports) => {
+    const resolved = require.resolve(path.join(root, relative));
+    require.cache[resolved] = { id: resolved, filename: resolved, loaded: true, exports };
+};
+const config = { security: { encryptionKey: 'ab'.repeat(32) }, upload: { uploadPath: '', maxFileSizeMB: 10 } };
+mock('src/config/env', config);
+mock('src/utils/logger', { debug() {}, error() {}, warn() {} });
+const dbFailure = new Error('audit storage unavailable');
+mock('src/config/db', { query: async () => { throw dbFailure; } });
+let scannerError;
+mock('src/services/antivirus.service', { scanBuffer: async () => { if (scannerError) throw scannerError; } });
+const auditService = require(path.join(root, 'src/services/audit.service'));
+const { encryptBuffer, decryptBuffer } = require(path.join(root, 'src/services/file.crypto'));
+const Files = require(path.join(root, 'src/services/file.upload.service'));
+test('security regressions against current source', async t => {
+    config.upload.uploadPath = await fs.mkdtemp(path.join(require('node:os').tmpdir(), 'shms-reliability-'));
+    t.after(() => fs.rm(config.upload.uploadPath, { recursive: true, force: true }));
+    await t.test('AES-GCM binds ciphertext to one patient/file and rejects legacy downgrade', () => {
+        const bytes = Buffer.from('synthetic clinical bytes');
+        const stored = encryptBuffer(bytes, 'patient-a/result.pdf');
+        assert.deepEqual(decryptBuffer(stored, 'patient-a/result.pdf'), bytes);
+        assert.throws(() => decryptBuffer(stored, 'patient-b/result.pdf'));
+        assert.throws(() => decryptBuffer(stored));
+        assert.throws(() => decryptBuffer(encryptBuffer(bytes), 'patient-a/result.pdf'), /migrated/);
+    });
+    await t.test('strict audit propagates DB failure while legacy wrapper returns null', async () => {
+        await assert.rejects(auditService.logAuditEvent({ action: 'view_record' }), /unavailable/);
+        assert.equal(await auditService.createAuditLog({ action: 'view_record' }), null);
+        const event = await auditService.logAuditEvent({ action: 'transaction_audit' }, { query: async () => ({ rows: [{ id: 'recorded' }] }) });
+        assert.equal(event.id, 'recorded');
+        await assert.rejects(auditService.logAuditEvent({ action: 'empty_audit' }, { query: async () => ({ rows: [] }) }), /not stored/);
+    });
+    let append;
+    let calls;
+    mock('src/services/audit.service', { logAuditEvent: (...args) => { calls.push(args[0]); return append(); } });
+    const { auditLog, collectPatientIds } = require(path.join(root, 'src/middleware/audit.middleware'));
+    const request = () => ({ user: { id: '11111111-1111-1111-1111-111111111111' }, params: {}, query: {}, body: { notes: 'private synthetic text' }, headers: {}, method: 'GET', path: '/records', connection: {} });
+    const response = () => ({ statusCode: 200, status(code) { this.statusCode = code; return this; }, json(data) { this.data = data; return this; } });
+    const tick = () => new Promise(resolve => setImmediate(resolve));
+    await t.test('clinical JSON is withheld until evidence commits and carries server consent context only', async () => {
+        calls = []; let release;
+        append = () => new Promise(resolve => { release = resolve; });
+        const req = request(); req.body.purpose = 'caller-controlled';
+        req.consentContext = { id: 'consent-id', purpose: 'treatment', dataCategory: 'lab_results', source: 'manual' };
+        const res = response();
+        await auditLog(null, 'emr')(req, res, () => {});
+        await auditLog('view_record', 'medical_record')(req, res, () => {});
+        res.json({ success: true, data: 'synthetic clinical data' });
+        assert.equal(res.data, undefined);
+        release({ id: 'recorded' }); await tick();
+        assert.equal(res.data.success, true);
+        assert.equal(calls.length, 1); assert.equal(calls[0].action, 'view_record');
+        assert.equal(calls[0].purpose, 'treatment');
+        assert.equal(calls[0].metadata.consentId, 'consent-id');
+        assert.equal(calls[0].metadata.body, undefined);
+    });
+    await t.test('audit outage prevents a successful PHI response', async () => {
+        calls = []; append = async () => { throw dbFailure; };
+        const req = request(); const res = response();
+        await auditLog('view_record')(req, res, () => {});
+        res.json({ success: true, data: 'private synthetic data' }); await tick();
+        assert.equal(res.statusCode, 503); assert.equal(res.data.data, undefined);
+    });
+    await t.test('patient list evidence excludes clinical values and fails closed instead of truncating identities', () => {
+        const id = '11111111-1111-1111-1111-111111111111';
+        assert.deepEqual(collectPatientIds({data:[{patient_id:id,notes:'private'},{patientId:id},{patientId:'invalid'}]},request()),[id]);
+        const data=Array.from({length:1001},()=>({patient_id:require('node:crypto').randomUUID()}));
+        assert.throws(()=>collectPatientIds({data},request()),/auditable/);
+    });
+    await t.test('committed transaction marker avoids duplicate append and denied responses do not deadlock', async () => {
+        calls = []; append = async () => { throw dbFailure; };
+        const req = request(); req.auditEventRecorded = true; const res = response();
+        await auditLog('view_record')(req, res, () => {}); res.json({ success: true });
+        assert.equal(calls.length, 0); assert.equal(res.data.success, true);
+        const denied = response(); denied.statusCode = 403;
+        await auditLog('denied')(request(), denied, () => {}); denied.json({ success: false }); await tick();
+        assert.equal(denied.statusCode, 403); assert.equal(denied.data.success, false);
+    });
+    await t.test('medical upload stores only bound ciphertext and scanner outage stores nothing', async () => {
+        const bytes = Buffer.from('%PDF-1.4 synthetic clinical test');
+        const file = { buffer: bytes, originalname: 'result.pdf', mimetype: 'application/pdf', size: bytes.length };
+        const options = { patientId: '11111111-1111-1111-1111-111111111111', fileType: 'lab_results' };
+        const saved = await Files.processUpload(file, options);
+        assert.deepEqual(await Files.getFile(saved.filePath), bytes);
+        assert.equal((await fs.readFile(saved.filePath)).includes(bytes), false);
+        const before = await fs.readdir(path.dirname(saved.filePath));
+        scannerError = new Error('scanner unavailable');
+        await assert.rejects(Files.processUpload(file, options), /scanner unavailable/);
+        scannerError = null;
+        assert.deepEqual(await fs.readdir(path.dirname(saved.filePath)), before);
+        await assert.rejects(fs.stat(path.join(config.upload.uploadPath, 'temp')), /ENOENT/);
+    });
+    await t.test('credential storage scans memory before persisting and contextual download verifies identity', async () => {
+        const upload = require(path.join(root, 'src/middleware/upload.middleware'));
+        const bytes = Buffer.from('%PDF-1.4 synthetic credential');
+        const file = { originalname: 'degree.pdf', mimetype: 'application/pdf', stream: Readable.from(bytes) };
+        const saved = await new Promise((resolve, reject) => upload.storage._handleFile({}, file, (error, result) => error ? reject(error) : resolve(result)));
+        const { readCredential } = require(path.join(root, 'src/services/credential-file.service'));
+        assert.deepEqual(await readCredential(saved.path), bytes);
+        assert.equal((await fs.readFile(saved.path)).includes(bytes), false);
+        const other = path.join(path.dirname(saved.path), 'different.pdf');
+        await fs.copyFile(saved.path, other);
+        await assert.rejects(readCredential(other));
+    });
+});

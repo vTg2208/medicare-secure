@@ -6,7 +6,7 @@ const VerificationDocument = require('../../models/verification_document.model')
 const { getRoleByName } = require('../../models/role.model');
 const { isValidEmail, validatePassword } = require('../../utils/validators');
 const { secureCredential } = require('../../services/credential-file.service');
-const { createAuditLog } = require('../../services/audit.service');
+const { logAuditEvent } = require('../../services/audit.service');
 const { sendDoctorRegistrationNotification } = require('../../config/mail');
 const logger = require('../../utils/logger');
 
@@ -30,11 +30,12 @@ module.exports = async (req, res) => {
             for (const [index, file] of files.entries()) await VerificationDocument.create({ userId: created.id,
                 documentType: index === 0 ? 'degree_certificate' : 'medical_license', filePath: file.path,
                 fileName: file.originalname, fileSize: file.size, mimeType: file.mimetype }, client);
+            await logAuditEvent({ userId: created.id, action: 'user_register', entityType: 'user', entityId: created.id,
+                purpose: 'Doctor credential submission', ipAddress: req.ip, statusCode: 201 }, client);
             return created;
         });
         committed = true;
-        await createAuditLog({ userId: user.id, action: 'user_register', entityType: 'user', entityId: user.id,
-            purpose: 'Doctor credential submission', ipAddress: req.ip, statusCode: 201 });
+        req.auditEventRecorded = true;
         if (process.env.ADMIN_EMAIL || process.env.EMAIL_USER) sendDoctorRegistrationNotification({ email, firstName, lastName, registrationId: licenseNumber })
             .catch(() => logger.error('Doctor registration notification delivery failed'));
         return res.status(201).json({ success: true, message: 'Credentials submitted for administrator review. You can sign in after approval.', data: { userId: user.id, status: 'pending' } });

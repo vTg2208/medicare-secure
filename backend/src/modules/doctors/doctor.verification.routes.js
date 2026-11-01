@@ -3,7 +3,7 @@ const router = express.Router();
 const DoctorVerificationController = require('./doctor.verification.controller');
 const { authenticate } = require('../../middleware/auth.middleware');
 const { requireRole, requireSystemAdmin } = require('../../middleware/rbac.middleware');
-const { uploadSingle } = require('../../middleware/file.upload.middleware');
+const upload = require('../../middleware/upload.middleware');
 const { asyncHandler } = require('../../middleware/error.middleware');
 const VerificationDocument = require('../../models/verification_document.model');
 const { readCredential } = require('../../services/credential-file.service');
@@ -30,7 +30,7 @@ router.post(
     '/upload-license',
     authenticate,
     requireRole(['doctor']),
-    uploadSingle,
+    upload.single('file'),
     DoctorVerificationController.uploadLicense
 );
 

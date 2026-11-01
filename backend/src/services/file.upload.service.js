@@ -21,16 +21,16 @@ class FileUploadService {
         } = options;
 
         // Read file buffer
-        const fileBuffer = await fs.readFile(file.path);
+        const fileBuffer = file.buffer || await fs.readFile(file.path);
         await require('./antivirus.service').scanBuffer(fileBuffer);
 
         // Scan for malware if enabled
         if (scanForMalware) {
-            const scanResults = await MalwareScannerService.scanFile(file.path, fileBuffer);
+            const scanResults = await MalwareScannerService.scanFile(file.originalname, fileBuffer);
 
             if (!scanResults.safe) {
                 // Quarantine suspicious file
-                await MalwareScannerService.quarantineFile(file.path);
+                if (file.path) await fs.unlink(file.path).catch(() => {});
 
                 throw new Error(`File failed security scan: ${scanResults.threats.join(', ')}`);
             }
@@ -49,8 +49,8 @@ class FileUploadService {
         const finalPath = path.join(storagePath, secureFileName);
 
         // Move file to final location
-        await fs.writeFile(finalPath, encryptBuffer(fileBuffer), { mode: 0o600, flag: 'wx' });
-        await fs.unlink(file.path);
+        await fs.writeFile(finalPath, encryptBuffer(fileBuffer, this.encryptionContext(finalPath)), { mode: 0o600, flag: 'wx' });
+        if (file.path) await fs.unlink(file.path);
 
         // Calculate file hash for integrity
         const fileHash = MalwareScannerService.calculateFileHash(fileBuffer);
@@ -163,7 +163,13 @@ class FileUploadService {
      * @returns {Promise<Buffer>} File buffer
      */
     static async getFile(filePath) {
-        return decryptBuffer(await fs.readFile(filePath));
+        return decryptBuffer(await fs.readFile(filePath), this.encryptionContext(filePath));
+    }
+
+    static encryptionContext(filePath) {
+        const relative = path.relative(path.resolve(config.upload.uploadPath), path.resolve(filePath));
+        if (relative.startsWith('..') || path.isAbsolute(relative)) throw new Error('Invalid encrypted file location');
+        return relative.split(path.sep).join('/');
     }
 
     /**

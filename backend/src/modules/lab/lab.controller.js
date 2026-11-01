@@ -1,5 +1,6 @@
 const db = require('../../config/db');
 const FileUploadService = require('../../services/file.upload.service');
+const { logAuditEvent } = require('../../services/audit.service');
 const { clinicalScopeSql } = require('../../middleware/clinical-access.middleware');
 const scope = (req, parameter = '$1', patient = 'v.patient_id', visit = 'v.id') => clinicalScopeSql(patient, visit, parameter, req.user.roleName, 'lab_results');
 const orderSelect = `SELECT lo.*, lo.created_at AS requested_time, lo.notes,
@@ -57,8 +58,12 @@ const uploadResult = async (req, res, next) => {
                     order?.test_category || req.body.test_category || null, fileInfo.fileUrl, fileInfo.fileName, fileInfo.fileType, fileInfo.fileSize,
                     JSON.stringify({ notes: req.body.notes || '' }), orderedBy, req.user.id]);
             if (order) await client.query("UPDATE lab_orders SET status='completed', lab_result_id=$1, result_available_at=NOW(), updated_at=NOW() WHERE id=$2", [created.rows[0].id, order.id]);
+            await logAuditEvent({ userId: req.user.id, action: 'upload_lab_result', entityType: 'lab_result',
+                entityId: created.rows[0].id, statusCode: 201, ipAddress: req.ip,
+                metadata: { patientId: context.patient_id, organizationId: context.organization_id, visitId: context.visit_id } }, client);
             return created.rows[0];
         });
+        req.auditEventRecorded = true;
         res.status(201).json({ success: true, data: result, message: 'Lab result uploaded successfully' });
     } catch (error) {
         if (fileInfo?.filePath) await require('fs/promises').unlink(fileInfo.filePath).catch(() => {});

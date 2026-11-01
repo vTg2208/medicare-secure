@@ -1,26 +1,9 @@
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
 const config = require('../config/env');
 
 // Configure storage
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        const uploadDir = path.resolve(config.upload.uploadPath, 'temp');
-
-        // Create directory if it doesn't exist
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
-        }
-
-        cb(null, uploadDir);
-    },
-    filename: function (req, file, cb) {
-        // Generate unique filename
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-    }
-});
+// Keep untrusted plaintext off persistent volumes; enforce the byte limit below.
+const storage = multer.memoryStorage();
 
 // File filter
 const fileFilter = (req, file, cb) => {
