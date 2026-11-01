@@ -79,6 +79,7 @@ const getOrders = async (req, res) => {
  * Upload imaging report
  */
 const uploadReport = async (req, res) => {
+    let fileInfo, committed = false;
     try {
         const { orderId, patientId, reportTitle, findings, impression, recommendations } = req.body;
         const radiologistId = req.user.id;
@@ -88,7 +89,7 @@ const uploadReport = async (req, res) => {
         let fileSize = 0;
 
         if (req.file) {
-            const fileInfo = await FileUploadService.processUpload(req.file, { patientId: req.clinicalContext.patient_id, fileType: 'imaging' });
+            fileInfo = await FileUploadService.processUpload(req.file, { patientId: req.clinicalContext.patient_id, fileType: 'imaging' });
             filePath = fileInfo.fileUrl;
             fileName = fileInfo.fileName;
             fileSize = fileInfo.fileSize;
@@ -106,6 +107,7 @@ const uploadReport = async (req, res) => {
             fileName,
             fileSize
         });
+        committed = true;
 
         res.status(HTTP_STATUS.CREATED).json({
             success: true,
@@ -113,6 +115,7 @@ const uploadReport = async (req, res) => {
             data: report
         });
     } catch (error) {
+        if (!committed && fileInfo?.filePath) await FileUploadService.deleteFile(fileInfo.filePath).catch(() => {});
         logger.error('Failed to upload radiology report:', error);
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             success: false,

@@ -13,6 +13,7 @@ class DoctorVerificationService {
      * Upload license document for a doctor
      */
     static async uploadLicenseDocument(userId, fileData) {
+        let committed = false;
         try {
             await require('./credential-file.service').secureCredential({ path: fileData.path, mimetype: fileData.mimetype });
             const document = await VerificationDocument.create({
@@ -24,10 +25,12 @@ class DoctorVerificationService {
                 mimeType: fileData.mimetype,
                 expiresAt: fileData.expiresAt || null
             });
+            committed = true;
 
             logger.info(`License document uploaded for user ${userId}`, { documentId: document.id });
             return document;
         } catch (error) {
+            if (!committed && fileData.path) await require('./encrypted-file-store').removeEncrypted(fileData.path).catch(() => {});
             logger.error('Error uploading license document:', error);
             throw error;
         }

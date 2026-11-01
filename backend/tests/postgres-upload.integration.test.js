@@ -19,7 +19,7 @@ test('durable encrypted uploads survive ephemeral filesystem loss and enforce cl
   const record=(await db.query("INSERT INTO medical_records(patient_id,visit_id,type,title,created_by) VALUES($1,$2,'lab_result','Synthetic durable upload',$3) RETURNING id",[people.patient.id,visit,people.doctor.id])).rows[0].id;
   let fileUrl,relative,ciphertext;
   await t.test('an actual multipart upload persists only encrypted bytes with generated integrity metadata',async()=>{
-   const response=await request(app).post('/api/emr/lab-results').set('Authorization','Bearer '+people.doctor.token).field('recordId',record).field('testName','Synthetic durable PDF').attach('file',bytes,{filename:'verification.pdf',contentType:'application/pdf'});
+   const response=await request(app).post('/api/emr/lab-results').set('Authorization','Bearer '+people.doctor.token).field('recordId',record).field('testName','Synthetic durable PDF').attach('file',bytes,{filename:'verification.PDF',contentType:'application/pdf'});
    assert.equal(response.status,201,JSON.stringify(response.body));fileUrl=response.body.data.file_url;
    relative='medical_files/'+fileUrl.slice('/api/files/'.length);
    const row=(await db.query('SELECT ciphertext,byte_length,cipher_sha256 FROM encrypted_upload_objects WHERE relative_key=$1',[relative])).rows[0];
@@ -45,6 +45,16 @@ test('durable encrypted uploads survive ephemeral filesystem loss and enforce cl
     await assert.rejects(Files.processUpload({buffer:bytes,originalname:'blocked.pdf',mimetype:'application/pdf',size:bytes.length},{patientId:people.patient.id,fileType:'lab_results'}),/scanning service.*configured/i);
     assert.equal((await db.query('SELECT count(*)::int AS n FROM encrypted_upload_objects')).rows[0].n,count);
    }finally{process.env.NODE_ENV=previous;}
+  });
+  await t.test('a rejected registration and malformed lab metadata reclaim unpublished durable objects',async()=>{
+   const before=(await db.query('SELECT bytes_used::text FROM encrypted_upload_budget')).rows[0].bytes_used;
+   const credentialPath=path.join(config.upload.uploadPath,'documents','rejected-registration.pdf');
+   await require('../src/services/credential-file.service').secureCredential({path:credentialPath,buffer:bytes,originalname:'rejected-registration.pdf',mimetype:'application/pdf'});
+   const res={status(code){this.code=code;return this;},json(value){this.body=value;return this;}};
+   await require('../src/modules/auth/auth.controller').registerOrganization({body:{},file:{path:credentialPath},headers:{}},res);
+   assert.equal(res.code,400);assert.equal((await db.query('SELECT bytes_used::text FROM encrypted_upload_budget')).rows[0].bytes_used,before);
+   const rejected=await request(app).post('/api/emr/lab-results').set('Authorization','Bearer '+people.doctor.token).field('recordId',record).field('testName','Synthetic invalid metadata').field('resultsData','{invalid-json').attach('file',bytes,{filename:'rejected.pdf',contentType:'application/pdf'});
+   assert.equal(rejected.status,500);assert.equal((await db.query('SELECT bytes_used::text FROM encrypted_upload_budget')).rows[0].bytes_used,before);
   });
   await t.test('a minimally privileged writer obeys a serialized storage budget under concurrent inserts',async()=>{
    const role=`healthcare_upload_fixture_${process.pid}_${crypto.randomBytes(4).toString('hex')}`;assert.match(role,/^healthcare_upload_fixture_\d+_[a-f\d]+$/);

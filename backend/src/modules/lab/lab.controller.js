@@ -33,6 +33,7 @@ const getOrderById = async (req, res, next) => {
 };
 const uploadResult = async (req, res, next) => {
     let fileInfo;
+    let committed = false;
     try {
         if (!req.file) return res.status(400).json({ success: false, message: 'A result file is required' });
         const context = req.clinicalContext;
@@ -63,10 +64,11 @@ const uploadResult = async (req, res, next) => {
                 metadata: { patientId: context.patient_id, organizationId: context.organization_id, visitId: context.visit_id } }, client);
             return created.rows[0];
         });
+        committed = true;
         req.auditEventRecorded = true;
         res.status(201).json({ success: true, data: result, message: 'Lab result uploaded successfully' });
     } catch (error) {
-        if (fileInfo?.filePath) await FileUploadService.deleteFile(fileInfo.filePath).catch(() => {});
+        if (!committed && fileInfo?.filePath) await FileUploadService.deleteFile(fileInfo.filePath).catch(() => {});
         next(error);
     }
 };

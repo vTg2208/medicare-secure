@@ -78,7 +78,7 @@ class FileUploadService {
      * @returns {string} Secure filename
      */
     static generateSecureFileName(originalName) {
-        const ext = path.extname(originalName);
+        const ext = path.extname(originalName).toLowerCase();
         const timestamp = Date.now();
         const randomString = crypto.randomBytes(8).toString('hex');
 
