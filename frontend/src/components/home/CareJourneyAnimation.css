@@ -103,9 +103,21 @@
     92% { opacity: 1; transform: translate(calc(75cqi - 40px), 0) rotate(0); }
     100% { opacity: 0; transform: translate(calc(75cqi - 40px), 0) rotate(0); }
 }
+@keyframes mc-care-return {
+    0% { opacity: 0; transform: translate(calc(75cqi - 40px), 0) rotate(0); }
+    8% { opacity: 1; transform: translate(calc(75cqi - 40px), 0) rotate(0); }
+    18% { opacity: 1; transform: translate(calc(75cqi - 40px), -8px) rotate(0); }
+    82% { opacity: 1; transform: translate(0, -8px) rotate(-5deg); }
+    92% { opacity: 1; transform: translate(0, 0) rotate(0); }
+    100% { opacity: 0; transform: translate(0, 0) rotate(0); }
+}
 @keyframes mc-care-point { 0% { opacity: 0; transform: translate(28px, 24px); } 20% { opacity: 1; } 65% { opacity: 1; transform: translate(0, 0) scale(1); } 82% { opacity: 1; transform: translate(0, 0) scale(.88); } 95% { opacity: 1; transform: translate(0, 0) scale(1); } 100% { opacity: 0; transform: translate(0, 0) scale(1); } }
 .mc-care-journey[data-phase=ready][data-motion=true] .mc-care-report { animation: mc-care-report-arrive 420ms cubic-bezier(.22,1,.36,1) both; }
 .mc-care-journey[data-phase=shared][data-motion=true] .mc-care-flying-report { animation: mc-care-transfer 1400ms cubic-bezier(.4,0,.2,1) 540ms both; }
+.mc-care-journey[data-phase=revoked][data-motion=true] .mc-care-flying-report { animation: mc-care-return 1400ms cubic-bezier(.4,0,.2,1) both; }
+/* Let the report settle back before the shackle swivels shut and lowers. */
+.mc-care-journey[data-phase=revoked][data-motion=true] .mc-care-shackle { transition-delay: 1200ms; }
+.mc-care-journey[data-phase=revoked][data-motion=true] .mc-care-shackle-lift { transition-delay: 1540ms; }
 .mc-care-journey:is([data-phase=choose], [data-phase=withdraw])[data-motion=true] .mc-care-cursor { animation: mc-care-point 650ms cubic-bezier(.25,1,.5,1) both; }
 .mc-care-journey[data-running=false][data-manual=false] *, .mc-care-journey[data-running=false][data-manual=false] *::before, .mc-care-journey[data-running=false][data-manual=false] *::after { animation-play-state: paused; }
 .mc-care-journey[data-motion=false] *, .mc-care-journey[data-motion=false] *::before, .mc-care-journey[data-motion=false] *::after { animation: none !important; transition: none !important; }
