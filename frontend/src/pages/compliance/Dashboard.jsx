@@ -53,7 +53,8 @@ const ComplianceDashboard = () => {
         { id: 'dashboard', label: 'Dashboard', icon: 'grid_view', path: '/compliance/dashboard' },
         { id: 'audits', label: 'Global Audits', icon: 'policy', path: '/compliance/global-audits' },
         { id: 'incidents', label: 'Incidents', icon: 'gavel', path: '/compliance/incidents' },
-        { id: 'overrides', label: 'Consent Overrides', icon: 'key_off', path: '/compliance/consent-overrides' }
+        { id: 'overrides', label: 'Consent Overrides', icon: 'key_off', path: '/compliance/consent-overrides' },
+        { id: 'privacy', label: 'Privacy Requests', icon: 'policy', path: '/compliance/privacy' }
     ];
 
     // Format date nicely

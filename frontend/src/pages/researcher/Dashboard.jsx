@@ -80,7 +80,7 @@ function Dashboard() {
                         <div>
                             <h2 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">Research Hub</h2>
                             <p className="text-slate-500 dark:text-slate-400 text-sm mt-1.5 font-medium tracking-wide">
-                                Welcome back, {user?.firstName || 'Researcher'} {user?.lastName || ''} • Anonymized Data Only
+                                Welcome back, {user?.firstName || 'Researcher'} {user?.lastName || ''} • Consent-based aggregate data
                             </p>
                         </div>
                         <div className="flex items-center gap-4">
@@ -95,7 +95,7 @@ function Dashboard() {
                     {/* Stats Grid */}
                     <div className="grid grid-cols-4 gap-4 mb-8">
                         {[
-                            { label: "Anonymized Patients", value: loading ? "..." : (stats.anonymizedPatients == null ? 'Suppressed' : stats.anonymizedPatients.toLocaleString()), icon: "group", classes: "bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400" },
+                            { label: "Eligible cohort patients", value: loading ? "..." : (stats.anonymizedPatients == null ? 'Suppressed' : stats.anonymizedPatients.toLocaleString()), icon: "group", classes: "bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400" },
                             { label: "Total Records", value: loading ? "..." : (stats.totalRecords == null ? 'Suppressed' : stats.totalRecords.toLocaleString()), icon: "folder_shared", classes: "bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400" },
                             { label: "Active Studies", value: loading ? "..." : (stats.activeStudies == null ? 'Suppressed' : stats.activeStudies.toLocaleString()), icon: "auto_stories", classes: "bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400" },
                             { label: "Data Points", value: loading ? "..." : (stats.dataPointsCollected == null ? 'Suppressed' : stats.dataPointsCollected.toLocaleString()), icon: "data_usage", classes: "bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400" }

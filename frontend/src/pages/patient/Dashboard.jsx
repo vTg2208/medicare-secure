@@ -140,6 +140,7 @@ function PatientDashboard() {
                         <span className="material-symbols-outlined text-[20px]">verified_user</span>
                         Consents
                     </Link>
+                    <Link to="/patient/privacy" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface transition rounded-xl"><span className="material-symbols-outlined text-[20px]">policy</span>Privacy Center</Link>
                 </nav>
                 <div className="space-y-2 mt-auto pt-6 border-t border-line dark:border-slate-800/50">
                     <Link to="/patient/support" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">

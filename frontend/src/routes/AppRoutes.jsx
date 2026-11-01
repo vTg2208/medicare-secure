@@ -45,6 +45,7 @@ const GlobalAuditLogs = lazy(() => import('../pages/compliance/GlobalAuditLogs')
 const Incidents = lazy(() => import('../pages/compliance/Incidents'));
 const ConsentOverrides = lazy(() => import('../pages/compliance/ConsentOverrides'));
 const ComplianceProfile = lazy(() => import('../pages/compliance/Profile'));
+const PrivacyCenter = lazy(() => import('../pages/privacy/PrivacyCenter'));
 
 // Insurance Pages
 const InsuranceDashboard = lazy(() => import('../pages/insurance/Dashboard'));
@@ -90,6 +91,8 @@ function AppRoutes() {
             <Route path="/staff/invitation/:token" element={isDemoMode ? <DemoUnavailable feature="Invitation verification" /> : <AcceptInvitation />} />
 
             {/* Protected Routes */}
+            <Route path="/patient/privacy" element={<ProtectedRoute allowedRoles={['patient']}><PrivacyCenter /></ProtectedRoute>} />
+            <Route path="/compliance/privacy" element={<ProtectedRoute allowedRoles={['compliance_officer']}><PrivacyCenter /></ProtectedRoute>} />
             <Route
                 path="/patient/dashboard"
                 element={
