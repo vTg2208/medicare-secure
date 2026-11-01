@@ -27,8 +27,7 @@ function Icon({ name, ...props }) {
 
 function MovingLock({ className = '' }) {
     return <svg className={`mc-care-moving-lock ${className}`} viewBox="0 0 32 40" fill="none" aria-hidden="true">
-        <path d="M24 13v8" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" />
-        <g className="mc-care-shackle-lift"><g className="mc-care-shackle"><path d="M8 19V11a8 8 0 0 1 16 0v8" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" /></g></g>
+        <g className="mc-care-shackle"><path d="M8 19V11a8 8 0 0 1 16 0v8" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" /></g>
         <rect x="3" y="17" width="26" height="21" rx="6" fill="currentColor" />
         <path d="M16 25v5" stroke="var(--mc-surface)" strokeWidth="3" strokeLinecap="round" />
     </svg>;
