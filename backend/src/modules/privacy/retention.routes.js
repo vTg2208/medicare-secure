@@ -59,8 +59,13 @@ router.get('/approvals',asyncHandler(async(req,res)=>{
 router.post('/approvals',asyncHandler(async(req,res)=>{
     const explanation=basis(req.body.basis);const id=randomUUID();
     await db.transaction(async client=>{
+        await client.query('SELECT pg_advisory_xact_lock(hashtextextended($1,0))',[`retention-approval:${req.body.recordId}`]);
         const result=await evaluateRetention(client,req.body.recordId,req.body.resourceType);
         if(!result.eligible)throw fault(409,result.reasons.join('; '));
+        const obsolete=(await client.query(`UPDATE retention_disposals d SET status='superseded',superseded_at=NOW(),superseded_by=$2
+            WHERE d.record_id=$1 AND d.status='approved' AND d.policy_id<>$3
+              AND EXISTS(SELECT 1 FROM retention_policies p WHERE p.id=d.policy_id AND NOT p.active) RETURNING d.id`,[result.recordId,req.user.id,result.policyId])).rows;
+        for(const previous of obsolete)await logAuditEvent({...event(req,'supersede_retention_approval',previous.id,result.patientId),metadata:{patientId:result.patientId,replacementDecisionId:id}},client);
         await client.query('INSERT INTO retention_disposals(id,record_id,patient_id,policy_id,basis_cipher,approved_by,resource_type) VALUES($1,$2,$3,$4,$5,$6,$7)',[id,result.recordId,result.patientId,result.policyId,seal(explanation,`retention-disposal:${id}`),req.user.id,result.resourceType]);
         await logAuditEvent(event(req,'approve_retention_disposal',id,result.patientId),client);
     });req.auditEventRecorded=true;res.status(201).json({success:true,data:{id}});

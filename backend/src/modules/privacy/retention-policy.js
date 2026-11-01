@@ -9,7 +9,7 @@ async function evaluateRetention(client,recordId,resourceType='medical_record') 
     const record=resourceType==='care_message' ? (await client.query("SELECT id,patient_id,'care_message' AS type,NULL::uuid AS organization_id,created_at AS last_activity FROM care_messages WHERE id=$1",[recordId])).rows[0]
         : resourceType==='triage_session' ? (await client.query("SELECT id,patient_id,'triage_session' AS type,NULL::uuid AS organization_id,GREATEST(created_at,updated_at) AS last_activity,status FROM triage_sessions WHERE id=$1",[recordId])).rows[0]
         : (await client.query(`SELECT r.id,r.patient_id,r.type,v.organization_id,
-        GREATEST(r.created_at,r.updated_at,v.check_out_time,v.closed_at,v.completed_at,v.cancelled_at,(SELECT MAX(created_at) FROM diagnoses WHERE record_id=r.id),
+        GREATEST(r.created_at,r.updated_at,v.check_out_time,v.closed_at,v.completed_at,v.cancelled_at,(SELECT MAX(GREATEST(created_at,updated_at)) FROM diagnoses WHERE record_id=r.id),
             (SELECT MAX(updated_at) FROM prescriptions WHERE record_id=r.id),(SELECT MAX(uploaded_at) FROM lab_results WHERE record_id=r.id),
             (SELECT MAX(uploaded_at) FROM imaging_reports WHERE record_id=r.id),(SELECT MAX(created_at) FROM medical_record_corrections WHERE record_id=r.id)) AS last_activity
         FROM medical_records r LEFT JOIN visits v ON v.id=r.visit_id WHERE r.id=$1`,[recordId])).rows[0];

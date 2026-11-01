@@ -128,4 +128,20 @@ test('retention requires a policy, released holds, review approval and a privile
             assert.equal((await db.query(`SELECT COUNT(*)::int count FROM ${table} WHERE id=$1`,[recordId])).rows[0].count,0);
         }
     });
+    await t.test('a replacement policy allows an audited new approval without losing old evidence',async()=>{
+        const id=await createOld('Policy replacement fixture');
+        const old=(await call('officer','POST','/retention/approvals',{recordId:id,basis},201)).data;
+        await call('officer','POST','/retention/policies',{recordType:'note',retentionDays:31,jurisdiction:'Synthetic jurisdiction',basis},201);
+        const next=(await call('officer','POST','/retention/approvals',{recordId:id,basis},201)).data;
+        assert.equal((await db.query('SELECT status FROM retention_disposals WHERE id=$1',[old.id])).rows[0].status,'superseded');
+        const client=await db.pool.connect();try{const {executeDisposal}=require('../scripts/retention-dispose');await assert.rejects(executeDisposal(client,old.id),/already|supersed/i);await executeDisposal(client,next.id,{apply:true,quiesced:true});}finally{client.release();}
+        assert.equal((await db.query("SELECT COUNT(*)::int count FROM audit_logs WHERE action='supersede_retention_approval' AND entity_id=$1",[old.id])).rows[0].count,1);
+    });
+    await t.test('resolving an old diagnosis restarts retention instead of allowing immediate disposal',async()=>{
+        const record=await createOld('Recently resolved old diagnosis');
+        const diagnosis=(await db.query("INSERT INTO diagnoses(record_id,icd_code,description,status,diagnosed_by,created_at,diagnosed_at) VALUES($1,'FIXTURE','Synthetic historical diagnosis','active',$2,NOW()-INTERVAL '400 days',NOW()-INTERVAL '400 days') RETURNING id",[record,people.doctor.id])).rows[0].id;
+        await require('../src/models/diagnosis.model').updateStatus(diagnosis,'resolved');
+        const result=(await call('officer','GET',`/retention/eligibility?recordId=${record}`)).data;
+        assert.equal(result.eligible,false);assert.match(result.reasons.join(' '),/period.*not expired/);
+    });
 }));
