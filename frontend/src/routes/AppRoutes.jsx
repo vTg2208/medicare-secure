@@ -91,6 +91,9 @@ function AppRoutes() {
             {/* Protected Routes */}
             <Route path="/patient/privacy" element={<ProtectedRoute allowedRoles={['patient']}><PrivacyCenter /></ProtectedRoute>} />
             <Route path="/compliance/privacy" element={<ProtectedRoute allowedRoles={['compliance_officer']}><PrivacyCenter /></ProtectedRoute>} />
+            <Route path="/messages" element={<ProtectedRoute allowedRoles={['patient', 'doctor', 'nurse']}><Messages /></ProtectedRoute>} />
+            <Route path="/doctor/messages" element={<ProtectedRoute allowedRoles={['doctor']}><Messages /></ProtectedRoute>} />
+            <Route path="/nurse/messages" element={<ProtectedRoute allowedRoles={['nurse']}><Messages /></ProtectedRoute>} />
             <Route
                 path="/patient/dashboard"
                 element={

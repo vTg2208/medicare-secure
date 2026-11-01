@@ -1,0 +1,26 @@
+.care-messages { min-height: 100vh; background: var(--mc-canvas); color: var(--mc-text); }
+.care-messages > header { display: flex; align-items: center; gap: 2rem; padding: 1.25rem 5%; background: var(--mc-surface); border-bottom: 1px solid var(--mc-border); }
+.care-messages > main { max-width: 1200px; margin: auto; padding: 2rem 1rem; }
+.care-messages h1 { font-size: 2rem; font-weight: 700; }
+.care-messages h2 { font-size: 1.15rem; font-weight: 700; }
+.care-messages label { display: block; margin-bottom: .5rem; font-weight: 600; }
+.care-messages button, .care-messages select, .care-messages textarea { border: 1px solid var(--mc-border-strong); border-radius: var(--mc-radius-control); padding: .65rem .9rem; background: var(--mc-surface); color: var(--mc-text); }
+.care-messages button:disabled { opacity: .6; cursor: not-allowed; }
+.care-messages button:hover:not(:disabled) { background: var(--mc-surface-hover); }
+.care-messages button:focus-visible, .care-messages select:focus-visible, .care-messages textarea:focus-visible { outline: 3px solid var(--mc-brand); outline-offset: 2px; }
+.care-message-start { padding: 1.25rem 0; }
+.care-message-start select { margin-right: .75rem; }
+.care-message-columns { display: grid; grid-template-columns: 250px 1fr; border: 1px solid var(--mc-border); border-radius: var(--mc-radius-panel); background: var(--mc-surface); overflow: hidden; }
+.care-message-columns > nav { border-right: 1px solid var(--mc-border); padding: 1rem; }
+.care-message-columns > nav button { display: block; width: 100%; text-align: left; margin-bottom: .5rem; }
+.care-message-columns > nav button[aria-current] { background: var(--mc-brand-soft); border-color: var(--mc-brand); }
+.care-message-columns > section { padding: 1.25rem; min-width: 0; }
+.care-message-heading { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+.care-message-history { list-style: none; padding: 1rem 0; max-height: 55vh; overflow: auto; }
+.care-message-history li { padding: .9rem; background: var(--mc-surface-muted); border-radius: var(--mc-radius-control); margin: .5rem 12% .5rem 0; overflow-wrap: anywhere; }
+.care-message-history .care-message-own { margin: .5rem 0 .5rem 12%; background: var(--mc-brand-soft); }
+.care-message-history p { white-space: pre-wrap; }
+.care-message-history span, .care-message-history time { font-size: .8rem; color: var(--mc-text-muted); }
+.care-messages textarea { display: block; width: 100%; margin-bottom: .75rem; }
+.care-messages [role=alert] { color: var(--mc-danger); padding: .75rem 0; }
+@media (max-width: 650px) { .care-message-columns { grid-template-columns: 1fr; } .care-message-columns > nav { border-right: 0; border-bottom: 1px solid var(--mc-border); } .care-message-heading { flex-wrap: wrap; } }

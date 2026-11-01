@@ -1,142 +1,101 @@
-import Brand from '../../components/common/Brand';
-import React from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import apiClient from '../../api/client';
+import Brand from '../../components/common/Brand';
 import ThemeToggle from '../../components/common/ThemeToggle';
-import './Dashboard.css';
+import './Messages.css';
 
-function Messages() {
-
-    const mockMessages = [
-        {
-            id: 1,
-            sender: "Dr. Omar Hassan",
-            specialty: "Neurology",
-            lastMessage: "Your latest EEG results look normal. I've scheduled a follow-up for next week.",
-            time: "2 hours ago",
-            unread: true
-        },
-        {
-            id: 2,
-            sender: "Dr. Elena Rodriguez",
-            specialty: "General Practice",
-            lastMessage: "Please remember to complete your fast before the blood work on Monday.",
-            time: "Yesterday",
-            unread: false
-        },
-        {
-            id: 3,
-            sender: "Hospital Admin",
-            specialty: "Medicare Support",
-            lastMessage: "Welcome to Medicare! Let us know if you need help navigating your records.",
-            time: "3 days ago",
-            unread: false
-        }
-    ];
-
-    return (
-        <div className="patient-dashboard-wrapper bg-[var(--background-light)] dark:bg-[var(--background-dark)] text-slate-800 dark:text-slate-100 flex h-screen w-full overflow-hidden mc-workspace">
-            <div className="mc-workspace-theme">
-                <ThemeToggle />
-            </div>
-
-            {/* Sidebar (same as dashboard) */}
-            <aside className="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800/50 p-6 flex flex-col h-full overflow-y-auto mc-sidebar">
-                <Brand to={'/patient/dashboard'} />
-                <nav className="space-y-2 flex-grow">
-                    <Link to="/patient/dashboard" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
-                        <span className="material-symbols-outlined text-[20px]">grid_view</span>
-                        Dashboard
-                    </Link>
-                    <Link to="/patient/visits" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
-                        <span className="material-symbols-outlined text-[20px]">calendar_today</span>
-                        Appointments
-                    </Link>
-                    <Link to="/patient/messages" className="flex items-center gap-3 px-4 py-3 sidebar-item-active rounded-xl font-medium text-slate-800 dark:text-slate-100">
-                        <span className="material-symbols-outlined text-[20px]">chat_bubble_outline</span>
-                        Messages
-                    </Link>
-                    <Link to="/patient/medical-records" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
-                        <span className="material-symbols-outlined text-[20px]">folder_shared</span>
-                        Records
-                    </Link>
-                    <Link to="/patient/consent" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
-                        <span className="material-symbols-outlined text-[20px]">verified_user</span>
-                        Consents
-                    </Link>
-                    <Link to="/patient/audit-trail" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
-                        <span className="material-symbols-outlined text-[20px]">history</span>
-                        Audit Trail
-                    </Link>
-                </nav>
-                <div className="space-y-2 mt-auto pt-6 border-t border-slate-200 dark:border-slate-800/50">
-                    <Link to="/patient/support" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
-                        <span className="material-symbols-outlined text-[20px]">favorite_border</span>
-                        Support
-                    </Link>
-                    <Link to="/patient/profile" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
-                        <span className="material-symbols-outlined text-[20px]">manage_accounts</span>
-                        Profile
-                    </Link>
-                </div>
-            </aside>
-
-            <main className="flex-grow p-8 overflow-y-auto h-full relative flex flex-col">
-                <header className="mb-10">
-                    <h2 className="text-3xl font-bold text-slate-900 dark:text-white">Messages</h2>
-                    <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Secure communication with your healthcare providers.</p>
-                </header>
-
-                <div className="flex-grow glass-card rounded-3xl border border-line dark:border-slate-700/50 overflow-hidden flex flex-col md:flex-row shadow-sm">
-                    {/* Chat List */}
-                    <div className="w-full md:w-80 border-r border-slate-100 dark:border-slate-800/50 flex flex-col">
-                        <div className="p-4 border-b border-slate-100 dark:border-slate-800/50">
-                            <div className="relative">
-                                <input
-                                    type="text"
-                                    placeholder="Search conversations..."
-                                    className="w-full bg-slate-50 dark:bg-slate-900/50 border-none rounded-xl py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary-500"
-                                />
-                                <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
-                            </div>
-                        </div>
-                        <div className="overflow-y-auto flex-grow">
-                            {mockMessages.map((chat) => (
-                                <div key={chat.id} className={`p-4 hover:bg-slate-50 dark:hover:bg-surface cursor-pointer transition-colors relative ${chat.unread ? "bg-primary-50/30 dark:bg-primary-900/10" : ''}`}>
-                                    <div className="flex gap-3">
-                                        <div className="w-12 h-12 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 flex-shrink-0 font-bold uppercase">
-                                            {chat.sender[0]}
-                                        </div>
-                                        <div className="min-w-0 flex-grow">
-                                            <div className="flex justify-between items-start mb-1">
-                                                <h5 className="font-bold text-sm text-slate-800 dark:text-slate-100 truncate">{chat.sender}</h5>
-                                                <span className="text-[10px] text-slate-400 whitespace-nowrap">{chat.time}</span>
-                                            </div>
-                                            <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{chat.lastMessage}</p>
-                                        </div>
-                                        {chat.unread && (
-                                            <div className="absolute right-4 bottom-4 w-2 h-2 bg-primary-500 rounded-full"></div>
-                                        )}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Chat Content Placeholder */}
-                    <div className="flex-grow flex flex-col items-center justify-center p-12 text-center bg-slate-50/30 dark:bg-slate-900/20">
-                        <div className="w-20 h-20 bg-primary-50 dark:bg-primary-900/30 rounded-3xl flex items-center justify-center text-primary-600 dark:text-primary-400 mb-6 scale-110">
-                            <span className="material-symbols-outlined text-4xl">forum</span>
-                        </div>
-                        <h4 className="text-2xl font-bold text-slate-800 dark:text-white mb-2">Select a Conversation</h4>
-                        <p className="text-slate-500 dark:text-slate-400 max-w-sm">Choose a provider from the list to start a secure discussion about your health records or appointments.</p>
-                        <button className="mt-8 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-lg shadow-lg shadow-primary-500/25 transition-all">
-                            New Conversation
-                        </button>
-                    </div>
-                </div>
-            </main>
-        </div>
-    );
+export default function Messages() {
+    const { user } = useAuth();
+    const role = user?.role || user?.roleName;
+    const [threads, setThreads] = useState([]);
+    const [contacts, setContacts] = useState([]);
+    const [recipient, setRecipient] = useState('');
+    const [selected, setSelected] = useState(null);
+    const [messages, setMessages] = useState([]);
+    const [canSend, setCanSend] = useState(false);
+    const [hasMore, setHasMore] = useState(false);
+    const [draft, setDraft] = useState('');
+    const [loading, setLoading] = useState(true);
+    const [busy, setBusy] = useState(false);
+    const [error, setError] = useState('');
+    const [conversationError, setConversationError] = useState('');
+    const selection = useRef(0);
+    const describe = (failure, fallback) => failure.response?.data?.message || fallback;
+    const loadInbox = useCallback(async () => {
+        setLoading(true); setError('');
+        try {
+            const [inbox, available] = await Promise.all([apiClient.get('/messages/threads'), apiClient.get('/messages/contacts')]);
+            setThreads(inbox.data.data); setContacts(available.data.data);
+        } catch (failure) { setError(describe(failure, 'Unable to load messages. Please retry.')); }
+        finally { setLoading(false); }
+    }, []);
+    const invalidateSelection = useCallback(() => { selection.current++; }, []);
+    useEffect(() => { loadInbox(); return invalidateSelection; }, [loadInbox, invalidateSelection]);
+    const open = async (thread, older = false) => {
+        const version = ++selection.current;
+        if (!older) { setSelected(thread); setMessages([]); setDraft(''); setCanSend(false); setHasMore(false); }
+        setConversationError(''); setBusy(true);
+        try {
+            const response = await apiClient.get('/messages/threads/' + thread.id + '/messages', older ? { params: { before: messages[0]?.sequence } } : undefined);
+            if (version !== selection.current) return;
+            const data = response.data.data;
+            setMessages(current => older ? [...data.messages, ...current] : data.messages);
+            setCanSend(data.canSend); setHasMore(data.hasMore);
+        } catch (failure) { if (version === selection.current) setConversationError(describe(failure, 'Unable to load this conversation. Please retry.')); }
+        finally { if (version === selection.current) setBusy(false); }
+    };
+    const start = async event => {
+        event.preventDefault(); setError(''); setBusy(true);
+        try {
+            const response = await apiClient.post('/messages/threads', { recipientId: recipient });
+            const contact = contacts.find(item => item.id === recipient);
+            await open({ ...response.data.data, name: contact?.name || 'Care conversation' });
+            await loadInbox();
+        } catch (failure) { setError(describe(failure, 'Unable to start a conversation.')); }
+        finally { setBusy(false); }
+    };
+    const send = async event => {
+        event.preventDefault();
+        const version = selection.current;
+        const thread = selected;
+        setBusy(true); setConversationError('');
+        try {
+            const response = await apiClient.post('/messages/threads/' + thread.id + '/messages', { body: draft });
+            if (version !== selection.current) return;
+            setMessages(current => [...current, response.data.data]); setDraft('');
+        } catch (failure) { if (version === selection.current) setConversationError(describe(failure, 'Message was not saved. Please retry.')); }
+        finally { if (version === selection.current) setBusy(false); }
+    };
+    return <div className="care-messages mc-workspace">
+        <header><Brand to={'/' + role + '/dashboard'} /><Link to={'/' + role + '/dashboard'}>Dashboard</Link><ThemeToggle /></header>
+        <main><h1>Messages</h1><p>Private correspondence with your current, consenting care team. This inbox is not monitored for emergencies.</p>
+            {error && <div role="alert">{error} <button onClick={loadInbox}>Retry</button></div>}
+            {loading && <p role="status">Loading messages…</p>}
+            {!loading && !error && <form onSubmit={start} className="care-message-start">
+                <label htmlFor="care-contact">Care team contact</label><select id="care-contact" value={recipient} onChange={event => setRecipient(event.target.value)} required>
+                    <option value="">Choose a contact</option>{contacts.map(contact => <option key={contact.id} value={contact.id}>{contact.name}</option>)}
+                </select><button disabled={!recipient || busy}>Start conversation</button>
+                {!contacts.length && <p>No current care contacts with active consent.</p>}
+            </form>}
+            <div className="care-message-columns"><nav aria-label="Conversations">
+                {!loading && !error && !threads.length && <p>No conversations yet.</p>}
+                {threads.map(thread => <button key={thread.id} onClick={() => open(thread)} aria-current={selected?.id === thread.id ? 'true' : undefined}>{thread.name}</button>)}
+            </nav><section aria-label="Conversation">
+                {!selected ? <p>Select a conversation or start one with an authorized care contact.</p> : <>
+                    <div className="care-message-heading"><h2>{selected.name}</h2><button onClick={() => open(selected)} disabled={busy}>Refresh conversation</button></div>
+                    {conversationError && <p role="alert">{conversationError}</p>}
+                    {hasMore && <button onClick={() => open(selected, true)} disabled={busy}>Load older messages</button>}
+                    <ol className="care-message-history" aria-live="polite">{messages.map(message => <li key={message.id} className={message.sender_id === user.id ? 'care-message-own' : ''}>
+                        <span>{message.sender_id === user.id ? 'You' : selected.name}</span><p>{message.body}</p>
+                        {message.created_at && <time dateTime={message.created_at}>{new Date(message.created_at).toLocaleString()}</time>}
+                    </li>)}</ol>
+                    {!canSend && !busy && <p>Sending requires current patient consent and assigned care. Your available history remains visible.</p>}
+                    <form onSubmit={send}><label htmlFor="care-message-body">Message</label><textarea id="care-message-body" rows={3} maxLength={4000} value={draft} onChange={event => setDraft(event.target.value)} disabled={!canSend || busy} required />
+                        <button disabled={!canSend || !draft.trim() || busy}>Send message</button></form>
+                </>}
+            </section></div>
+        </main>
+    </div>;
 }
-
-export default Messages;

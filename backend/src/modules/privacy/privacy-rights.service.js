@@ -151,6 +151,11 @@ const exportPatient = async req => {
         const requests = await rows('SELECT * FROM privacy_rights_requests WHERE patient_id=$1 ORDER BY created_at,id');
         const requestHistory = await historyRows(client, requests.map(item => item.id));
         const triageSessions = await rows('SELECT id,conversation,soap_summary,recommended_department,priority,confidence_score,status,created_at,updated_at FROM triage_sessions WHERE patient_id=$1 ORDER BY created_at,id');
+        const careMessages = (await rows(`SELECT m.id,m.sequence,m.sender_id,m.body_cipher,m.created_at
+            FROM care_messages m JOIN care_message_threads t ON t.id=m.thread_id
+            WHERE m.patient_id=$1 AND t.patient_id=$1 ORDER BY m.sequence`)).map(({ body_cipher, ...message }) => ({
+                ...message, body: unseal(body_cipher, `care-message:${message.id}`),
+            }));
         const ownedIds = [req.user.id, ...[visits, medicalRecords, diagnoses, prescriptions, labResults, imagingReports, visitNotes, medicationOrders, radiologyReports, consents, requests, triageSessions].flatMap(group => group.map(item => item.id))];
         await audit.logAuditEvent({ ...event(req, 'export_patient_information', req.user.id, req.user.id), entityType: 'patient' }, client);
         const auditHistory = (await client.query(`SELECT id,action,entity_type,CASE WHEN entity_id=ANY($2::uuid[]) THEN entity_id ELSE NULL END AS entity_id,timestamp,status_code
@@ -163,7 +168,7 @@ const exportPatient = async req => {
             profile: { account: accountProfile, patient: patientProfile }, visits, medicalRecords, diagnoses, prescriptions,
             labResults: fileReferences(labResults).map(item => ({ ...item, results_data: safeJson(item.results_data) })), imagingReports: fileReferences(imagingReports),
             visitNotes, medicationOrders, radiologyReports: fileReferences(radiologyReports), insurancePolicies, insuranceClaims,
-            consents, triageSessions: triageSessions.map(safeJson), auditHistory, privacyRequests: requests.map(item => decode(item, requestHistory)) };
+            consents, careMessages, triageSessions: triageSessions.map(safeJson), auditHistory, privacyRequests: requests.map(item => decode(item, requestHistory)) };
     }, { isolationLevel: 'repeatable read' });
     let result;
     // The callback only reads and appends audit evidence in its own transaction.
