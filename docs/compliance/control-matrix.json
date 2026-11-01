@@ -33,7 +33,7 @@
         "observations": [
           {
             "revision": "3f3d3a9c533b910cf4538188b4555d7cb32f42e1",
-            "observedAt": "2026-11-01T17:48:49Z",
+            "observedAt": "2026-11-01",
             "kind": "automated_execution",
             "evidence": "docs/releases/2026-11-01-durable-backup-activation.md"
           }
@@ -75,7 +75,7 @@
         "observations": [
           {
             "revision": "3f3d3a9c533b910cf4538188b4555d7cb32f42e1",
-            "observedAt": "2026-11-01T17:48:49Z",
+            "observedAt": "2026-11-01",
             "kind": "automated_execution",
             "evidence": "docs/releases/2026-11-01-durable-backup-activation.md"
           }
@@ -116,7 +116,7 @@
         "observations": [
           {
             "revision": "3f3d3a9c533b910cf4538188b4555d7cb32f42e1",
-            "observedAt": "2026-11-01T17:48:49Z",
+            "observedAt": "2026-11-01",
             "kind": "automated_execution",
             "evidence": "docs/releases/2026-11-01-durable-backup-activation.md"
           }
@@ -157,7 +157,7 @@
         "observations": [
           {
             "revision": "3f3d3a9c533b910cf4538188b4555d7cb32f42e1",
-            "observedAt": "2026-11-01T17:48:49Z",
+            "observedAt": "2026-11-01",
             "kind": "automated_execution",
             "evidence": "docs/releases/2026-11-01-durable-backup-activation.md"
           }
@@ -206,7 +206,7 @@
         "observations": [
           {
             "revision": "3f3d3a9c533b910cf4538188b4555d7cb32f42e1",
-            "observedAt": "2026-11-01T17:48:49Z",
+            "observedAt": "2026-11-01",
             "kind": "automated_execution",
             "evidence": "docs/releases/2026-11-01-durable-backup-activation.md"
           }
@@ -260,7 +260,7 @@
         "observations": [
           {
             "revision": "3f3d3a9c533b910cf4538188b4555d7cb32f42e1",
-            "observedAt": "2026-11-01T17:48:49Z",
+            "observedAt": "2026-11-01",
             "kind": "automated_execution",
             "evidence": "docs/releases/2026-11-01-durable-backup-activation.md"
           }
@@ -302,7 +302,7 @@
         "observations": [
           {
             "revision": "3f3d3a9c533b910cf4538188b4555d7cb32f42e1",
-            "observedAt": "2026-11-01T17:48:49Z",
+            "observedAt": "2026-11-01",
             "kind": "automated_execution",
             "evidence": "docs/releases/2026-11-01-durable-backup-activation.md"
           }
@@ -344,7 +344,7 @@
         "observations": [
           {
             "revision": "3f3d3a9c533b910cf4538188b4555d7cb32f42e1",
-            "observedAt": "2026-11-01T17:48:49Z",
+            "observedAt": "2026-11-01",
             "kind": "automated_execution",
             "evidence": "docs/releases/2026-11-01-durable-backup-activation.md"
           }
@@ -405,7 +405,14 @@
             "title": "an officer previews and explicitly confirms publication before a version becomes public"
           }
         ],
-        "observations": []
+        "observations": [
+          {
+            "revision": "f4a4ad63b45a777a996cd42f85605aeb69db7d75",
+            "observedAt": "2026-11-02",
+            "kind": "automated_execution",
+            "evidence": "docs/releases/2026-11-02-compliance-evidence-and-notices.md"
+          }
+        ]
       },
       "externalRequirements": [
         {
