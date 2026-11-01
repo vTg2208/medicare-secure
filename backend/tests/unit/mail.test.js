@@ -29,7 +29,7 @@ it('creates no transport and returns a service error when SMTP is absent', () =>
     expect(inspectMail(false)).toEqual({ create: 0, verify: 0, send: 0, error: { statusCode: 503, code: 'EMAIL_UNAVAILABLE' } });
 });
 it('verifies and uses the configured production SMTP host', () => {
-    expect(inspectMail(true)).toMatchObject({ create: 1, verify: 1, send: 2, options: { host: 'smtp.example.test' } });
+    expect(inspectMail(true)).toMatchObject({ create: 1, verify: 1, send: 2, options: { host: 'smtp.example.test', requireTLS: true, tls: {rejectUnauthorized:true,minVersion:'TLSv1.2'} } });
 });
 it('uses an offline JSON transport only in tests', () => {
     expect(inspectMail(false, 'test')).toEqual({ create: 1, verify: 0, send: 2, options: { jsonTransport: true } });

@@ -6,7 +6,9 @@ const emailConfigured = process.env.NODE_ENV === 'test' || Boolean(process.env.E
 const transporter = !emailConfigured ? null : nodemailer.createTransport(process.env.NODE_ENV === 'test' ? { jsonTransport: true } : {
   host: process.env.EMAIL_HOST,
   port: process.env.EMAIL_PORT || 587,
-  secure: process.env.EMAIL_SECURE === 'true', // true for 465, false for other ports
+  secure: process.env.EMAIL_SECURE === 'true', // implicit TLS on 465; STARTTLS otherwise
+  requireTLS: process.env.NODE_ENV === 'production',
+  tls: { rejectUnauthorized: true, minVersion: 'TLSv1.2' },
   ...(process.env.EMAIL_USER && { auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASSWORD,
