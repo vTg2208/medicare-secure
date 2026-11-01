@@ -59,6 +59,28 @@ test('clinical workflows enforce patient, role, care and tenant boundaries', { s
             assert.equal(response.status, expected, `${method} ${path}: ${JSON.stringify(payload)}`);
             return payload;
         }
+        await t.test('nurse profile saves only the signed-in account and profile together', async () => {
+            const saved = await request('nurse', 'PUT', '/nurse/profile', {
+                phone: '+15555550123', address: 'Synthetic nursing address', userId: people.doctor.id,
+            });
+            assert.equal(saved.data.phone, '+15555550123');
+            assert.equal(saved.data.address, 'Synthetic nursing address');
+            assert.equal((await db.query('SELECT phone FROM users WHERE id=$1', [people.doctor.id])).rows[0].phone, null);
+            assert.equal((await db.query('SELECT address FROM nurse_profiles WHERE user_id=$1', [people.nurse.id])).rows[0].address, 'Synthetic nursing address');
+        });
+        await t.test('nurse profile failures roll back the account update', async () => {
+            await db.query(`CREATE FUNCTION reject_fixture_nurse_address() RETURNS trigger LANGUAGE plpgsql AS $$
+                BEGIN RAISE EXCEPTION 'Synthetic profile write outage'; END $$`);
+            await db.query('CREATE TRIGGER reject_fixture_nurse_address BEFORE UPDATE ON nurse_profiles FOR EACH ROW EXECUTE FUNCTION reject_fixture_nurse_address()');
+            try {
+                await request('nurse', 'PUT', '/nurse/profile', { phone: '+15555550456', address: 'Must not persist' }, 500);
+                assert.equal((await db.query('SELECT phone FROM users WHERE id=$1', [people.nurse.id])).rows[0].phone, '+15555550123');
+                assert.equal((await db.query('SELECT address FROM nurse_profiles WHERE user_id=$1', [people.nurse.id])).rows[0].address, 'Synthetic nursing address');
+            } finally {
+                await db.query('DROP TRIGGER reject_fixture_nurse_address ON nurse_profiles');
+                await db.query('DROP FUNCTION reject_fixture_nurse_address()');
+            }
+        });
         let record; let labOrder; let imagingOrder; let prescription;
         await t.test('assigned clinician creates records; patient only reads own records', async () => {
             const result = await request('doctor', 'POST', '/emr/medical-records', { patientId: people.patient.id, visitId: visits[0], type: 'consultation', title: 'Fixture integration record', description: 'Fixture fixture' }, 201);
