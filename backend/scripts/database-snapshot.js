@@ -11,6 +11,7 @@ const knownFiles=new Set(['organizations.license_document_url','doctor_profiles.
 async function withDatabaseSnapshot({env=process.env}={},run){
  const schema=env.BACKUP_DATABASE_SCHEMA;
  if(!['public','healthcare'].includes(schema))throw Error('Explicit supported BACKUP_DATABASE_SCHEMA is required');
+ if(!env.DB_HOST||!env.DB_NAME||!env.DB_USER||!Number.isInteger(Number(env.DB_PORT))||Number(env.DB_PORT)<1||Number(env.DB_PORT)>65535)throw Error('Explicit database connection settings are required');
  if(!['127.0.0.1','localhost','::1'].includes(env.DB_HOST)&&env.DB_SSL!=='true')throw Error('Remote snapshot requires verified database TLS');
  const client=new Client({host:env.DB_HOST,port:Number(env.DB_PORT),database:env.DB_NAME,user:env.DB_USER,password:env.DB_PASSWORD,ssl:databaseTls(env),connectionTimeoutMillis:15000,statement_timeout:60000,idle_in_transaction_session_timeout:300000,application_name:'healthcare-backup-snapshot'});
  try{

@@ -113,3 +113,8 @@ test('an older same-day snapshot cannot displace a newer authenticated recovery 
  await assert.rejects(archive.archiveBackup({input,env,store,now:new Date(new Date().setUTCHours(23,59,0,0))}),/newer snapshot/);
  assert.equal(store.uploaded.length,0);assert.deepEqual(store.deleted,[]);
 }));
+test('failed recovery drill prevents retention pruning even when ciphertext downloads correctly',async()=>fixture(async(root,input)=>{
+ const store=memoryStore({bytes:await fs.readFile(input)});let attempted=false;
+ await assert.rejects(archive.archiveBackup({input,env,store,now:new Date(new Date().setUTCHours(23,59,0,0)),verifyRecovery:async()=>{attempted=true;throw Error('Recovery drill refused fixture');}}),/Recovery drill refused/);
+ assert.equal(attempted,true);assert.deepEqual(store.deleted,[]);
+}));

@@ -90,7 +90,7 @@ function retentionPlan(files,now=new Date()){
 }
 async function digest(input){const hash=crypto.createHash('sha256');for await(const chunk of createReadStream(input))hash.update(chunk);return hash.digest('hex');}
 
-async function archiveBackup({input,env=process.env,store,now=new Date()}={}){
+async function archiveBackup({input,env=process.env,store,now=new Date(),verifyRecovery}={}){
  const key=encryptionKey(env);if(!input||!Number.isFinite(now.getTime()))fail('Backup input and valid time required');
  const stat=await fs.lstat(input);if(!stat.isFile()||stat.isSymbolicLink()||stat.size>MAX_ARTIFACT)fail('Backup must be a regular file no larger than 256 MiB');
  const staging=await fs.mkdtemp(path.join(os.tmpdir(),'shms-archive-'));await fs.chmod(staging,0o700);
@@ -118,7 +118,9 @@ async function archiveBackup({input,env=process.env,store,now=new Date()}={}){
    if(file.fileName!==name||!file.fileId||file.contentLength!==bytes)fail('Uploaded backup identity or size mismatch');
    const downloaded=path.join(staging,`${kind}.enc`);await store.download(file,downloaded);
    if(await digest(downloaded)!==checksum)fail('Remote backup checksum mismatch; previous backups retained');
-   await inspectBundle(downloaded,key);uploaded.push(file);
+   await inspectBundle(downloaded,key);
+   if(kind==='daily'&&verifyRecovery)await verifyRecovery(downloaded);
+   uploaded.push(file);
   }
   const expired=retentionPlan([...files,...uploaded],now);
   const expiredIds=new Set(expired.map(f=>f.fileId));
@@ -128,7 +130,7 @@ async function archiveBackup({input,env=process.env,store,now=new Date()}={}){
    const check=path.join(staging,`${crypto.randomUUID()}.enc`);await store.download(file,check);await inspectBundle(check,key);await fs.unlink(check);
   }
   for(const file of expired)await store.remove(file);
-  return {uploaded:uploaded.length,pruned:expired.length,verified:true};
+  return {uploaded:uploaded.length,pruned:expired.length,verified:true,objects:uploaded.map(f=>({fileName:f.fileName,fileId:f.fileId}))};
  }finally{await fs.rm(staging,{recursive:true,force:true});}
 }
 if(require.main===module)archiveBackup({input:process.argv[2]}).then(result=>process.stdout.write(`Archive verified: ${result.uploaded} uploaded, ${result.pruned} expired versions removed\n`)).catch(()=>{process.stderr.write('Archive failed; inspect configuration and provider status. No credentials or provider response bodies are logged.\n');process.exitCode=1;});
