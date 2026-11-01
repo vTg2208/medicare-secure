@@ -40,9 +40,9 @@ test('approval precedes care-team viewing and withdrawal blocks future access wi
     expect(permission()).toHaveAttribute('aria-checked', 'true');
     expect(screen.getByRole('button', { name: 'View report' })).toBeEnabled();
     expect(region()).toHaveAttribute('data-viewed', 'false');
-    advance(1250); expect(phase()).toBe('viewed');
+    advance(1550); expect(phase()).toBe('viewed');
     expect(region()).toHaveAttribute('data-viewed', 'true');
-    advance(1600); expect(phase()).toBe('withdraw');
+    advance(1300); expect(phase()).toBe('withdraw');
     advance(650); expect(phase()).toBe('revoked');
     expect(permission()).toHaveAttribute('aria-checked', 'false');
     expect(screen.getByRole('button', { name: 'Report protected' })).toBeDisabled();

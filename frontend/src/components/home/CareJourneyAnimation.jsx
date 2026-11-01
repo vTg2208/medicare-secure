@@ -4,8 +4,8 @@ import './CareJourneyAnimation.css';
 const steps = [
     { id: 'ready', title: 'Your report is ready.', detail: 'Private until you choose to share.', duration: 1300, chapter: 0 },
     { id: 'choose', title: 'You approve access.', detail: 'One clear sharing control.', duration: 650, chapter: 1 },
-    { id: 'shared', title: 'Your care team is connected.', detail: 'The right information, shared with permission.', duration: 1250, chapter: 1 },
-    { id: 'viewed', title: 'Every access is recorded.', detail: 'Keep a clear history of who viewed your report.', duration: 1600, chapter: 1 },
+    { id: 'shared', title: 'Your care team is connected.', detail: 'The right information, shared with permission.', duration: 1550, chapter: 1 },
+    { id: 'viewed', title: 'Every access is recorded.', detail: 'Keep a clear history of who viewed your report.', duration: 1300, chapter: 1 },
     { id: 'withdraw', title: 'You can switch it off.', detail: 'Your sharing choices stay flexible.', duration: 650, chapter: 2 },
     { id: 'revoked', title: 'Future access is blocked.', detail: 'Your records and access history stay with you.', duration: 1800, chapter: 2 },
 ];
@@ -27,7 +27,7 @@ function Icon({ name, ...props }) {
 
 function MovingLock({ className = '' }) {
     return <svg className={`mc-care-moving-lock ${className}`} viewBox="0 0 32 40" fill="none" aria-hidden="true">
-        <g className="mc-care-shackle"><path d="M8 19V11a8 8 0 0 1 16 0v8" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" /></g>
+        <g className="mc-care-shackle-lift"><g className="mc-care-shackle"><path d="M8 19V11a8 8 0 0 1 16 0v16" stroke="currentColor" strokeWidth="2.75" strokeLinecap="round" vectorEffect="non-scaling-stroke" /></g></g>
         <rect x="3" y="17" width="26" height="21" rx="6" fill="currentColor" />
         <path d="M16 25v5" stroke="var(--mc-surface)" strokeWidth="3" strokeLinecap="round" />
     </svg>;
