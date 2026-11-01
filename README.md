@@ -82,7 +82,9 @@ Role membership alone does not grant unrestricted record access. Server-side che
 
 ## Architecture
 
-![Medicare architecture: browser and React interface, API proxy, authorization and consent, PostgreSQL, scanned encrypted files, audit evidence, and configured integrations](docs/assets/medicare-architecture.svg)
+![Icon-based Medicare architecture showing people, the React frontend on Vercel, the Node.js API on Render, private PostgreSQL on Supabase, and separately configured services](docs/assets/medicare-architecture.svg)
+
+[Diagram source and icon credits](docs/design/architecture-diagram.md).
 
 The API enforces authorization at the data boundary. Database migrations run separately from the restricted runtime account. In the hosted configuration, application tables live in a private `healthcare` schema and the public database Data API is disabled.
 
