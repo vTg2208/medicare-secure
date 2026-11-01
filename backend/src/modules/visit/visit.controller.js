@@ -251,13 +251,8 @@ const VisitController = {
                 return res.status(400).json({ success: false, message: 'Doctor ID is required for approval' });
             }
 
-            // First update scheduled time if provided
-            if (scheduledTime) {
-                const updateResult = await VisitModel.update(id, { scheduledTime });
-            }
-
-            // Approve visit and generate OTP
-            const updatedVisit = await VisitModel.approveVisit(id, finalDoctorId, nurseId || null);
+            // Reserve the final physician and selected time in one transaction.
+            const updatedVisit = await VisitModel.approveVisit(id, finalDoctorId, nurseId || null, scheduledTime);
 
             if (!updatedVisit) {
                 return res.status(404).json({ success: false, message: 'Visit not found' });
@@ -296,6 +291,8 @@ const VisitController = {
             });
 
         } catch (error) {
+            if (error.code === '23P01') return res.status(409).json({success:false,message:'The selected appointment is no longer available'});
+            if (['22023','22007','22008'].includes(error.code)) return res.status(400).json({success:false,message:'Select an available appointment slot'});
             logger.error('=== APPROVE VISIT ERROR ===');
             logger.error('Error details:', error);
             logger.error('Approve visit failed:', error);

@@ -47,4 +47,16 @@ test('appointments use configured clinic hours and enforce reservations across e
         await call('patient','POST','/visits/request',{hospitalCode:'F00000',doctorId:people.doctor.id,scheduledTime:slots[0].startsAt},201);
         await call('otherPatient','POST','/visits/request',{hospitalCode:'F00001',doctorId:people.doctor.id,scheduledTime:slots[0].startsAt},409);
     });
+    await t.test('failed approval preserves the original physician, time and reservation',async()=>{
+        await db.query("INSERT INTO staff_org_mapping(user_id,organization_id,role_id,status) VALUES($1,$2,(SELECT id FROM roles WHERE name='doctor'),'active')",[people.otherDoctor.id,organizations[0]]);
+        await call('admin','PUT','/appointments/calendar',{...calendar,doctorId:people.otherDoctor.id});
+        const original=(await call('otherPatient','POST','/visits/request',{hospitalCode:'F00000',doctorId:people.otherDoctor.id,scheduledTime:slots[0].startsAt},201)).data;
+        const response=await call('admin','POST',`/visits/${original.id}/approve`,{doctorId:people.doctor.id,scheduledTime:slots[1].startsAt},null);
+        assert.ok(response.status>=400);
+        const after=(await db.query('SELECT * FROM visits WHERE id=$1',[original.id])).rows[0];
+        assert.equal(new Date(after.scheduled_time).toISOString(),slots[0].startsAt);assert.equal(after.assigned_doctor_id,people.otherDoctor.id);assert.equal(after.status,'pending');
+        const reservation=(await db.query('SELECT doctor_id,starts_at FROM appointment_reservations WHERE visit_id=$1',[original.id])).rows[0];
+        assert.equal(reservation.doctor_id,people.otherDoctor.id);assert.equal(new Date(reservation.starts_at).toISOString(),slots[0].startsAt);
+        assert.equal(response.status,409);
+    });
 }));
