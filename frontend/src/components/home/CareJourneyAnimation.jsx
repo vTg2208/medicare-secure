@@ -18,7 +18,6 @@ function Icon({ name, ...props }) {
         clinician: <><path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6Z" /></>,
         check: <path d="m5 12 4 4L19 6" />,
         shield: <><path d="m12 3 8 3v6c0 5-8 9-8 9s-8-4-8-9V6Z" /><path d="m8 12 3 3 5-6" /></>,
-        arrow: <path d="M4 12h15m-6-6 6 6-6 6" />,
         pause: <path d="M9 5v14M15 5v14" />,
         play: <path d="m8 4 12 8-12 8Z" />,
         replay: <><path d="M3 10a9 9 0 1 1 1 8M3 4v6h6" /></>,
@@ -28,9 +27,19 @@ function Icon({ name, ...props }) {
 
 function MovingLock({ className = '' }) {
     return <svg className={`mc-care-moving-lock ${className}`} viewBox="0 0 32 40" fill="none" aria-hidden="true">
-        <g className="mc-care-shackle"><path d="M8 19V11a8 8 0 0 1 16 0v8" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" /></g>
+        <path d="M24 13v8" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" />
+        <g className="mc-care-shackle-lift"><g className="mc-care-shackle"><path d="M8 19V11a8 8 0 0 1 16 0v8" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" /></g></g>
         <rect x="3" y="17" width="26" height="21" rx="6" fill="currentColor" />
         <path d="M16 25v5" stroke="var(--mc-surface)" strokeWidth="3" strokeLinecap="round" />
+    </svg>;
+}
+
+function SharingPath() {
+    return <svg className="mc-care-sharing-path" viewBox="0 0 64 80" fill="none" aria-hidden="true">
+        <rect className="mc-care-route-channel" x="0" y="28" width="64" height="24" rx="12" />
+        <path className="mc-care-route-leads" d="M1 40H15M49 40H63" />
+        <circle className="mc-care-route-hub" cx="32" cy="40" r="17" />
+        <path className="mc-care-route-symbol" d="M24 36h15m-4-4 4 4-4 4M40 44H25m4-4-4 4 4 4" />
     </svg>;
 }
 
@@ -129,7 +138,7 @@ export default function CareJourneyAnimation() {
                     <div className="mc-care-report"><span className="mc-care-paper"><Icon name="document" /><span /><span /><span /><MovingLock className="mc-care-report-lock" /></span><span className="mc-care-ready"><Icon name="check" />Ready</span><strong>Lab report</strong><small>In your medical records</small></div>
                 </article>
 
-                <div className="mc-care-connection" aria-hidden="true"><span className="mc-care-track" /><span className="mc-care-track-active" /><Icon name="arrow" className="mc-care-route-arrow" /><span className="mc-care-gate" /></div>
+                <div className="mc-care-connection" aria-hidden="true"><SharingPath /></div>
 
                 <article className="mc-care-team" aria-label="Care team access">
                     <div className="mc-care-card-top"><span className="mc-care-avatar"><Icon name="clinician" /></span><div><strong>Care team</strong><small>Clinical workspace</small></div></div>
