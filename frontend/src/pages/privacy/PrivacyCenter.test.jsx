@@ -5,10 +5,10 @@ import { MemoryRouter } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import PrivacyCenter from './PrivacyCenter';
 import { privacyApi } from '../../api/privacyApi';
-vi.mock('../../api/privacyApi', () => ({ privacyApi: { requests: vi.fn(), review: vi.fn(), submit: vi.fn(), update: vi.fn(), exportData: vi.fn() } }));
+vi.mock('../../api/privacyApi', () => ({ privacyApi: { requests: vi.fn(), review: vi.fn(), submit: vi.fn(), update: vi.fn(), exportData: vi.fn(), controls: vi.fn(), releaseControl: vi.fn() } }));
 vi.mock('../../components/common/ThemeToggle', () => ({ default: () => null }));
 const renderAs = role => render(<MemoryRouter><AuthContext.Provider value={{ user: { role }, logout: vi.fn() }}><PrivacyCenter /></AuthContext.Provider></MemoryRouter>);
-beforeEach(() => { vi.clearAllMocks(); privacyApi.requests.mockResolvedValue([]); privacyApi.review.mockResolvedValue([]); });
+beforeEach(() => { vi.clearAllMocks(); privacyApi.requests.mockResolvedValue([]); privacyApi.review.mockResolvedValue([]); privacyApi.controls.mockResolvedValue([]); });
 test('patients can submit a privacy request with their chosen type and details', async () => {
     const user = userEvent.setup(); privacyApi.submit.mockResolvedValue({ id: 'created' });
     renderAs('patient');
@@ -40,4 +40,23 @@ test('a failed queue load is visible and does not claim an empty queue', async (
     renderAs('patient');
     expect(await screen.findByRole('alert')).toHaveTextContent('Unable to load privacy requests');
     expect(screen.queryByText('No privacy requests yet.')).not.toBeInTheDocument();
+});
+test('the officer selects the processing purpose that the server must actually restrict', async () => {
+    const user = userEvent.setup();
+    privacyApi.review.mockResolvedValue([{id:'request',type:'restriction',status:'in_review',details:'Please restrict secondary research use.',history:[]}]);
+    privacyApi.update.mockResolvedValue({});
+    renderAs('compliance_officer');
+    await user.selectOptions(await screen.findByLabelText('Processing purpose'),'research');
+    await user.type(screen.getByLabelText('Resolution and actions actually taken'),'Research processing will now be blocked.');
+    await user.type(screen.getByLabelText('Decision or retention basis'),'Reviewed the patient restriction request.');
+    await user.click(screen.getByRole('button',{name:'Save review'}));
+    await waitFor(()=>expect(privacyApi.update).toHaveBeenCalledWith('request',expect.objectContaining({action:{type:'restrict',purpose:'research'}})));
+});
+test('patients can withdraw their own processing restriction without granting consent', async () => {
+    const user = userEvent.setup();
+    privacyApi.controls.mockResolvedValue([{id:'control',purpose:'research'}]);
+    privacyApi.releaseControl.mockResolvedValue({});
+    renderAs('patient');
+    await user.click(await screen.findByRole('button',{name:'Release research restriction'}));
+    await waitFor(()=>expect(privacyApi.releaseControl).toHaveBeenCalledWith('control'));
 });

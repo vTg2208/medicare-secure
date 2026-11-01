@@ -13,7 +13,8 @@ const ScheduleNewVisit = () => {
         hospitalCode: '',
         reason: '',
         symptoms: '',
-        doctorId: ''
+        doctorId: '',
+        scheduledTime: undefined
     });
     const [doctors, setDoctors] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -261,7 +262,8 @@ return (
                     onBook={(bookingDetails) => {
                         setFormData({
                             ...formData,
-                            doctorId: bookingDetails.doctorId
+                            doctorId: bookingDetails.doctorId,
+                            scheduledTime: bookingDetails.scheduledTime
                         });
                         setShowDoctorProfile(false);
                     }}

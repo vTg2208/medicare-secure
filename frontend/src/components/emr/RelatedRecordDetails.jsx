@@ -34,7 +34,7 @@ export default function RelatedRecordDetails({ recordId }) {
             {downloading === item.id ? 'Downloading…' : 'Download report'}
         </button>
     );
-    const hasDetails = record && ['diagnoses', 'prescriptions', 'labResults', 'imagingReports'].some(key => record[key]?.length);
+    const hasDetails = record && ['diagnoses', 'prescriptions', 'labResults', 'imagingReports', 'corrections'].some(key => record[key]?.length);
 
     return (
         <div className="mt-4 border-t border-[var(--mc-border)] pt-3 text-sm text-[var(--mc-text)]">
@@ -45,6 +45,7 @@ export default function RelatedRecordDetails({ recordId }) {
             {error && <p role="alert" className="mt-2 text-[var(--mc-danger)]">{error}</p>}
             {expanded && record && <div className="mt-3 space-y-4">
                 {!hasDetails && <p>No linked clinical details.</p>}
+                {!!record.corrections?.length && <section aria-label="Patient-requested corrections"><h4 className="font-semibold">Patient-requested corrections</h4>{record.corrections.map(item=><div key={item.id} className="mt-2"><p className="whitespace-pre-wrap">{item.text}</p><p className="text-[var(--mc-text-muted)]">Reviewed addendum · {new Date(item.created_at).toLocaleString()}</p></div>)}</section>}
                 {!!record.diagnoses?.length && <section aria-label="Diagnoses"><h4 className="font-semibold">Diagnoses</h4>
                     {record.diagnoses.map(item => <div key={item.id} className="mt-2">
                         <p>{item.icd_code} — {item.description}</p>

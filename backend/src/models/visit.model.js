@@ -18,7 +18,8 @@ class VisitModel {
             symptoms,
             type,
             priority,
-            doctorId
+            doctorId,
+            scheduledTime
         } = visitData;
 
         // Generate a random 8-character alphanumeric visit code
@@ -26,9 +27,9 @@ class VisitModel {
 
         const query = `
             INSERT INTO visits (
-                patient_id, organization_id, chief_complaint, symptoms, type, priority, status, assigned_doctor_id, visit_code
+                patient_id, organization_id, chief_complaint, symptoms, type, priority, status, assigned_doctor_id, visit_code, scheduled_time
             )
-            VALUES ($1, $2, $3, $4, $5, $6, 'pending', $7, $8)
+            VALUES ($1, $2, $3, $4, $5, $6, 'pending', $7, $8, $9)
             RETURNING *
         `;
 
@@ -40,7 +41,8 @@ class VisitModel {
             type || 'walk_in',
             priority || 'normal',
             doctorId || null,
-            visitCode
+            visitCode,
+            scheduledTime || null
         ];
         const result = await pool.query(query, values);
         return result.rows[0];
@@ -206,12 +208,12 @@ class VisitModel {
      * @param {string} nurseId 
      * @returns {Promise<Object>} Visit with OTP
      */
-    static async approveVisit(visitId, doctorId, nurseId) {
+    static async approveVisit(visitId, doctorId, nurseId, scheduledTime) {
         const otp = String(crypto.randomInt(100000, 1000000));
         return pool.transaction(async client => {
             const result = await client.query(`UPDATE visits SET status='approved', assigned_doctor_id=$1, assigned_nurse_id=$2,
-                otp_code=$3, otp_expires_at=NOW()+INTERVAL '24 hours', otp_verified=false, updated_at=NOW()
-                WHERE id=$4 AND status IN ('pending','scheduled','approved') RETURNING *`, [doctorId, nurseId, otp, visitId]);
+                otp_code=$3, otp_expires_at=NOW()+INTERVAL '24 hours', otp_verified=false, updated_at=NOW(), scheduled_time=COALESCE($5::timestamptz,scheduled_time)
+                WHERE id=$4 AND status IN ('pending','scheduled','approved') RETURNING *`, [doctorId, nurseId, otp, visitId, scheduledTime || null]);
             const visit = result.rows[0];
             if (!visit) throw Object.assign(new Error('Visit cannot be approved in its current state'), { statusCode: 409 });
             for (const [id,role] of [[doctorId,'doctor'],[nurseId,'nurse']]) {

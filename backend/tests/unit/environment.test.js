@@ -1,6 +1,6 @@
 const { validateEnvironment } = require('../../src/config/validate-env');
 const safe = () => ({
-    NODE_ENV: 'production', DB_PASSWORD: 'local-fixture-password',
+    NODE_ENV: 'production', DB_SSL: 'true', DB_PASSWORD: 'local-fixture-password',
     JWT_SECRET: 'a'.repeat(64), JWT_REFRESH_SECRET: 'b'.repeat(64),
     ENCRYPTION_KEY: 'cd'.repeat(32), CORS_ORIGIN: 'https://health.example.test',
     FRONTEND_URL: 'https://health.example.test',
@@ -31,4 +31,8 @@ it.each([
     ['PORT', '-1'], ['ENCRYPTION_ALGORITHM', 'aes-256-cbc'],
 ])('rejects unsafe production setting %s', (name, value) => {
     expect(validateEnvironment({ ...safe(), [name]: value }).length).toBeGreaterThan(0);
+});
+
+it.each([undefined, 'false'])('requires verified database TLS in production (%s)', DB_SSL => {
+    expect(validateEnvironment({...safe(), DB_SSL})).toContain('DB_SSL must be true in production');
 });

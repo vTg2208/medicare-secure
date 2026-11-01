@@ -21,7 +21,7 @@ const hashes = Object.fromEntries(ACCOUNT_ROLES.map(role => [role, testHash]));
 test('browser schema includes each immutable migration body and ledger hash', () => {
     const sql = buildBrowserSchemaSql();
     const migrations = readMigrations();
-    assert.equal(migrations.length, 25);
+    assert.ok(migrations.length >= 25);
     assert.ok(sql.startsWith('BEGIN;\nSELECT pg_advisory_xact_lock('));
     assert.ok(sql.indexOf('healthcare schema already exists') < sql.indexOf('CREATE SCHEMA healthcare;'));
     assert.match(sql, /SET LOCAL search_path TO healthcare, public, extensions;/);

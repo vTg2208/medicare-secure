@@ -131,6 +131,7 @@ function DoctorDashboard() {
                 </nav>
 
                 <div className="space-y-2 mt-auto pt-6 border-t border-line dark:border-slate-800/50">
+                    <Link to="/messages" className="flex items-center gap-3 px-4 py-3 rounded-xl">Messages</Link>
                     <Link to="/profile" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
                         <span className="material-symbols-outlined text-[20px]">manage_accounts</span>
                         Profile

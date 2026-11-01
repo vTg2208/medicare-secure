@@ -1,4 +1,4 @@
-const { query } = require('../../config/db');
+const { query, transaction } = require('../../config/db');
 const asyncHandler = require('../../utils/asyncHandler');
 const { clinicalScopeSql } = require('../../middleware/clinical-access.middleware');
 const logger = require('../../utils/logger');

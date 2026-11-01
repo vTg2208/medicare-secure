@@ -71,7 +71,7 @@ const createRequest = async req => {
 const updateRequest = async req => {
     requireRole(req, 'compliance_officer');
     const body = req.body || {};
-    if (Object.keys(body).some(key => !['status', 'resolution', 'retentionBasis', 'note'].includes(key))) throw fault(400, 'Only a review decision and its explanation may be supplied');
+    if (Object.keys(body).some(key => !['status', 'resolution', 'retentionBasis', 'note', 'action'].includes(key))) throw fault(400, 'Only a review decision, fulfillment action and explanation may be supplied');
     const result = await db.transaction(async client => {
         const row = (await client.query('SELECT * FROM privacy_rights_requests WHERE id=$1 FOR UPDATE', [req.params.id])).rows[0];
         if (!row) throw fault(404, 'Privacy request not found');
@@ -82,6 +82,8 @@ const updateRequest = async req => {
         const outcome = terminal ? { resolution: narrative(body.resolution, 'Resolution'), retentionBasis: narrative(body.retentionBasis, 'Decision or retention basis', 4000),
             ...(row.request_type === 'erasure' ? { clinicalRecordsDeleted: false, erasureScope: 'This workflow records a review decision; it does not delete clinical records.' } : {}) } : null;
         const note = body.note == null || body.note === '' ? null : narrative(body.note, 'Review note', 4000);
+        const applied = await require('./privacy-fulfillment.service').applyFulfillment(client,req,row);
+        if (outcome && applied) outcome.appliedAction = applied;
         const updated = (await client.query(`UPDATE privacy_rights_requests SET status=$1,outcome_cipher=$2,
             resolved_at=CASE WHEN $3 THEN NOW() ELSE NULL END,resolved_by=CASE WHEN $3 THEN $4::uuid ELSE NULL END,updated_at=NOW()
             WHERE id=$5 RETURNING *`, [body.status, outcome ? seal(outcome, `privacy-request:${row.id}:outcome`) : null, terminal, req.user.id, row.id])).rows[0];
@@ -151,6 +153,14 @@ const exportPatient = async req => {
         const requests = await rows('SELECT * FROM privacy_rights_requests WHERE patient_id=$1 ORDER BY created_at,id');
         const requestHistory = await historyRows(client, requests.map(item => item.id));
         const triageSessions = await rows('SELECT id,conversation,soap_summary,recommended_department,priority,confidence_score,status,created_at,updated_at FROM triage_sessions WHERE patient_id=$1 ORDER BY created_at,id');
+        const careMessages = (await rows(`SELECT m.id,m.sequence,m.sender_id,m.body_cipher,m.created_at
+            FROM care_messages m JOIN care_message_threads t ON t.id=m.thread_id
+            WHERE m.patient_id=$1 AND t.patient_id=$1 ORDER BY m.sequence`)).map(({ body_cipher, ...message }) => ({
+                ...message, body: unseal(body_cipher, `care-message:${message.id}`),
+            }));
+        const processingControls = await rows('SELECT id,purpose,created_at,released_at FROM patient_processing_controls WHERE patient_id=$1 ORDER BY created_at,id');
+        const corrections = (await rows('SELECT id,record_id,text_cipher,created_at FROM medical_record_corrections WHERE patient_id=$1 ORDER BY created_at,id')).map(({text_cipher,...correction})=>({...correction,text:unseal(text_cipher,`record-correction:${correction.id}`)}));
+        const retentionDecisions = await rows('SELECT id,record_id,resource_type,approved_at,status,executed_at FROM retention_disposals WHERE patient_id=$1 ORDER BY approved_at,id');
         const ownedIds = [req.user.id, ...[visits, medicalRecords, diagnoses, prescriptions, labResults, imagingReports, visitNotes, medicationOrders, radiologyReports, consents, requests, triageSessions].flatMap(group => group.map(item => item.id))];
         await audit.logAuditEvent({ ...event(req, 'export_patient_information', req.user.id, req.user.id), entityType: 'patient' }, client);
         const auditHistory = (await client.query(`SELECT id,action,entity_type,CASE WHEN entity_id=ANY($2::uuid[]) THEN entity_id ELSE NULL END AS entity_id,timestamp,status_code
@@ -163,7 +173,7 @@ const exportPatient = async req => {
             profile: { account: accountProfile, patient: patientProfile }, visits, medicalRecords, diagnoses, prescriptions,
             labResults: fileReferences(labResults).map(item => ({ ...item, results_data: safeJson(item.results_data) })), imagingReports: fileReferences(imagingReports),
             visitNotes, medicationOrders, radiologyReports: fileReferences(radiologyReports), insurancePolicies, insuranceClaims,
-            consents, triageSessions: triageSessions.map(safeJson), auditHistory, privacyRequests: requests.map(item => decode(item, requestHistory)) };
+            consents, careMessages, processingControls, corrections, retentionDecisions, triageSessions: triageSessions.map(safeJson), auditHistory, privacyRequests: requests.map(item => decode(item, requestHistory)) };
     }, { isolationLevel: 'repeatable read' });
     let result;
     // The callback only reads and appends audit evidence in its own transaction.

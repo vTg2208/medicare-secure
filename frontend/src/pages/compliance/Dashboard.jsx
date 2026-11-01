@@ -54,7 +54,8 @@ const ComplianceDashboard = () => {
         { id: 'audits', label: 'Global Audits', icon: 'policy', path: '/compliance/global-audits' },
         { id: 'incidents', label: 'Incidents', icon: 'gavel', path: '/compliance/incidents' },
         { id: 'overrides', label: 'Consent Overrides', icon: 'key_off', path: '/compliance/consent-overrides' },
-        { id: 'privacy', label: 'Privacy Requests', icon: 'policy', path: '/compliance/privacy' }
+        { id: 'privacy', label: 'Privacy Requests', icon: 'policy', path: '/compliance/privacy' },
+        { id: 'retention', label: 'Retention Governance', icon: 'inventory_2', path: '/compliance/retention' }
     ];
 
     // Format date nicely

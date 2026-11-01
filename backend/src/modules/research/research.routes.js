@@ -4,6 +4,7 @@ const { asyncHandler } = require('../../middleware/error.middleware');
 const { auditLog } = require('../../middleware/audit.middleware');
 const { query } = require('../../config/db');
 const { isValidPhone } = require('../../utils/validators');
+const { processingAllowedSql } = require('../privacy/processing-policy');
 const router = express.Router();
 router.use(authenticate, authorize('researcher'));
 // Only explicit research consent is used. Aggregate groups below five distinct
@@ -11,7 +12,7 @@ router.use(authenticate, authorize('researcher'));
 const cohort = (category = 'all_medical_data') => `WITH cohort AS (SELECT DISTINCT p.* FROM patient_profiles p JOIN consents c ON c.patient_id=p.user_id
     WHERE c.recipient_user_id=$1 AND c.purpose IN ('clinical_research','medical_study')
     AND c.data_category IN ('all','all_medical_data','*','${category}')
-    AND c.status='active' AND c.start_time<=NOW() AND (c.end_time IS NULL OR c.end_time>NOW()))`;
+    AND c.status='active' AND c.start_time<=NOW() AND (c.end_time IS NULL OR c.end_time>NOW()) AND ${processingAllowedSql('p.user_id','research')})`;
 const respond = (res, data) => res.json({ success: true, data, minimumCohort: 5 });
 
 router.get('/stats', auditLog('research_statistics', 'research'), asyncHandler(async (req, res) => {

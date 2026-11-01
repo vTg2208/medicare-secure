@@ -10,8 +10,11 @@ const VisitController = {
      */
     async requestVisit(req, res) {
         try {
-            const { hospitalCode, reason, symptoms, doctorId } = req.body;
+            const { hospitalCode, reason, symptoms, doctorId, scheduledTime } = req.body;
             const patientId = req.user.id;
+
+            if (scheduledTime !== undefined && (typeof scheduledTime !== 'string' || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/.test(scheduledTime)
+                || !Number.isFinite(Date.parse(scheduledTime)) || Date.parse(scheduledTime)<=Date.now() || !doctorId)) return res.status(400).json({success:false,message:'Choose a future appointment with a doctor'});
 
             if (!hospitalCode) {
                 return res.status(400).json({ success: false, message: 'Hospital code is required' });
@@ -21,7 +24,7 @@ const VisitController = {
             // We need a helper or direct query here since OrganizationModel might not have findByCode yet
             // Let's use direct query for now or add to OrgModel. Let's assume direct for speed.
             const orgRes = await require('../../config/db').query(
-                'SELECT id, name FROM organizations WHERE hospital_code = $1',
+                "SELECT id, name FROM organizations WHERE hospital_code = $1 AND status='active' AND verified=true",
                 [hospitalCode]
             );
 
@@ -31,9 +34,15 @@ const VisitController = {
 
             const organization = orgRes.rows[0];
 
+            if (doctorId) {
+                const doctor = await pool.query(`SELECT s.user_id FROM staff_org_mapping s JOIN users u ON u.id=s.user_id JOIN roles r ON r.id=u.role_id
+                    WHERE s.user_id=$1 AND s.organization_id=$2 AND s.status='active' AND u.status='active' AND r.name='doctor'`,[doctorId,organization.id]);
+                if (!doctor.rowCount) return res.status(403).json({success:false,message:'Doctor is not active in the selected clinic'});
+            }
+
             // 2. Check for existing active visit
             const existingVisit = await VisitModel.findActiveByPatient(patientId);
-            if (existingVisit) {
+            if (existingVisit && !scheduledTime) {
                 return res.status(409).json({
                     success: false,
                     message: 'You already have an active visit request.',
@@ -49,7 +58,8 @@ const VisitController = {
                 symptoms,
                 type: doctorId ? 'appointment' : 'walk_in',
                 priority: 'normal',
-                doctorId
+                doctorId,
+                scheduledTime
             });
 
             res.status(201).json({
@@ -60,6 +70,8 @@ const VisitController = {
 
         } catch (error) {
             logger.error('Request visit failed:', error);
+            if (error.code === '23P01') return res.status(409).json({success:false,message:'This appointment was just reserved. Choose another available time.'});
+            if (['22023','23514','22007','22008'].includes(error.code)) return res.status(400).json({success:false,message:'Choose a future available appointment from the clinic calendar'});
             res.status(500).json({ success: false, message: 'Failed to request visit' });
         }
     },
@@ -239,13 +251,8 @@ const VisitController = {
                 return res.status(400).json({ success: false, message: 'Doctor ID is required for approval' });
             }
 
-            // First update scheduled time if provided
-            if (scheduledTime) {
-                const updateResult = await VisitModel.update(id, { scheduledTime });
-            }
-
-            // Approve visit and generate OTP
-            const updatedVisit = await VisitModel.approveVisit(id, finalDoctorId, nurseId || null);
+            // Reserve the final physician and selected time in one transaction.
+            const updatedVisit = await VisitModel.approveVisit(id, finalDoctorId, nurseId || null, scheduledTime);
 
             if (!updatedVisit) {
                 return res.status(404).json({ success: false, message: 'Visit not found' });
@@ -284,6 +291,8 @@ const VisitController = {
             });
 
         } catch (error) {
+            if (error.code === '23P01') return res.status(409).json({success:false,message:'The selected appointment is no longer available'});
+            if (['22023','22007','22008'].includes(error.code)) return res.status(400).json({success:false,message:'Select an available appointment slot'});
             logger.error('=== APPROVE VISIT ERROR ===');
             logger.error('Error details:', error);
             logger.error('Approve visit failed:', error);
@@ -572,6 +581,8 @@ const VisitController = {
 
         } catch (error) {
             logger.error('Update scheduled time failed:', error);
+            if (error.code === '23P01') return res.status(409).json({success:false,message:'This appointment is already reserved'});
+            if (['22023','23514','22007','22008'].includes(error.code)) return res.status(400).json({success:false,message:'Choose a future available appointment from the clinic calendar'});
             res.status(500).json({ success: false, message: 'Failed to update scheduled time' });
         }
     }

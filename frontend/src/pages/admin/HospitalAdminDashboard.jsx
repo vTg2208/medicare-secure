@@ -13,6 +13,7 @@ export function AdminSidebar({ active }) {
     const links = [
         { to: '/admin/dashboard', icon: 'grid_view', label: 'Overview' },
         { to: '/admin/visits', icon: 'calendar_month', label: 'Visit Management' },
+        { to: '/admin/appointment-calendars', icon: 'schedule', label: 'Appointment Calendars' },
         { to: '/admin/staff', icon: 'manage_accounts', label: 'Staff Management' },
         { to: '/admin/doctor-verification', icon: 'verified_user', label: 'Doctor Verification' },
         { to: '/admin/users', icon: 'group', label: 'User Management' },

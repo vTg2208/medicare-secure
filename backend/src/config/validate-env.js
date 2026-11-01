@@ -25,6 +25,7 @@ const validateEnvironment = (env) => {
     if (env.BCRYPT_ROUNDS && (!/^\d+$/.test(env.BCRYPT_ROUNDS) || +env.BCRYPT_ROUNDS < 10 || +env.BCRYPT_ROUNDS > 16)) errors.push('BCRYPT_ROUNDS must be between 10 and 16');
     if (env.OTP_LENGTH && !/^[6-8]$/.test(env.OTP_LENGTH)) errors.push('OTP_LENGTH must be between 6 and 8');
     if (production) {
+        if (env.DB_SSL !== 'true') errors.push('DB_SSL must be true in production');
         for (const key of ['FRONTEND_URL', 'WEBAUTHN_ORIGIN']) {
             if (env[key]) {
                 try { if (new URL(env[key]).protocol !== 'https:') errors.push(`${key} must use HTTPS`); }
