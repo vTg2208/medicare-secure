@@ -128,7 +128,7 @@ function PatientDashboard() {
                         <span className="material-symbols-outlined text-[20px]">smart_toy</span>
                         AI Pre-Screening
                     </Link>
-                    <Link to="#" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
+                    <Link to="/patient/messages" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
                         <span className="material-symbols-outlined text-[20px]">chat_bubble_outline</span>
                         Messages
                     </Link>
