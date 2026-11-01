@@ -1,0 +1,100 @@
+# PostgreSQL Custom Queries for Prometheus Exporter
+# Only essential metrics - postgres_exporter provides good defaults
+# Add custom queries here only if needed for specific use cases
+
+pg_database:
+  query: |
+    SELECT 
+      datname,
+      pg_database_size(datname) as size_bytes
+    FROM pg_database
+    WHERE datname NOT IN ('template0', 'template1')
+  metrics:
+    - datname:
+        usage: "LABEL"
+        description: "Database name"
+    - size_bytes:
+        usage: "GAUGE"
+        description: "Database size in bytes"
+
+pg_slow_queries:
+  query: |
+    SELECT
+      LEFT(query, 50) AS query_snippet,
+      calls,
+      total_time,
+      mean_time,
+      max_time
+    FROM pg_stat_statements
+    WHERE mean_time > 1000
+    ORDER BY mean_time DESC
+    LIMIT 10
+  metrics:
+    - query_snippet:
+        usage: "LABEL"
+        description: "Query snippet"
+    - calls:
+        usage: "COUNTER"
+        description: "Number of times executed"
+    - total_time:
+        usage: "COUNTER"
+        description: "Total time spent in milliseconds"
+    - mean_time:
+        usage: "GAUGE"
+        description: "Mean time in milliseconds"
+    - max_time:
+        usage: "GAUGE"
+        description: "Maximum time in milliseconds"
+
+pg_locks:
+  query: |
+    SELECT
+      pg_database.datname,
+      tmp.mode,
+      COALESCE(count, 0) as count
+    FROM
+      (VALUES 
+        ('AccessShareLock'),
+        ('RowShareLock'),
+        ('RowExclusiveLock'),
+        ('ShareUpdateExclusiveLock'),
+        ('ShareLock'),
+        ('ShareRowExclusiveLock'),
+        ('ExclusiveLock'),
+        ('AccessExclusiveLock')
+      ) AS tmp(mode) CROSS JOIN pg_database
+    LEFT JOIN
+      (SELECT database, mode, count(*) AS count
+      FROM pg_locks WHERE database IS NOT NULL
+      GROUP BY database, mode
+      ) AS tmp2
+    ON tmp.mode = tmp2.mode AND pg_database.oid = tmp2.database
+    WHERE pg_database.datname NOT IN ('template0', 'template1')
+  metrics:
+    - datname:
+        usage: "LABEL"
+        description: "Database name"
+    - mode:
+        usage: "LABEL"
+        description: "Lock mode"
+    - count:
+        usage: "GAUGE"
+        description: "Number of locks"
+
+pg_replication:
+  query: |
+    SELECT
+      client_addr,
+      state,
+      EXTRACT(EPOCH FROM (now() - pg_last_xact_replay_timestamp())) as lag_seconds
+    FROM pg_stat_replication
+  metrics:
+    - client_addr:
+        usage: "LABEL"
+        description: "Client IP address"
+    - state:
+        usage: "LABEL"
+        description: "Replication state"
+    - lag_seconds:
+        usage: "GAUGE"
+        description: "Replication lag in seconds"

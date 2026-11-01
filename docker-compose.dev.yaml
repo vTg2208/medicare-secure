@@ -1,0 +1,129 @@
+# Local development only. Production uses docker-compose.prod.yaml.
+services:
+  postgres:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-healthcare}
+      POSTGRES_USER: ${DB_USER:-healthcare_owner}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Run node scripts/setup-local.js first}
+    ports: ["127.0.0.1:${DB_PORT:-55432}:5432"]
+    volumes: [postgres_data_dev:/var/lib/postgresql]
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks: [healthcare_dev]
+
+  migrate:
+    build: { context: ./backend, target: development }
+    environment: &backend-environment
+      NODE_ENV: development
+      PORT: 5000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-healthcare}
+      DB_USER: ${DB_USER:-healthcare_owner}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_SSL: "false"
+      JWT_SECRET: ${JWT_SECRET:?Run node scripts/setup-local.js first}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?Run node scripts/setup-local.js first}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:?Run node scripts/setup-local.js first}
+      ENCRYPTION_ALGORITHM: aes-256-gcm
+      FRONTEND_URL: http://localhost:3000
+      CORS_ORIGIN: http://localhost:3000
+      WEBAUTHN_RP_ID: localhost
+      WEBAUTHN_ORIGIN: http://localhost:3000
+      EMAIL_HOST: mailpit
+      EMAIL_PORT: 1025
+      EMAIL_SECURE: "false"
+      EMAIL_FROM: healthcare@localhost.invalid
+      AUTO_LOGOUT_ENABLED: "true"
+      CLAMAV_HOST: clamav
+      AI_ENABLED: ${AI_ENABLED:-false}
+      AI_SERVICE_URL: http://ai-service:8000
+      AI_SERVICE_TOKEN: ${AI_SERVICE_TOKEN:-}
+    command: [node, src/database/migrate.js]
+    depends_on:
+      postgres: { condition: service_healthy }
+    networks: [healthcare_dev]
+
+  backend:
+    build: { context: ./backend, target: development }
+    restart: unless-stopped
+    environment: *backend-environment
+    ports: ["127.0.0.1:${PORT:-5000}:5000"]
+    volumes:
+      - ./backend/src:/app/src
+      - ./backend/scripts:/app/scripts
+      - backend_uploads_dev:/app/uploads
+      - backend_logs_dev:/app/logs
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+      mailpit: { condition: service_started }
+      clamav: { condition: service_started }
+    healthcheck:
+      test: [CMD, node, -e, "require('http').get('http://127.0.0.1:5000/readyz',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+    networks: [healthcare_dev]
+
+  frontend:
+    build: { context: ./frontend, target: development }
+    environment:
+      API_PROXY_TARGET: http://backend:5000
+      REACT_APP_API_URL: /api
+      CHOKIDAR_USEPOLLING: "true"
+    ports: ["127.0.0.1:3000:3000"]
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+      - ./frontend/index.html:/app/index.html:ro
+      - ./frontend/vite.config.mjs:/app/vite.config.mjs:ro
+    depends_on:
+      backend: { condition: service_started }
+    networks: [healthcare_dev]
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports: ["127.0.0.1:8025:8025", "127.0.0.1:1025:1025"]
+    networks: [healthcare_dev]
+
+  clamav:
+    image: clamav/clamav:stable
+    ports: ["127.0.0.1:3310:3310"]
+    volumes: [clamav_data_dev:/var/lib/clamav]
+    networks: [healthcare_dev]
+    mem_limit: 2g
+
+  ai-service:
+    profiles: [ai]
+    build: { context: ./ai-service }
+    environment:
+      AI_SERVICE_TOKEN: ${AI_SERVICE_TOKEN:-}
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      GROQ_MODEL: ${GROQ_MODEL:-llama-3.1-8b-instant}
+      AI_RAG_ENABLED: "false"
+    networks: [healthcare_dev]
+
+  pgadmin:
+    profiles: [tools]
+    image: dpage/pgadmin4:latest
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@localhost.invalid}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:?Generate a local pgAdmin password with setup-local.js}
+    ports: ["127.0.0.1:5050:80"]
+    volumes: [pgadmin_data_dev:/var/lib/pgadmin]
+    networks: [healthcare_dev]
+
+volumes:
+  postgres_data_dev:
+  backend_uploads_dev:
+  backend_logs_dev:
+  clamav_data_dev:
+  pgadmin_data_dev:
+networks:
+  healthcare_dev:
