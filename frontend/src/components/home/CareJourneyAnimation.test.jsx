@@ -10,7 +10,7 @@ const region = () => screen.getByRole('region', { name: 'See how Medicare sharin
 const permission = () => screen.getByRole('switch', { name: 'Allow care team access' });
 const phase = () => region().getAttribute('data-phase');
 function advanceStep(current, next) {
-    advance(999); expect(phase()).toBe(current);
+    advance(2499); expect(phase()).toBe(current);
     advance(1); expect(phase()).toBe(next);
 }
 const scene = () => render(<CareJourneyAnimation />);
@@ -119,17 +119,41 @@ test('pointer navigation wraps in both directions and keeps autoplay running aft
     expect(phase()).toBe('ready');
 });
 
-test('manual navigation restarts the one-second hold instead of inheriting the old timer', () => {
+test('manual navigation restarts the full hold instead of inheriting the old timer', () => {
     setup();
     advance(500);
     fireEvent.click(screen.getByRole('button', { name: 'Next care journey step' }), { detail: 1 });
     advanceStep('choose', 'shared');
 });
 
+test('pointer focus arriving after navigation does not hold autoplay', () => {
+    setup();
+    const next = screen.getByRole('button', { name: 'Next care journey step' });
+    const focusVisible = vi.spyOn(next, 'matches').mockReturnValue(false);
+    fireEvent.click(next, { detail: 1 });
+    fireEvent.focus(next);
+    expect(focusVisible).toHaveBeenCalledWith(':focus-visible');
+    expect(region()).toHaveAttribute('data-running', 'true');
+    advanceStep('choose', 'shared');
+});
+
+test('keyboard focus alone holds autoplay before a navigation button is activated', () => {
+    setup();
+    const next = screen.getByRole('button', { name: 'Next care journey step' });
+    vi.spyOn(next, 'matches').mockReturnValue(true);
+    fireEvent.focus(next);
+    expect(region()).toHaveAttribute('data-running', 'false');
+    advance(20000); expect(phase()).toBe('ready');
+    fireEvent.blur(next, { relatedTarget: document.body });
+    advanceStep('ready', 'choose');
+});
+
 test('keyboard navigation holds the selected step until focus leaves the illustration', () => {
     setup();
     const next = screen.getByRole('button', { name: 'Next care journey step' });
     const previous = screen.getByRole('button', { name: 'Previous care journey step' });
+    vi.spyOn(next, 'matches').mockReturnValue(true);
+    vi.spyOn(previous, 'matches').mockReturnValue(true);
     fireEvent.focus(next);
     fireEvent.click(next, { detail: 0 });
     expect(phase()).toBe('choose');
@@ -159,7 +183,7 @@ test('offscreen and background-tab states stop the timeline and resume without s
     act(() => intersect([{ isIntersecting: false }]));
     advance(20000); expect(phase()).toBe('ready');
     act(() => intersect([{ isIntersecting: true }]));
-    advance(1000); expect(phase()).toBe('choose');
+    advance(2500); expect(phase()).toBe('choose');
     vi.spyOn(document, 'visibilityState', 'get').mockReturnValue('hidden');
     fireEvent(document, new Event('visibilitychange'));
     advance(20000); expect(phase()).toBe('choose');
@@ -180,7 +204,7 @@ test('reduced-motion users start paused and can use all sharing controls without
 });
 
 test('a changed motion preference stops a running sequence', () => {
-    setup(); advance(1000);
+    setup(); advance(2500);
     act(() => { preference.matches = true; preferenceChanged(); });
     advance(20000); expect(phase()).toBe('choose');
     expect(region()).toHaveAttribute('data-running', 'false');

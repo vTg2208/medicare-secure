@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './CareJourneyAnimation.css';
 
-const STEP_DURATION_MS = 1000;
+const STEP_DURATION_MS = 2500;
 const steps = [
     { id: 'ready', title: 'Your report is ready.', detail: 'Private until you choose to share.' },
     { id: 'choose', title: 'You approve access.', detail: 'One clear sharing control.' },
@@ -120,7 +120,7 @@ export default function CareJourneyAnimation() {
         <section className="mc-care-journey" aria-label="See how Medicare sharing works" ref={region}
             data-phase={step.id} data-connected={connected} data-viewed={viewed}
             data-running={running} data-motion={animate && !reducedMotion} data-manual={manualInteraction}
-            onFocusCapture={() => setFocusPaused(true)}
+            onFocusCapture={event => setFocusPaused(event.target.matches(':focus-visible'))}
             onKeyDownCapture={() => setFocusPaused(true)}
             onBlurCapture={event => { if (!event.currentTarget.contains(event.relatedTarget)) setFocusPaused(false); }}>
             <header className="mc-care-heading">
