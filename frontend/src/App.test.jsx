@@ -3,7 +3,6 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import App from './App';
 import ErrorBoundary from './components/common/ErrorBoundary';
-import apiClient from './api/client';
 
 const demoConfig = vi.hoisted(() => ({ isDemoMode: false }));
 vi.mock('./config/demoMode', () => demoConfig);
@@ -28,13 +27,22 @@ test('does not start invitation verification in demo builds', async () => {
   expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
 });
 
-test('renders the public landing page with same-origin API data', async () => {
-  vi.spyOn(apiClient, 'get').mockResolvedValue({ data: { success: true, data: { hospitalsCount: 3, patientsManaged: 42 } } });
+test('introduces Medicare with one feature story and a clear registration path', async () => {
   render(<MemoryRouter><App /></MemoryRouter>);
-  expect(await screen.findAllByRole('button', { name: /Log In/i })).toHaveLength(2);
-  expect(await screen.findByText('3 registered healthcare facilities')).toBeInTheDocument();
-  expect(apiClient.get).toHaveBeenCalledWith('/public/stats', { skipAuth: true });
+  expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Your health.Your story.All connected.');
+  expect(screen.getByRole('region', { name: 'Discover Medicare' })).toBeInTheDocument();
+  expect(screen.getAllByRole('link', { name: /get started/i })).toHaveLength(2);
+  screen.getAllByRole('link', { name: /get started/i }).forEach(link => expect(link).toHaveAttribute('href', '/register'));
   expect(screen.queryByRole('note', { name: /free demo/i })).not.toBeInTheDocument();
+});
+
+test('homepage demo calls to action lead to login without offering registration', async () => {
+  demoConfig.isDemoMode = true;
+  render(<MemoryRouter><App /></MemoryRouter>);
+  const links = await screen.findAllByRole('link', { name: /explore the demo/i });
+  links.forEach(link => expect(link).toHaveAttribute('href', '/login'));
+  expect(screen.getByRole('note', { name: /free demo/i })).toBeInTheDocument();
+  expect(screen.queryByRole('link', { name: /get started/i })).not.toBeInTheDocument();
 });
 
 test('shows a recoverable fallback for rendering errors', () => {
