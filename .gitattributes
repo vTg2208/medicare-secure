@@ -1,2 +1,1 @@
-# Migration checksums are calculated from exact source bytes.
-* -text
+deployment/*.sh text eol=lf

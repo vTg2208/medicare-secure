@@ -1,5 +1,5 @@
-const { query } = require('../config/db');
-const { createAuditLog } = require('./audit.service');
+const { query, transaction } = require('../config/db');
+const { logAuditEvent } = require('./audit.service');
 const logger = require('../utils/logger');
 
 /**
@@ -45,7 +45,8 @@ const recordViolation = async ({
     metadata = {},
 }) => {
     try {
-        // Insert into security_events table
+        return await transaction(async client => {
+        // The event trigger durably delivers high-severity in-app alerts.
         const violationQuery = `
             INSERT INTO security_events (
                 user_id,
@@ -58,7 +59,7 @@ const recordViolation = async ({
             RETURNING id
         `;
 
-        const result = await query(violationQuery, [
+        const result = await client.query(violationQuery, [
             userId,
             violationType,
             severity,
@@ -70,7 +71,7 @@ const recordViolation = async ({
         const violationId = result.rows[0].id;
 
         // Also create audit log
-        await createAuditLog({
+        await logAuditEvent({
             userId,
             action: 'policy_violation',
             entityType,
@@ -83,7 +84,7 @@ const recordViolation = async ({
                 violationId,
                 ...metadata,
             },
-        });
+        }, client);
 
         logger.warn('Access violation recorded:', {
             violationId,
@@ -93,15 +94,8 @@ const recordViolation = async ({
             description,
         });
 
-        // Trigger alerts for high/critical violations
-        if (severity === VIOLATION_SEVERITY.HIGH || severity === VIOLATION_SEVERITY.CRITICAL) {
-            await triggerViolationAlert(violationId, userId, violationType, severity, description);
-        }
-
-        return {
-            success: true,
-            violationId,
-        };
+        return {success:true,violationId};
+        });
     } catch (error) {
         logger.error('Failed to record violation:', error);
         return {
@@ -123,13 +117,13 @@ const detectRepeatedViolations = async (userId, timeWindowHours = 24) => {
                 MAX(created_at) as last_occurrence
             FROM security_events
             WHERE user_id = $1
-                AND created_at > NOW() - INTERVAL '${timeWindowHours} hours'
+                AND created_at > NOW() - ($2 * INTERVAL '1 hour')
                 AND resolved = false
             GROUP BY event_type
             HAVING COUNT(*) >= 3
         `;
 
-        const result = await query(violationsQuery, [userId]);
+        const result = await query(violationsQuery, [userId, timeWindowHours]);
 
         if (result.rows.length > 0) {
             // User has repeated violations
@@ -386,29 +380,6 @@ const getSystemViolationReport = async (filters = {}) => {
             success: false,
             error: error.message,
         };
-    }
-};
-
-/**
- * Trigger alert for violation
- */
-const triggerViolationAlert = async (violationId, userId, violationType, severity, description) => {
-    try {
-        logger.warn('VIOLATION ALERT:', {
-            violationId,
-            userId,
-            violationType,
-            severity,
-            description,
-        });
-
-        // TODO: Implement actual alerting (email, SMS, dashboard notification)
-        // For now, just log it
-
-        return { success: true };
-    } catch (error) {
-        logger.error('Failed to trigger violation alert:', error);
-        return { success: false };
     }
 };
 

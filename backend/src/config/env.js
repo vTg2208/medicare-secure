@@ -13,10 +13,7 @@ const config = {
         name: process.env.DB_NAME || 'healthcare_db',
         user: process.env.DB_USER || 'postgres',
         password: process.env.DB_PASSWORD,
-        ssl: process.env.DB_SSL === 'true' ? {
-            rejectUnauthorized: true,
-            ...(process.env.DB_SSL_CA && { ca: process.env.DB_SSL_CA.replace(/\\n/g, '\n') }),
-        } : false,
+        ssl: require('./database-tls').databaseTls(),
     },
 
     // JWT

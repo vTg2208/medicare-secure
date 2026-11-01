@@ -17,7 +17,7 @@ Prometheus `promtool check config` validates the production configuration and al
 | Boundary | Required owner/environment evidence |
 | --- | --- |
 | Alert delivery | Supply the actual reviewed Alertmanager receiver file and dedicated token, verify private connectivity, and demonstrate one test alert and recovery notification to the intended incident owner. No destination is silently invented. |
-| Database transport | The hosted configuration uses certificate-verified TLS. The standalone production Compose template's `DB_SSL:false` is a trusted-host demonstration boundary, not proof of encrypted database transport. Real deployments need verified database TLS or an explicitly approved protected-host transport design. |
+| Database transport | The hosted configuration uses certificate-verified TLS. The standalone production Compose template now requires verified TLS and rejects plaintext TCP; see [database transport](database-transport.md). The owner must supply and rotate certificates and verify the intended host. |
 | Storage encryption | Ordinary clinical PostgreSQL columns are not application-encrypted. The owner must establish encrypted database volumes, backup storage and access controls in the actual provider/host. Application file/narrative encryption does not prove those properties. |
 | Recovery | Coordinate stopped writes and encrypted database/file backup, retain the two required keys separately, retain encrypted artifacts off-host, define recovery objectives, schedule the job and complete a restore drill in the intended environment. |
 | Malware scanning | Enable scanner availability/signature updates and verify clean, rejected and unavailable cases before enabling uploads. The free demo keeps uploads disabled. |

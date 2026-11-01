@@ -53,10 +53,12 @@ function databaseConfig(env, restore = false) {
 }
 
 function toolEnvironment(env, config) {
+    if (!['127.0.0.1','localhost','::1'].includes(config.host) && env.PGSSLMODE !== 'verify-full' && env.DB_SSL !== 'true') fail('Remote backups require verified TLS');
+    if (env.DB_SSL === 'true' && env.PGSSLMODE && env.PGSSLMODE !== 'verify-full') fail('Database TLS must not be downgraded for backups');
     return Object.fromEntries(Object.entries({ PATH: env.PATH, SystemRoot: env.SystemRoot, TEMP: env.TEMP, TMP: env.TMP,
         PGHOST: config.host, PGPORT: String(config.port), PGDATABASE: config.database, PGUSER: config.user,
         PGPASSWORD: config.password, PGCONNECT_TIMEOUT: '10', PGSSLMODE: env.PGSSLMODE || (env.DB_SSL === 'true' ? 'verify-full' : 'disable'),
-        PGSSLROOTCERT: env.PGSSLROOTCERT, LANG: 'C' }).filter(([, value]) => value !== undefined));
+        PGSSLROOTCERT: env.PGSSLROOTCERT || env.DB_SSL_CA_FILE, LANG: 'C' }).filter(([, value]) => value !== undefined));
 }
 
 function tool(command, args, env) {

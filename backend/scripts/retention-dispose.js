@@ -94,7 +94,7 @@ async function main(args=process.argv.slice(2),env=process.env) {
     if(!['127.0.0.1','localhost','::1'].includes(host)&&env.DB_SSL!=='true')fail('Remote operator connections require verified database TLS');
     const {Client}=require('pg');
     const client=new Client({host,port:Number(env.DB_PORT||5432),database:env.DB_NAME,user:env.DB_USER,password:env.DB_PASSWORD,
-        ssl:env.DB_SSL==='true'?{rejectUnauthorized:true,...(env.DB_SSL_CA?{ca:env.DB_SSL_CA.replace(/\\n/g,'\n')}:{})}:false,
+        ssl:require('../src/config/database-tls').databaseTls(env),
         connectionTimeoutMillis:10000,statement_timeout:30000,application_name:'healthcare-retention-operator'});
     await client.connect();
     try {
