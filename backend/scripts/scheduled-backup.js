@@ -9,9 +9,9 @@ const {archiveBackup}=require('./backup-archive');
 const {inspectBundle,encryptionKey,restoreBackup}=require('./backup-helper');
 const quote=value=>`"${value.replaceAll('"','""')}"`;
 
-async function verifyRestoredSnapshot(client,manifest){
+async function verifyRestoredSnapshot(client,manifest,{uploads}={}){
  const consistency=manifest.consistency;
- if(consistency?.mode!=='database-only'||!['public','healthcare'].includes(consistency.schema)||!Array.isArray(consistency.tables)||!consistency.tables.length||consistency.tables.length>200)throw Error('Unsupported recovery manifest');
+ if(!['database-only','coordinated'].includes(consistency?.mode)||!['public','healthcare'].includes(consistency.schema)||!Array.isArray(consistency.tables)||!consistency.tables.length||consistency.tables.length>200)throw Error('Unsupported recovery manifest');
  const schema=quote(consistency.schema);
  const actual=(await client.query(`SELECT c.relname AS name FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname=$1 AND c.relkind IN('r','p') ORDER BY c.relname`,[consistency.schema])).rows.map(row=>row.name);
  if(JSON.stringify(actual)!==JSON.stringify(consistency.tables.map(t=>t.name)))throw Error('Restored table inventory differs from snapshot');
@@ -28,7 +28,8 @@ async function verifyRestoredSnapshot(client,manifest){
  const head=(await client.query(`SELECT last_hash FROM ${schema}.audit_chain_head WHERE singleton=1`)).rows;
  const tail=(await client.query(`SELECT current_hash FROM ${schema}.audit_logs ORDER BY sequence DESC LIMIT 1`)).rows[0]?.current_hash||null;
  if(head.length!==1||head[0].last_hash!==tail)throw Error('Restored audit head differs from retained evidence');
- return {tables:actual.length,auditVerified:true,ledgerVerified:true};
+ const files=consistency.mode==='coordinated'?await require('./backup-file-references').verifySnapshotFiles(client,manifest,uploads):{};
+ return {tables:actual.length,auditVerified:true,ledgerVerified:true,...files};
 }
 
 async function drillRecovery(input,env,parent){

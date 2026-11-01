@@ -114,13 +114,22 @@ async function createBackup({ output, env = process.env, dumpCommand, databaseSn
     if (!databaseSnapshot && env.BACKUP_QUIESCED !== 'true') fail('BACKUP_QUIESCED=true is required after stopping application writes');
     if (!env.UPLOAD_PATH || !output) fail('UPLOAD_PATH and an output artifact path are required');
     const uploads = await listUploads(path.resolve(env.UPLOAD_PATH));
+    const coordinated = databaseSnapshot?.mode === 'coordinated';
+    if (coordinated) {
+        const captured = databaseSnapshot.capturedFiles;
+        if (!captured || captured.root !== uploads.root || !databaseSnapshot.lease || !Array.isArray(captured.files)) fail('Invalid coordinated snapshot descriptor');
+        const available = new Map(uploads.files.map(file => [file.relative, file.absolute]));
+        for (const file of captured.files) if (available.get(uploadPath(file.relative)) !== file.absolute) fail('Referenced file is missing from the upload inventory');
+        uploads.files = captured.files;
+    }
     if (databaseSnapshot && (!/^[a-f\d-]+$/i.test(databaseSnapshot.id || '') || !['public','healthcare'].includes(databaseSnapshot.schema)
-        || uploads.files.length || !Array.isArray(databaseSnapshot.extensions) || databaseSnapshot.extensions.some(e => !['uuid-ossp','pgcrypto','btree_gist'].includes(e.name) || !['public','extensions',databaseSnapshot.schema].includes(e.schema)))) fail('Invalid database-only snapshot descriptor');
+        || (!coordinated && uploads.files.length) || !Array.isArray(databaseSnapshot.extensions) || databaseSnapshot.extensions.some(e => !['uuid-ossp','pgcrypto','btree_gist'].includes(e.name) || !['public','extensions',databaseSnapshot.schema].includes(e.schema)))) fail('Invalid database snapshot descriptor');
     const destination = path.resolve(output);
     const outputRelation = path.relative(uploads.root, destination);
     if (!outputRelation || (!outputRelation.startsWith('..') && !path.isAbsolute(outputRelation))) fail('Backups must be stored outside UPLOAD_PATH');
     const partial = `${destination}.partial-${crypto.randomUUID()}`;
     let handle; let dump;
+    const abortDump = () => dump?.child.kill('SIGKILL');
     try {
         handle = await fs.open(partial, 'wx', 0o600);
         const header = Buffer.concat([MAGIC, crypto.randomBytes(12)]);
@@ -147,15 +156,20 @@ async function createBackup({ output, env = process.env, dumpCommand, databaseSn
         }
         const snapshotArgs = databaseSnapshot ? [`--snapshot=${databaseSnapshot.id}`, `--schema=${databaseSnapshot.schema}`, ...databaseSnapshot.extensions.map(e=>`--extension=${e.name}`)] : [];
         dump = tool(dumpCommand?.file || env.PG_DUMP_BIN || 'pg_dump', [...(dumpCommand?.args || []), ...snapshotArgs, '--format=custom', '--no-owner', '--no-privileges', '--no-password'], toolEnvironment(env, database));
+        if (coordinated) { databaseSnapshot.lease.assertActive(); databaseSnapshot.lease.signal.addEventListener('abort', abortDump, { once: true }); }
         dump.child.stdin.end();
         entries.push(await entry('database.dump', dump.child.stdout));
         await dump.done;
         for (const file of uploads.files) {
+            if (coordinated) databaseSnapshot.lease.assertActive();
             const stat = await fs.lstat(file.absolute);
-            if (!stat.isFile() || stat.isSymbolicLink()) fail('Upload changed during backup');
+            if (!stat.isFile() || stat.isSymbolicLink() || stat.nlink !== 1 || await fs.realpath(file.absolute) !== file.absolute) fail('Upload changed during backup');
             entries.push(await entry(`uploads/${file.relative}`, createReadStream(file.absolute, { flags: constants.O_RDONLY | (constants.O_NOFOLLOW || 0) }), true));
+            const after = await fs.lstat(file.absolute);
+            if (stat.ino !== after.ino || stat.size !== after.size || stat.mtimeMs !== after.mtimeMs || stat.ctimeMs !== after.ctimeMs) fail('Upload changed during backup');
         }
-        const consistency = databaseSnapshot ? { mode:'database-only', schema:databaseSnapshot.schema, requiredSchemas:[...new Set(databaseSnapshot.extensions.map(e=>e.schema).filter(s=>s!==databaseSnapshot.schema))], tables:databaseSnapshot.tables } : {mode:'coordinated'};
+        const consistency = databaseSnapshot ? { mode:coordinated?'coordinated':'database-only', schema:databaseSnapshot.schema, requiredSchemas:[...new Set(databaseSnapshot.extensions.map(e=>e.schema).filter(s=>s!==databaseSnapshot.schema))], tables:databaseSnapshot.tables,
+            ...(coordinated && { coordination:'postgres-advisory-v1', fileReferences:databaseSnapshot.capturedFiles.references, pendingFileCleanup:databaseSnapshot.capturedFiles.cleanup }) } : {mode:'coordinated'};
         const manifest = Buffer.from(JSON.stringify({ version: 1, createdAt: databaseSnapshot?.createdAt || new Date().toISOString(), consistency, sourceDatabase: database.database,
             sourceUploadRoot: uploads.root.replaceAll('\\', '/'), entries }));
         if (manifest.length > MAX_MANIFEST) fail('Backup manifest exceeds the supported size');
@@ -163,10 +177,12 @@ async function createBackup({ output, env = process.env, dumpCommand, databaseSn
         await put(u32(0));
         await append(handle, cipher.final()); await append(handle, cipher.getAuthTag());
         await handle.sync(); await handle.close(); handle = null;
+        if (coordinated) await databaseSnapshot.lease.assertHeld();
         // Hard-link publication is atomic and never replaces an existing backup.
         await fs.link(partial, destination);
         return { output: destination, files: uploads.files.length, database: database.database };
     } finally {
+        if (coordinated) databaseSnapshot.lease.signal.removeEventListener('abort', abortDump);
         if (dump && dump.child.exitCode === null) dump.child.kill('SIGKILL');
         if (dump) await dump.done.catch(() => {});
         if (handle) await handle.close().catch(() => {});
@@ -298,7 +314,7 @@ async function restoreBackup({ input, uploads: destinationPath, env = process.en
         if ((await admin.query('SELECT 1 FROM pg_database WHERE datname=$1', [database.database])).rows.length) fail('Restore requires a new disposable database; existing databases are never overwritten');
         await admin.query(`CREATE DATABASE "${database.database}" TEMPLATE template0`);
         createdDatabase = true;
-        if (manifest.consistency?.mode === 'database-only') {
+        if (manifest.consistency?.mode === 'database-only' || manifest.consistency?.coordination === 'postgres-advisory-v1') {
             const schemas = manifest.consistency.requiredSchemas;
             if (!['public','healthcare'].includes(manifest.consistency.schema) || !Array.isArray(schemas) || schemas.some(s=>!['public','extensions'].includes(s))) fail('Unsupported snapshot extension namespace');
             const provision = await clientFor(database);
@@ -330,6 +346,11 @@ async function restoreBackup({ input, uploads: destinationPath, env = process.en
         await processRestore.done;
         restored = await clientFor(database);
         await restored.query('BEGIN');
+        if (manifest.consistency?.coordination === 'postgres-advisory-v1') {
+            const {rebaseSnapshotReferences,verifySnapshotFiles} = require('./backup-file-references');
+            await rebaseSnapshotReferences(restored, manifest, destination);
+            await verifySnapshotFiles(restored, manifest, destination);
+        } else {
         const credentials = await credentialTable(restored, manifest);
         if (credentials) {
             const documents = await restored.query(`SELECT id,${credentials.column} AS file_path FROM ${credentials.qualified}`);
@@ -341,6 +362,7 @@ async function restoreBackup({ input, uploads: destinationPath, env = process.en
                 if (!manifest.entries.some(entry => entry.path === `uploads/${relative}`)) fail('Credential document is missing from the backup');
                 await restored.query(`UPDATE ${credentials.qualified} SET ${credentials.column}=$1 WHERE id=$2`, [contained(destination, relative), document.id]);
             }
+        }
         }
         await restored.query('COMMIT');
         return { database: database.database, uploads: destination, files: manifest.entries.length - 1 };

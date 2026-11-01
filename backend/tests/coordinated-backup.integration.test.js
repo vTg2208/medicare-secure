@@ -5,9 +5,19 @@ const {AsyncResource}=require('node:async_hooks');
 const fs=require('node:fs/promises');
 const os=require('node:os');
 const path=require('node:path');
+const crypto=require('node:crypto');
 const coordination=require('../src/services/file-coordination');
 const enabled=process.env.RUN_DB_TESTS==='true';
 const tick=()=>new Promise(resolve=>setImmediate(resolve));
+
+test('file references preserve portable API paths and safely normalize Windows credential roots',()=>{
+ const {normalizeReference}=require('../scripts/backup-file-references');
+ assert.deepEqual(normalizeReference('C:\\private\\uploads\\documents\\degree.pdf','C:\\private\\uploads','doctor_profiles.degree_certificate_url'),{relative:'documents/degree.pdf',absolute:true});
+ const medical='11111111-1111-4111-8111-111111111111/imaging/result.pdf';
+ assert.deepEqual(normalizeReference('/api/files/'+medical,'/private/uploads','radiology_reports.file_path'),{relative:'medical_files/'+medical,absolute:false});
+ for(const value of ['https://example.invalid/a.pdf','documents/../degree.pdf','documents/%2e%2e/degree.pdf','/private/other/degree.pdf','documents/degree.pdf?token=secret'])assert.throws(()=>normalizeReference(value,'/private/uploads','verification_documents.document_url'));
+ assert.throws(()=>normalizeReference('/api/files/'+medical,'/private/uploads','organizations.license_document_url'));
+});
 
 test('file mutation gate serializes backup ownership across PostgreSQL sessions', {skip:!enabled,timeout:20000},async t=>{
  assert.equal(process.env.NODE_ENV,'test');assert.ok(['127.0.0.1','localhost','::1'].includes(process.env.DB_HOST));
@@ -71,4 +81,134 @@ test('file mutation gate serializes backup ownership across PostgreSQL sessions'
    }
   });
  }finally{await observer.end();}
+});
+
+test('coordinated capture restores one database instant with its encrypted files', {skip:!enabled,timeout:120000},async t=>{
+ const {createCoordinatedBackup}=require('../scripts/coordinated-backup');
+ const {inspectBundle,restoreBackup}=require('../scripts/backup-helper');
+ const {verifyRestoredSnapshot}=require('../scripts/scheduled-backup');
+ const {migrate}=require('../src/database/migrate');
+ const {encryptBuffer,decryptBuffer}=require('../src/services/file.crypto');
+ const root=await fs.mkdtemp(path.join(os.tmpdir(),'shms-coordinated-test-'));
+ const uploads=path.join(root,'uploads');await fs.mkdir(path.join(uploads,'documents'),{recursive:true});
+ const config={host:process.env.DB_HOST,port:Number(process.env.DB_PORT),user:process.env.DB_USER,password:process.env.DB_PASSWORD,database:process.env.DB_NAME,ssl:false};
+ const admin=new Client(config);await admin.connect();
+ const suffix=crypto.randomBytes(6).toString('hex'),sourceName=`healthcare_coordinated_${suffix}`,targetName=`healthcare_restore_coordinated_${suffix}`;
+ let source,target;const extraTargets=[];
+ const env={...process.env,DB_NAME:sourceName,BACKUP_DATABASE_SCHEMA:'healthcare',UPLOAD_PATH:uploads,BACKUP_ENCRYPTION_KEY:'d'.repeat(64)};
+ const restoreEnv={...env,RESTORE_DISPOSABLE:'true',RESTORE_DB_HOST:config.host,RESTORE_DB_PORT:String(config.port),RESTORE_DB_USER:config.user,RESTORE_DB_PASSWORD:config.password,RESTORE_ADMIN_DB:config.database,RESTORE_DB_NAME:targetName};
+ const plain=Buffer.from('%PDF-1.4\nSynthetic coordinated recovery content');
+ const write=async relative=>{const absolute=path.join(uploads,...relative.split('/'));await fs.mkdir(path.dirname(absolute),{recursive:true});await fs.writeFile(absolute,encryptBuffer(plain,relative));return absolute;};
+ try{
+  await admin.query(`CREATE DATABASE "${sourceName}" TEMPLATE template0`);
+  source=new Client({...config,database:sourceName});await source.connect();
+  await source.query('CREATE SCHEMA healthcare; CREATE SCHEMA extensions; CREATE EXTENSION "uuid-ossp" SCHEMA extensions; CREATE EXTENSION pgcrypto SCHEMA extensions; CREATE EXTENSION btree_gist SCHEMA healthcare; SET search_path=healthcare,extensions,public');
+  await migrate(source,{log:()=>{}});
+  const patient=(await source.query("INSERT INTO users(email,role_id) VALUES('coordinated@example.invalid',(SELECT id FROM roles WHERE name='patient')) RETURNING id")).rows[0].id;
+  const record=(await source.query("INSERT INTO medical_records(patient_id,type,title,created_by) VALUES($1,'lab_result','Synthetic recovery record',$1) RETURNING id",[patient])).rows[0].id;
+  const medical=`medical_files/${patient}/lab_results/1700000000000_0123456789abcdef.pdf`;
+  await write(medical);await write('documents/credential.pdf');const license=await write('documents/license.pdf');
+  await write('documents/unpublished-orphan.pdf');
+  const organization=(await source.query("INSERT INTO organizations(name,type,license_number,license_document_url) VALUES('Synthetic clinic','clinic','COORDINATED', $1) RETURNING id",[license])).rows[0].id;
+  await source.query("INSERT INTO verification_documents(user_id,document_type,document_url) VALUES($1,'medical_license',$2)",[patient,path.join(uploads,'documents/credential.pdf')]);
+  await source.query("INSERT INTO lab_results(record_id,test_name,file_url,ordered_by) VALUES($1,'Synthetic test',$2,$3)",[record,`/api/files/${patient}/lab_results/1700000000000_0123456789abcdef.pdf`,patient]);
+  await source.query("CREATE TABLE healthcare.capture_fixture(id integer PRIMARY KEY); INSERT INTO healthcare.capture_fixture VALUES(1)");
+  const input=path.join(root,'coordinated.shmsbkp');
+  let manifest;
+  await t.test('captures referenced files and excludes unpublished uploads without a quiescence flag',async()=>{
+   delete env.BACKUP_QUIESCED;
+   const result=await createCoordinatedBackup({output:input,env});assert.equal(result.files,3);
+   manifest=await inspectBundle(input,Buffer.from(env.BACKUP_ENCRYPTION_KEY,'hex'));
+   assert.equal(manifest.consistency.mode,'coordinated');assert.equal(manifest.consistency.fileReferences.length,3);
+   assert.equal(manifest.entries.some(e=>e.path.includes('unpublished-orphan')),false);
+   assert.equal(manifest.entries.length,4);
+  });
+  await t.test('fresh recovery rebases absolute references and decrypts every recovered file',async()=>{
+   const recovered=path.join(root,'recovered');await restoreBackup({input,uploads:recovered,env:restoreEnv});
+   target=new Client({...config,database:targetName,options:'-c search_path=healthcare,extensions,public'});await target.connect();
+   const verification=await verifyRestoredSnapshot(target,manifest,{uploads:recovered});assert.equal(verification.filesVerified,3);
+   assert.equal((await target.query('SELECT document_url FROM verification_documents')).rows[0].document_url,path.join(recovered,'documents/credential.pdf'));
+   assert.equal((await target.query('SELECT license_document_url FROM organizations')).rows[0].license_document_url,path.join(recovered,'documents/license.pdf'));
+   for(const relative of ['documents/credential.pdf','documents/license.pdf',medical])assert.deepEqual(decryptBuffer(await fs.readFile(path.join(recovered,...relative.split('/'))),relative),plain);
+   await fs.unlink(path.join(recovered,...medical.split('/')));
+   await assert.rejects(verifyRestoredSnapshot(target,manifest,{uploads:recovered}),/file|ENOENT/i);
+  });
+  await t.test('missing files, remote references, unknown columns and symbolic links refuse publication',async()=>{
+   const refused=async(name,pattern)=>{const output=path.join(root,name+'.shmsbkp');await assert.rejects(createCoordinatedBackup({output,env}),pattern);await assert.rejects(fs.stat(output),{code:'ENOENT'});};
+   await fs.rename(license,license+'.offline');await refused('missing',/file|ENOENT/i);await fs.rename(license+'.offline',license);
+   await source.query('UPDATE organizations SET license_document_url=$1 WHERE id=$2',['https://example.invalid/remote.pdf',organization]);await refused('remote',/file|reference/i);
+   await source.query('UPDATE organizations SET license_document_url=$1 WHERE id=$2',[license,organization]);
+   await source.query('ALTER TABLE healthcare.capture_fixture ADD COLUMN attachment_path text');await refused('unknown',/file column/i);await source.query('ALTER TABLE healthcare.capture_fixture DROP COLUMN attachment_path');
+   await fs.rename(license,license+'.offline');await fs.symlink(license+'.offline',license);await refused('symlink',/symbolic|symlink/i);await fs.unlink(license);await fs.rename(license+'.offline',license);
+   assert.deepEqual((await source.query('SELECT id FROM capture_fixture')).rows,[{id:1}]);
+  });
+  await t.test('concurrent DB commits stay outside the snapshot and file deletion waits for encrypted publication',async()=>{
+   const {withDatabaseSnapshot}=require('../scripts/database-snapshot');
+   const {collectSnapshotFiles}=require('../scripts/backup-file-references');
+   const {createBackup}=require('../scripts/backup-helper');
+   const separate=new AsyncResource('concurrent-retention-worker');let deletion,deleted=false;
+   const raceInput=path.join(root,'racing.shmsbkp');
+   try{
+    await withDatabaseSnapshot({env,fileCapture:(client,metadata)=>collectSnapshotFiles(client,metadata,uploads)},async descriptor=>{
+     await source.query('INSERT INTO healthcare.capture_fixture VALUES(2)');
+     deletion=separate.runInAsyncScope(()=>coordination.withFileMutation(async()=>{await fs.unlink(path.join(uploads,...medical.split('/')));deleted=true;},{env}));
+     await createBackup({output:raceInput,env,databaseSnapshot:descriptor});
+     assert.equal(deleted,false);assert.ok(await fs.stat(path.join(uploads,...medical.split('/'))));
+    });
+    await deletion;assert.equal(deleted,true);
+    const name=`healthcare_restore_racing_${suffix}`;extraTargets.push(name);const recovered=path.join(root,'race-recovery');
+    await restoreBackup({input:raceInput,uploads:recovered,env:{...restoreEnv,RESTORE_DB_NAME:name}});
+    const reader=new Client({...config,database:name,options:'-c search_path=healthcare,extensions,public'});await reader.connect();
+    try{
+     assert.deepEqual((await reader.query('SELECT id FROM capture_fixture ORDER BY id')).rows,[{id:1}]);
+     assert.equal((await verifyRestoredSnapshot(reader,await inspectBundle(raceInput,Buffer.from(env.BACKUP_ENCRYPTION_KEY,'hex')),{uploads:recovered})).filesVerified,3);
+     assert.deepEqual(decryptBuffer(await fs.readFile(path.join(recovered,...medical.split('/'))),medical),plain);
+    }finally{await reader.end();}
+   }finally{if(deletion)await deletion;await write(medical);separate.emitDestroy();}
+  });
+  await t.test('pending retention files and an interrupted unlink recover without resurrecting removed bytes',async()=>{
+   const policy=(await source.query("INSERT INTO retention_policies(record_type,retention_days,jurisdiction,basis_cipher,created_by) VALUES('lab_result',30,'synthetic','fixture',$1) RETURNING id",[patient])).rows[0].id;
+   const disposal=(await source.query("INSERT INTO retention_disposals(record_id,patient_id,policy_id,basis_cipher,approved_by,status) VALUES($1,$2,$3,'fixture',$2,'database_disposed') RETURNING id",[record,patient,policy])).rows[0].id;
+   const retained=`medical_files/${patient}/imaging/1700000000001_0123456789abcdef.pdf`;
+   const removed=`medical_files/${patient}/imaging/1700000000002_0123456789abcdef.pdf`;await write(retained);
+   await source.query("INSERT INTO retention_file_cleanup(disposal_id,patient_id,file_type,file_name) VALUES($1,$2,'imaging','1700000000001_0123456789abcdef.pdf'),($1,$2,'imaging','1700000000002_0123456789abcdef.pdf')",[disposal,patient]);
+   const pendingInput=path.join(root,'pending.shmsbkp');await createCoordinatedBackup({output:pendingInput,env});
+   const pendingManifest=await inspectBundle(pendingInput,Buffer.from(env.BACKUP_ENCRYPTION_KEY,'hex'));
+   assert.deepEqual(pendingManifest.consistency.pendingFileCleanup.map(row=>row.present).sort(),[false,true]);
+   const name=`healthcare_restore_pending_${suffix}`;extraTargets.push(name);const recovered=path.join(root,'pending-recovery');
+   await restoreBackup({input:pendingInput,uploads:recovered,env:{...restoreEnv,RESTORE_DB_NAME:name}});
+   const reader=new Client({...config,database:name,options:'-c search_path=healthcare,extensions,public'});await reader.connect();
+   try{
+    assert.equal((await verifyRestoredSnapshot(reader,pendingManifest,{uploads:recovered})).filesVerified,4);
+    assert.deepEqual(decryptBuffer(await fs.readFile(path.join(recovered,...retained.split('/'))),retained),plain);
+    await assert.rejects(fs.stat(path.join(recovered,...removed.split('/'))),{code:'ENOENT'});
+    const {cleanupDisposalFiles}=require('../scripts/retention-dispose');
+    await cleanupDisposalFiles(reader,disposal,{uploadPath:recovered,apply:true,quiesced:true});
+    assert.equal((await reader.query('SELECT count(*)::int AS n FROM retention_file_cleanup WHERE cleaned_at IS NULL')).rows[0].n,0);
+   }finally{await reader.end();}
+  });
+  await t.test('a failed dump or lost lock session leaves no bundle and releases file writers',async()=>{
+   const failed=path.join(root,'failed-tool.shmsbkp');
+   await assert.rejects(createCoordinatedBackup({output:failed,env:{...env,PG_DUMP_BIN:'/nonexistent/pg_dump'}}),/tool/i);
+   await assert.rejects(fs.stat(failed),{code:'ENOENT'});
+   await coordination.withFileMutation(async()=>{}, {env});
+   const {withDatabaseSnapshot}=require('../scripts/database-snapshot');
+   const {collectSnapshotFiles}=require('../scripts/backup-file-references');
+   const {createBackup}=require('../scripts/backup-helper');
+   const lost=path.join(root,'lost-session.shmsbkp');
+   await assert.rejects(withDatabaseSnapshot({env,fileCapture:(client,metadata)=>collectSnapshotFiles(client,metadata,uploads)},async descriptor=>{
+    const aborted=new Promise(resolve=>descriptor.lease.signal.addEventListener('abort',resolve,{once:true}));
+    await source.query("SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname=$1 AND application_name='healthcare-backup-snapshot'",[sourceName]);
+    if(!descriptor.lease.signal.aborted)await aborted;
+    await createBackup({output:lost,env,databaseSnapshot:descriptor});
+   }),/session|ownership|connection|tool/i);
+   await assert.rejects(fs.stat(lost),{code:'ENOENT'});
+   assert.equal((await fs.readdir(root)).some(name=>name.includes('.partial-')),false);
+   await coordination.withFileMutation(async()=>{}, {env});
+  });
+ }finally{
+  if(target)await target.end();if(source)await source.end();
+  for(const name of [targetName,sourceName,...extraTargets])await admin.query(`DROP DATABASE IF EXISTS "${name}" WITH (FORCE)`);
+  await admin.end();await fs.rm(root,{recursive:true,force:true});
+ }
 });
