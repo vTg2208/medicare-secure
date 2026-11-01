@@ -61,4 +61,5 @@ test('offers account creation and explains role-based access', () => {
     setup();
     expect(screen.getByText('Your records are available according to your role and sharing permissions.')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Create a patient account' })).toHaveAttribute('href', '/register');
+    expect(screen.getByRole('link', { name: 'Read privacy notice' })).toHaveAttribute('href', '/privacy-notice');
 });

@@ -377,7 +377,10 @@
         "sources": [
           "backend/src/modules/privacy/notices.service.js",
           "backend/src/modules/privacy/notices.routes.js",
-          "backend/src/database/ordered/033_privacy_notices.sql"
+          "backend/src/database/ordered/033_privacy_notices.sql",
+          "frontend/src/pages/privacy/PrivacyNotice.jsx",
+          "frontend/src/pages/privacy/NoticeGovernance.jsx",
+          "frontend/src/routes/AppRoutes.jsx"
         ],
         "limitations": [
           "Publication does not establish legal applicability or provider assurance. Acknowledgement is nonblocking and grants no medical-data consent. No production notice is seeded."
@@ -392,6 +395,14 @@
           {
             "file": "backend/tests/privacy-notice-runtime.integration.test.js",
             "title": "private notice runtime grants preserve immutable timestamps and reader-only backup access"
+          },
+          {
+            "file": "frontend/src/pages/privacy/PrivacyNotice.test.jsx",
+            "title": "a patient explicitly acknowledges the displayed version and sees the saved receipt"
+          },
+          {
+            "file": "frontend/src/pages/privacy/NoticeGovernance.test.jsx",
+            "title": "an officer previews and explicitly confirms publication before a version becomes public"
           }
         ],
         "observations": []

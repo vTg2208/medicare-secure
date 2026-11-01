@@ -34,6 +34,7 @@ test('a reviewer sees the review queue and cannot export a patient account', asy
     await waitFor(() => expect(privacyApi.review).toHaveBeenCalled());
     expect(screen.queryByLabelText('Current password')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Submit request' })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Manage notice publications' })).toHaveAttribute('href', '/compliance/notices');
 });
 test('a failed queue load is visible and does not claim an empty queue', async () => {
     privacyApi.requests.mockRejectedValue(new Error('offline'));

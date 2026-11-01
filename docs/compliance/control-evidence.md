@@ -12,6 +12,7 @@ The authoritative structured matrix is [control-matrix.json](control-matrix.json
 | INCIDENT-01 | Restricted versioned assessments and immutable notification-evidence logging | Human legal assessment, real incident ownership and delivery evidence |
 | MINIMIZATION-01 | Scoped aggregate research and sanitized operational logging | Collection necessity review and stronger de-identification for future dataset sharing |
 | RECOVERY-01 | One coordinated database/file snapshot, independent archive key, exact cloud-download recovery gate | Defined recovery objectives, promotion rehearsal and operator failure delivery |
+| TRANSPARENCY-01 | Officer-published immutable notices, exact owned patient acknowledgement provenance and export, public/history UI | Operator content and publication authority require review; acknowledgement grants no medical consent or deployment assurance |
 
 Run `npm run governance:check` from backend. It validates metadata shape, local source/evidence references and named scenario references. Its result is **references_checked_only**: it does not execute tests, contact a provider or turn a pending responsibility into a verified fact. Historical observations retain their actual source revision, date and report. Referenced scenarios can subsequently change; fresh execution evidence must be recorded independently.
 

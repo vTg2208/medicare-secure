@@ -186,6 +186,7 @@ function Login() {
                     )}
                     <p className="login-access-note"><span className="material-symbols-outlined" aria-hidden="true">lock</span>Your records are available according to your role and sharing permissions.</p>
                     <p className="login-signup">New to Medicare? <Link to="/register">Create a patient account</Link></p>
+                    <p className="login-signup"><Link to="/privacy-notice">Read privacy notice</Link></p>
                 </div>
                 <footer className="login-footer">© {new Date().getFullYear()} Medicare. Your care, connected.</footer>
             </section>
