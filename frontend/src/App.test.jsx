@@ -21,12 +21,14 @@ test('validates invitation links through the invitation page', async () => {
   expect(staffApi.validateInvitation).toHaveBeenCalledWith('sample-token');
 });
 
-test('introduces Medicare with one feature story and a clear registration path', async () => {
+test('introduces Medicare through the sharing journey and routes patients and care teams correctly', async () => {
   render(<MemoryRouter><App /></MemoryRouter>);
-  expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Your health.Your story.All connected.');
-  expect(screen.getByRole('region', { name: 'Discover Medicare' })).toBeInTheDocument();
-  expect(screen.getAllByRole('link', { name: /get started/i })).toHaveLength(2);
-  screen.getAllByRole('link', { name: /get started/i }).forEach(link => expect(link).toHaveAttribute('href', '/register'));
+  expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Your medical records.Your care team.One secure place.');
+  expect(screen.getByRole('region', { name: 'See how Medicare sharing works' })).toBeInTheDocument();
+  expect(screen.getByRole('link', { name: /create patient account/i })).toHaveAttribute('href', '/register');
+  expect(screen.getByRole('link', { name: /open your patient portal/i })).toHaveAttribute('href', '/login');
+  expect(screen.getByRole('link', { name: /care team sign in/i })).toHaveAttribute('href', '/login');
+  expect(document.querySelector(screen.getByRole('link', { name: /see how it works/i }).getAttribute('href'))).toBeInTheDocument();
   expect(screen.queryByRole('note')).not.toBeInTheDocument();
 });
 
