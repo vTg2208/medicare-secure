@@ -12,6 +12,8 @@ Use direct PostgreSQL connections or a **session-mode pooler**. Transaction-mode
 
 FILE_COORDINATION_TIMEOUT_MS defaults to 30000 and accepts 100..60000. Timeouts fail the attempt and release the owned connection. A lost coordination session aborts the dump and prevents normal publication. A killed process loses its PostgreSQL session locks automatically. Pending/incomplete artifacts are cleaned by the command; a host crash can leave an unpublished `.partial-*` file for operator inspection, never a successful archive rotation.
 
+Ownership checks inspect the current backend's granted advisory lock and lock mode, rather than treating a live connection as proof. Legacy credential rewrites are staged and synced in a sibling temporary file, checked against the unchanged original and atomically renamed; an interrupted write leaves the original intact. A host crash may leave a hidden rewrite temporary file; inspect it under the mutation gate before removal instead of treating it as a published credential.
+
 ## File inventory and recovery
 
 The authenticated manifest records the snapshot's table counts, required extension namespaces, each supported file reference and pending retention cleanup. Organization licenses, physician credential fields, verification documents, laboratory results, imaging reports and radiology reports must resolve to allowlisted local paths. API-relative paths and supported legacy `/uploads/` paths remain portable; absolute references are rebased into the fresh restore root. Windows source-root separators are supported. Unknown file columns, remote URLs, traversal, missing active files, symlinks, hard links and unencrypted files fail closed.
