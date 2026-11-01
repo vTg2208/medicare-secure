@@ -48,17 +48,17 @@ async function verifyCatalog(client, inventory, schema = 'public') {
     if (!['public','healthcare'].includes(schema)) fail('unsupported application schema');
     const rows = (await client.query(`SELECT c.relname AS table_name,a.attname AS column_name
         FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace
-        JOIN pg_catalog.pg_attribute a ON a.attrelid=c.oid AND a.attnum>0 AND NOT a.attisdropped
+        LEFT JOIN pg_catalog.pg_attribute a ON a.attrelid=c.oid AND a.attnum>0 AND NOT a.attisdropped
         WHERE n.nspname=$1 AND c.relkind IN ('r','p') ORDER BY c.relname,a.attname`, [schema])).rows;
     const actual = new Map();
     for (const row of rows) {
         if (!actual.has(row.table_name)) actual.set(row.table_name, []);
-        actual.get(row.table_name).push(row.column_name);
+        if (row.column_name !== null) actual.get(row.table_name).push(row.column_name);
     }
     const expected = inventory.tables.map(table => table.name).sort();
     if (JSON.stringify([...actual.keys()].sort()) !== JSON.stringify(expected)) fail('table inventory differs from migrated catalog');
     for (const table of inventory.tables) if (JSON.stringify(actual.get(table.name).slice().sort()) !== JSON.stringify(table.columns.slice().sort())) fail(`column inventory differs for ${table.name}`);
-    return { tables: actual.size, columns: rows.length };
+    return { tables: actual.size, columns: rows.filter(row => row.column_name !== null).length };
 }
 function checkEvidence({ root, inventory, controls }) {
     root = fs.realpathSync(root); checkInventory(inventory);

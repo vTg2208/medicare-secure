@@ -27,6 +27,9 @@ test('the governance inventory covers the actual migrated public and private cat
                 await client.query('DROP TABLE unclassified_fixture; ALTER TABLE pharmacy_inventory ADD COLUMN unclassified_fixture text');
                 await assert.rejects(verifyCatalog(client, inventory, schema), /column inventory differs.*pharmacy_inventory/);
                 await client.query('ALTER TABLE pharmacy_inventory DROP COLUMN unclassified_fixture');
+                await client.query('CREATE TABLE unclassified_fixture ()');
+                await assert.rejects(verifyCatalog(client, inventory, schema), /table inventory differs/);
+                await client.query('DROP TABLE unclassified_fixture');
                 await assert.rejects(verifyCatalog(client, inventory, 'other_schema'), /unsupported.*schema/i);
                 await verifyCatalog(client, inventory, schema);
             } finally { await client.end(); await admin.query(`DROP DATABASE "${name}" WITH (FORCE)`); }

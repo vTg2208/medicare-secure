@@ -3,7 +3,7 @@ CREATE TABLE privacy_notice_versions (
     version_number BIGINT GENERATED ALWAYS AS IDENTITY UNIQUE CHECK (version_number>0),
     content JSONB NOT NULL CHECK (jsonb_typeof(content)='object' AND octet_length(content::text)<=65536),
     content_hash TEXT GENERATED ALWAYS AS (encode(digest(content::text,'sha256'),'hex')) STORED,
-    review_basis_ciphertext TEXT NOT NULL CHECK (length(review_basis_ciphertext) BETWEEN 52 AND 12000 AND substring(decode(review_basis_ciphertext,'base64') FROM 1 FOR 8)=decode('53484d53454e4332','hex')),
+    review_basis_ciphertext TEXT NOT NULL CHECK (length(review_basis_ciphertext) BETWEEN 52 AND 32768 AND substring(decode(review_basis_ciphertext,'base64') FROM 1 FOR 8)=decode('53484d53454e4332','hex')),
     published_by UUID NOT NULL REFERENCES users(id),
     published_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     UNIQUE(id,content_hash)
@@ -68,6 +68,7 @@ BEGIN
     END IF;
     IF EXISTS(SELECT 1 FROM pg_catalog.pg_roles WHERE rolname='healthcare_backup') THEN
         GRANT SELECT ON privacy_notice_versions,privacy_notice_current,privacy_notice_acknowledgements TO healthcare_backup;
+        GRANT SELECT ON SEQUENCE privacy_notice_versions_version_number_seq TO healthcare_backup;
     END IF;
 END
 $notice_roles$;

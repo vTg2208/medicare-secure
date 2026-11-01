@@ -56,6 +56,17 @@ test('a historical notice remains readable and cannot be acknowledged as the cur
     renderPage('patient','/privacy-notice/version-one');expect(await screen.findByText(/earlier notice version/i)).toBeInTheDocument();
     expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();expect(screen.getByRole('link',{name:'Read current notice'})).toHaveAttribute('href','/privacy-notice');
 });
+test('recovering a conflict from a stable version URL opens the new current content',async()=>{
+    noticeApi.acknowledge.mockRejectedValue({response:{status:409}});const user=userEvent.setup();
+    renderPage('patient','/privacy-notice/version-one');
+    await user.click(await screen.findByRole('checkbox'));await user.click(screen.getByRole('button',{name:'Record acknowledgement'}));
+    const reload=await screen.findByRole('button',{name:'Reload current notice'});
+    const second={...first,id:'version-two',versionNumber:'2',content:{...first.content,title:'Replacement notice'}};
+    noticeApi.current.mockResolvedValue(second);noticeApi.acknowledgements.mockResolvedValue({currentVersionId:second.id,acknowledgedCurrent:false,receipts:[]});
+    await user.click(reload);
+    expect(await screen.findByRole('heading',{name:'Replacement notice'})).toBeInTheDocument();
+    expect(screen.getByRole('checkbox')).not.toBeChecked();expect(screen.queryByText(/earlier notice version/i)).not.toBeInTheDocument();
+});
 test('a receipt-history failure does not hide the public notice or claim acknowledgement',async()=>{
     noticeApi.acknowledgements.mockRejectedValue(new Error('unavailable'));renderPage('patient');
     expect(await screen.findByRole('heading',{name:'Patient information notice'})).toBeInTheDocument();

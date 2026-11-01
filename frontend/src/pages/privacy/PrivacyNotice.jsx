@@ -1,5 +1,5 @@
 import React,{useEffect,useRef,useState} from 'react';
-import {Link,useParams} from 'react-router-dom';
+import {Link,useNavigate,useParams} from 'react-router-dom';
 import {useAuth} from '../../context/AuthContext';
 import {noticeApi} from '../../api/noticeApi';
 import Brand from '../../components/common/Brand';
@@ -9,7 +9,7 @@ import './PrivacyCenter.css';
 import './PrivacyNotice.css';
 
 export default function PrivacyNotice() {
-    const {versionId}=useParams();const {user}=useAuth();const patient=user?.role==='patient';const userId=user?.id;
+    const {versionId}=useParams();const navigate=useNavigate();const {user}=useAuth();const patient=user?.role==='patient';const userId=user?.id;
     const [notice,setNotice]=useState(null),[history,setHistory]=useState(null),[currentId,setCurrentId]=useState(null);
     const [loading,setLoading]=useState(true),[loadError,setLoadError]=useState(''),[historyError,setHistoryError]=useState('');
     const [checked,setChecked]=useState(false),[busy,setBusy]=useState(false),[ackError,setAckError]=useState(''),[stale,setStale]=useState(false),[message,setMessage]=useState('');
@@ -36,6 +36,7 @@ export default function PrivacyNotice() {
     },[versionId,patient,userId,reload]);
     const recorded=history?.receipts.find(receipt=>receipt.versionId===notice?.id);
     const isCurrent=Boolean(notice?.id&&notice.id===currentId);
+    const reloadCurrent=()=>{if(versionId)navigate('/privacy-notice');else setReload(value=>value+1);};
     const acknowledge=async event=>{
         event.preventDefault();if(!checked||busy||!isCurrent||!history)return;
         const token=generation.current;setBusy(true);setAckError('');
@@ -64,7 +65,7 @@ export default function PrivacyNotice() {
                         {message&&<p role="status" className="privacy-notice">{message}</p>}
                         {isCurrent&&!recorded&&history&&<form onSubmit={acknowledge}><label className="notice-checkbox"><input type="checkbox" checked={checked} disabled={busy||stale} onChange={event=>setChecked(event.target.checked)}/>I have read this version of the privacy notice.</label><button className="privacy-button" disabled={!checked||busy||stale}>{busy?'Recording…':'Record acknowledgement'}</button></form>}
                         {ackError&&<p role="alert" className="privacy-error">{ackError}</p>}
-                        {stale&&<button className="privacy-button" onClick={()=>setReload(value=>value+1)}>Reload current notice</button>}
+                        {stale&&<button className="privacy-button" onClick={reloadCurrent}>Reload current notice</button>}
                         <h3>Your acknowledgement history</h3>{history?.receipts.length?<ul className="notice-history">{history.receipts.map(receipt=><li key={receipt.id}><Link to={`/privacy-notice/${receipt.versionId}`}>Read acknowledged notice version {receipt.notice.versionNumber}</Link><time dateTime={receipt.acknowledgedAt}>{noticeDate(receipt.acknowledgedAt)}</time></li>)}</ul>:!historyError&&<p className="privacy-hint">No notice acknowledgements recorded.</p>}
                     </section>}
                 </>}

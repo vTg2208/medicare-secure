@@ -102,4 +102,14 @@ test('published privacy notices preserve exact patient provenance without granti
         assert.equal(receipts[0].data.id,receipts[1].data.id);
         assert.equal((await db.query('SELECT count(*)::int AS n FROM privacy_notice_acknowledgements WHERE patient_id=$1 AND version_id=$2',[people.patient.id,latest.id])).rows[0].n,1);
     });
+    await t.test('all accepted review characters fit encrypted storage and excess input fails before publication',async()=>{
+        for(const reviewBasis of ['审'.repeat(4000),'\ud800'.repeat(4000)]){
+            const version=(await call('officer','POST','/notices/versions',{...fixture,reviewBasis},201)).data;
+            const history=(await call('officer','GET','/notices/versions')).data;
+            assert.equal(history.versions.find(value=>value.id===version.id).reviewBasis,reviewBasis);
+        }
+        const pointer=(await request(app).get('/api/notices/current')).body.data.id;
+        await call('officer','POST','/notices/versions',{...fixture,reviewBasis:'审'.repeat(4001)},400);
+        assert.equal((await request(app).get('/api/notices/current')).body.data.id,pointer);
+    });
 }));
