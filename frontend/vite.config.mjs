@@ -8,7 +8,6 @@ export default defineConfig(({ mode }) => {
     define: Object.fromEntries(Object.entries(env).map(([key, value]) => [`process.env.${key}`, JSON.stringify(value)]).concat([
       ['process.env.REACT_APP_API_URL', JSON.stringify(env.REACT_APP_API_URL || '')],
       ['process.env.REACT_APP_APP_NAME', JSON.stringify(env.REACT_APP_APP_NAME || 'MediCare')],
-      ['process.env.REACT_APP_DEMO_MODE', JSON.stringify(env.REACT_APP_DEMO_MODE || 'false')],
       ['process.env.REACT_APP_API_TIMEOUT_MS', JSON.stringify(env.REACT_APP_API_TIMEOUT_MS || '15000')],
     ])),
     server: { proxy: { '/api': process.env.API_PROXY_TARGET || 'http://localhost:5000', '/readyz': process.env.API_PROXY_TARGET || 'http://localhost:5000' } },

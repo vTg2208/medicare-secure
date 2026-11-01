@@ -1,7 +1,7 @@
 {
   "framework": "vite",
   "installCommand": "npm ci",
-  "buildCommand": "REACT_APP_API_URL=/api REACT_APP_DEMO_MODE=true REACT_APP_API_TIMEOUT_MS=90000 npm run build",
+  "buildCommand": "REACT_APP_API_URL=/api REACT_APP_API_TIMEOUT_MS=90000 npm run build",
   "outputDirectory": "build",
   "rewrites": [
     { "source": "/api/:path*", "destination": "https://medicare-secure-api.onrender.com/api/:path*" },
