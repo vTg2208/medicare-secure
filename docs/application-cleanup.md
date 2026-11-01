@@ -14,7 +14,7 @@ This change follows the requirements-completion review at `d14df15`. It changes 
 
 ## Deployment
 
-The code is prepared on `codex/clean-application-experience`, based on the requirements-completion branch. Production has not been promoted. The current production database still needs the reviewed `018`–`025` upgrade before the API can run this branch. Use [the release procedure](requirements-release.md).
+The review branches were renamed to `clean-application-experience` and `requirements-completion`, then integrated into `main`. The private database upgrade through `025`, API release and frontend release are complete. See [the verified release record](releases/2026-11-01-main-release.md); retain [the release procedure](requirements-release.md) for future upgrades.
 
 When promoting, remove obsolete `DEMO_MODE` and `REACT_APP_DEMO_MODE` hosting settings. Neither is read by this application. Configure SMTP before account verification is needed; configure the scanner and a durable encrypted upload store before accepting documents. Existing account identifiers and passwords do not need to change. Historical deployment reports describe earlier releases; this document and the current README describe the new behavior.
 

@@ -1,12 +1,12 @@
 # Requirement-completion release procedure
 
-The `codex/requirements-completion` branch is prepared for inspection. Its new code has not been deployed to the hosted application by this review. The current hosted site continues to use synthetic data and the previous release.
+The requirements and interface changes are integrated into `main` and deployed. Migrations `018`–`025` were applied to the existing private schema before releasing the API and frontend. See [the release verification](releases/2026-11-01-main-release.md). The steps below remain the migration and recovery procedure for subsequent releases.
 
 ## Review inputs
 
 1. Read [the clause-by-clause matrix](requirements-traceability.md), [threat model](architecture-threat-model.md) and [audit integrity guarantees](clinical-audit-integrity.md).
 2. Inspect the branch's focused commits and the new ordered migrations after `017`. Do not edit checksummed historical migration files or publish the original workspace's private/historical Git tree.
-3. Confirm the synthetic-only deployment remains configured. Registration, uploads, email and AI remain disabled on that free demo. No patient identities or clinical records should be entered while reviewing it.
+3. Use the retained sample dataset for verification. Normal feature routes are enabled; email verification requires configured SMTP, uploads require scanning and durable storage, and AI requires its explicitly enabled service. Actual patient information requires the operational/provider conditions in the requirement report.
 
 ## Verification and rollout order
 

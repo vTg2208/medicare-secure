@@ -2,7 +2,7 @@
 
 Medicare brings patient records, visits, prescriptions, laboratory and imaging results, consent and care teams into one healthcare management application. It uses React, Express on Node 24 and PostgreSQL, with role-based access, encrypted files, durable audit evidence and privacy casework.
 
-**Website:** [medicare-vtg.vercel.app](https://medicare-vtg.vercel.app). The hosted production release is separate from this review branch.
+**Website:** [medicare-vtg.vercel.app](https://medicare-vtg.vercel.app). Both reviewed changesets are merged into `main` and deployed. See [release verification](docs/releases/2026-11-01-main-release.md).
 
 ## Hosting
 
@@ -30,4 +30,4 @@ See [STYLEGUIDE.md](STYLEGUIDE.md) for the shared Medicare theme. Source exclude
 
 Start with [requirement coverage](docs/requirements-traceability.md), [architecture and threats](docs/architecture-threat-model.md), [audit guarantees](docs/clinical-audit-integrity.md) and [application cleanup](docs/application-cleanup.md).
 
-The current branch includes ordered migrations 018–025. Review and apply them before upgrading the API; production has not been promoted by this change. Follow [the release procedure](docs/requirements-release.md), preserving database privileges, encrypted-file recovery and operational readiness requirements.
+The deployed `main` includes ordered migrations 018–025. The private database was upgraded before the API and frontend release. Follow [the release procedure](docs/requirements-release.md) for future upgrades, preserving database privileges, encrypted-file recovery and operational readiness requirements.

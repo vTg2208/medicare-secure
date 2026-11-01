@@ -1,6 +1,6 @@
 # Free demonstration deployment
 
-> Historical production-release evidence. The subsequent [application cleanup](docs/application-cleanup.md) removes the shared presentation mode and documents the current source behavior. Production promotion remains pending the reviewed database upgrade.
+> Current release: the reviewed changesets are merged into `main`, migrations 018–025 are applied, and the API/frontend are deployed. See [the verified release record](docs/releases/2026-11-01-main-release.md). The earlier release evidence below is retained as history.
 
 The synthetic-data demonstration is live at **https://medicare-vtg.vercel.app**. Deployment began on 2026-10-31; final verification continued on 2026-11-01 (Asia/Calcutta).
 

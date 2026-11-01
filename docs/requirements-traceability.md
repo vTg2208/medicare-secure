@@ -1,6 +1,6 @@
 # Problem-statement review and implementation evidence
 
-Review date: 2026-11-01. Specification: [the supplied H1 statement](problem-statement.md). This review distinguishes working application controls, optional extensions, and deployment/organizational obligations. Passing tests demonstrates the tested engineering properties; it is not a GDPR or HIPAA certification.
+Historical implementation audit: 2026-11-01. The subsequent interface cleanup and verified main release are recorded in [the release report](releases/2026-11-01-main-release.md). Specification: [the supplied H1 statement](problem-statement.md). This review distinguishes working application controls, optional extensions, and deployment/organizational obligations. Passing tests demonstrates the tested engineering properties; it is not a GDPR or HIPAA certification.
 
 ## Mandatory clauses
 
