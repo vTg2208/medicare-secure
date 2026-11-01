@@ -2,6 +2,8 @@
 
 The manual tools back up the PostgreSQL database and the application's encrypted upload tree together. They do not configure a host, cloud service or scheduler. A scheduler can invoke the same backup command after it has stopped writes and loaded secrets into the process environment.
 
+For the hosted demonstration with no external files, the explicit [scheduled database-only snapshot mode](scheduled-backups.md) uses an exported PostgreSQL snapshot and refuses external-file references. It does not require application downtime or claim that writes were quiesced. Its authenticated custom dump uses the same restore tooling described here, including supported extension namespace provisioning. Consult the release evidence for the actual activation status.
+
 `backend/scripts/backup.js` streams `pg_dump --format=custom` directly into an AES-256-GCM envelope. A plaintext database dump is never written to disk. The encrypted manifest records each payload's path, size and SHA-256 hash. The envelope authenticates the manifest, dump and encrypted uploads together. An incomplete or failed dump is never published as a backup; an existing backup is never replaced.
 
 Only `UPLOAD_PATH/documents/*.{pdf,png,jpg,jpeg}` and `UPLOAD_PATH/medical_files/<patient UUID>/{lab_results,imaging}/<report>` are supported. Files must have the application's `SHMSENC2` identity-bound encrypted format. Symbolic links, unknown directories, plaintext uploads and unrelated files cause backup failure. Environment files, logs, service credential files and encryption keys are not copied into the bundle. Database application records, including password hashes and session metadata, remain part of the encrypted database dump.

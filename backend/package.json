@@ -16,6 +16,9 @@
     "db:test": "node --test tests/database.integration.test.js",
     "db:bootstrap-admin": "node scripts/bootstrap-admin.js",
     "backup": "node scripts/backup.js",
+    "backup:archive": "node scripts/backup-archive.js",
+    "backup:online": "node scripts/database-snapshot.js",
+    "backup:scheduled": "node scripts/scheduled-backup.js",
     "backup:restore-drill": "node scripts/restore-backup.js",
     "files:migrate-encryption": "node scripts/migrate-file-encryption.js",
     "check": "node scripts/check-syntax.js"

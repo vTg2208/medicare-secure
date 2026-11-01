@@ -14,11 +14,13 @@ const u32 = size => { const value = Buffer.alloc(4); value.writeUInt32BE(size); 
 const sha256 = () => crypto.createHash('sha256');
 
 function encryptionKey(env) {
-    if (!/^[a-f\d]{64}$/i.test(env.BACKUP_ENCRYPTION_KEY || '') || !/^[a-f\d]{64}$/i.test(env.ENCRYPTION_KEY || '')) {
+    const applicationKey = /^[a-f\d]{64}$/i.test(env.ENCRYPTION_KEY || '') ? Buffer.from(env.ENCRYPTION_KEY, 'hex') : null;
+    const fingerprint = applicationKey ? sha256().update(applicationKey).digest('hex') : env.BACKUP_APPLICATION_KEY_SHA256;
+    if (!/^[a-f\d]{64}$/i.test(env.BACKUP_ENCRYPTION_KEY || '') || !/^[a-f\d]{64}$/i.test(fingerprint || '')) {
         fail('BACKUP_ENCRYPTION_KEY and ENCRYPTION_KEY must be separately configured 32-byte hexadecimal keys');
     }
     const key = Buffer.from(env.BACKUP_ENCRYPTION_KEY, 'hex');
-    if (crypto.timingSafeEqual(key, Buffer.from(env.ENCRYPTION_KEY, 'hex'))) fail('The backup key must differ from the application encryption key');
+    if (crypto.timingSafeEqual(sha256().update(key).digest(), Buffer.from(fingerprint, 'hex'))) fail('The backup key must differ from the application encryption key');
     return key;
 }
 
@@ -106,12 +108,14 @@ async function listUploads(root) {
     return { root: realRoot, files: files.sort((a, b) => a.relative.localeCompare(b.relative)) };
 }
 
-async function createBackup({ output, env = process.env, dumpCommand } = {}) {
+async function createBackup({ output, env = process.env, dumpCommand, databaseSnapshot } = {}) {
     const key = encryptionKey(env);
     const database = databaseConfig(env);
-    if (env.BACKUP_QUIESCED !== 'true') fail('BACKUP_QUIESCED=true is required after stopping application writes');
+    if (!databaseSnapshot && env.BACKUP_QUIESCED !== 'true') fail('BACKUP_QUIESCED=true is required after stopping application writes');
     if (!env.UPLOAD_PATH || !output) fail('UPLOAD_PATH and an output artifact path are required');
     const uploads = await listUploads(path.resolve(env.UPLOAD_PATH));
+    if (databaseSnapshot && (!/^[a-f\d-]+$/i.test(databaseSnapshot.id || '') || !['public','healthcare'].includes(databaseSnapshot.schema)
+        || uploads.files.length || !Array.isArray(databaseSnapshot.extensions) || databaseSnapshot.extensions.some(e => !['uuid-ossp','pgcrypto','btree_gist'].includes(e.name) || !['public','extensions',databaseSnapshot.schema].includes(e.schema)))) fail('Invalid database-only snapshot descriptor');
     const destination = path.resolve(output);
     const outputRelation = path.relative(uploads.root, destination);
     if (!outputRelation || (!outputRelation.startsWith('..') && !path.isAbsolute(outputRelation))) fail('Backups must be stored outside UPLOAD_PATH');
@@ -141,7 +145,8 @@ async function createBackup({ output, env = process.env, dumpCommand } = {}) {
             await put(u32(0));
             return { path: name, size, sha256: hash.digest('hex') };
         }
-        dump = tool(dumpCommand?.file || env.PG_DUMP_BIN || 'pg_dump', [...(dumpCommand?.args || []), '--format=custom', '--no-owner', '--no-privileges', '--no-password'], toolEnvironment(env, database));
+        const snapshotArgs = databaseSnapshot ? [`--snapshot=${databaseSnapshot.id}`, `--schema=${databaseSnapshot.schema}`, ...databaseSnapshot.extensions.map(e=>`--extension=${e.name}`)] : [];
+        dump = tool(dumpCommand?.file || env.PG_DUMP_BIN || 'pg_dump', [...(dumpCommand?.args || []), ...snapshotArgs, '--format=custom', '--no-owner', '--no-privileges', '--no-password'], toolEnvironment(env, database));
         dump.child.stdin.end();
         entries.push(await entry('database.dump', dump.child.stdout));
         await dump.done;
@@ -150,7 +155,8 @@ async function createBackup({ output, env = process.env, dumpCommand } = {}) {
             if (!stat.isFile() || stat.isSymbolicLink()) fail('Upload changed during backup');
             entries.push(await entry(`uploads/${file.relative}`, createReadStream(file.absolute, { flags: constants.O_RDONLY | (constants.O_NOFOLLOW || 0) }), true));
         }
-        const manifest = Buffer.from(JSON.stringify({ version: 1, createdAt: new Date().toISOString(), sourceDatabase: database.database,
+        const consistency = databaseSnapshot ? { mode:'database-only', schema:databaseSnapshot.schema, requiredSchemas:[...new Set(databaseSnapshot.extensions.map(e=>e.schema).filter(s=>s!==databaseSnapshot.schema))], tables:databaseSnapshot.tables } : {mode:'coordinated'};
+        const manifest = Buffer.from(JSON.stringify({ version: 1, createdAt: databaseSnapshot?.createdAt || new Date().toISOString(), consistency, sourceDatabase: database.database,
             sourceUploadRoot: uploads.root.replaceAll('\\', '/'), entries }));
         if (manifest.length > MAX_MANIFEST) fail('Backup manifest exceeds the supported size');
         await entry('manifest.json', [manifest]);
@@ -265,7 +271,10 @@ async function credentialTable(client, manifest) {
     if (!['public', 'healthcare'].includes(candidate.schema_name) || !['r', 'p'].includes(candidate.kind)) {
         fail('Credential table uses an unsupported application schema or relation type');
     }
-    return `${quoteIdentifier(candidate.schema_name)}.${quoteIdentifier('verification_documents')}`;
+    const qualified = `${quoteIdentifier(candidate.schema_name)}.${quoteIdentifier('verification_documents')}`;
+    const columns = (await client.query(`SELECT a.attname FROM pg_catalog.pg_attribute a JOIN pg_catalog.pg_class c ON c.oid=a.attrelid JOIN pg_catalog.pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname=$1 AND c.relname='verification_documents' AND a.attname IN('file_path','document_url') AND a.attnum>0 AND NOT a.attisdropped`, [candidate.schema_name])).rows;
+    if (columns.length !== 1) fail('Credential file reference column is missing or ambiguous');
+    return { qualified, column:quoteIdentifier(columns[0].attname) };
 }
 
 async function restoreBackup({ input, uploads: destinationPath, env = process.env, restoreCommand } = {}) {
@@ -289,6 +298,13 @@ async function restoreBackup({ input, uploads: destinationPath, env = process.en
         if ((await admin.query('SELECT 1 FROM pg_database WHERE datname=$1', [database.database])).rows.length) fail('Restore requires a new disposable database; existing databases are never overwritten');
         await admin.query(`CREATE DATABASE "${database.database}" TEMPLATE template0`);
         createdDatabase = true;
+        if (manifest.consistency?.mode === 'database-only') {
+            const schemas = manifest.consistency.requiredSchemas;
+            if (!['public','healthcare'].includes(manifest.consistency.schema) || !Array.isArray(schemas) || schemas.some(s=>!['public','extensions'].includes(s))) fail('Unsupported snapshot extension namespace');
+            const provision = await clientFor(database);
+            try { for (const schema of new Set(schemas)) await provision.query(`CREATE SCHEMA IF NOT EXISTS ${quoteIdentifier(schema)}`); }
+            finally { await provision.end(); }
+        }
         await fs.mkdir(destination, { mode: 0o700 }); createdDirectory = true;
         processRestore = tool(restoreCommand?.file || env.PG_RESTORE_BIN || 'pg_restore', [...(restoreCommand?.args || []), '--single-transaction', '--exit-on-error', '--no-owner', '--no-privileges', '--no-password', '--dbname', database.database], toolEnvironment(env, database));
         processRestore.child.stdout.resume();
@@ -316,14 +332,14 @@ async function restoreBackup({ input, uploads: destinationPath, env = process.en
         await restored.query('BEGIN');
         const credentials = await credentialTable(restored, manifest);
         if (credentials) {
-            const documents = await restored.query(`SELECT id,file_path FROM ${credentials}`);
+            const documents = await restored.query(`SELECT id,${credentials.column} AS file_path FROM ${credentials.qualified}`);
             const original = manifest.sourceUploadRoot.replaceAll('\\', '/').replace(/\/$/, '');
             for (const document of documents.rows) {
                 const file = String(document.file_path || '').replaceAll('\\', '/');
                 if (!file.startsWith(`${original}/`)) fail('Credential reference is outside the backed-up upload root');
                 const relative = uploadPath(file.slice(original.length + 1));
                 if (!manifest.entries.some(entry => entry.path === `uploads/${relative}`)) fail('Credential document is missing from the backup');
-                await restored.query(`UPDATE ${credentials} SET file_path=$1 WHERE id=$2`, [contained(destination, relative), document.id]);
+                await restored.query(`UPDATE ${credentials.qualified} SET ${credentials.column}=$1 WHERE id=$2`, [contained(destination, relative), document.id]);
             }
         }
         await restored.query('COMMIT');

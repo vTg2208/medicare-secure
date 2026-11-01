@@ -1,0 +1,81 @@
+name: Encrypted healthcare backup
+on:
+  schedule:
+    - cron: '37 21 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: healthcare-b2-backups
+  cancel-in-progress: false
+jobs:
+  backup-and-recovery:
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'workflow_dispatch' || vars.BACKUPS_ENABLED == 'true')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - name: Install locked backup dependencies without access to backup secrets
+        working-directory: backend
+        run: npm ci --omit=dev --ignore-scripts
+      - name: Prepare matching PostgreSQL clients and private disposable recovery server
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker pull postgres:17-bookworm
+          docker run -d --log-driver none --name healthcare-backup-recovery \
+            --read-only --user 999:999 --cpus 1 --memory 1536m --pids-limit 256 \
+            --cap-drop ALL --security-opt no-new-privileges \
+            --tmpfs /var/lib/postgresql/data:rw,nosuid,nodev,size=1024m,uid=999,gid=999 \
+            --tmpfs /var/run/postgresql:rw,nosuid,nodev,size=16m,uid=999,gid=999 \
+            --publish 127.0.0.1:55432:5432 \
+            --env POSTGRES_PASSWORD=disposable-recovery-only \
+            postgres:17-bookworm -c log_min_messages=fatal -c log_min_error_statement=panic -c log_error_verbosity=terse
+          ready=false
+          for attempt in $(seq 1 40); do
+            if docker exec healthcare-backup-recovery pg_isready -q; then ready=true; break; fi
+            sleep 1
+          done
+          test "$ready" = true
+          mkdir -p "$RUNNER_TEMP/backup-pg-tools"
+          chmod 700 backend/scripts/pg-container-tool.sh
+          for tool in pg_dump pg_restore; do
+            printf '#!/bin/sh\nexec "%s/backend/scripts/pg-container-tool.sh" %s "$@"\n' "$GITHUB_WORKSPACE" "$tool" > "$RUNNER_TEMP/backup-pg-tools/$tool"
+            chmod 700 "$RUNNER_TEMP/backup-pg-tools/$tool"
+          done
+          echo "PG_DUMP_BIN=$RUNNER_TEMP/backup-pg-tools/pg_dump" >> "$GITHUB_ENV"
+          echo "PG_RESTORE_BIN=$RUNNER_TEMP/backup-pg-tools/pg_restore" >> "$GITHUB_ENV"
+      - name: Capture encrypted snapshot, verify cloud recovery and rotate retention
+        working-directory: backend
+        env:
+          NODE_ENV: production
+          TMPDIR: ${{ runner.temp }}
+          DB_HOST: ${{ secrets.BACKUP_DB_HOST }}
+          DB_PORT: ${{ secrets.BACKUP_DB_PORT }}
+          DB_NAME: ${{ secrets.BACKUP_DB_NAME }}
+          DB_USER: ${{ secrets.BACKUP_DB_USER }}
+          DB_PASSWORD: ${{ secrets.BACKUP_DB_PASSWORD }}
+          DB_SSL: 'true'
+          DB_SSL_CA: ${{ secrets.BACKUP_DB_SSL_CA }}
+          PGSSLMODE: verify-full
+          BACKUP_DATABASE_SCHEMA: healthcare
+          BACKUP_ENCRYPTION_KEY: ${{ secrets.BACKUP_ENCRYPTION_KEY }}
+          BACKUP_APPLICATION_KEY_SHA256: ${{ secrets.BACKUP_APPLICATION_KEY_SHA256 }}
+          B2_KEY_ID: ${{ secrets.BACKUP_B2_KEY_ID }}
+          B2_APPLICATION_KEY: ${{ secrets.BACKUP_B2_APPLICATION_KEY }}
+          B2_BUCKET_ID: ${{ secrets.BACKUP_B2_BUCKET_ID }}
+          B2_PREFIX: medicare-backups/
+          RESTORE_DB_HOST: 127.0.0.1
+          RESTORE_DB_PORT: '55432'
+          RESTORE_DB_USER: postgres
+          RESTORE_DB_PASSWORD: disposable-recovery-only
+          RESTORE_ADMIN_DB: postgres
+        run: node scripts/scheduled-backup.js
+      - name: Remove only this job's disposable recovery server
+        if: always()
+        run: docker rm -f healthcare-backup-recovery >/dev/null 2>&1 || true
