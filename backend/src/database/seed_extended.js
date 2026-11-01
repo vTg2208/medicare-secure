@@ -1,7 +1,7 @@
-require('./demo-seed-guard')();
+require('./local-seed-guard')();
 /**
  * Extended Seed Script
- * Adds comprehensive demo data to Supabase:
+ * Adds comprehensive sample data to Supabase:
  *   - 6 patients
  *   - 2 doctors per specialty (Cardiology, Pediatrics, General Practice, Orthopedics, Neurology, Dermatology)
  *   - 6 nurses
@@ -159,7 +159,7 @@ async function seedExtended() {
         const uid = res.rows[0].id;
         await pool.query(
             `INSERT INTO patient_profiles (user_id, unique_health_id, date_of_birth, gender, address)
-             VALUES ($1,$2,$3,$4,'Demo Address')
+             VALUES ($1,$2,$3,$4,'12 Care Avenue')
              ON CONFLICT (user_id) DO NOTHING`,
             [uid, p.uhid, p.dob, p.gender]
         );

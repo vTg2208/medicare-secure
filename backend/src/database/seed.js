@@ -1,4 +1,4 @@
-require('./demo-seed-guard')();
+require('./local-seed-guard')();
 const { Pool } = require('pg');
 const bcrypt = require('bcrypt');
 const config = require('../config/env');

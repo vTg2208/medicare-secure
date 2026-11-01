@@ -1,4 +1,4 @@
-require('../src/database/demo-seed-guard')();
+require('../src/database/local-seed-guard')();
 require('dotenv').config({ path: './.env' }); // Load env vars from backend/.env
 const { pool, query } = require('../src/config/db');
 const { v4: uuidv4 } = require('uuid');

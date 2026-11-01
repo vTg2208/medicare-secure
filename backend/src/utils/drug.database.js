@@ -1,5 +1,5 @@
 /**
- * Drug Database - In-memory database for demonstration
+ * Drug Database - In-memory reference catalog
  * For production, integrate with FDA API, RxNorm, or commercial drug database
  */
 

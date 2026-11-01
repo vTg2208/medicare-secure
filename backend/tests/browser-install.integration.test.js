@@ -4,19 +4,19 @@ const crypto = require('node:crypto');
 const { Client } = require('pg');
 const { readMigrations, isSchemaReady } = require('../src/database/migrate');
 const { buildBrowserSchemaSql } = require('../scripts/export-browser-schema');
-const { DEMO_ROLES, EXTRA_PATIENT_EMAILS, buildDemoSeedSql, seedHostedDemo } = require('../scripts/hosted-demo-seed');
+const { ACCOUNT_ROLES, EXTRA_PATIENT_EMAILS, buildSeedSql, seedWorkspace } = require('../scripts/seed-workspace');
 
-function withDemoMode(callback) {
-    const previous = process.env.DEMO_MODE;
-    process.env.DEMO_MODE = 'true';
+function withSeedApproval(callback) {
+    const previous = process.env.ALLOW_SAMPLE_DATA;
+    process.env.ALLOW_SAMPLE_DATA = 'true';
     try { return callback(); } finally {
-        if (previous === undefined) delete process.env.DEMO_MODE;
-        else process.env.DEMO_MODE = previous;
+        if (previous === undefined) delete process.env.ALLOW_SAMPLE_DATA;
+        else process.env.ALLOW_SAMPLE_DATA = previous;
     }
 }
 
 const testHash = '$2b$12$' + 'A'.repeat(53);
-const hashes = Object.fromEntries(DEMO_ROLES.map(role => [role, testHash]));
+const hashes = Object.fromEntries(ACCOUNT_ROLES.map(role => [role, testHash]));
 
 test('browser schema includes each immutable migration body and ledger hash', () => {
     const sql = buildBrowserSchemaSql();
@@ -37,44 +37,44 @@ test('browser schema includes each immutable migration body and ledger hash', ()
     assert.ok(sql.endsWith('COMMIT;\n'));
 });
 
-test('synthetic seed requires explicit mode and a validated hash for every role', () => {
-    const previous = process.env.DEMO_MODE;
-    delete process.env.DEMO_MODE;
-    try { assert.throws(() => buildDemoSeedSql(hashes), /DEMO_MODE=true/); }
-    finally { if (previous !== undefined) process.env.DEMO_MODE = previous; }
-    withDemoMode(() => {
-        assert.throws(() => buildDemoSeedSql({ ...hashes, doctor: "'); DROP SCHEMA healthcare CASCADE; --" }), /bcrypt/);
-        assert.throws(() => buildDemoSeedSql({ ...hashes, patient: null }), /patient/);
-        const sql = buildDemoSeedSql(hashes);
+test('fixture seed requires explicit mode and a validated hash for every role', () => {
+    const previous = process.env.ALLOW_SAMPLE_DATA;
+    delete process.env.ALLOW_SAMPLE_DATA;
+    try { assert.throws(() => buildSeedSql(hashes), /ALLOW_SAMPLE_DATA=true/); }
+    finally { if (previous !== undefined) process.env.ALLOW_SAMPLE_DATA = previous; }
+    withSeedApproval(() => {
+        assert.throws(() => buildSeedSql({ ...hashes, doctor: "'); DROP SCHEMA healthcare CASCADE; --" }), /bcrypt/);
+        assert.throws(() => buildSeedSql({ ...hashes, patient: null }), /patient/);
+        const sql = buildSeedSql(hashes);
         assert.match(sql, /LOCK TABLE healthcare.users IN EXCLUSIVE MODE/);
         assert.match(sql, /healthcare.users is not empty/);
         assert.match(sql, /exact current migration ledger/);
-        for (const role of DEMO_ROLES) assert.ok(sql.includes(`${role}@demo.invalid`));
-        assert.equal(DEMO_ROLES.length, 12);
+        for (const role of ACCOUNT_ROLES) assert.ok(sql.includes(`${role}@demo.invalid`));
+        assert.equal(ACCOUNT_ROLES.length, 12);
     });
 });
 
 test('seed client rolls back on an execution error', async () => {
     const queries = [];
-    const sql = withDemoMode(() => buildDemoSeedSql(hashes));
-    const previous = process.env.DEMO_MODE;
-    process.env.DEMO_MODE = 'true';
+    const sql = withSeedApproval(() => buildSeedSql(hashes));
+    const previous = process.env.ALLOW_SAMPLE_DATA;
+    process.env.ALLOW_SAMPLE_DATA = 'true';
     try {
-        await assert.rejects(seedHostedDemo({ query: async query => {
+        await assert.rejects(seedWorkspace({ query: async query => {
             queries.push(query);
-            if (query !== 'ROLLBACK') throw new Error('synthetic failure');
-        } }, hashes), /synthetic failure/);
+            if (query !== 'ROLLBACK') throw new Error('fixture failure');
+        } }, hashes), /fixture failure/);
         assert.equal(queries.length, 2);
         assert.equal(queries[1], 'ROLLBACK');
         assert.equal(queries[0].split('\n')[0], sql.split('\n')[0]);
     } finally {
-        if (previous === undefined) delete process.env.DEMO_MODE;
-        else process.env.DEMO_MODE = previous;
+        if (previous === undefined) delete process.env.ALLOW_SAMPLE_DATA;
+        else process.env.ALLOW_SAMPLE_DATA = previous;
     }
 });
 
 // Opt in only: hardcoded disposable local service, never the inspection database.
-test('fresh private browser install and guarded synthetic seed are atomic', {
+test('fresh private browser install and guarded fixture seed are atomic', {
     skip: process.env.RUN_BROWSER_DB_TESTS !== 'true'
 }, async () => {
     assert.equal(process.env.NODE_ENV,'test');
@@ -87,7 +87,7 @@ test('fresh private browser install and guarded synthetic seed are atomic', {
     const owner = new Client({ ...configuration, database: process.env.DB_NAME });
     let client;
     let created = false;
-    const previousMode = process.env.DEMO_MODE;
+    const previousMode = process.env.ALLOW_SAMPLE_DATA;
     try {
         await owner.connect();
         assert.equal((await owner.query('SELECT 1 FROM pg_database WHERE datname=$1', [databaseName])).rowCount, 0);
@@ -115,22 +115,22 @@ test('fresh private browser install and guarded synthetic seed are atomic', {
         await client.query('ROLLBACK');
         assert.equal(await isSchemaReady(client), true);
 
-        process.env.DEMO_MODE = 'true';
-        const seedSql = buildDemoSeedSql(hashes);
-        await assert.rejects(client.query(seedSql.replace('COMMIT;', 'SELECT nonexistent_demo_seed_function();\nCOMMIT;')), /nonexistent_demo_seed_function/);
+        process.env.ALLOW_SAMPLE_DATA = 'true';
+        const seedSql = buildSeedSql(hashes);
+        await assert.rejects(client.query(seedSql.replace('COMMIT;', 'SELECT nonexistent_fixture_seed_function();\nCOMMIT;')), /nonexistent_fixture_seed_function/);
         await client.query('ROLLBACK');
         assert.equal((await client.query('SELECT count(*)::int AS count FROM healthcare.users')).rows[0].count, 0);
         assert.equal((await client.query('SELECT count(*)::int AS count FROM healthcare.organizations')).rows[0].count, 0);
 
         await client.query("UPDATE healthcare._migrations SET file_hash='drift' WHERE id=$1", [migrations[0].id]);
-        await assert.rejects(seedHostedDemo(client, hashes), /exact current migration ledger/);
+        await assert.rejects(seedWorkspace(client, hashes), /exact current migration ledger/);
         assert.equal((await client.query('SELECT count(*)::int AS count FROM healthcare.users')).rows[0].count, 0);
         await client.query('UPDATE healthcare._migrations SET file_hash=$1 WHERE id=$2', [migrations[0].hash, migrations[0].id]);
 
-        await seedHostedDemo(client, hashes);
+        await seedWorkspace(client, hashes);
         const users = (await client.query(`SELECT u.email,u.status,u.is_verified,u.verification_status,r.name AS role
             FROM healthcare.users u JOIN healthcare.roles r ON u.role_id=r.id ORDER BY r.name`)).rows;
-        assert.deepEqual([...new Set(users.map(user => user.role))], [...DEMO_ROLES].sort());
+        assert.deepEqual([...new Set(users.map(user => user.role))], [...ACCOUNT_ROLES].sort());
         assert.equal(users.length, 16);
         for (const user of users) {
             assert.ok(user.email === `${user.role}@demo.invalid` || EXTRA_PATIENT_EMAILS.includes(user.email));
@@ -142,16 +142,16 @@ test('fresh private browser install and guarded synthetic seed are atomic', {
             ['nurse_profiles', 1], ['patient_profiles', 5], ['visits', 1], ['visit_staff_assignments', 2], ['consents', 11], ['medical_records', 1]]) {
             assert.equal((await client.query(`SELECT count(*)::int AS count FROM healthcare.${table}`)).rows[0].count, count, table);
         }
-        await assert.rejects(seedHostedDemo(client, hashes), /healthcare.users is not empty/);
+        await assert.rejects(seedWorkspace(client, hashes), /healthcare.users is not empty/);
         assert.equal((await client.query('SELECT count(*)::int AS count FROM healthcare.users')).rows[0].count, 16);
         // Trigger functions must find digest() under the deployed extension layout.
-        await client.query("INSERT INTO healthcare.audit_logs(action) VALUES('synthetic_browser_test')");
+        await client.query("INSERT INTO healthcare.audit_logs(action) VALUES('fixture_browser_test')");
         const audit = (await client.query('SELECT current_hash,hash_version FROM healthcare.audit_logs')).rows[0];
         assert.match(audit.current_hash, /^[a-f0-9]{64}$/);
         assert.equal(audit.hash_version, 1);
     } finally {
-        if (previousMode === undefined) delete process.env.DEMO_MODE;
-        else process.env.DEMO_MODE = previousMode;
+        if (previousMode === undefined) delete process.env.ALLOW_SAMPLE_DATA;
+        else process.env.ALLOW_SAMPLE_DATA = previousMode;
         if (client) await client.end();
         if (created) await owner.query(`DROP DATABASE "${databaseName}"`);
         await owner.end();

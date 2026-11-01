@@ -1,4 +1,4 @@
-require('../src/database/demo-seed-guard')();
+require('../src/database/local-seed-guard')();
 require('dotenv').config();
 const { Pool } = require('pg');
 const bcrypt = require('bcrypt');
