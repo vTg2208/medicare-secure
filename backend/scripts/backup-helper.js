@@ -318,7 +318,14 @@ async function restoreBackup({ input, uploads: destinationPath, env = process.en
             const schemas = manifest.consistency.requiredSchemas;
             if (!['public','healthcare'].includes(manifest.consistency.schema) || !Array.isArray(schemas) || schemas.some(s=>!['public','extensions'].includes(s))) fail('Unsupported snapshot extension namespace');
             const provision = await clientFor(database);
-            try { for (const schema of new Set(schemas)) await provision.query(`CREATE SCHEMA IF NOT EXISTS ${quoteIdentifier(schema)}`); }
+            try {
+                // A public-schema dump includes CREATE SCHEMA public. Only this newly
+                // created disposable database is touched; let the archive recreate it.
+                if (manifest.consistency.schema === 'public') await provision.query('DROP SCHEMA public');
+                for (const schema of new Set(schemas)) {
+                    if (schema !== manifest.consistency.schema) await provision.query(`CREATE SCHEMA IF NOT EXISTS ${quoteIdentifier(schema)}`);
+                }
+            }
             finally { await provision.end(); }
         }
         await fs.mkdir(destination, { mode: 0o700 }); createdDirectory = true;
