@@ -21,11 +21,18 @@ test('validates invitation links through the invitation page', async () => {
   expect(staffApi.validateInvitation).toHaveBeenCalledWith('sample-token');
 });
 
-test('introduces Medicare through the sharing journey and routes patients and care teams correctly', async () => {
+test('leads with sharing, retains the feature carousel and onboarding, and routes each audience correctly', async () => {
   render(<MemoryRouter><App /></MemoryRouter>);
   expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Your medical records.Your care team.One secure place.');
-  expect(screen.getByRole('region', { name: 'See how Medicare sharing works' })).toBeInTheDocument();
-  expect(screen.getByRole('link', { name: /create patient account/i })).toHaveAttribute('href', '/register');
+  const sharing = screen.getByRole('region', { name: 'See how Medicare sharing works' });
+  const features = screen.getByRole('region', { name: 'Discover Medicare' });
+  expect(sharing.compareDocumentPosition(features) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  expect(screen.getByRole('heading', { name: /getting started should be simple/i })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: 'Make yourself at home' })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: 'See the whole picture' })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: 'Keep care connected' })).toBeInTheDocument();
+  expect(screen.getAllByRole('link', { name: /create patient account/i })).toHaveLength(2);
+  screen.getAllByRole('link', { name: /create patient account/i }).forEach(link => expect(link).toHaveAttribute('href', '/register'));
   expect(screen.getByRole('link', { name: /open your patient portal/i })).toHaveAttribute('href', '/login');
   expect(screen.getByRole('link', { name: /care team sign in/i })).toHaveAttribute('href', '/login');
   expect(document.querySelector(screen.getByRole('link', { name: /see how it works/i }).getAttribute('href'))).toBeInTheDocument();
