@@ -1,0 +1,133 @@
+# Run only after owner review. TLS terminates at your external reverse proxy.
+x-api-environment: &api-environment
+  NODE_ENV: production
+  PORT: 5000
+  DB_HOST: postgres
+  DB_PORT: 5432
+  DB_NAME: ${DB_NAME:-healthcare}
+  DB_USER: ${DB_USER:-healthcare_app}
+  DB_PASSWORD: ${DB_PASSWORD:?Set a random application database password}
+  DB_SSL: "false"
+  JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET}
+  JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?Set JWT_REFRESH_SECRET}
+  JWT_EXPIRES_IN: 1h
+  ENCRYPTION_KEY: ${ENCRYPTION_KEY:?Set a 64-character hex encryption key}
+  FRONTEND_URL: ${FRONTEND_URL:?Set the external HTTPS origin}
+  CORS_ORIGIN: ${FRONTEND_URL}
+  WEBAUTHN_ORIGIN: ${FRONTEND_URL}
+  WEBAUTHN_RP_ID: ${WEBAUTHN_RP_ID:?Set the external hostname}
+  EMAIL_HOST: ${EMAIL_HOST:?Configure SMTP delivery}
+  EMAIL_PORT: ${EMAIL_PORT:-587}
+  EMAIL_SECURE: ${EMAIL_SECURE:-false}
+  EMAIL_USER: ${EMAIL_USER:-}
+  EMAIL_PASSWORD: ${EMAIL_PASSWORD:-}
+  EMAIL_FROM: ${EMAIL_FROM:?Set a verified sender}
+  ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+  TRUST_PROXY: "1"
+  AUTO_LOGOUT_ENABLED: "true"
+  SESSION_TIMEOUT_MINUTES: 30
+  MAX_FILE_SIZE_MB: 10
+  UPLOAD_PATH: /app/uploads
+  CLAMAV_HOST: clamav
+  AI_ENABLED: ${AI_ENABLED:-false}
+  # Optional AI is a separately operated service, disabled by default.
+  AI_SERVICE_URL: ${AI_SERVICE_URL:-}
+  AI_SERVICE_TOKEN: ${AI_SERVICE_TOKEN:-}
+  METRICS_TOKEN: ${METRICS_TOKEN:-}
+
+x-backend-build: &backend-build
+  context: ./backend
+  target: production
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-healthcare}
+      POSTGRES_USER: ${DB_OWNER_USER:-healthcare_owner}
+      POSTGRES_PASSWORD: ${DB_OWNER_PASSWORD:?Set a distinct database owner password}
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks: [data]
+    security_opt: [no-new-privileges:true]
+    logging: { driver: json-file, options: { max-size: 10m, max-file: "5" } }
+
+  migrate:
+    image: secure-healthcare-backend:local
+    build: *backend-build
+    environment:
+      <<: *api-environment
+      DB_USER: ${DB_OWNER_USER:-healthcare_owner}
+      DB_PASSWORD: ${DB_OWNER_PASSWORD}
+      DB_APP_USER: ${DB_USER:-healthcare_app}
+      DB_APP_PASSWORD: ${DB_PASSWORD}
+    command: [sh, -c, 'node src/database/migrate.js && node scripts/provision-app-role.js']
+    depends_on:
+      postgres: { condition: service_healthy }
+    networks: [data]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+
+  backend:
+    image: secure-healthcare-backend:local
+    build: *backend-build
+    restart: unless-stopped
+    environment: *api-environment
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+      clamav: { condition: service_started }
+    volumes:
+      - uploads:/app/uploads
+      - logs:/app/logs
+    read_only: true
+    tmpfs: [/tmp:noexec,nosuid,size=64m]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    # Egress is needed for configured SMTP. No backend ports are published.
+    networks: [app, data, egress]
+    mem_limit: 768m
+    pids_limit: 128
+    logging: { driver: json-file, options: { max-size: 10m, max-file: "5" } }
+
+  frontend:
+    build: { context: ./frontend, target: production }
+    restart: unless-stopped
+    ports: ["127.0.0.1:${FRONTEND_PORT:-8080}:8080"]
+    depends_on:
+      backend: { condition: service_healthy }
+    read_only: true
+    tmpfs: [/tmp:noexec,nosuid,size=32m, /var/cache/nginx:size=64m]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    networks: [app]
+    mem_limit: 128m
+    pids_limit: 64
+    logging: { driver: json-file, options: { max-size: 5m, max-file: "5" } }
+
+  clamav:
+    image: clamav/clamav:stable
+    restart: unless-stopped
+    volumes: [clamav_data:/var/lib/clamav]
+    networks: [app, egress]
+    mem_limit: 2g
+    pids_limit: 128
+    security_opt: [no-new-privileges:true]
+    logging: { driver: json-file, options: { max-size: 5m, max-file: "3" } }
+
+volumes:
+  postgres_data:
+  uploads:
+  logs:
+  clamav_data:
+networks:
+  app: { internal: true }
+  data: { internal: true }
+  egress:

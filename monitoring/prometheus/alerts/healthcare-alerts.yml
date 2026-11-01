@@ -1,0 +1,65 @@
+# Rules use metrics actually emitted by the application. These are operational
+# signals, not legal compliance certifications or proof that notices were sent.
+groups:
+  - name: healthcare_service_and_integrity
+    interval: 30s
+    rules:
+      - alert: BackendUnavailable
+        expr: up{job="backend-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Backend metrics are unavailable"
+          description: "Check API readiness, scrape authentication and private network connectivity."
+      - alert: MissingBackendTarget
+        expr: absent(up{job="backend-api"})
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Backend monitoring target is missing"
+      - alert: HighErrorRate
+        expr: sum(rate(http_requests_total{job="backend-api",status=~"5.."}[5m])) / clamp_min(sum(rate(http_requests_total{job="backend-api"}[5m])), 0.001) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Backend error rate exceeds five percent"
+      - alert: SlowAPIResponse
+        expr: histogram_quantile(0.95, sum by (le, route) (rate(http_request_duration_seconds_bucket{job="backend-api"}[5m]))) > 3
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Slow API response on {{ $labels.route }}"
+      - alert: AuthenticationFailureBurst
+        expr: sum(increase(http_requests_total{job="backend-api",route="/login",status="401"}[5m])) > 20
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Repeated failed login responses"
+          description: "Review authentication audit evidence and rate-limit events."
+      - alert: UnauthorizedAccessBurst
+        expr: sum by (route) (increase(http_requests_total{job="backend-api",status=~"401|403"}[5m])) > 50
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Repeated denied requests on {{ $labels.route }}"
+      - alert: AuditLogFailure
+        expr: increase(audit_log_errors_total{job="backend-api"}[5m]) > 0
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Durable audit recording failed"
+          description: "Protected delivery fails closed; clinical mutations with audit enforcement roll back. Investigate immediately."
+      - alert: MissingAuditTelemetry
+        expr: absent(audit_log_errors_total{job="backend-api"})
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Audit failure telemetry is missing"

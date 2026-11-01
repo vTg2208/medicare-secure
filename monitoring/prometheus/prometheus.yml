@@ -1,0 +1,68 @@
+# Prometheus Configuration for Healthcare Management System
+# https://prometheus.io/docs/prometheus/latest/configuration/configuration/
+
+global:
+  scrape_interval: 15s      # How frequently to scrape targets
+  evaluation_interval: 15s  # How frequently to evaluate rules
+  scrape_timeout: 10s
+
+  external_labels:
+    cluster: 'healthcare-system'
+    environment: 'development'
+
+# Alertmanager configuration (optional - configure if using alerting)
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - 'alertmanager:9093'
+
+# Load rules once and periodically evaluate them
+rule_files:
+  - '/etc/prometheus/alerts/*.yml'
+
+# Scrape configurations
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          service: 'prometheus'
+
+  # Backend API metrics
+  - job_name: 'backend-api'
+    static_configs:
+      - targets: ['backend:5000']
+        labels:
+          service: 'backend'
+          component: 'api'
+    metrics_path: '/metrics'
+    scrape_interval: 10s
+
+  # PostgreSQL metrics via postgres_exporter
+  - job_name: 'postgresql'
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+        labels:
+          service: 'database'
+          component: 'postgresql'
+
+  # Node Exporter for system metrics (if deployed)
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+        labels:
+          service: 'system'
+          component: 'node'
+
+  # Docker container metrics via cAdvisor
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+        labels:
+          service: 'containers'
+          component: 'cadvisor'
+
+  # /health and /readyz are JSON endpoints, not Prometheus exposition.
+  # Production scraping and alert delivery use production.yml instead.

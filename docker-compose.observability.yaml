@@ -1,0 +1,45 @@
+# Optional self-hosted overlay; it is not provisioned on the free hosted demo.
+# docker compose -f docker-compose.prod.yaml -f docker-compose.observability.yaml up -d
+# Receiver configuration and the dedicated matching backend token are required.
+services:
+  backend:
+    environment:
+      METRICS_TOKEN: ${METRICS_TOKEN:?Set a dedicated metrics bearer token matching METRICS_TOKEN_FILE}
+  prometheus:
+    image: prom/prometheus:v3.6.0
+    command: ['--config.file=/etc/prometheus/production.yml','--storage.tsdb.path=/prometheus','--storage.tsdb.retention.time=15d','--storage.tsdb.retention.size=2GB']
+    volumes:
+      - ./monitoring/prometheus/production.yml:/etc/prometheus/production.yml:ro
+      - ./monitoring/prometheus/alerts:/etc/prometheus/alerts:ro
+      - prometheus_data:/prometheus
+    secrets: [metrics_token]
+    networks: [app]
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 512m
+    pids_limit: 128
+    restart: unless-stopped
+    logging: {driver: json-file, options: {max-size: 10m, max-file: '3'}}
+  alertmanager:
+    image: prom/alertmanager:v0.28.1
+    command: ['--config.file=/etc/alertmanager/receivers.yml','--storage.path=/alertmanager']
+    volumes:
+      - ${ALERTMANAGER_CONFIG_FILE:?Supply a reviewed Alertmanager configuration with an actual incident receiver}:/etc/alertmanager/receivers.yml:ro
+      - alertmanager_data:/alertmanager
+    # A configured incident destination requires outbound connectivity. Neither
+    # dashboard is published; inspect it through an authenticated local tunnel.
+    networks: [app, egress]
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 128m
+    pids_limit: 64
+    restart: unless-stopped
+    logging: {driver: json-file, options: {max-size: 5m, max-file: '3'}}
+secrets:
+  metrics_token:
+    file: ${METRICS_TOKEN_FILE:?Supply a local secret file containing only the metrics bearer token}
+volumes:
+  prometheus_data:
+  alertmanager_data:

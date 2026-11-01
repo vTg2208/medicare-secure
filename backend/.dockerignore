@@ -1,0 +1,77 @@
+# Dependencies
+node_modules/
+uploads/
+.env*
+!.env.example
+*.json
+!package.json
+!package-lock.json
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+yarn.lock
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+
+# Testing
+coverage/
+.nyc_output/
+tests/
+*.test.js
+*.spec.js
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
+docs/
+*.md
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+temp/
+tmp/
+.tmp/
+
+# Debug files
+debug*.js
+check_*.js
+fix_*.js
+test_*.js
+verify_*.js
+run_*.js
+find_*.js
+delete-*.js
+inspect_*.txt
+debug_*.txt
+db_output.txt
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# OS
+Thumbs.db
