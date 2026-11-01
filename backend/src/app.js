@@ -9,10 +9,13 @@ const { errorHandler, notFoundHandler, asyncHandler } = require('./middleware/er
 const { apiLimiter } = require('./middleware/rateLimit.middleware');
 const { demoGuard, deploymentInfo } = require('./middleware/demo.middleware');
 const { metricsMiddleware, trackConnections, metricsEndpoint } = require('./middleware/metrics');
+const { auditLog } = require('./middleware/audit.middleware');
+const { requestContext } = require('./services/request-context');
 
 const app = express();
 app.disable('x-powered-by');
 app.set('trust proxy', config.trustProxy);
+app.use(requestContext);
 app.use(helmet());
 app.use(cors({ origin: config.cors.origin, credentials: false }));
 app.use(express.json({ limit: '1mb' }));
@@ -58,9 +61,13 @@ const routes = {
     files: './modules/files/files.routes',
     research: './modules/research/research.routes',
     emergency: './modules/emergency/emergency.routes',
+    privacy: './modules/privacy/privacy.routes',
 };
 for (const [prefix, source] of Object.entries(routes)) {
     const router = require(source);
+    if (prefix !== 'auth') {
+        app.use([`/api/${config.apiVersion}/${prefix}`, `/api/${prefix}`], auditLog(null, prefix));
+    }
     app.use(`/api/${config.apiVersion}/${prefix}`, router);
     app.use(`/api/${prefix}`, router);
 }

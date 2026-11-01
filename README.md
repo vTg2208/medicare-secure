@@ -25,3 +25,9 @@ Frontend: `cd frontend`, `npm ci`, `npm test`, `npm run lint`, `npm run build`.
 The native database integration suites run only when explicitly enabled against a disposable loopback PostgreSQL database. Credentials and generated synthetic account passwords must stay private.
 
 Interface conventions and theme verification are documented in [STYLEGUIDE.md](STYLEGUIDE.md).
+
+## Requirement completion review — 2026-11-01
+
+The `codex/requirements-completion` branch closes source-confirmed gaps in the supplied H1 problem statement. Start with [the requirement matrix](docs/requirements-traceability.md), [architecture/threat model](docs/architecture-threat-model.md), and [audit guarantees](docs/clinical-audit-integrity.md). Privacy requests/exports, breach assessment and notice evidence, clinical contract/state fixes, identity-bound file encryption, encrypted backup/restore and legacy file migration are implemented with regression coverage.
+
+This branch is for owner inspection before deployment. It adds ordered migrations 018–025; do not deploy its API against the old 17-migration schema. The existing hosted site remains a synthetic-only demonstration. Legal/provider arrangements, verified encrypted infrastructure, retention policy and actual monitoring/notice delivery are separate operational prerequisites. See the matrix for exact boundaries; no HIPAA/GDPR certification is claimed.
