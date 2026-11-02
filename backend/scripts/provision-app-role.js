@@ -27,6 +27,18 @@ async function main() {
         await client.query(`REVOKE ALL PRIVILEGES (singleton,last_hash) ON audit_chain_head FROM ${identifier}`);
         await client.query(`GRANT SELECT ON audit_chain_head TO ${identifier}`);
         await client.query(`REVOKE EXECUTE ON FUNCTION chain_audit_insert() FROM ${identifier}`);
+        const evidenceTables = {
+            privacy_export_receipts: ['request_id,patient_id,content_hash,byte_length,schema_version,scope,exclusions', 'id,request_id,patient_id,content_hash,byte_length,schema_version,scope,exclusions,prepared_at'],
+            privacy_export_confirmations: ['receipt_id,request_id,patient_id,content_hash', 'receipt_id,request_id,patient_id,content_hash,confirmed_at'],
+            privacy_request_disposals: ['id,request_id,patient_id,disposal_id,linked_by,explanation_cipher', 'id,request_id,patient_id,disposal_id,linked_by,linked_at,explanation_cipher'],
+        };
+        for (const [table, [insertColumns, allColumns]] of Object.entries(evidenceTables)) {
+            await client.query(`REVOKE ALL ON public.${table} FROM ${identifier}`);
+            await client.query(`REVOKE ALL (${allColumns}) ON public.${table} FROM ${identifier}`);
+            await client.query(`GRANT SELECT ON public.${table} TO ${identifier}`);
+            await client.query(`GRANT INSERT (${insertColumns}) ON public.${table} TO ${identifier}`);
+        }
+        await client.query(`REVOKE EXECUTE ON FUNCTION protect_privacy_fulfillment_evidence() FROM ${identifier}`);
         await client.query('COMMIT');
         console.log('Application database role provisioned with data access and no schema administration privileges');
     } catch (error) { await client.query('ROLLBACK'); throw error; }
