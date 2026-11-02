@@ -120,6 +120,12 @@
         ],
         "observations": [
           {
+            "revision": "4aeb987b7a2729d49c0c4778708ee7a657c81973",
+            "observedAt": "2026-11-02",
+            "kind": "automated_execution",
+            "evidence": "docs/releases/2026-11-02-privacy-request-fulfillment.md"
+          },
+          {
             "revision": "3f3d3a9c533b910cf4538188b4555d7cb32f42e1",
             "observedAt": "2026-11-01",
             "kind": "automated_execution",

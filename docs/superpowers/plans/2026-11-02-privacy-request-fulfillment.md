@@ -33,10 +33,10 @@ Files: add `backend/src/database/ordered/034_privacy_fulfillment_evidence.sql`, 
 
 Interfaces: `POST /privacy/requests/:id/export` accepts `{currentPassword}`, returns `{success,data,receipt}`. `POST /privacy/requests/:id/receipts/:receiptId/confirm` accepts `{received:true,contentHash}`. `evidenceForRequests(client, ids)` returns request-indexed `{exports,disposals}`; receipts contain `id,requestId,patientId,contentHash,byteLength,schemaVersion,scope,exclusions,preparedAt,confirmedAt`.
 
-- [ ] Add HTTP/DB regressions for missing route (404 before implementation), exact digest/bytes, ownership, password, no implicit confirmation, duplicate confirmation, malformed/forged fields and rollback.
-- [ ] Run `node --test tests/privacy-evidence.integration.test.js` in the isolated fixture and observe RED.
-- [ ] Implement additive tables, immutable guards/grants, export transaction hook, confirmations and owned list/export metadata. Preserve general export response.
-- [ ] Run focused HTTP tests and existing privacy/notice tests; expected all pass. Record RED/GREEN and commit `feat: record request-linked export receipts and patient confirmation`.
+- [x] Add HTTP/DB regressions for missing route (404 before implementation), exact digest/bytes, ownership, password, no implicit confirmation, duplicate confirmation, malformed/forged fields and rollback.
+- [x] Run `node --test tests/privacy-evidence.integration.test.js` in the isolated fixture and observe RED.
+- [x] Implement additive tables, immutable guards/grants, export transaction hook, confirmations and owned list/export metadata. Preserve general export response.
+- [x] Run focused HTTP tests and existing privacy/notice tests; expected all pass. Record RED/GREEN and commit `feat: record request-linked export receipts and patient confirmation`.
 
 ## Task 2: Evidence-required case completion and disposal associations
 
@@ -44,26 +44,26 @@ Files: evidence service, privacy rights/fulfillment service, routes, `backend/te
 
 Interfaces: `POST /privacy/requests/:id/disposals` officer-only `{disposalId,explanation}`. Closure `action` is `{type:'export_receipt',receiptId}` for access/portability or `{type:'disposal_evidence',disposalIds:[...]}` for partial erasure. `validateCompletion(client,req,row)` returns server-derived action provenance. All mutations lock case first; disposal locks sorted.
 
-- [ ] Add RED tests for narrative-only completion, prepared/unrelated receipt, pending/wrong-patient/old/superseded disposal, outstanding cleanup, message-only claims, no full erasure, legacy preservation and closure races.
-- [ ] Implement linking, current disposal evidence, completion validation, explicit legacy display metadata and bounded validation; retain existing restriction/correction behavior.
-- [ ] Update existing success fixtures to use actual confirmed evidence; run affected privacy/retention suites and commit `feat: require verified evidence for privacy case fulfillment`.
+- [x] Add RED tests for narrative-only completion, prepared/unrelated receipt, pending/wrong-patient/old/superseded disposal, outstanding cleanup, message-only claims, no full erasure, legacy preservation and closure races.
+- [x] Implement linking, current disposal evidence, completion validation, explicit legacy display metadata and bounded validation; retain existing restriction/correction behavior.
+- [x] Update existing success fixtures to use actual confirmed evidence; run affected privacy/retention suites and commit `feat: require verified evidence for privacy case fulfillment`.
 
 ## Task 3: Patient and officer evidence controls
 
 Files: `frontend/src/api/privacyApi.js`, `frontend/src/pages/privacy/PrivacyCenter.jsx`; add focused `RequestEvidence.jsx` and rendered tests; extend `PrivacyCenter.test.jsx`.
 
-- [ ] Add RED rendered tests for request download, unconfirmed/confirmed history, explicit confirmation, password clearing, errors/retry, reviewer confirmed-receipt selection and disposal association/selection.
-- [ ] Use exact saved serialization, no automatic confirmation; show limited scope and pending cleanup. Generic export unchanged. Show historical closed decisions without inventing evidence.
-- [ ] Run frontend suite, lint, theme check and build; commit `feat: show privacy fulfillment evidence in patient and officer workflows`.
+- [x] Add RED rendered tests for request download, unconfirmed/confirmed history, explicit confirmation, password clearing, errors/retry, reviewer confirmed-receipt selection and disposal association/selection.
+- [x] Use exact saved serialization, no automatic confirmation; show limited scope and pending cleanup. Generic export unchanged. Show historical closed decisions without inventing evidence.
+- [x] Run frontend suite, lint, theme check and build; commit `feat: show privacy fulfillment evidence in patient and officer workflows`.
 
 ## Task 4: Privileges, upgrade/recovery, inventory and review
 
 Files: new evidence runtime/recovery integration tests; governance inventory/control matrix/lifecycle, privacy fulfillment docs and release evidence.
 
-- [ ] Add RED tests for restricted API immutable timestamps/rows, backup read-only access, both provisioning orders and schema layouts, 033 upgrade/replay preserving old decisions, encrypted backup/restore exact evidence and explanations.
-- [ ] Update migration/export/catalog references and inventory for three new tables; no edits to old SQL migrations. Correct issues exposed by tests.
-- [ ] Run backend unit and full integration suites, frontend suite/lint/build, syntax and governance checks; record exact results and limitations.
-- [ ] Obtain fresh whole-branch review; reproduce actionable findings with failing regressions and fix them. Commit coherent recovery/governance evidence and review fixes.
+- [x] Add RED tests for restricted API immutable timestamps/rows, backup read-only access, both provisioning orders and schema layouts, 033 upgrade/replay preserving old decisions, encrypted backup/restore exact evidence and explanations.
+- [x] Update migration/export/catalog references and inventory for three new tables; no edits to old SQL migrations. Correct issues exposed by tests.
+- [x] Run backend unit and full integration suites, frontend suite/lint/build, syntax and governance checks; record exact results and limitations.
+- [x] Obtain fresh whole-branch review; reproduce actionable findings with failing regressions and fix them. Commit coherent recovery/governance evidence and review fixes.
 
 ## Execution ledger
 
