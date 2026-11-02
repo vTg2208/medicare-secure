@@ -4,19 +4,14 @@ import { useAuth } from '../../context/AuthContext';
 import { privacyApi } from '../../api/privacyApi';
 import Brand from '../../components/common/Brand';
 import ThemeToggle from '../../components/common/ThemeToggle';
+import RequestEvidence, { CompletionEvidence } from './RequestEvidence';
+import { savePrivacyExport as saveExport } from './privacyDownload';
 import './PrivacyCenter.css';
 
 const TYPES = { access: 'Access to information', rectification: 'Correct information', erasure: 'Erasure review', restriction: 'Restrict processing', portability: 'Data portability', objection: 'Object to processing' };
 const STATUS = { submitted: 'Submitted', in_review: 'In review', fulfilled: 'Fulfilled', partially_fulfilled: 'Partially fulfilled', retained: 'Retained with a basis', declined: 'Declined with a basis' };
 const date = value => value ? new Date(value).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) : 'Not recorded';
 const errorText = (error, fallback) => error.response?.data?.message || fallback;
-const saveExport = data => {
-    const href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
-    const anchor = document.createElement('a');
-    anchor.href = href; anchor.download = `medicare-information-${new Date().toISOString().slice(0, 10)}.json`;
-    document.body.appendChild(anchor);
-    try { anchor.click(); } finally { anchor.remove(); setTimeout(() => URL.revokeObjectURL(href), 1000); }
-};
 function ReviewForm({ request, onUpdated }) {
     const initial = request.status === 'submitted' ? 'in_review' : request.type === 'erasure' ? 'retained' : 'fulfilled';
     const [status, setStatus] = useState(initial);
@@ -29,12 +24,16 @@ function ReviewForm({ request, onUpdated }) {
     const [correctionTarget, setCorrectionTarget] = useState('record');
     const [profileField, setProfileField] = useState('date_of_birth');
     const [profileValue, setProfileValue] = useState('');
+    const [receiptId, setReceiptId] = useState('');
+    const [disposalIds, setDisposalIds] = useState([]);
     const [busy, setBusy] = useState(false);
     const [error, setError] = useState('');
     const terminal = status !== 'in_review';
     const applies = ['fulfilled','partially_fulfilled'].includes(status);
     const action = applies && ['restriction','objection'].includes(request.type) ? {type:'restrict',purpose}
-        : applies && request.type==='rectification' ? correctionTarget==='record' ? {type:'correction',recordId,text:correction} : {type:'profile_correction',changes:{[profileField]:profileValue}} : null;
+        : applies && request.type==='rectification' ? correctionTarget==='record' ? {type:'correction',recordId,text:correction} : {type:'profile_correction',changes:{[profileField]:profileValue}}
+        : applies && ['access','portability'].includes(request.type) ? {type:'export_receipt',receiptId}
+        : applies && request.type==='erasure' ? {type:'disposal_evidence',disposalIds} : null;
     const submit = async event => {
         event.preventDefault(); setError(''); setBusy(true);
         try { await privacyApi.update(request.id, { status, ...(terminal ? { resolution, retentionBasis } : {}), ...(note ? { note } : {}), ...(action ? {action} : {}) }); await onUpdated(); }
@@ -47,6 +46,7 @@ function ReviewForm({ request, onUpdated }) {
             {(request.status === 'submitted' ? ['in_review'] : ['fulfilled', 'partially_fulfilled', 'retained', 'declined'].filter(item => request.type !== 'erasure' || item !== 'fulfilled')).map(item => <option key={item} value={item}>{STATUS[item]}</option>)}
         </select>
         {terminal && <>
+            {applies && <CompletionEvidence request={request} receiptId={receiptId} setReceiptId={setReceiptId} disposalIds={disposalIds} setDisposalIds={setDisposalIds} />}
             <label htmlFor={`resolution-${request.id}`}>Resolution and actions actually taken</label>
             <textarea id={`resolution-${request.id}`} value={resolution} onChange={event => setResolution(event.target.value)} required minLength={10} maxLength={10000} rows={3} />
             <label htmlFor={`basis-${request.id}`}>Decision or retention basis</label>
@@ -64,7 +64,7 @@ function ReviewForm({ request, onUpdated }) {
         <label htmlFor={`note-${request.id}`}>Review note (optional)</label>
         <textarea id={`note-${request.id}`} value={note} onChange={event => setNote(event.target.value)} minLength={10} maxLength={4000} rows={2} />
         {error && <p role="alert" className="privacy-error">{error}</p>}
-        <button className="privacy-button" disabled={busy}>{busy ? 'Saving review…' : 'Save review'}</button>
+        <button className="privacy-button" disabled={busy || (action?.type==='export_receipt' && !receiptId) || (action?.type==='disposal_evidence' && !disposalIds.length)}>{busy ? 'Saving review…' : 'Save review'}</button>
     </form>;
 }
 function RequestCard({ request, reviewer, onUpdated }) {
@@ -75,8 +75,9 @@ function RequestCard({ request, reviewer, onUpdated }) {
             <h3>{TYPES[request.type] || request.type}</h3></div><span className={`privacy-status ${overdue ? 'privacy-status-overdue' : ''}`}>{overdue ? 'Review overdue' : STATUS[request.status]}</span></div>
         <p className="privacy-request-details">{request.details}</p>
         <dl className="privacy-dates"><div><dt>Received</dt><dd><time dateTime={request.createdAt}>{date(request.createdAt)}</time></dd></div><div><dt>Review due</dt><dd><time dateTime={request.dueAt}>{date(request.dueAt)}</time></dd></div></dl>
-        {request.outcome && <div className="privacy-outcome"><h4>Recorded decision</h4><p>{request.outcome.resolution}</p><p><strong>Basis:</strong> {request.outcome.retentionBasis}</p>{request.outcome.erasureScope && <p>{request.outcome.erasureScope}</p>}{request.outcome.appliedAction && <p>Applied: {request.outcome.appliedAction.type} {request.outcome.appliedAction.type==='profile_correction' ? Object.keys(request.outcome.appliedAction.after).join(', ') : request.outcome.appliedAction.purpose || `for record ${request.outcome.appliedAction.recordId}`}</p>}</div>}
+        {request.outcome && <div className="privacy-outcome"><h4>Recorded decision</h4><p>{request.outcome.resolution}</p><p><strong>Basis:</strong> {request.outcome.retentionBasis}</p>{request.outcome.erasureScope && <p>{request.outcome.erasureScope}</p>}{request.outcome.appliedAction && !['export_receipt','disposal_evidence'].includes(request.outcome.appliedAction.type) && <p>Applied: {request.outcome.appliedAction.type} {request.outcome.appliedAction.type==='profile_correction' ? Object.keys(request.outcome.appliedAction.after).join(', ') : request.outcome.appliedAction.purpose || `for record ${request.outcome.appliedAction.recordId}`}</p>}</div>}
         <details className="privacy-history"><summary>Decision history ({request.history?.length || 0})</summary><ol>{(request.history || []).map(item => <li key={item.id}><strong>{STATUS[item.status]}</strong><time dateTime={item.createdAt}>{date(item.createdAt)}</time>{item.note && <p>{item.note}</p>}{item.outcome && <p>{item.outcome.resolution}<br />Basis: {item.outcome.retentionBasis}</p>}</li>)}</ol></details>
+        <RequestEvidence request={request} reviewer={reviewer} onUpdated={onUpdated} />
         {reviewer && open && <ReviewForm key={`${request.id}-${request.status}`} request={request} onUpdated={onUpdated} />}
     </article>;
 }
