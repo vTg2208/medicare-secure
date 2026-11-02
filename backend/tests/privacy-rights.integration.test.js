@@ -102,8 +102,10 @@ test('privacy requests and exports enforce owner, reviewer, encryption and durab
             status(await send('reviewer', 'put', `/requests/${ownRequest.id}`, { status: 'fulfilled', resolution: 'Trying to skip initial review.', retentionBasis: 'No exception has been identified.' }), 409);
             status(await send('reviewer', 'put', `/requests/${ownRequest.id}`, { status: 'in_review', note: 'Review accepted by privacy team.' }), 200);
             status(await send('reviewer', 'put', `/requests/${ownRequest.id}`, { status: 'fulfilled' }), 400);
-            const resolved = await send('reviewer', 'put', `/requests/${ownRequest.id}`, { status: 'fulfilled', resolution: 'Access review completed and the requested copy was supplied.', retentionBasis: 'Existing clinical retention requirements continue to apply.' });
-            status(resolved, 200); assert.equal(resolved.body.data.history.length, 3);
+            const copy = await require('../src/modules/privacy/privacy-rights.service').exportPatient({ user: { id: people.patient.id, roleName: 'patient' }, body: { currentPassword: password }, headers: {} }, { requestId: ownRequest.id });
+            status(await send('patient','post',`/requests/${ownRequest.id}/receipts/${copy.receipt.id}/confirm`,{received:true,contentHash:copy.receipt.contentHash}),200);
+            const resolved = await send('reviewer', 'put', `/requests/${ownRequest.id}`, { status: 'fulfilled', resolution: 'Access review completed and the requested copy was supplied.', retentionBasis: 'Existing clinical retention requirements continue to apply.', action:{type:'export_receipt',receiptId:copy.receipt.id} });
+            status(resolved, 200); assert.equal(resolved.body.data.history.length, 5);
             assert.equal(resolved.body.data.history[1].previousStatus, 'submitted');
             assert.ok(resolved.body.data.resolvedAt);
             status(await send('reviewer', 'put', `/requests/${ownRequest.id}`, { status: 'in_review' }), 409);
@@ -154,7 +156,7 @@ test('privacy requests and exports enforce owner, reviewer, encryption and durab
             assert.deepEqual(data.labResults.find(item => item.test_name === 'Own fixture test').results_data, { observation: { value: 12, unit: 'g/dL' } });
             assert.equal(typeof data.triageSessions[0].created_at, 'string');
             assert.deepEqual(data.triageSessions[0].soap_summary, { subjective: 'Own fixture summary' });
-            assert.equal(data.privacyRequests.length, 2); assert.equal(data.privacyRequests.find(item => item.id === ownRequest.id).history.length, 3);
+            assert.equal(data.privacyRequests.length, 2); assert.equal(data.privacyRequests.find(item => item.id === ownRequest.id).history.length, 5);
             assert.ok(data.auditHistory.some(item => item.action === 'export_patient_information'));
             assert.ok(data.auditHistory.some(item => item.action === 'shared_patient_list_fixture'));
             assert.ok(!data.auditHistory.some(item => item.action === 'foreign_only_list_fixture'));

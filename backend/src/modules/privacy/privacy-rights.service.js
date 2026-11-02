@@ -87,12 +87,16 @@ const updateRequest = async req => {
         const note = body.note == null || body.note === '' ? null : narrative(body.note, 'Review note', 4000);
         const applied = await require('./privacy-fulfillment.service').applyFulfillment(client,req,row);
         if (outcome && applied) outcome.appliedAction = applied;
+        if (outcome && applied?.type === 'disposal_evidence') {
+            outcome.clinicalRecordsDeleted = applied.disposals.some(item => item.resourceType === 'medical_record');
+            outcome.erasureScope = applied.scope;
+        }
         const updated = (await client.query(`UPDATE privacy_rights_requests SET status=$1,outcome_cipher=$2,
             resolved_at=CASE WHEN $3 THEN NOW() ELSE NULL END,resolved_by=CASE WHEN $3 THEN $4::uuid ELSE NULL END,updated_at=NOW()
             WHERE id=$5 RETURNING *`, [body.status, outcome ? seal(outcome, `privacy-request:${row.id}:outcome`) : null, terminal, req.user.id, row.id])).rows[0];
         await appendHistory(client, req, row.id, row.status, body.status, { note, outcome });
         await audit.logAuditEvent(event(req, 'resolve_privacy_request', row.id, row.patient_id), client);
-        return decode(updated, await historyRows(client, [row.id]));
+        return decode(updated, await historyRows(client, [row.id]), await evidence.evidenceForRequests(client, [row.id]));
     });
     req.auditEventRecorded = true;
     return result;

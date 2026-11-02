@@ -35,6 +35,9 @@ router.post('/requests/:id/export', requireRole('patient'), exportLimiter, async
 router.post('/requests/:id/receipts/:receiptId/confirm', requireRole('patient'), asyncHandler(async (req,res) => {
     res.json({ success: true, data: await require('./fulfillment-evidence.service').confirmReceipt(req) });
 }));
+router.post('/requests/:id/disposals', requireRole('compliance_officer'), asyncHandler(async (req,res) => {
+    res.status(201).json({ success: true, data: await require('./fulfillment-evidence.service').linkDisposal(req) });
+}));
 router.post('/export', requireRole('patient'), exportLimiter, asyncHandler(async (req, res) => {
     const data = await service.exportPatient(req);
     res.set('Content-Disposition', 'attachment; filename="patient-information.json"');

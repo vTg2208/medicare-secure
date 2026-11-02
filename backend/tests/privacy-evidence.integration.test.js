@@ -52,5 +52,9 @@ test('privacy fulfillment binds exact exports and explicit confirmations to thei
             await assert.rejects(db.query('UPDATE privacy_export_receipts SET content_hash=$1 WHERE id=$2',['0'.repeat(64),exported.receipt.id]),/immutable/);
             await assert.rejects(db.query('DELETE FROM privacy_export_confirmations WHERE receipt_id=$1',[exported.receipt.id]),/immutable/);
         });
+        await t.test('request exports share the existing authenticated patient export limit',async()=>{
+            await call('patient','POST','/privacy/export',{currentPassword:password});
+            await call('patient','POST',`/privacy/requests/${own.id}/export`,{currentPassword:password},429);
+        });
     });
 });
