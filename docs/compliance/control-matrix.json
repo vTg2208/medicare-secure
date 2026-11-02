@@ -120,6 +120,12 @@
         ],
         "observations": [
           {
+            "revision": "f0ef2c2d4970a2da55059ce8f3a0523fcaaf469d",
+            "observedAt": "2026-11-02",
+            "kind": "live_drill",
+            "evidence": "docs/releases/2026-11-02-privacy-fulfillment-live-release.md"
+          },
+          {
             "revision": "4aeb987b7a2729d49c0c4778708ee7a657c81973",
             "observedAt": "2026-11-02",
             "kind": "automated_execution",

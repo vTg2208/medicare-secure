@@ -1,6 +1,6 @@
 # Privacy-request fulfillment implementation — 2026-11-02
 
-The approved privacy-request fulfillment design is implemented on `feat/privacy-request-fulfillment`, based on main `0e51a908ba78d63f5316009ed08985725d94f35c`. This is source/test evidence, not a deployment report. Migration 034 has not been applied to the live installation, and no live patient information, credentials, notices or disposal decisions were changed.
+The approved privacy-request fulfillment design was implemented on `feat/privacy-request-fulfillment`, based on main `0e51a908ba78d63f5316009ed08985725d94f35c`. This records the source/test phase, which applied no live migration and changed no live patient information, credentials, notices or disposal decisions. The subsequent authorized deployment is recorded separately in [live release evidence](2026-11-02-privacy-fulfillment-live-release.md).
 
 ## Implemented behavior
 
