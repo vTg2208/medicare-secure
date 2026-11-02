@@ -1,4 +1,4 @@
--- Apply as the existing schema owner after guarded migrations through 033.
+-- Apply as the existing schema owner after guarded migrations through 034.
 -- Existing API principal only; no login changes or schema exposure.
 BEGIN;
 GRANT SELECT,INSERT ON healthcare.care_message_threads,healthcare.care_messages,healthcare.medical_record_corrections TO healthcare_api;
@@ -15,6 +15,12 @@ GRANT INSERT(patient_id,version_id,notice_hash) ON healthcare.privacy_notice_ack
 GRANT UPDATE(version_id) ON healthcare.privacy_notice_current TO healthcare_api;
 GRANT USAGE,SELECT ON SEQUENCE healthcare.privacy_notice_versions_version_number_seq TO healthcare_api;
 REVOKE ALL ON FUNCTION healthcare.protect_privacy_notice_history(),healthcare.advance_privacy_notice_current() FROM healthcare_api;
+REVOKE ALL ON healthcare.privacy_export_receipts,healthcare.privacy_export_confirmations,healthcare.privacy_request_disposals FROM healthcare_api;
+GRANT SELECT ON healthcare.privacy_export_receipts,healthcare.privacy_export_confirmations,healthcare.privacy_request_disposals TO healthcare_api;
+GRANT INSERT(request_id,patient_id,content_hash,byte_length,schema_version,scope,exclusions) ON healthcare.privacy_export_receipts TO healthcare_api;
+GRANT INSERT(receipt_id,request_id,patient_id,content_hash) ON healthcare.privacy_export_confirmations TO healthcare_api;
+GRANT INSERT(id,request_id,patient_id,disposal_id,linked_by,explanation_cipher) ON healthcare.privacy_request_disposals TO healthcare_api;
+REVOKE ALL ON FUNCTION healthcare.protect_privacy_fulfillment_evidence() FROM healthcare_api;
 DO $runtime_contract$
 BEGIN
  IF NOT has_column_privilege('healthcare_api','healthcare.care_message_threads','patient_id','UPDATE')

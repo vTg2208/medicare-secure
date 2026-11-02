@@ -27,6 +27,14 @@ router.get('/requests', requireRole('patient'), asyncHandler(async (req, res) =>
 router.post('/requests', requireRole('patient'), asyncHandler(async (req, res) => res.status(201).json({ success: true, data: await service.createRequest(req) })));
 router.get('/review', requireRole('compliance_officer'), asyncHandler(async (req, res) => res.json({ success: true, data: await service.listRequests(req, true) })));
 router.put('/requests/:id', requireRole('compliance_officer'), asyncHandler(async (req, res) => res.json({ success: true, data: await service.updateRequest(req) })));
+router.post('/requests/:id/export', requireRole('patient'), exportLimiter, asyncHandler(async (req,res) => {
+    const result = await service.exportPatient(req, { requestId: req.params.id });
+    res.set('Content-Disposition', 'attachment; filename="patient-information.json"');
+    res.json({ success: true, ...result });
+}));
+router.post('/requests/:id/receipts/:receiptId/confirm', requireRole('patient'), asyncHandler(async (req,res) => {
+    res.json({ success: true, data: await require('./fulfillment-evidence.service').confirmReceipt(req) });
+}));
 router.post('/export', requireRole('patient'), exportLimiter, asyncHandler(async (req, res) => {
     const data = await service.exportPatient(req);
     res.set('Content-Disposition', 'attachment; filename="patient-information.json"');
