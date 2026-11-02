@@ -1,6 +1,6 @@
 # Privacy-request fulfillment evidence
 
-Status: concrete design for review; product implementation has not started.
+Status: approved by the user on 2026-11-02; implementation proceeds under the matching plan. Live deployment remains a separate phase.
 
 ## Intent and scope
 

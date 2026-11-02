@@ -1301,6 +1301,70 @@
       }
     },
     {
+      "name": "privacy_export_confirmations",
+      "columns": [
+        "receipt_id",
+        "request_id",
+        "patient_id",
+        "content_hash",
+        "confirmed_at"
+      ],
+      "classification": "governance",
+      "purposes": [
+        "Evidence of patient-request fulfillment, explicit receipt confirmation or reviewed disposal scope"
+      ],
+      "ownerRole": "privacy_officer",
+      "audience": [
+        "owning_patient",
+        "authorized_compliance_officer",
+        "restricted_backup_reader"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Immutable request evidence; retain under reviewed governance policy. No export payload is stored. Retained evidence and historical backups are outside clinical disposal scope.",
+      "columnOverrides": {
+        "patient_id": {
+          "classification": "identity",
+          "protection": "Request ownership enforced by composite foreign keys and authenticated service checks."
+        }
+      }
+    },
+    {
+      "name": "privacy_export_receipts",
+      "columns": [
+        "id",
+        "request_id",
+        "patient_id",
+        "content_hash",
+        "byte_length",
+        "schema_version",
+        "scope",
+        "exclusions",
+        "prepared_at"
+      ],
+      "classification": "governance",
+      "purposes": [
+        "Evidence of patient-request fulfillment, explicit receipt confirmation or reviewed disposal scope"
+      ],
+      "ownerRole": "privacy_officer",
+      "audience": [
+        "owning_patient",
+        "authorized_compliance_officer",
+        "restricted_backup_reader"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Immutable request evidence; retain under reviewed governance policy. No export payload is stored. Retained evidence and historical backups are outside clinical disposal scope.",
+      "columnOverrides": {
+        "patient_id": {
+          "classification": "identity",
+          "protection": "Request ownership enforced by composite foreign keys and authenticated service checks."
+        }
+      }
+    },
+    {
       "name": "privacy_notice_acknowledgements",
       "columns": [
         "id",
@@ -1391,6 +1455,44 @@
         "published_by": {
           "classification": "identity",
           "protection": "Responsible publisher identity; excluded from public notice projection."
+        }
+      }
+    },
+    {
+      "name": "privacy_request_disposals",
+      "columns": [
+        "id",
+        "request_id",
+        "patient_id",
+        "disposal_id",
+        "linked_by",
+        "linked_at",
+        "explanation_cipher"
+      ],
+      "classification": "governance",
+      "purposes": [
+        "Evidence of patient-request fulfillment, explicit receipt confirmation or reviewed disposal scope"
+      ],
+      "ownerRole": "privacy_officer",
+      "audience": [
+        "owning_patient",
+        "authorized_compliance_officer",
+        "restricted_backup_reader"
+      ],
+      "applicationEncryption": "selected_fields",
+      "encryptedColumns": [
+        "explanation_cipher"
+      ],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Immutable request evidence; retain under reviewed governance policy. No export payload is stored. Retained evidence and historical backups are outside clinical disposal scope.",
+      "columnOverrides": {
+        "patient_id": {
+          "classification": "identity",
+          "protection": "Request ownership enforced by composite foreign keys and authenticated service checks."
+        },
+        "explanation_cipher": {
+          "classification": "governance",
+          "protection": "Identity-bound application encryption; patient-visible case scope, not private disposal review."
         }
       }
     },
