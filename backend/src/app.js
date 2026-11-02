@@ -63,10 +63,11 @@ const routes = {
     messages: './modules/messages/messages.routes',
     appointments: './modules/appointments/appointments.routes',
     retention: './modules/privacy/retention.routes',
+    notices: './modules/privacy/notices.routes',
 };
 for (const [prefix, source] of Object.entries(routes)) {
     const router = require(source);
-    if (prefix !== 'auth') {
+    if (!['auth','notices'].includes(prefix)) {
         app.use([`/api/${config.apiVersion}/${prefix}`, `/api/${prefix}`], auditLog(null, prefix));
     }
     app.use(`/api/${config.apiVersion}/${prefix}`, router);

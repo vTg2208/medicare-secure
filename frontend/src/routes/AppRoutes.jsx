@@ -44,6 +44,8 @@ const Incidents = lazy(() => import('../pages/compliance/Incidents'));
 const ConsentOverrides = lazy(() => import('../pages/compliance/ConsentOverrides'));
 const ComplianceProfile = lazy(() => import('../pages/compliance/Profile'));
 const PrivacyCenter = lazy(() => import('../pages/privacy/PrivacyCenter'));
+const PrivacyNotice = lazy(() => import('../pages/privacy/PrivacyNotice'));
+const NoticeGovernance = lazy(() => import('../pages/privacy/NoticeGovernance'));
 
 // Insurance Pages
 const InsuranceDashboard = lazy(() => import('../pages/insurance/Dashboard'));
@@ -88,6 +90,8 @@ function AppRoutes() {
             {/* Public Routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/privacy-notice/:versionId?" element={<PrivacyNotice />} />
+            <Route path="/compliance/notices" element={<ProtectedRoute allowedRoles={['compliance_officer']}><NoticeGovernance /></ProtectedRoute>} />
             <Route path="/staff/invitation/:token" element={<AcceptInvitation />} />
 
             {/* Protected Routes */}

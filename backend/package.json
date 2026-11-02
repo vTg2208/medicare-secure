@@ -22,7 +22,8 @@
     "backup:scheduled": "node scripts/scheduled-backup.js",
     "backup:restore-drill": "node scripts/restore-backup.js",
     "files:migrate-encryption": "node scripts/migrate-file-encryption.js",
-    "check": "node scripts/check-syntax.js"
+    "check": "node scripts/check-syntax.js",
+    "governance:check": "node scripts/governance-evidence.js"
   },
   "keywords": [
     "healthcare",

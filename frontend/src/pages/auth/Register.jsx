@@ -507,6 +507,7 @@ function Register() {
                         </button>
                     </div>
                 )}
+                <p className="mt-6 text-sm text-center"><Link to="/privacy-notice" className="text-primary-600 dark:text-primary-400 underline">Read privacy notice</Link></p>
             </div>
         </div>
     );
