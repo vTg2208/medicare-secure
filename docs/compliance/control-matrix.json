@@ -347,6 +347,12 @@
             "observedAt": "2026-11-01",
             "kind": "automated_execution",
             "evidence": "docs/releases/2026-11-01-durable-backup-activation.md"
+          },
+          {
+            "revision": "513cefd8a899bcefa92c1a328e7ec8767df3ff0a",
+            "observedAt": "2026-11-02",
+            "kind": "live_drill",
+            "evidence": "docs/releases/2026-11-02-privacy-notices-live-release.md"
           }
         ]
       },
@@ -411,6 +417,12 @@
             "observedAt": "2026-11-02",
             "kind": "automated_execution",
             "evidence": "docs/releases/2026-11-02-compliance-evidence-and-notices.md"
+          },
+          {
+            "revision": "513cefd8a899bcefa92c1a328e7ec8767df3ff0a",
+            "observedAt": "2026-11-02",
+            "kind": "live_drill",
+            "evidence": "docs/releases/2026-11-02-privacy-notices-live-release.md"
           }
         ]
       },
