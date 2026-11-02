@@ -6,6 +6,7 @@ const applyFulfillment = async (client, req, request) => {
     const action = req.body.action;
     const applied = ['fulfilled','partially_fulfilled'].includes(req.body.status);
     if (!applied) { if (action) fail('Actions require a fulfilled or partially fulfilled decision'); return null; }
+    if (['access','portability','erasure'].includes(request.request_type)) return require('./fulfillment-evidence.service').validateCompletion(client,req,request);
     if (!['restriction','objection','rectification'].includes(request.request_type)) {
         if (action) fail('This request type does not accept that fulfillment action');
         return null;

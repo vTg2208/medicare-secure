@@ -3,6 +3,7 @@ const db = require('../../config/db');
 const audit = require('../../services/audit.service');
 const { comparePassword } = require('../../services/encryption.service');
 const { seal, unseal } = require('./privacy-crypto');
+const evidence = require('./fulfillment-evidence.service');
 
 const TYPES = ['access', 'rectification', 'erasure', 'restriction', 'portability', 'objection'];
 const TERMINAL = ['fulfilled', 'partially_fulfilled', 'retained', 'declined'];
@@ -25,10 +26,11 @@ const calendarMonthDue = received => {
 const event = (req, action, entityId, patientId) => ({ userId: req.user.id, action, entityType: 'privacy_request', entityId,
     purpose: 'Patient information rights', ipAddress: req.ip, userAgent: req.headers?.['user-agent'],
     requestMethod: req.method, requestPath: req.path, statusCode: 200, metadata: { patientId } });
-const decode = (row, histories = []) => ({ id: row.id, patientId: row.patient_id, patientName: row.patient_name,
+const decode = (row, histories = [], evidenceByRequest = {}) => ({ id: row.id, patientId: row.patient_id, patientName: row.patient_name,
     type: row.request_type, status: row.status, details: unseal(row.detail_cipher, `privacy-request:${row.id}:details`),
     outcome: row.outcome_cipher ? unseal(row.outcome_cipher, `privacy-request:${row.id}:outcome`) : null,
     dueAt: row.due_at, createdAt: row.created_at, updatedAt: row.updated_at, resolvedAt: row.resolved_at,
+    evidence: evidenceByRequest[row.id] || { exports: [], disposals: [] },
     history: histories.filter(item => item.request_id === row.id).map(item => ({ id: item.id, sequence: item.event_sequence, actorId: item.actor_id,
         previousStatus: item.previous_status, status: item.status, createdAt: item.created_at,
         ...unseal(item.event_cipher, `privacy-history:${item.id}`) })) });
@@ -45,7 +47,8 @@ const listRequests = async (req, review = false) => {
             JOIN users u ON u.id=r.patient_id ${review ? '' : 'WHERE r.patient_id=$1'} ORDER BY r.created_at DESC,r.id`, review ? [] : [req.user.id])).rows;
         const histories = await historyRows(client, rows.map(row => row.id));
         await audit.logAuditEvent(event(req, review ? 'review_privacy_requests' : 'view_privacy_requests', null, review ? null : req.user.id), client);
-        return rows.map(row => decode(row, histories));
+        const linked = await evidence.evidenceForRequests(client, rows.map(row => row.id));
+        return rows.map(row => decode(row, histories, linked));
     });
     req.auditEventRecorded = true;
     return result;
@@ -84,12 +87,16 @@ const updateRequest = async req => {
         const note = body.note == null || body.note === '' ? null : narrative(body.note, 'Review note', 4000);
         const applied = await require('./privacy-fulfillment.service').applyFulfillment(client,req,row);
         if (outcome && applied) outcome.appliedAction = applied;
+        if (outcome && applied?.type === 'disposal_evidence') {
+            outcome.clinicalRecordsDeleted = applied.disposals.some(item => item.resourceType === 'medical_record');
+            outcome.erasureScope = applied.scope;
+        }
         const updated = (await client.query(`UPDATE privacy_rights_requests SET status=$1,outcome_cipher=$2,
             resolved_at=CASE WHEN $3 THEN NOW() ELSE NULL END,resolved_by=CASE WHEN $3 THEN $4::uuid ELSE NULL END,updated_at=NOW()
             WHERE id=$5 RETURNING *`, [body.status, outcome ? seal(outcome, `privacy-request:${row.id}:outcome`) : null, terminal, req.user.id, row.id])).rows[0];
         await appendHistory(client, req, row.id, row.status, body.status, { note, outcome });
         await audit.logAuditEvent(event(req, 'resolve_privacy_request', row.id, row.patient_id), client);
-        return decode(updated, await historyRows(client, [row.id]));
+        return decode(updated, await historyRows(client, [row.id]), await evidence.evidenceForRequests(client, [row.id]));
     });
     req.auditEventRecorded = true;
     return result;
@@ -106,7 +113,7 @@ const safeJson = value => {
     if (!value || typeof value !== 'object') return value;
     return Object.fromEntries(Object.entries(value).filter(([key]) => !secretKey.test(key)).map(([key, item]) => [key, safeJson(item)]));
 };
-const exportPatient = async req => {
+const exportPatient = async (req, { requestId } = {}) => {
     requireRole(req, 'patient');
     if (Object.keys(req.body || {}).some(key => key !== 'currentPassword')) throw fault(400, 'The export always belongs to the signed-in patient');
     const password = req.body?.currentPassword;
@@ -114,6 +121,12 @@ const exportPatient = async req => {
     const snapshot = () => db.transaction(async client => {
         const account = (await client.query('SELECT password_hash FROM users WHERE id=$1', [req.user.id])).rows[0];
         if (!account?.password_hash || !await comparePassword(password, account.password_hash)) throw fault(403, 'Current password could not be confirmed');
+        let linkedRequest;
+        if (requestId) {
+            linkedRequest = await evidence.lockRequest(client, { ...req, params: { id: requestId } }, { patient: true });
+            evidence.inReview(linkedRequest);
+            if (!['access','portability'].includes(linkedRequest.request_type)) throw fault(400, 'Only access and portability requests accept an information copy');
+        }
         const own = [req.user.id];
         const rows = async sql => (await client.query(sql, own)).rows;
         const accountProfile = (await rows('SELECT id,email,phone,first_name,last_name,address,status,is_verified,created_at,updated_at FROM users WHERE id=$1'))[0];
@@ -152,6 +165,7 @@ const exportPatient = async req => {
             created_at,updated_at FROM consents WHERE patient_id=$1 ORDER BY created_at,id`);
         const requests = await rows('SELECT * FROM privacy_rights_requests WHERE patient_id=$1 ORDER BY created_at,id');
         const requestHistory = await historyRows(client, requests.map(item => item.id));
+        const linked = await evidence.evidenceForRequests(client, requests.map(item => item.id));
         const triageSessions = await rows('SELECT id,conversation,soap_summary,recommended_department,priority,confidence_score,status,created_at,updated_at FROM triage_sessions WHERE patient_id=$1 ORDER BY created_at,id');
         const careMessages = (await rows(`SELECT m.id,m.sequence,m.sender_id,m.body_cipher,m.created_at
             FROM care_messages m JOIN care_message_threads t ON t.id=m.thread_id
@@ -166,7 +180,7 @@ const exportPatient = async req => {
         await audit.logAuditEvent({ ...event(req, 'export_patient_information', req.user.id, req.user.id), entityType: 'patient' }, client);
         const auditHistory = (await client.query(`SELECT id,action,entity_type,CASE WHEN entity_id=ANY($2::uuid[]) THEN entity_id ELSE NULL END AS entity_id,timestamp,status_code
             FROM audit_logs WHERE user_id=$1 OR entity_id=ANY($2::uuid[]) OR metadata->>'patientId'=$1::text OR (metadata->'patientIds') ? $1::text ORDER BY sequence`, [req.user.id, ownedIds])).rows;
-        return { schemaVersion: 1, exportedAt: new Date().toISOString(), patientId: req.user.id,
+        const data = { schemaVersion: 1, exportedAt: new Date().toISOString(), patientId: req.user.id,
             scope: 'All rows with verified patient ownership in the included categories; no row-count truncation.',
             exclusions: ['Passwords, government-ID hashes, tokens, passkeys, infrastructure credentials, and other patients or unrelated provider profiles.',
                 'Binary attachments are separate authenticated downloads; legacy or external file locations are omitted.', 'Audit metadata and request paths are omitted to avoid exposing credentials or unrelated identities.',
@@ -174,7 +188,8 @@ const exportPatient = async req => {
             profile: { account: accountProfile, patient: patientProfile }, visits, medicalRecords, diagnoses, prescriptions,
             labResults: fileReferences(labResults).map(item => ({ ...item, results_data: safeJson(item.results_data) })), imagingReports: fileReferences(imagingReports),
             visitNotes, medicationOrders, radiologyReports: fileReferences(radiologyReports), insurancePolicies, insuranceClaims,
-            consents, careMessages, processingControls, corrections, retentionDecisions, noticeAcknowledgements, triageSessions: triageSessions.map(safeJson), auditHistory, privacyRequests: requests.map(item => decode(item, requestHistory)) };
+            consents, careMessages, processingControls, corrections, retentionDecisions, noticeAcknowledgements, triageSessions: triageSessions.map(safeJson), auditHistory, privacyRequests: requests.map(item => decode(item, requestHistory, linked)) };
+        return linkedRequest ? { data, receipt: await evidence.prepareExport(client, req, linkedRequest, data) } : data;
     }, { isolationLevel: 'repeatable read' });
     let result;
     // The callback only reads and appends audit evidence in its own transaction.
