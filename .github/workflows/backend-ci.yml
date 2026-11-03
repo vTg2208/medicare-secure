@@ -73,6 +73,8 @@ jobs:
           echo "PG_DUMP_BIN=$RUNNER_TEMP/healthcare-pg-tools/pg_dump" >> "$GITHUB_ENV"
           echo "PG_RESTORE_BIN=$RUNNER_TEMP/healthcare-pg-tools/pg_restore" >> "$GITHUB_ENV"
       - run: npm run test:integration
+        env:
+          RUN_PERFORMANCE_DB_TESTS: 'true'
       - name: Verify migrations are repeatable
         run: npm run db:migrate
       - name: Build production image

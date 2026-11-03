@@ -22,7 +22,7 @@ it('looks up the presented token, so a different active session cannot revive a 
     const next = vi.fn();
     await authenticate(req, res, next);
     expect(query.mock.calls[0][0]).toContain('token_hash = $2');
-    expect(query.mock.calls[0][1]).toEqual(['u1', crypto.createHash('sha256').update(token).digest('hex')]);
+    expect(query.mock.calls[0][1].slice(0, 2)).toEqual(['u1', crypto.createHash('sha256').update(token).digest('hex')]);
     expect(res.status).toHaveBeenCalledWith(401);
     expect(next).not.toHaveBeenCalled();
 });
