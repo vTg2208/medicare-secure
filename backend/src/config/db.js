@@ -3,6 +3,7 @@ const logger = require('../utils/logger');
 const config = require('./env');
 const { getRequestContext } = require('../services/request-context');
 const { recordAuditError } = require('../middleware/metrics');
+const { measurePhase } = require('../services/request-timing');
 
 // Database configuration from environment variables
 const pool = new Pool({
@@ -38,7 +39,7 @@ const query = async (text, params) => {
         // Every request-bound statement uses a transaction-local identity. This
         // includes CTE writes without relying on a fragile SQL verb parser.
         const result = getRequestContext()
-            ? await transaction(client => client.query(text, params))
+            ? await transaction(client => measurePhase('db_sql', () => client.query(text, params)))
             : await pool.query(text, params);
         const duration = Date.now() - start;
         logger.debug('Executed query', { duration, rows: result.rowCount });
@@ -56,12 +57,14 @@ const transaction = async (callback, { isolationLevel } = {}) => {
         'repeatable read': 'BEGIN ISOLATION LEVEL REPEATABLE READ',
         serializable: 'BEGIN ISOLATION LEVEL SERIALIZABLE' };
     if (isolationLevel && !Object.prototype.hasOwnProperty.call(beginnings,isolationLevel)) throw new Error('Unsupported transaction isolation level');
-    const client = await pool.connect();
+    const client = await measurePhase('db_pool', () => pool.connect());
     try {
-        await client.query(isolationLevel ? beginnings[isolationLevel] : 'BEGIN');
-        await applyRequestContext(client);
+        await measurePhase('db_protocol', async () => {
+            await client.query(isolationLevel ? beginnings[isolationLevel] : 'BEGIN');
+            await applyRequestContext(client);
+        });
         const result = await callback(client);
-        await client.query('COMMIT');
+        await measurePhase('db_protocol', () => client.query('COMMIT'));
         return result;
     } catch (error) {
         await client.query('ROLLBACK');

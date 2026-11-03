@@ -94,6 +94,33 @@ test('performance queries preserve isolation, searchable pagination and bounded 
             const measured = await request(app).post('/api/performance').send({ name: 'LCP', value: 1500 });
             assert.equal(measured.status, 204);
             assert.equal(measured.headers['cache-control'], 'no-store');
+            await http.test('request timing is opt-in, admin-only and includes the audit write', async () => {
+                const bcrypt = require('bcrypt');
+                const password = 'Synthetic-Timing-Only-8a';
+                const email = 'trace-owner@example.invalid';
+                await db.query('UPDATE users SET email=$1,password_hash=$2 WHERE id=$3', [email, await bcrypt.hash(password, 4), administrator]);
+                const login = await request(app).post('/api/auth/login').set('X-Performance-Trace', '1').send({ email, password });
+                assert.equal(login.status, 200, JSON.stringify({ status: login.status, success: login.body.success }));
+                const loginTiming = login.headers['server-timing'];
+                assert.match(loginTiming, /login_password;dur=[\d.]+/);
+                assert.match(loginTiming, /login_audit;dur=[\d.]+/);
+                assert.match(loginTiming, /db_protocol;dur=[\d.]+/);
+                assert.ok(!loginTiming.includes(email));
+                const logs = () => request(app).get('/api/audit/logs').set('Authorization', `Bearer ${login.body.data.accessToken}`);
+                assert.equal((await logs()).headers['server-timing'], undefined);
+                const traced = await logs().set('X-Performance-Trace', '1');
+                assert.equal(traced.status, 200);
+                for (const phase of ['session_lookup', 'audit_count', 'audit_page', 'audit_append', 'app']) {
+                    assert.match(traced.headers['server-timing'], new RegExp(`\\b${phase};dur=[\\d.]+`));
+                }
+                const denied = await request(app).get('/api/audit/logs')
+                    .set('Authorization', `Bearer ${patientToken}`).set('X-Performance-Trace', '1');
+                assert.equal(denied.status, 403);
+                assert.equal(denied.headers['server-timing'], undefined);
+                const bad = await request(app).post('/api/auth/login').set('X-Performance-Trace', '1').send({ email, password: 'wrong' });
+                assert.equal(bad.status, 401);
+                assert.equal(bad.headers['server-timing'], undefined);
+            });
             await http.test('visit and audit searches reach beyond page one within their access scope', async () => {
                 const otherOrg = (await db.query("INSERT INTO organizations(name,type,license_number,hospital_code,status,verified) VALUES('Other fixture','hospital','OTHER-LIC','OTHER','active',true) RETURNING id")).rows[0].id;
                 await db.query(`INSERT INTO visits(patient_id,organization_id,visit_code,status,assigned_doctor_id,created_at)

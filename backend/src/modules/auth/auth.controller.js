@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const { createUser, findUserByEmailOrPhone, userExists, updateUserVerification, updateLastLogin, incrementFailedLoginAttempts, isAccountLocked } = require('../../models/user.model');
+const { measurePhase } = require('../../services/request-timing');
 const { createPatientProfile, findPatientByUserId } = require('../../models/patient.model');
 const { createOrganization } = require('../../models/organization.model');
 const { getRoleByName } = require('../../models/role.model');
@@ -613,7 +614,7 @@ const login = async (req, res) => {
         }
 
         // Find user
-        const user = await findUserByEmailOrPhone(emailOrPhone);
+        const user = await measurePhase('login_lookup', () => findUserByEmailOrPhone(emailOrPhone));
 
         if (!user) {
             return res.status(HTTP_STATUS.UNAUTHORIZED).json({
@@ -623,7 +624,7 @@ const login = async (req, res) => {
         }
 
         // Check if account is locked
-        const locked = await isAccountLocked(user.id);
+        const locked = await measurePhase('login_lock', () => isAccountLocked(user.id));
         if (locked) {
             return res.status(HTTP_STATUS.FORBIDDEN).json({
                 success: false,
@@ -632,7 +633,7 @@ const login = async (req, res) => {
         }
 
         // Verify password
-        const isValidPassword = await comparePassword(password, user.password_hash);
+        const isValidPassword = await measurePhase('login_password', () => comparePassword(password, user.password_hash));
 
         if (!isValidPassword) {
             // Increment failed attempts
@@ -715,7 +716,7 @@ const login = async (req, res) => {
       RETURNING id
     `;
 
-        await query(sessionQuery, [
+        await measurePhase('login_session', () => query(sessionQuery, [
             user.id,
             tokenHash,
             refreshTokenHash,
@@ -723,13 +724,13 @@ const login = async (req, res) => {
             req.headers['user-agent'],
             JSON.stringify(deviceInfo),
             new Date(require('jsonwebtoken').decode(accessToken).exp * 1000),
-        ]);
+        ]));
 
         // Update last login
-        await updateLastLogin(user.id);
+        await measurePhase('login_last_login', () => updateLastLogin(user.id));
 
         // Audit log
-        await createAuditLog({
+        await measurePhase('login_audit', () => createAuditLog({
             userId: user.id,
             action: AUDIT_ACTIONS.USER_LOGIN,
             purpose: 'User login',
@@ -738,7 +739,7 @@ const login = async (req, res) => {
             requestMethod: req.method,
             requestPath: req.path,
             statusCode: HTTP_STATUS.OK,
-        });
+        }));
 
         logger.info('User logged in successfully:', { userId: user.id, role: user.role_name });
 
