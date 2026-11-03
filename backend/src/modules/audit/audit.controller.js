@@ -1,6 +1,7 @@
 const auditService = require('../../services/audit.service');
 const logger = require('../../utils/logger');
 const { query } = require('../../config/db');
+const { measurePhase } = require('../../services/request-timing');
 const organizationScope = async req => {
     if (req.user.roleName !== 'hospital_admin') return null;
     const result = await query('SELECT id FROM organizations WHERE admin_user_id=$1 ORDER BY id LIMIT 1', [req.user.id]);
@@ -22,7 +23,7 @@ class AuditController {
             // Get query params for filtering/pagination
             const options = {
                 ...pagination(req),
-                organizationId: await organizationScope(req),
+                organizationId: await measurePhase('audit_scope', () => organizationScope(req)),
                 sortBy: req.query.sortBy || 'timestamp',
                 sortOrder: req.query.sortOrder || 'desc',
                 action: req.query.action,

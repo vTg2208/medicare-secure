@@ -9,6 +9,7 @@ const { query } = require('../config/db');
 const { createHash } = require('crypto');
 const config = require('../config/env');
 const { bindAuthenticatedActor } = require('../services/request-context');
+const { measurePhase, outsideRequestTiming } = require('../services/request-timing');
 
 /**
  * Authenticate JWT token
@@ -62,7 +63,8 @@ const authenticate = async (req, res, next) => {
     `;
 
         logger.debug(`Checking session for user ${decoded.userId}`);
-        const sessionResult = await query(sessionQuery, [decoded.userId, createHash('sha256').update(token).digest('hex')]);
+        const sessionResult = await measurePhase('session_lookup', () =>
+            query(sessionQuery, [decoded.userId, createHash('sha256').update(token).digest('hex')]));
 
         if (sessionResult.rows.length === 0) {
             logger.warn(`No active session found for user ${decoded.userId}`);
@@ -88,16 +90,16 @@ const authenticate = async (req, res, next) => {
         }
 
         // Update last activity
-        await query('UPDATE sessions SET last_activity = NOW() WHERE id = $1', [session.id]);
+        await measurePhase('session_touch', () => query('UPDATE sessions SET last_activity = NOW() WHERE id = $1', [session.id]));
 
         // Capture device information
         const deviceInfo = captureDeviceInfo(req);
 
         // Validate device
-        const deviceValidation = await validateDevice(decoded.userId, deviceInfo);
+        const deviceValidation = await measurePhase('device_check', () => validateDevice(decoded.userId, deviceInfo));
 
         if (!deviceValidation.isTrusted) {
-            await flagSuspiciousDevice(decoded.userId, deviceInfo, deviceValidation.reason);
+            await measurePhase('device_check', () => flagSuspiciousDevice(decoded.userId, deviceInfo, deviceValidation.reason));
 
             logger.warn('Suspicious device detected:', {
                 userId: decoded.userId,
@@ -111,13 +113,13 @@ const authenticate = async (req, res, next) => {
 
         // Periodically check for suspicious patterns (every 10th request to reduce overhead)
         if (Math.random() < 0.1) {
-            detectSuspiciousPatterns(decoded.userId).catch(err => {
+            outsideRequestTiming(() => detectSuspiciousPatterns(decoded.userId)).catch(err => {
                 logger.error('Pattern detection failed:', err);
             });
         }
 
         // Get user details
-        const user = await findUserById(decoded.userId);
+        const user = await measurePhase('account_lookup', () => findUserById(decoded.userId));
 
         if (!user) {
             return res.status(HTTP_STATUS.UNAUTHORIZED).json({

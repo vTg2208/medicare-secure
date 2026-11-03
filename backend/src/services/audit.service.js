@@ -3,6 +3,7 @@ const { redactSensitive } = require('../utils/redact');
 const logger = require('../utils/logger');
 const { recordAuditError } = require('../middleware/metrics');
 const { searchPattern } = require('../utils/pagination');
+const { measurePhase } = require('./request-timing');
 
 /**
  * Create audit log entry
@@ -248,7 +249,7 @@ const getAllAuditLogs = async (options = {}) => {
 
         // Get total count
         const countQuery = `SELECT COUNT(*) as total FROM audit_logs a LEFT JOIN users u ON a.user_id = u.id ${whereClause}`;
-        const countResult = await query(countQuery, params);
+        const countResult = await measurePhase('audit_count', () => query(countQuery, params));
         const total = parseInt(countResult.rows[0].total);
 
         // Get logs
@@ -266,7 +267,7 @@ const getAllAuditLogs = async (options = {}) => {
 
         params.push(limit, offset);
 
-        const result = await query(selectQuery, params);
+        const result = await measurePhase('audit_page', () => query(selectQuery, params));
 
         return {
             logs: result.rows,

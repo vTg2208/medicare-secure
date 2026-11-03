@@ -10,6 +10,7 @@ const { apiLimiter } = require('./middleware/rateLimit.middleware');
 const { metricsMiddleware, trackConnections, metricsEndpoint } = require('./middleware/metrics');
 const { auditLog } = require('./middleware/audit.middleware');
 const { requestContext } = require('./services/request-context');
+const { requestTiming } = require('./services/request-timing');
 
 const app = express();
 app.disable('x-powered-by');
@@ -46,6 +47,8 @@ app.get('/metrics', (req, res, next) => {
 }, metricsEndpoint);
 
 app.use('/api', apiLimiter);
+// Install before the audit response wrapper so its durable write is included.
+app.use(requestTiming(config.apiVersion));
 // Public, bounded, aggregate-only telemetry. It performs no database reads or
 // audit inserts and accepts no identity, page path or attribution fields.
 app.use(['/api/performance', `/api/${config.apiVersion}/performance`], require('./modules/performance/performance.routes'));

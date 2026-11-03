@@ -1,5 +1,6 @@
 const { logAuditEvent } = require('../services/audit.service');
 const logger = require('../utils/logger');
+const { measurePhase } = require('../services/request-timing');
 
 /**
  * Audit logging middleware
@@ -50,7 +51,7 @@ const auditLog = (action, entityType = null) => {
                         },
                     };
 
-                    await logAuditEvent(logData);
+                    await measurePhase('audit_append', () => logAuditEvent(logData));
                     req.auditEventRecorded = true;
                     return originalJson(data);
                 } catch (error) {
