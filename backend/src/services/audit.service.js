@@ -2,6 +2,7 @@ const { query } = require('../config/db');
 const { redactSensitive } = require('../utils/redact');
 const logger = require('../utils/logger');
 const { recordAuditError } = require('../middleware/metrics');
+const { searchPattern } = require('../utils/pagination');
 
 /**
  * Create audit log entry
@@ -190,6 +191,8 @@ const getAllAuditLogs = async (options = {}) => {
             userId,
             startDate,
             endDate,
+            endBefore,
+            search,
         } = options;
 
         let conditions = [];
@@ -222,16 +225,29 @@ const getAllAuditLogs = async (options = {}) => {
             paramIndex++;
         }
 
-        if (endDate) {
-            conditions.push(`a.timestamp <= $${paramIndex}`);
+        if (endBefore) {
+            conditions.push(`a.timestamp < $${paramIndex}`);
+            params.push(endBefore);
+            paramIndex++;
+        } else if (endDate) {
+            conditions.push(typeof endDate === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(endDate)
+                ? `a.timestamp < ($${paramIndex}::date + 1)`
+                : `a.timestamp <= $${paramIndex}`);
             params.push(endDate);
             paramIndex++;
+        }
+
+        const pattern = searchPattern(search);
+        if (pattern) {
+            const parameter = `$${paramIndex++}`;
+            conditions.push(`(u.email ILIKE ${parameter} OR a.action ILIKE ${parameter} OR a.purpose ILIKE ${parameter})`);
+            params.push(pattern);
         }
 
         const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
         // Get total count
-        const countQuery = `SELECT COUNT(*) as total FROM audit_logs a ${whereClause}`;
+        const countQuery = `SELECT COUNT(*) as total FROM audit_logs a LEFT JOIN users u ON a.user_id = u.id ${whereClause}`;
         const countResult = await query(countQuery, params);
         const total = parseInt(countResult.rows[0].total);
 
@@ -244,7 +260,7 @@ const getAllAuditLogs = async (options = {}) => {
       FROM audit_logs a
       LEFT JOIN users u ON a.user_id = u.id
       ${whereClause}
-      ORDER BY a.timestamp DESC
+      ORDER BY a.timestamp DESC, a.id DESC
       LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
     `;
 

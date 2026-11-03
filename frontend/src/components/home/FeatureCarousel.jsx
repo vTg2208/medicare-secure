@@ -60,7 +60,7 @@ export default function FeatureCarousel() {
             <div className="mc-feature-slides" aria-live={rotating ? 'off' : 'polite'} aria-atomic="true" data-animate={animate && !reducedMotion}>
                 {stories.map((story, index) => (
                     <figure key={story.image} className="mc-feature-slide" hidden={active !== index} role="group" aria-roledescription="slide" aria-label={`${index + 1} of ${stories.length}: ${story.title}`}>
-                        <div className="mc-feature-art"><img src={`/images/home/${story.image}.webp`} alt={story.alt} width="1000" height="750" loading="eager" fetchPriority={index === 0 ? 'high' : 'low'} /></div>
+                        <div className="mc-feature-art"><img src={`/images/home/${story.image}.webp`} alt={story.alt} width="1000" height="750" loading="lazy" decoding="async" /></div>
                         <figcaption><p className="mc-home-eyebrow">{story.category}</p><h2>{story.title}</h2><p>{story.description}</p></figcaption>
                     </figure>
                 ))}

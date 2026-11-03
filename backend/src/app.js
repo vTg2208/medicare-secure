@@ -46,6 +46,9 @@ app.get('/metrics', (req, res, next) => {
 }, metricsEndpoint);
 
 app.use('/api', apiLimiter);
+// Public, bounded, aggregate-only telemetry. It performs no database reads or
+// audit inserts and accepts no identity, page path or attribution fields.
+app.use(['/api/performance', `/api/${config.apiVersion}/performance`], require('./modules/performance/performance.routes'));
 const routes = {
     auth: './modules/auth/auth.routes', users: './modules/users/user.routes',
     consent: './modules/consent/consent.routes', emr: './modules/emr/emr.routes',

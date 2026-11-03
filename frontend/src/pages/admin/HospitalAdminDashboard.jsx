@@ -3,6 +3,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import ThemeToggle from '../../components/common/ThemeToggle';
+import { SkeletonLine } from '../../components/common/LoadingSkeleton';
 import apiClient from '../../api/client';
 import '../patient/Dashboard.css';
 
@@ -111,28 +112,28 @@ function HospitalAdminDashboard() {
                             <div className="w-12 h-12 rounded-2xl bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 mb-4 transition-transform">
                                 <span className="material-symbols-outlined text-2xl">manage_accounts</span>
                             </div>
-                            <p className="text-4xl font-bold text-primary-600 dark:text-primary-400 leading-none">{statsLoading ? '—' : stats.totalStaff}</p>
+                            <p className="text-4xl font-bold text-primary-600 dark:text-primary-400 leading-none" aria-busy={statsLoading}>{statsLoading ? <SkeletonLine /> : stats.totalStaff}</p>
                             <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-2 uppercase tracking-widest">Total Staff</p>
                         </div>
                         <div className="admin-glass-card p-6 rounded-3xl group">
                             <div className="w-12 h-12 rounded-2xl bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 mb-4 transition-transform">
                                 <span className="material-symbols-outlined text-2xl">stethoscope</span>
                             </div>
-                            <p className="text-4xl font-bold text-primary-600 dark:text-primary-400 leading-none">{statsLoading ? '—' : stats.activeDoctors}</p>
+                            <p className="text-4xl font-bold text-primary-600 dark:text-primary-400 leading-none" aria-busy={statsLoading}>{statsLoading ? <SkeletonLine /> : stats.activeDoctors}</p>
                             <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-2 uppercase tracking-widest">Active Doctors</p>
                         </div>
                         <div className="admin-glass-card p-6 rounded-3xl group cursor-pointer" onClick={() => navigate('/admin/visits', { state: { activeTab: 'pending' } })}>
                             <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400 mb-4 transition-transform">
                                 <span className="material-symbols-outlined text-2xl">pending_actions</span>
                             </div>
-                            <p className="text-4xl font-bold text-amber-600 dark:text-amber-400 leading-none">{statsLoading ? '—' : stats.pendingVisits}</p>
+                            <p className="text-4xl font-bold text-amber-600 dark:text-amber-400 leading-none" aria-busy={statsLoading}>{statsLoading ? <SkeletonLine /> : stats.pendingVisits}</p>
                             <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-2 uppercase tracking-widest">Pending Visits</p>
                         </div>
                         <div className="admin-glass-card p-6 rounded-3xl group">
                             <div className="w-12 h-12 rounded-2xl bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center text-primary-600 dark:text-primary-400 mb-4 transition-transform">
                                 <span className="material-symbols-outlined text-2xl">favorite</span>
                             </div>
-                            <p className="text-4xl font-bold text-primary-600 dark:text-primary-400 leading-none">{statsLoading ? '—' : stats.totalPatients}</p>
+                            <p className="text-4xl font-bold text-primary-600 dark:text-primary-400 leading-none" aria-busy={statsLoading}>{statsLoading ? <SkeletonLine /> : stats.totalPatients}</p>
                             <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-2 uppercase tracking-widest">Total Patients</p>
                         </div>
                     </div>

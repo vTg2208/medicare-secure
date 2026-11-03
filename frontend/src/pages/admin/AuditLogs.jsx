@@ -1,4 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import Pagination from '../../components/common/Pagination';
+import useDebouncedValue from '../../hooks/useDebouncedValue';
+import usePagedResults from '../../hooks/usePagedResults';
+import LoadingSkeleton from '../../components/common/LoadingSkeleton';
+import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AdminSidebar } from './HospitalAdminDashboard';
 import ThemeToggle from '../../components/common/ThemeToggle';
@@ -25,40 +29,31 @@ const ACTION_COLORS = {
     'staff_deactivate': 'bg-rose-50 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300',
 };
 
+function dateBoundary(value, nextDay = false) {
+    if (!value) return undefined;
+    const date = new Date(`${value}T00:00:00`);
+    if (!Number.isFinite(date.getTime())) return undefined;
+    if (nextDay) date.setDate(date.getDate() + 1);
+    return date.toISOString();
+}
+
 function AuditLogs() {
     const navigate = useNavigate();
-    const [logs, setLogs] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [filterAction, setFilterAction] = useState('all');
     const [dateRange, setDateRange] = useState({ start: '', end: '' });
-
-    const fetchLogs = useCallback(async () => {
-        try {
-            setLoading(true); setError(null);
-            const response = await apiClient.get('/audit/logs');
-            const data = response.data;
-            if (data.success) setLogs(data.data || []);
-            else { setError(data.message || 'Failed to fetch logs'); setLogs([]); }
-        } catch (error) {
-            setError(error.response?.data?.message || 'Failed to connect to the server');
-            setLogs([]);
-        } finally { setLoading(false); }
-    }, []);
-
-    useEffect(() => { fetchLogs(); }, [fetchLogs]);
-
-    const filteredLogs = logs.filter(log => {
-        const matchesSearch = log.user_email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            log.action?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            log.details?.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesAction = filterAction === 'all' || log.action === filterAction;
-        let matchesDate = true;
-        if (dateRange.start) matchesDate = matchesDate && new Date(log.timestamp) >= new Date(dateRange.start);
-        if (dateRange.end) matchesDate = matchesDate && new Date(log.timestamp) <= new Date(dateRange.end);
-        return matchesSearch && matchesAction && matchesDate;
-    });
+    const search = useDebouncedValue(searchTerm.trim());
+    const loadPage = useCallback(async (limit, offset) => {
+        const response = await apiClient.get('/audit/logs', {
+            params: {
+                limit, page: offset / limit + 1, search: search || undefined,
+                action: filterAction === 'all' ? undefined : filterAction,
+                startDate: dateBoundary(dateRange.start), endBefore: dateBoundary(dateRange.end, true)
+            }
+        });
+        return response.data;
+    }, [search, filterAction, dateRange.start, dateRange.end]);
+    const { rows: logs, loading, error, refresh, pagination } = usePagedResults(loadPage);
 
     const formatTimestamp = (timestamp) => new Date(timestamp).toLocaleString('en-US', {
         month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit'
@@ -94,12 +89,13 @@ function AuditLogs() {
                     <span className="material-symbols-outlined text-slate-400 text-[20px]">search</span>
                     <input
                         type="text"
+                        aria-label="Search audit logs"
                         placeholder="Search by user, action, or details..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className={`flex-grow min-w-[200px] ${selectCls}`}
                     />
-                    <select value={filterAction} onChange={(e) => setFilterAction(e.target.value)} className={selectCls}>
+                    <select aria-label="Audit action" value={filterAction} onChange={(e) => setFilterAction(e.target.value)} className={selectCls}>
                         <option value="all">All Actions</option>
                         <option value="user_login">User Login</option>
                         <option value="create_visit">Requested Visit</option>
@@ -112,8 +108,8 @@ function AuditLogs() {
                         <option value="staff_onboard">Staff Onboard</option>
                         <option value="staff_deactivate">Staff Deactivate</option>
                     </select>
-                    <input type="date" value={dateRange.start} onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })} className={selectCls} />
-                    <input type="date" value={dateRange.end} onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })} className={selectCls} />
+                    <input type="date" aria-label="Start date" value={dateRange.start} onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })} className={selectCls} />
+                    <input type="date" aria-label="End date" value={dateRange.end} onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })} className={selectCls} />
                     {hasFilters && (
                         <Button onClick={() => { setSearchTerm(''); setFilterAction('all'); setDateRange({ start: '', end: '' }); }} variant="outline">
                             Reset
@@ -124,7 +120,7 @@ function AuditLogs() {
                 {/* Summary badge */}
                 {!loading && !error && (
                     <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
-                        Showing <span className="font-bold text-slate-800 dark:text-white">{filteredLogs.length}</span> of <span className="font-bold">{logs.length}</span> log entries
+                        Showing <span className="font-bold text-slate-800 dark:text-white">{logs.length}</span> of <span className="font-bold">{pagination.total}</span> log entries
                     </p>
                 )}
 
@@ -132,15 +128,15 @@ function AuditLogs() {
                 <div className="glass-card rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden">
                     {loading ? (
                         <div className="flex items-center justify-center h-40 text-slate-400">
-                            <span className="material-symbols-outlined animate-spin text-3xl">progress_activity</span>
+                            <LoadingSkeleton label="Loading content" rows={3} />
                         </div>
                     ) : error ? (
                         <div className="flex flex-col items-center justify-center h-40 gap-3 text-center px-8">
                             <span className="material-symbols-outlined text-4xl text-rose-400">error</span>
                             <p className="text-rose-500 font-medium">{error}</p>
-                            <p className="text-sm text-slate-500 dark:text-slate-400">Please ensure you are logged in as an administrator.</p>
+                            <Button onClick={refresh} variant="outline">Retry</Button>
                         </div>
-                    ) : filteredLogs.length === 0 ? (
+                    ) : logs.length === 0 ? (
                         <div className="flex flex-col items-center justify-center h-40 text-slate-400 gap-2">
                             <span className="material-symbols-outlined text-4xl">receipt_long</span>
                             <p className="text-sm">No audit logs found</p>
@@ -159,7 +155,7 @@ function AuditLogs() {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                                    {filteredLogs.map(log => (
+                                    {logs.map(log => (
                                         <tr key={log.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
                                             <td className="px-6 py-4 whitespace-nowrap text-slate-600 dark:text-slate-400 text-xs font-mono">{formatTimestamp(log.timestamp)}</td>
                                             <td className="px-6 py-4 text-slate-700 dark:text-slate-300 font-medium">{log.user_email}</td>
@@ -178,6 +174,7 @@ function AuditLogs() {
                         </div>
                     )}
                 </div>
+                <Pagination {...pagination} />
             </main>
         </div>
     );

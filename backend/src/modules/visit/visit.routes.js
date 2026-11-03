@@ -4,7 +4,7 @@ const VisitController = require('./visit.controller');
 const StaffHelperController = require('./staff.helper.controller');
 const { authenticate, authorize } = require('../../middleware/auth.middleware');
 const { auditLog } = require('../../middleware/audit.middleware');
-const { visitAccess, assignedStaff } = require('../../middleware/clinical-access.middleware');
+const { visitAccess, assignedStaff, orgContext } = require('../../middleware/clinical-access.middleware');
 
 // Staff helper routes (for getting doctors/nurses for assignment)
 router.get('/staff/:role', authenticate, authorize(['hospital_admin', 'system_admin', 'doctor', 'nurse', 'receptionist']), StaffHelperController.getStaffByRole);
@@ -18,7 +18,7 @@ router.post('/check-in', authenticate, authorize(['patient']), VisitController.c
 router.get('/my-visits', authenticate, authorize(['patient']), VisitController.getMyVisits);
 
 // Staff/Admin/Receptionist routes
-router.get('/hospital', authenticate, authorize(['hospital_admin', 'system_admin', 'doctor', 'nurse', 'receptionist']), VisitController.getHospitalVisits);
+router.get('/hospital', authenticate, authorize(['hospital_admin', 'system_admin', 'doctor', 'nurse', 'receptionist']), orgContext, VisitController.getHospitalVisits);
 router.get('/assigned', authenticate, authorize(['doctor', 'nurse']), VisitController.getAssignedVisits);
 router.post('/:id/approve', authenticate, authorize(['hospital_admin', 'system_admin', 'receptionist']), auditLog('approve_visit', 'visit'), visitAccess({ administrative: true }), assignedStaff, VisitController.approveVisit);
 router.patch('/:id/assign', authenticate, authorize(['hospital_admin', 'system_admin', 'doctor', 'nurse', 'receptionist']), auditLog('update_visit', 'visit'), visitAccess({ administrative: true }), assignedStaff, VisitController.updateVisit);

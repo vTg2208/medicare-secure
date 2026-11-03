@@ -1,6 +1,7 @@
 const {
     findUserById,
     getAllUsers,
+    countAllUsers,
     updateUserStatus,
     createUser,
     userExists,
@@ -16,6 +17,7 @@ const { isValidEmail, validatePassword, validateRequiredFields } = require('../.
 const logger = require('../../utils/logger');
 const { query } = require('../../config/db');
 const { staffRoleAllowed, canManageOrganization } = require('../../middleware/clinical-access.middleware');
+const { pagination } = require('../../utils/pagination');
 
 /**
  * Onboard staff member
@@ -179,19 +181,15 @@ const getUserProfile = async (req, res) => {
  */
 const getUsers = async (req, res) => {
     try {
-        const { limit, offset, role, status } = req.query;
+        const { role, status, search } = req.query;
+        const { limit, offset } = pagination(req.query);
         let organizationId = null;
 
         // If not system admin, restrict to own organization
         if (req.user.roleName !== 'system_admin') organizationId = req.organizationId;
 
-        const result = await getAllUsers({
-            limit: parseInt(limit) || 50,
-            offset: parseInt(offset) || 0,
-            role,
-            status,
-            organizationId
-        });
+        const options = { limit, offset, role, status, search, organizationId };
+        const [result, total] = await Promise.all([getAllUsers(options), countAllUsers(options)]);
 
         // Map users to match frontend expectations
         const mappedUsers = result.map(user => ({
@@ -203,6 +201,7 @@ const getUsers = async (req, res) => {
         res.status(HTTP_STATUS.OK).json({
             success: true,
             data: mappedUsers,
+            pagination: { total, limit, offset },
         });
     } catch (error) {
         logger.error('Get users failed:', error);

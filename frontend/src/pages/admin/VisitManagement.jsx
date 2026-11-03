@@ -1,6 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import Pagination from '../../components/common/Pagination';
+import useDebouncedValue from '../../hooks/useDebouncedValue';
+import usePagedResults from '../../hooks/usePagedResults';
+import LoadingSkeleton from '../../components/common/LoadingSkeleton';
+import React, { useState, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { visitApi } from '../../api/visitApi';
+import { visitApi, VISIT_QUEUE_STATUSES } from '../../api/visitApi';
 import { AdminSidebar } from './HospitalAdminDashboard';
 import ThemeToggle from '../../components/common/ThemeToggle';
 import '../patient/Dashboard.css';
@@ -10,8 +14,6 @@ function VisitManagement() {
     const location = useLocation();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState(location.state?.activeTab || 'pending');
-    const [visits, setVisits] = useState([]);
-    const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [showApprovalModal, setShowApprovalModal] = useState(false);
     const [selectedVisit, setSelectedVisit] = useState(null);
@@ -21,39 +23,12 @@ function VisitManagement() {
 
     const [successModal, setSuccessModal] = useState({ show: false, title: '', message: '', highlight: '' });
 
-    const loadVisits = useCallback(async () => {
-        setLoading(true);
-        setError('');
-        try {
-            const statusFilter = activeTab === 'pending' ? 'pending' :
-                activeTab === 'active' ? null :
-                    activeTab;
-
-            const response = await visitApi.getHospitalVisits(statusFilter);
-            let filteredVisits = response.data || [];
-
-            if (activeTab === 'active') {
-                filteredVisits = filteredVisits.filter(v =>
-                    ['approved', 'checked_in', 'in_progress'].includes(v.status)
-                );
-            } else if (activeTab === 'completed') {
-                filteredVisits = filteredVisits.filter(v =>
-                    ['completed', 'cancelled'].includes(v.status)
-                );
-            }
-
-            setVisits(filteredVisits);
-        } catch (err) {
-            const errorMsg = err.response?.data?.message || err.message || 'Failed to load visits';
-            setError(errorMsg);
-        } finally {
-            setLoading(false);
-        }
-    }, [activeTab]);
-
-    useEffect(() => {
-        loadVisits();
-    }, [loadVisits]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const search = useDebouncedValue(searchTerm.trim());
+    const loadPage = useCallback((limit, offset) => visitApi.getHospitalVisits(VISIT_QUEUE_STATUSES[activeTab], {
+        limit, offset, search: search || undefined
+    }), [activeTab, search]);
+    const { rows: visits, loading, error: loadError, refresh, pagination } = usePagedResults(loadPage);
 
     const handleApproveClick = async (visit) => {
         setSelectedVisit(visit);
@@ -100,7 +75,8 @@ function VisitManagement() {
 
             setApprovalData({ doctorId: '', nurseId: '' });
             setActiveTab('active'); // Switch to active tab
-            loadVisits();
+            setError('');
+            refresh();
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to approve visit');
         }
@@ -116,7 +92,8 @@ function VisitManagement() {
                 message: `The visit protocol was successfully ${status}.`,
                 highlight: ''
             });
-            loadVisits();
+            setError('');
+            refresh();
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to close visit');
         }
@@ -193,18 +170,23 @@ function VisitManagement() {
                     ))}
                 </div>
 
-                {error && (
+                <input type="search" aria-label="Search visits" placeholder="Search by patient name or visit code"
+                    value={searchTerm} onChange={event => setSearchTerm(event.target.value)}
+                    className="my-4 w-full max-w-md rounded-xl border border-line bg-surface px-4 py-2" />
+                {(error || loadError) && (
                     <div className="bg-rose-50 dark:bg-rose-900/10 border border-rose-100 dark:border-rose-900/30 p-4 rounded-2xl text-rose-600 dark:text-rose-400 text-sm font-medium flex items-center gap-3">
                         <span className="material-symbols-outlined">error</span>
-                        {error}
+                        {error || loadError}
                     </div>
                 )}
 
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-20 text-slate-400 gap-4">
-                        <span className="material-symbols-outlined animate-spin text-4xl">progress_activity</span>
+                        <LoadingSkeleton label="Loading content" rows={3} />
                         <p className="text-sm font-bold uppercase tracking-widest">Synchronizing Logs...</p>
                     </div>
+                ) : loadError ? (
+                    <button type="button" className="btn btn-secondary" onClick={refresh}>Retry</button>
                 ) : (
                     <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                         {visits.length > 0 ? (
@@ -303,6 +285,8 @@ function VisitManagement() {
                         )}
                     </div>
                 )}
+
+                <Pagination {...pagination} />
 
                 {showApprovalModal && (
                     <div className="modal-overlay" onClick={() => setShowApprovalModal(false)}>

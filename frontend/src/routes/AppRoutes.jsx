@@ -1,4 +1,5 @@
 import React, { lazy, Suspense } from 'react';
+import LoadingSkeleton from '../components/common/LoadingSkeleton';
 import { Routes, Route, Navigate } from 'react-router-dom';
 const Login = lazy(() => import('../pages/auth/Login'));
 const Register = lazy(() => import('../pages/auth/Register'));
@@ -85,7 +86,7 @@ const TriageQueue = lazy(() => import('../pages/doctor/TriageQueue'));
 
 function AppRoutes() {
     return (
-        <Suspense fallback={<div role="status" className="p-8 text-center">Loading page...</div>}>
+        <Suspense fallback={<LoadingSkeleton label="Loading page" />}>
         <Routes>
             {/* Public Routes */}
             <Route path="/login" element={<Login />} />

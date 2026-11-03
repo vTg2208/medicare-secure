@@ -1,0 +1,7 @@
+.mc-skeleton { display: grid; gap: 16px; padding: 24px; width: 100%; }
+.mc-skeleton-row { display: grid; gap: 10px; padding: 16px; border: 1px solid var(--mc-border); border-radius: var(--mc-radius-control); }
+.mc-skeleton-line { display: inline-block; width: 100%; min-width: 2ch; height: 1em; border-radius: 4px; background: var(--mc-border); animation: mc-skeleton-pulse 1.5s ease-in-out infinite alternate; }
+.mc-skeleton-row .mc-skeleton-line:nth-child(2) { width: 75%; }
+.mc-skeleton-row .mc-skeleton-line:nth-child(3) { width: 45%; }
+@keyframes mc-skeleton-pulse { from { opacity: .45; } to { opacity: .85; } }
+@media (prefers-reduced-motion: reduce) { .mc-skeleton-line { animation: none; } }

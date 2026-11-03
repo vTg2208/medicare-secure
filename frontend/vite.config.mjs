@@ -11,7 +11,8 @@ export default defineConfig(({ mode }) => {
       ['process.env.REACT_APP_API_TIMEOUT_MS', JSON.stringify(env.REACT_APP_API_TIMEOUT_MS || '15000')],
     ])),
     server: { proxy: { '/api': process.env.API_PROXY_TARGET || 'http://localhost:5000', '/readyz': process.env.API_PROXY_TARGET || 'http://localhost:5000' } },
-    build: { outDir: 'build', sourcemap: false },
+    // Keep font resources external and fingerprinted; CSP does not allow data: fonts.
+    build: { outDir: 'build', sourcemap: false, assetsInlineLimit: 0 },
     test: { globals: true, environment: 'jsdom', setupFiles: ['./src/setupTests.js'], clearMocks: true },
   };
 });

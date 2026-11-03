@@ -2,8 +2,8 @@ import apiClient from './client';
 
 export const userApi = {
     // Get all users (with optional role filter)
-    getAllUsers: async (role = null) => {
-        const params = role ? { role } : {};
+    getAllUsers: async (role = null, options = {}) => {
+        const params = role ? { ...options, role } : options;
         const response = await apiClient.get('/users', { params });
         return response.data;
     },

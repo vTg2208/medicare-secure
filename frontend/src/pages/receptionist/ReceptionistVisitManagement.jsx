@@ -1,3 +1,6 @@
+import Pagination from '../../components/common/Pagination';
+import useDebouncedValue from '../../hooks/useDebouncedValue';
+import usePagedResults from '../../hooks/usePagedResults';
 import Brand from '../../components/common/Brand';
 import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -20,7 +23,7 @@ import {
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { visitApi } from '../../api/visitApi';
+import { visitApi, VISIT_QUEUE_STATUSES } from '../../api/visitApi';
 import { AuthContext } from '../../context/AuthContext';
 
 /* ─────────────────── helpers ─────────────────── */
@@ -95,35 +98,18 @@ function SortableVisitCard({ visit }) {
 /* ════════════════ TAB 1: Approve Scheduled Visits ════════════════ */
 function ApproveVisitsTab() {
     const [activeSubTab, setActiveSubTab] = useState('pending');
-    const [visits, setVisits] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
     const [showApprovalModal, setShowApprovalModal] = useState(false);
     const [selectedVisit, setSelectedVisit] = useState(null);
     const [doctors, setDoctors] = useState([]);
     const [nurses, setNurses] = useState([]);
     const [approvalData, setApprovalData] = useState({ nurseId: '', doctorId: '' });
 
-    const loadVisits = useCallback(async () => {
-        setLoading(true);
-        setError('');
-        try {
-            const response = await visitApi.getHospitalVisits(activeSubTab === 'pending' ? 'pending' : null);
-            let data = response.data || [];
-            if (activeSubTab === 'active') {
-                data = data.filter(v => ['approved', 'checked_in', 'in_progress'].includes(v.status));
-            } else if (activeSubTab === 'completed') {
-                data = data.filter(v => ['completed', 'cancelled'].includes(v.status));
-            }
-            setVisits(data);
-        } catch (err) {
-            setError(err.response?.data?.message || 'Failed to load visits');
-        } finally {
-            setLoading(false);
-        }
-    }, [activeSubTab]);
-
-    useEffect(() => { loadVisits(); }, [loadVisits]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const search = useDebouncedValue(searchTerm.trim());
+    const loadPage = useCallback((limit, offset) => visitApi.getHospitalVisits(VISIT_QUEUE_STATUSES[activeSubTab], {
+        limit, offset, search: search || undefined
+    }), [activeSubTab, search]);
+    const { rows: visits, loading, error, refresh, pagination } = usePagedResults(loadPage);
 
     const handleApproveClick = async (visit) => {
         setSelectedVisit(visit);
@@ -155,7 +141,7 @@ function ApproveVisitsTab() {
             else alert('✅ Visit Approved and assigned!');
             setApprovalData({ nurseId: '', doctorId: '' });
             setActiveSubTab('active');
-            loadVisits();
+            refresh();
         } catch (err) {
             alert(err.response?.data?.message || 'Failed to approve visit');
         }
@@ -165,7 +151,7 @@ function ApproveVisitsTab() {
         if (!window.confirm(`Are you sure you want to ${status} this visit?`)) return;
         try {
             await visitApi.closeVisit(visitId, status);
-            loadVisits();
+            refresh();
         } catch (err) {
             alert(err.response?.data?.message || 'Failed to update visit');
         }
@@ -188,10 +174,13 @@ function ApproveVisitsTab() {
                 ))}
             </div>
 
-            {error && <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-3 rounded-xl text-sm mb-4">{error}</div>}
+            <input type="search" aria-label="Search visits" placeholder="Search by patient name or visit code"
+                value={searchTerm} onChange={event => setSearchTerm(event.target.value)}
+                className="my-4 w-full max-w-md rounded-xl border border-line bg-surface px-4 py-2" />
+            {error && <div role="alert" className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-3 rounded-xl text-sm mb-4">{error} <button type="button" onClick={refresh}>Retry</button></div>}
             {loading && <div className="text-slate-500 dark:text-slate-400 text-sm">Loading visits...</div>}
 
-            {!loading && (
+            {!loading && !error && (
                 <div className="space-y-3">
                     {visits.length === 0 ? (
                         <div className="text-center py-16 text-slate-400 dark:text-slate-500">
@@ -237,6 +226,8 @@ function ApproveVisitsTab() {
                     ))}
                 </div>
             )}
+
+            <Pagination {...pagination} />
 
             {/* Approval Modal */}
             {showApprovalModal && (

@@ -46,6 +46,20 @@ const auditLogErrors = new promClient.Counter({
   registers: [register],
 });
 const recordAuditError = () => auditLogErrors.inc();
+// Aggregate browser measurements only: never label by user, URL or record.
+const browserVitals = {
+  LCP: { max: 120000, scale: 1000, histogram: new promClient.Histogram({ name: 'browser_lcp_seconds', help: 'Browser Largest Contentful Paint', buckets: [1, 2.5, 4, 8, 15, 30, 60], registers: [register] }) },
+  INP: { max: 60000, scale: 1000, histogram: new promClient.Histogram({ name: 'browser_inp_seconds', help: 'Browser Interaction to Next Paint', buckets: [.1, .2, .5, 1, 2, 5, 10], registers: [register] }) },
+  CLS: { max: 100, scale: 1, histogram: new promClient.Histogram({ name: 'browser_cls', help: 'Browser Cumulative Layout Shift', buckets: [.01, .05, .1, .25, .5, 1, 5], registers: [register] }) },
+};
+const recordBrowserVital = body => {
+  if (!body || typeof body !== 'object' || Array.isArray(body) || Object.keys(body).length !== 2 ||
+      !Object.hasOwn(body, 'name') || !Object.hasOwn(body, 'value') || typeof body.name !== 'string' || !Object.hasOwn(browserVitals, body.name)) return false;
+  const { max, scale, histogram } = browserVitals[body.name];
+  if (typeof body.value !== 'number' || !Number.isFinite(body.value) || body.value < 0 || body.value > max) return false;
+  histogram.observe(body.value / scale);
+  return true;
+};
 
 // ═══════════════════════════════════════════════════════
 // Middleware
@@ -84,5 +98,6 @@ module.exports = {
   metricsMiddleware,
   trackConnections,
   metricsEndpoint,
-  recordAuditError
+  recordAuditError,
+  recordBrowserVital
 };

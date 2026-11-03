@@ -100,7 +100,8 @@ class EmrController {
     static async getPatientMedicalRecords(req, res) {
         try {
             const { patientId } = req.params;
-            const { type, visitId, limit, offset } = req.query;
+            const { type, visitId, search, summary } = req.query;
+            const { limit, offset } = require('../../utils/pagination').pagination(req.query);
             const userId = req.user.id;
             const userRole = req.user.roleName.toUpperCase();
 
@@ -112,14 +113,10 @@ class EmrController {
                 });
             }
 
-            const records = await MedicalRecordModel.findByPatientId(patientId, {
-                type,
-                visitId,
-                limit: parseInt(limit) || 50,
-                offset: parseInt(offset) || 0
-            });
-
-            const count = await MedicalRecordModel.countByPatient(patientId, type, visitId);
+            const [records, count] = await Promise.all([
+                MedicalRecordModel.findByPatientId(patientId, { type, visitId, search, summary: summary === 'true', limit, offset }),
+                MedicalRecordModel.countByPatient(patientId, type, visitId, search)
+            ]);
 
             // Create audit log ONLY if accessing user is NOT the patient owner
             // Patients don't need to see their own "viewed records" dashboard refresh clutter
@@ -145,8 +142,8 @@ class EmrController {
                     records,
                     pagination: {
                         total: count,
-                        limit: parseInt(limit) || 50,
-                        offset: parseInt(offset) || 0
+                        limit,
+                        offset
                     }
                 }
             });

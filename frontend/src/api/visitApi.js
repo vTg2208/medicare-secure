@@ -1,6 +1,12 @@
 // Visit API Client - Epic 3: Visit Management
 import apiClient from './client';
 
+export const VISIT_QUEUE_STATUSES = {
+    pending: 'pending',
+    active: 'approved,checked_in,in_progress',
+    completed: 'completed,cancelled'
+};
+
 export const visitApi = {
     // Patient: Create a new visit (Request to join hospital)
     createVisit: async (visitData) => {
@@ -34,15 +40,15 @@ export const visitApi = {
     },
 
     // Admin/Staff: Get hospital visits
-    getHospitalVisits: async (status = null) => {
-        const params = status ? { status } : {};
+    getHospitalVisits: async (status = null, options = {}) => {
+        const params = status ? { ...options, status } : options;
         const response = await apiClient.get('/visits/hospital', { params });
         return response.data;
     },
 
     // Doctor/Nurse: Get assigned/active visits
-    getActiveVisits: async () => {
-        const response = await apiClient.get('/visits/assigned');
+    getActiveVisits: async (params) => {
+        const response = await apiClient.get('/visits/assigned', { params });
         return response.data;
     },
 
