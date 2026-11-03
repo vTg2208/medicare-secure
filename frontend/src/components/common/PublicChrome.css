@@ -1,0 +1,26 @@
+.mc-public-tint {
+    background: color-mix(in srgb, var(--mc-surface) 64%, var(--mc-brand-soft));
+    border-top: 1px solid color-mix(in srgb, var(--mc-accent) 38%, var(--mc-border));
+}
+
+.mc-public-waves {
+    position: absolute;
+    inset: auto 0 0;
+    z-index: -1;
+    width: 100%;
+    height: clamp(78px, 10vw, 144px);
+    fill: var(--mc-accent);
+    fill-opacity: .09;
+    pointer-events: none;
+}
+
+.mc-public-tile {
+    display: inline-grid;
+    flex: none;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--mc-radius-control);
+    background: var(--mc-brand-soft);
+    color: var(--mc-accent);
+}

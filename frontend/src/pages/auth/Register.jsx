@@ -1,7 +1,7 @@
 import { brandName } from '../../config/brand';
 import Brand from '../../components/common/Brand';
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { authApi } from '../../api/authApi';
 import { startRegistration } from '@simplewebauthn/browser';
 import ThemeToggle from '../../components/common/ThemeToggle';
@@ -10,7 +10,8 @@ import '../patient/Dashboard.css';
 
 function Register() {
     const navigate = useNavigate();
-    const [step, setStep] = useState(1);
+    const [searchParams] = useSearchParams();
+    const [step, setStep] = useState(() => searchParams.get('verify') === '1' ? 2 : 1);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [successMsg, setSuccessMsg] = useState('');
@@ -105,6 +106,11 @@ function Register() {
         try {
             await authApi.verifyOTP(patientData.email, otp);
 
+            if (!patientData.password) {
+                navigate('/login', { state: { message: 'Email verified. You can now sign in.' } });
+                return;
+            }
+
             // Auto-login to get a token for passkey registration
             try {
                 const loginRes = await authApi.login(patientData.email, patientData.password);
@@ -129,6 +135,10 @@ function Register() {
     const handleResendOTP = async () => {
         setError('');
         setSuccessMsg('');
+        if (!patientData.email) {
+            setError('Enter your email address to receive a new code.');
+            return;
+        }
         setLoading(true);
         try {
             const res = await authApi.resendOTP(patientData.email);
@@ -396,11 +406,27 @@ function Register() {
                             <span className="material-symbols-outlined text-3xl text-primary-600 dark:text-primary-400">mark_email_read</span>
                         </div>
                         <h2 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight mb-2">Verify OTP</h2>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm mb-8">{successMsg || 'Enter OTP sent to your email/phone'}</p>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm mb-8">{successMsg || 'Enter the verification code sent to your email address.'}</p>
 
                         <form onSubmit={handleVerifyOTP} className="space-y-5">
+                            {!patientData.password && (
+                                <input
+                                    aria-label="Email address"
+                                    type="email"
+                                    name="email"
+                                    autoComplete="email"
+                                    value={patientData.email}
+                                    onChange={handlePatientChange}
+                                    placeholder="Email address"
+                                    required
+                                    className="block w-full px-4 py-4 rounded-2xl bg-surface dark:bg-slate-800/60 text-slate-900 dark:text-white"
+                                />
+                            )}
                             <input
+                                aria-label="Verification code"
                                 type="text"
+                                inputMode="numeric"
+                                autoComplete="one-time-code"
                                 value={otp}
                                 onChange={(e) => setOtp(e.target.value)}
                                 placeholder="000000"
@@ -429,7 +455,7 @@ function Register() {
                                 >
                                     Resend OTP
                                 </button>
-                                <button type="button" onClick={() => setStep(1)} className="text-sm font-semibold text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors">
+                                <button type="button" onClick={() => { setStep(1); navigate('/register', { replace: true }); }} className="text-sm font-semibold text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors">
                                     Back to Registration
                                 </button>
                             </div>
@@ -507,7 +533,11 @@ function Register() {
                         </button>
                     </div>
                 )}
-                <p className="mt-6 text-sm text-center"><Link to="/privacy-notice" className="text-primary-600 dark:text-primary-400 underline">Read privacy notice</Link></p>
+                <nav aria-label="Account information" className="mt-6 flex flex-wrap justify-center gap-x-4 gap-y-2 text-sm text-primary-600 dark:text-primary-400">
+                    <Link to="/privacy-notice" className="underline">Privacy notice</Link>
+                    <Link to="/terms" className="underline">Terms of use</Link>
+                    <Link to="/support" className="underline">Help &amp; support</Link>
+                </nav>
             </div>
         </div>
     );

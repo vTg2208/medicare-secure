@@ -6,7 +6,7 @@ const steps = [
     { id: 'ready', title: 'Your report is ready.', detail: 'Private until you choose to share.' },
     { id: 'choose', title: 'You approve access.', detail: 'One clear sharing control.' },
     { id: 'shared', title: 'Your care team is connected.', detail: 'The right information, shared with permission.' },
-    { id: 'viewed', title: 'Every access is recorded.', detail: 'Keep a clear history of who viewed your report.' },
+    { id: 'viewed', title: 'The report view is recorded.', detail: 'See who viewed your report in the access history.' },
     { id: 'withdraw', title: 'You can switch it off.', detail: 'Your sharing choices stay flexible.' },
     { id: 'revoked', title: 'Future access is blocked.', detail: 'Your records and access history stay with you.' },
 ];

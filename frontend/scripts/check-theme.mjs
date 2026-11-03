@@ -30,7 +30,10 @@ for (const file of cssFiles) {
         if (file.endsWith('tokens.css') || paper(decl)) return;
         if (/#[\da-f]{3,8}\b|\brgba?\(/i.test(decl.value)) fail(file, line, 'Use semantic theme tokens for colors');
         if (/(?:linear|radial)-gradient\(/.test(decl.value)) fail(file, line, 'Use solid Medicare surfaces');
-        if (decl.prop === 'font-family' && !/^(?:var\(--mc-font\)|inherit)$/.test(decl.value)) fail(file, line, 'Use the shared Medicare font');
+        if (decl.prop === 'font-family') {
+            const careAccent = file.endsWith('global.css') && decl.parent.selector === '.mc-care-accent' && decl.value === 'var(--mc-font-care)';
+            if (!careAccent && !/^(?:var\(--mc-font\)|inherit)$/.test(decl.value)) fail(file, line, 'Use the shared Medicare font');
+        }
         if (/backdrop-filter/.test(decl.prop) && decl.value !== 'none') fail(file, line, 'Glass effects do not belong to the shared theme');
     });
 }

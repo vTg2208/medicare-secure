@@ -75,6 +75,7 @@ const DoctorVerification = lazy(() => import('../pages/admin/DoctorVerification'
 const AuditTrail = lazy(() => import('../pages/patient/AuditTrail'));
 const Profile = lazy(() => import('../pages/common/Profile'));
 const LandingPage = lazy(() => import('../pages/LandingPage'));
+const PublicInfoPage = lazy(() => import('../pages/PublicInfoPage'));
 const ReceptionistVisitManagement = lazy(() => import('../pages/receptionist/ReceptionistVisitManagement'));
 const PatientRegistration = lazy(() => import('../pages/staff/PatientRegistration'));
 const Support = lazy(() => import('../pages/patient/Support'));
@@ -92,6 +93,11 @@ function AppRoutes() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/privacy-notice/:versionId?" element={<PrivacyNotice />} />
+            <Route path="/about" element={<PublicInfoPage page="about" />} />
+            <Route path="/support" element={<PublicInfoPage page="support" />} />
+            <Route path="/accessibility" element={<PublicInfoPage page="accessibility" />} />
+            <Route path="/terms" element={<PublicInfoPage page="terms" />} />
+            <Route path="/cookies" element={<PublicInfoPage page="cookies" />} />
             <Route path="/compliance/notices" element={<ProtectedRoute allowedRoles={['compliance_officer']}><NoticeGovernance /></ProtectedRoute>} />
             <Route path="/staff/invitation/:token" element={<AcceptInvitation />} />
 

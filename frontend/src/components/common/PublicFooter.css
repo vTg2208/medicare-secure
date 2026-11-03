@@ -1,0 +1,124 @@
+.mc-public-footer {
+    position: relative;
+    isolation: isolate;
+    color: var(--mc-text);
+}
+
+.mc-public-footer-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.65fr);
+    align-items: start;
+    gap: clamp(24px, 4vw, 54px);
+    padding-block: clamp(36px, 4.5vw, 64px);
+}
+
+.mc-public-footer-brand {
+    border-inline-end: 1px solid var(--mc-border);
+    padding-inline-end: clamp(24px, 4vw, 48px);
+    padding-block-end: 16px;
+}
+
+.mc-public-footer-brand .mc-brand {
+    gap: 14px;
+    font-size: clamp(29px, 3.2vw, 42px);
+}
+
+.mc-public-footer-brand .mc-brand img {
+    width: clamp(48px, 5vw, 64px);
+    height: auto;
+}
+
+.mc-public-footer-brand p {
+    max-width: 29ch;
+    margin-block: 16px 22px;
+    color: var(--mc-text-muted);
+    font-size: clamp(15px, 1.5vw, 18px);
+    line-height: 1.6;
+}
+
+.mc-public-footer-github {
+    color: var(--mc-text);
+}
+
+.mc-public-footer-github:hover {
+    background: var(--mc-surface-hover);
+    color: var(--mc-accent);
+}
+
+.mc-public-footer-nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(20px, 5vw, 72px);
+}
+
+.mc-public-footer-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    font-size: clamp(18px, 2vw, 24px);
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.mc-public-footer-label svg {
+    flex: none;
+}
+
+.mc-public-footer-nav ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.mc-public-footer-nav a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    min-height: 48px;
+    padding-block: 8px;
+    border-bottom: 1px solid var(--mc-border);
+    font-size: clamp(14px, 1.4vw, 17px);
+    font-weight: 600;
+}
+
+.mc-public-footer-nav a svg {
+    flex: none;
+    width: 18px;
+    height: 18px;
+}
+
+.mc-public-footer-nav a:hover {
+    color: var(--mc-accent);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+}
+
+.mc-public-footer-bottom {
+    border-top: 1px solid var(--mc-border);
+    padding-block: 18px;
+    color: var(--mc-text-muted);
+    font-size: 14px;
+}
+
+@media (max-width: 740px) {
+    .mc-public-footer-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .mc-public-footer-brand {
+        border-inline-end: 0;
+        border-block-end: 1px solid var(--mc-border);
+        padding: 0 0 24px;
+    }
+
+    .mc-public-footer-label {
+        gap: 8px;
+    }
+
+    .mc-public-footer-label svg {
+        width: 32px;
+        height: 32px;
+    }
+}

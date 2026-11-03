@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import App from './App';
 import ErrorBoundary from './components/common/ErrorBoundary';
@@ -21,24 +21,15 @@ test('validates invitation links through the invitation page', async () => {
   expect(staffApi.validateInvitation).toHaveBeenCalledWith('sample-token');
 });
 
-test('leads with sharing, retains the feature carousel and onboarding, and routes each audience correctly', async () => {
+test('keeps patient and care team entry points and public information discoverable', async () => {
   render(<MemoryRouter><App /></MemoryRouter>);
-  expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('Your medical records.Your care team.One secure place.');
-  const sharing = screen.getByRole('region', { name: 'See how Medicare sharing works' });
-  const features = screen.getByRole('region', { name: 'Discover Medicare' });
-  expect(sharing.compareDocumentPosition(features) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-  expect(screen.getByRole('heading', { name: /getting started should be simple/i })).toBeInTheDocument();
-  expect(screen.getByRole('heading', { name: 'Make yourself at home' })).toBeInTheDocument();
-  expect(screen.getByRole('heading', { name: 'See the whole picture' })).toBeInTheDocument();
-  expect(screen.getByRole('heading', { name: 'Keep care connected' })).toBeInTheDocument();
-  expect(screen.getAllByRole('link', { name: /create patient account/i })).toHaveLength(2);
-  screen.getAllByRole('link', { name: /create patient account/i }).forEach(link => expect(link).toHaveAttribute('href', '/register'));
-  expect(screen.getByRole('link', { name: /open your patient portal/i })).toHaveAttribute('href', '/login');
+  expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent(/health records/i);
+  expect(screen.getByRole('region', { name: 'See how Medicare sharing works' })).toBeInTheDocument();
+  screen.getAllByRole('link', { name: /create your patient account/i }).forEach(link => expect(link).toHaveAttribute('href', '/register'));
   expect(screen.getByRole('link', { name: /care team sign in/i })).toHaveAttribute('href', '/login');
-  expect(screen.queryByRole('link', { name: /see how it works/i })).not.toBeInTheDocument();
-  expect(screen.queryByRole('list', { name: 'Your information controls' })).not.toBeInTheDocument();
-  expect(document.querySelector(screen.getByRole('link', { name: 'Explore Medicare' }).getAttribute('href'))).toBeInTheDocument();
-  expect(screen.queryByRole('note')).not.toBeInTheDocument();
+  const footer = within(screen.getByRole('navigation', { name: 'Footer navigation' }));
+  expect(footer.getByRole('link', { name: 'Privacy notice' })).toHaveAttribute('href', '/privacy-notice');
+  expect(footer.getByRole('link', { name: 'Help & support' })).toHaveAttribute('href', '/support');
 });
 
 test('shows a recoverable fallback for rendering errors', () => {

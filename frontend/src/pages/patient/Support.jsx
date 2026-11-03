@@ -76,27 +76,26 @@ function Support() {
                 <header className="mb-10 text-center max-w-2xl mx-auto">
                     <span className="px-3 py-1 bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-400 rounded-full text-[10px] font-bold uppercase tracking-widest mb-4 inline-block">Support Center</span>
                     <h2 className="text-4xl font-bold text-slate-900 dark:text-white mt-2">How can we help?</h2>
-                    <p className="text-slate-500 dark:text-slate-400 mt-4 font-medium">Find answers to common questions or reach out to our dedicated medical support team.</p>
+                    <p className="text-slate-500 dark:text-slate-400 mt-4 font-medium">Find answers to common questions about using Medicare.</p>
                 </header>
 
                 <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
                     {/* Contact Cards */}
                     <div className="glass-card p-8 rounded-3xl border border-line dark:border-slate-700/50 text-center transition-transform duration-300">
                         <div className="w-14 h-14 bg-primary-50 dark:bg-primary-900/30 rounded-2xl flex items-center justify-center text-primary-600 dark:text-primary-400 mx-auto mb-6">
-                            <span className="material-symbols-outlined text-3xl">email</span>
+                            <span className="material-symbols-outlined text-3xl" aria-hidden="true">help</span>
                         </div>
-                        <h4 className="text-xl font-bold text-slate-800 dark:text-white mb-2">Email Support</h4>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">General inquiries, feedback, or account issues.</p>
-                        <a href="mailto:support@medicare.com" className="text-primary-600 dark:text-primary-400 font-bold hover:underline">support@medicare.com</a>
+                        <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">Website help</h3>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">Find sign-in help or learn how to report a website problem.</p>
+                        <Link to="/support" className="text-primary-600 dark:text-primary-400 font-bold underline">Help &amp; support</Link>
                     </div>
 
                     <div className="glass-card p-8 rounded-3xl border border-line dark:border-slate-700/50 text-center transition-transform duration-300">
                         <div className="w-14 h-14 bg-emerald-50 dark:bg-emerald-900/30 rounded-2xl flex items-center justify-center text-emerald-600 dark:text-emerald-400 mx-auto mb-6">
-                            <span className="material-symbols-outlined text-3xl">call</span>
+                            <span className="material-symbols-outlined text-3xl" aria-hidden="true">call</span>
                         </div>
-                        <h4 className="text-xl font-bold text-slate-800 dark:text-white mb-2">24/7 Helpline</h4>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">Immediate medical guidance or urgent assistance.</p>
-                        <a href="tel:+1800MEDICARE" className="text-emerald-600 dark:text-emerald-400 font-bold hover:underline">1-800-MED-HELP</a>
+                        <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">Questions about your care</h3>
+                        <p className="text-slate-500 dark:text-slate-400 text-sm">Contact your healthcare provider directly for questions about your health, appointments or treatment.</p>
                     </div>
                 </div>
 

@@ -1,4 +1,4 @@
-.mc-care-journey { container-type: inline-size; width: 100%; color: var(--mc-text); background: var(--mc-surface); border: 1px solid var(--mc-border); border-radius: 24px; box-shadow: var(--mc-shadow-panel); overflow: hidden; font-family: var(--mc-font); }
+.mc-care-journey { container-type: inline-size; width: 100%; color: var(--mc-text); background: var(--mc-surface); border: 1px solid var(--mc-border); border-radius: var(--mc-radius-panel); overflow: hidden; font-family: var(--mc-font); }
 .mc-care-journey *, .mc-care-journey *::before, .mc-care-journey *::after { box-sizing: border-box; }
 .mc-care-journey button { font: inherit; cursor: pointer; touch-action: manipulation; }
 .mc-care-journey button:disabled { cursor: default; }
@@ -24,7 +24,7 @@
 .mc-care-card-top > div { min-width: 0; }
 .mc-care-card-top strong { display: block; font-size: 12px; line-height: 1.3; font-weight: 700; }
 .mc-care-card-top small { display: block; color: var(--mc-text-muted); font-size: 11px; line-height: 1.4; margin-top: 3px; }
-.mc-care-avatar { display: grid; place-items: center; flex-shrink: 0; color: var(--mc-accent); background: var(--mc-brand-soft); width: 30px; height: 30px; border-radius: 50%; }
+.mc-care-avatar { display: grid; place-items: center; flex-shrink: 0; color: var(--mc-accent); background: var(--mc-brand-soft); width: 30px; height: 30px; border-radius: var(--mc-radius-control); }
 .mc-care-avatar svg { width: 17px; height: 17px; }
 .mc-care-report { position: relative; padding: 17px 14px 13px; opacity: 1; transform: translateY(0); }
 .mc-care-paper { position: relative; display: grid; gap: 4px; width: 64px; height: 78px; padding: 10px; background: var(--mc-surface-muted); border: 1px solid var(--mc-border); border-radius: 7px; color: var(--mc-accent); margin-bottom: 12px; }
@@ -70,7 +70,7 @@
 .mc-care-open { display: inline-flex; flex-shrink: 0; align-items: center; justify-content: center; gap: 5px; width: 100%; max-width: 160px; min-height: 44px; margin-top: auto; font-size: 10px !important; font-weight: 700 !important; border: 1px solid var(--mc-border); border-radius: 7px; background: var(--mc-surface-muted); color: var(--mc-text-muted); padding: 9px 12px; }
 .mc-care-open svg { width: 12px; height: 12px; }
 .mc-care-open:not(:disabled) { color: var(--mc-on-brand); background: var(--mc-brand); border-color: var(--mc-brand); }
-.mc-care-permission { position: relative; display: flex; align-items: center; gap: 11px; margin: 0 26px; padding: 15px; border-radius: 13px; border: 1px solid transparent; background: var(--mc-text); color: var(--mc-surface); transition: background-color 160ms ease; }
+.mc-care-permission { position: relative; display: flex; align-items: center; gap: 11px; margin: 0 26px; padding: 10px 15px; border-radius: 13px; border: 1px solid transparent; background: var(--mc-brand); color: var(--mc-on-brand); transition: background-color 160ms ease; }
 .mc-care-journey:is([data-phase=choose], [data-phase=withdraw]) .mc-care-permission { background: var(--mc-brand-hover); color: var(--mc-on-brand); }
 .mc-care-permission strong { font-size: 12px; font-weight: 700; display: block; }
 .mc-care-permission small { font-size: 11px; color: inherit; opacity: .85; display: block; margin-top: 4px; }
@@ -121,6 +121,15 @@
 .mc-care-journey:is([data-phase=choose], [data-phase=withdraw])[data-motion=true] .mc-care-cursor { animation: mc-care-point 650ms cubic-bezier(.25,1,.5,1) both; }
 .mc-care-journey[data-running=false][data-manual=false] *, .mc-care-journey[data-running=false][data-manual=false] *::before, .mc-care-journey[data-running=false][data-manual=false] *::after { animation-play-state: paused; }
 .mc-care-journey[data-motion=false] *, .mc-care-journey[data-motion=false] *::before, .mc-care-journey[data-motion=false] *::after { animation: none !important; transition: none !important; }
+
+@container (min-width: 431px) {
+    .mc-care-heading { padding-top: 16px; }
+    .mc-care-caption { min-height: 86px; padding-top: 8px; }
+    .mc-care-scene { margin-top: 12px; padding-block: 12px; }
+    .mc-care-personal, .mc-care-team { min-height: 230px; }
+    .mc-care-access-icon { width: 48px; height: 48px; margin-block: 5px 8px; }
+    .mc-care-team-detail { min-height: 2.7em; margin-bottom: 8px; }
+}
 
 @container (max-width: 430px) {
     .mc-care-heading { padding: 20px 17px 0; }

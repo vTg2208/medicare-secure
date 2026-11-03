@@ -1,6 +1,7 @@
 {
   "codepointsUrl": "https://raw.githubusercontent.com/google/material-design-icons/master/variablefont/MaterialSymbolsOutlined%5BFILL%2CGRAD%2Copsz%2Cwght%5D.codepoints",
   "icons": [
+    "accessibility",
     "accessible",
     "account_balance",
     "add",
@@ -30,6 +31,7 @@
     "autorenew",
     "backup",
     "badge",
+    "balance",
     "bar_chart",
     "bed",
     "bedtime",
@@ -115,7 +117,6 @@
     "fact_check",
     "favorite",
     "favorite_border",
-    "feedback",
     "files",
     "filter",
     "filter_list",
@@ -151,6 +152,7 @@
     "hourglass_empty",
     "html",
     "http",
+    "https",
     "hub",
     "id_card",
     "image",
@@ -238,6 +240,7 @@
     "priority",
     "privacy",
     "privacy_tip",
+    "problem",
     "procedure",
     "progress_activity",
     "psychology",
@@ -383,11 +386,18 @@
       "sha256": "153fc85b70298beeb1d61a5f723331649e7f23bb77302a66e61cb3e2fbdb5e79"
     },
     {
+      "filename": "courgette-0.woff2",
+      "source": "https://fonts.gstatic.com/l/font?kit=wEO_EBrAnc9BLjLQAUkFVOgLtSl6-w&skey=427bdd45dca77eaa&v=v19",
+      "stylesheet": "https://fonts.googleapis.com/css2?family=Courgette&text=care&display=swap",
+      "bytes": 2604,
+      "sha256": "b0a0f60884a59c427043a39e97d53695371c60a470a5ad1ab1fcc4aeea06ff09"
+    },
+    {
       "filename": "material-symbols-0.woff2",
-      "source": "https://fonts.gstatic.com/l/font?kit=kJF1BvYX7BgnkSrUwT8OhrdQw4oELdPIeeII9v6oDMzByHX9rA6RzaxHMPdY43zj-jCxv3fzvRNU22ZXGJpEpjC_1v-p_4MrImHCIJIZrDCvHOejdcZJ80FOurF9-dOV9sS6DuE2biNAAtbvTSDq2bZhzmdmx0P9gJrtxADrPeIIS4OybN3xb1b7ymPc49gEqgSGah2SJBCi3GxpqBtCErOomHZd99qC7mKs1MjdFkPSDz7HakG-ZM_df0Ada2Y-pZO_gq-Tmq_lgcAxboCmIh9EzLAjsX0WNys_2m9DyU1KjsDYMQ8xboTI3_DBYtbvgfPK-zWIq15mOi6JK6Oh2kzKkL3LEboGvyQ_om-QBkzOAqaP8yMfrQlc-Pi2Nsr7Zu1MjHg8sFEIyRmdhZ9hf3R2eWsUxfKg5SvPLMgnqGNLM0k9dGC4k6INayGVZm8MEILJZAC6VcaBD4_3kwOewBt8SZPugrbTPo3AZWf6957cH_JcvJTUPNcNUrD-m4gketKVM7MshG9L0GnkKd_d&skey=b8dc2088854b122f&v=v382",
-      "stylesheet": "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght@24,400&icon_names=accessible,account_balance,add,add_circle,admin_panel_settings,alarm,allergies,analytics,anchor,animation,apartment,api,approval,aq,arrow_back,arrow_forward,article,assessment,assignment,assignment_ind,assistant,attach_file_off,attachment,attribution,auto_stories,autoplay,autorenew,backup,badge,bar_chart,bed,bedtime,biotech,block,bolt,box,business,cached,calculate,calendar_clock,calendar_month,calendar_today,call,cancel,capture,cards,cases,category,chat_bubble_outline,check,check_circle,checklist,chevron_left,chevron_right,child_care,chips,chronic,circle,class,clear,clinical_notes,close,cloud_upload,code,colors,communication,conditions,contact_emergency,contact_mail,contacts,content_paste_off,contract,contrast,conversation,coronavirus,corporate_fare,create,css,dashboard,data_usage,database,delete,description,desk,details,diagnosis,distance,domain,done,done_all,download,downloading,draft,edit,edit_document,edit_note,eject,email,emergency,encrypted,ent,error,event,event_available,event_busy,event_note,expand,expand_more,explore,eyebrow,face,fact_check,favorite,favorite_border,feedback,files,filter,filter_list,fingerprint,flag,floor,folder,folder_open,folder_shared,forward,function,functions,gavel,gradient,grid_view,group,group_off,groups,handshake,hardware,healing,health_and_safety,height,help,hide,highlight,history,history_edu,history_toggle_off,home,home_pin,hotel,hourglass_empty,html,http,hub,id_card,image,inbox,info,input,insights,inventory,inventory_2,iso,join,keep,key,key_off,keyboard,label,labs,lan,license,light,light_mode,link,list,local_hospital,lock,lock_clock,lock_reset,login,logout,lowercase,mail,manage_accounts,map,margin,mark_email_read,matter,medical_information,medical_services,medication,message,mobile,mode,monitor,monitor_heart,monitoring,more,move,moving,navigation,nightlight,no_accounts,note,note_stack,notes,notifications,notifications_active,numbers,opacity,orders,overview,padding,pages,palette,passkey,password,pause,payments,pending,pending_actions,person,person_add,phone,pie_chart,pill,pin,place,policy,polyline,post,post_add,pregnancy,prescriptions,preview,print,priority,privacy,privacy_tip,procedure,progress_activity,psychology,public,publish,qr_code_scanner,query_stats,queue,quiz,radio,radiology,receipt,receipt_long,record_voice_over,refresh,reminder,remove,reorder,repeat,reply,report,resize,restart_alt,restore,reviews,room,route,router,rule,save,scale,scan,scanner,scene,schedule,schema,science,screenshot,search,search_off,security,select,send,sensors,sentiment_dissatisfied,serif,settings,shadow,share,shield,shift,signature,skeleton,slideshow,smart_toy,soap,sort,spa,square,stack,start,step,steps,stethoscope,stop,storage,store,strategy,style,support,switch,symptoms,sync,tab,table,tablet,tabs,tag,target,task,task_alt,terminal,timeline,timer,title,toast,today,token,transform,translate,trip,try,upcoming,update,upload,uppercase,vaccines,verified,verified_user,view_list,visibility,visibility_off,vital_signs,vitals,ward,warning,waves,web,weight,width,window,work,workflow,workspaces&display=block",
-      "bytes": 31712,
-      "sha256": "d032df3b90b7cad8b4c205899da9a3df29a5a1470836916b08fb78d2a33b164b"
+      "source": "https://fonts.gstatic.com/l/font?kit=kJF1BvYX7BgnkSrUwT8OhrdQw4oELdPIeeII9v6oDMzByHX9rA6RzaxHMPdY43zj-jCxv3fzvRNU22ZXGJpEpjC_1v-p_4MrImHCIJIZrDCvHOejdcZJ80FOurF9-dOV9sS6DuE2biNAAtbvTSDq2bZhzmZmx0P9gJrtxADrPeIIS4OybN3xb1b7ymPc49gEqgSGah2SJBCi3OxpqBtCErOomHZd99qC7mKs1MjdFkPSDz7HakG-ZM_df0Ada2Y-pZO_gq-Tmq_lgcAxboCmIh9EzLAjsX0WNys_2m9DyU1KLnrZg5ulZ5tFRC2c4P3RJH_Okpkz-5I2b5zQTUGrSeZgUIiMVROs7GGip-GjrChjK2_PDnm5FqPMnWIvplNLYR78J6L9usIh-BwINwbQFifMHgsibMKgDnOEgmh5N_ZoaiYHnYuOAP60guHrPsGghl9ZvQ3zaMBUoc-ZP1ULbbbp2ZNyGFyvroEJbAtWPVgeS7gliAR5Ndc-A3tSrd7i7ePwZiaP5GyOTFaLeeX-nQ&skey=b8dc2088854b122f&v=v382",
+      "stylesheet": "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght@24,400&icon_names=accessibility,accessible,account_balance,add,add_circle,admin_panel_settings,alarm,allergies,analytics,anchor,animation,apartment,api,approval,aq,arrow_back,arrow_forward,article,assessment,assignment,assignment_ind,assistant,attach_file_off,attachment,attribution,auto_stories,autoplay,autorenew,backup,badge,balance,bar_chart,bed,bedtime,biotech,block,bolt,box,business,cached,calculate,calendar_clock,calendar_month,calendar_today,call,cancel,capture,cards,cases,category,chat_bubble_outline,check,check_circle,checklist,chevron_left,chevron_right,child_care,chips,chronic,circle,class,clear,clinical_notes,close,cloud_upload,code,colors,communication,conditions,contact_emergency,contact_mail,contacts,content_paste_off,contract,contrast,conversation,coronavirus,corporate_fare,create,css,dashboard,data_usage,database,delete,description,desk,details,diagnosis,distance,domain,done,done_all,download,downloading,draft,edit,edit_document,edit_note,eject,email,emergency,encrypted,ent,error,event,event_available,event_busy,event_note,expand,expand_more,explore,eyebrow,face,fact_check,favorite,favorite_border,files,filter,filter_list,fingerprint,flag,floor,folder,folder_open,folder_shared,forward,function,functions,gavel,gradient,grid_view,group,group_off,groups,handshake,hardware,healing,health_and_safety,height,help,hide,highlight,history,history_edu,history_toggle_off,home,home_pin,hotel,hourglass_empty,html,http,https,hub,id_card,image,inbox,info,input,insights,inventory,inventory_2,iso,join,keep,key,key_off,keyboard,label,labs,lan,license,light,light_mode,link,list,local_hospital,lock,lock_clock,lock_reset,login,logout,lowercase,mail,manage_accounts,map,margin,mark_email_read,matter,medical_information,medical_services,medication,message,mobile,mode,monitor,monitor_heart,monitoring,more,move,moving,navigation,nightlight,no_accounts,note,note_stack,notes,notifications,notifications_active,numbers,opacity,orders,overview,padding,pages,palette,passkey,password,pause,payments,pending,pending_actions,person,person_add,phone,pie_chart,pill,pin,place,policy,polyline,post,post_add,pregnancy,prescriptions,preview,print,priority,privacy,privacy_tip,problem,procedure,progress_activity,psychology,public,publish,qr_code_scanner,query_stats,queue,quiz,radio,radiology,receipt,receipt_long,record_voice_over,refresh,reminder,remove,reorder,repeat,reply,report,resize,restart_alt,restore,reviews,room,route,router,rule,save,scale,scan,scanner,scene,schedule,schema,science,screenshot,search,search_off,security,select,send,sensors,sentiment_dissatisfied,serif,settings,shadow,share,shield,shift,signature,skeleton,slideshow,smart_toy,soap,sort,spa,square,stack,start,step,steps,stethoscope,stop,storage,store,strategy,style,support,switch,symptoms,sync,tab,table,tablet,tabs,tag,target,task,task_alt,terminal,timeline,timer,title,toast,today,token,transform,translate,trip,try,upcoming,update,upload,uppercase,vaccines,verified,verified_user,view_list,visibility,visibility_off,vital_signs,vitals,ward,warning,waves,web,weight,width,window,work,workflow,workspaces&display=block",
+      "bytes": 31840,
+      "sha256": "34cf4d1182199fb9f816e9ef9b93551fd6f8d344f6be01877ff1f58f033985e6"
     }
   ],
   "preload": "plus-jakarta-sans-3.woff2"

@@ -69,9 +69,7 @@ function Login() {
             navigateByRole(user.role || user.roleName);
         } catch (err) {
             if (err.response?.status === 403 && err.response?.data?.message?.includes('not verified')) {
-                setError('Your account is not verified yet. Please check your email/phone for the OTP or contact support.');
-                // Optionally redirect to a verification page if one exists,
-                // but since Register.jsx handles it for now, we just inform them.
+                setError('Your account is awaiting verification. Patients can choose Verify email below and enter the code sent to them.');
             } else {
                 const errorMsg = err.response?.data?.message || err.message || 'Login failed';
                 setError(errorMsg);
@@ -186,7 +184,9 @@ function Login() {
                     )}
                     <p className="login-access-note"><span className="material-symbols-outlined" aria-hidden="true">lock</span>Your records are available according to your role and sharing permissions.</p>
                     <p className="login-signup">New to Medicare? <Link to="/register">Create a patient account</Link></p>
+                    <p className="login-signup"><Link to="/register?verify=1">Verify email</Link></p>
                     <p className="login-signup"><Link to="/privacy-notice">Read privacy notice</Link></p>
+                    <p className="login-signup"><Link to="/support">Get help signing in</Link></p>
                 </div>
                 <footer className="login-footer">© {new Date().getFullYear()} Medicare. Your care, connected.</footer>
             </section>

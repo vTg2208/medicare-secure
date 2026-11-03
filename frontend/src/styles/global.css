@@ -45,6 +45,20 @@ input[type='checkbox'], input[type='radio'], input[type='range'] { accent-color:
 .mc-brand--large { font-size: 28px; }
 .mc-brand--large img { width: 48px; height: 48px; }
 .mc-brand--stack { margin: 0 auto 28px; }
+.mc-care-accent {
+    color: var(--mc-accent);
+    font-family: var(--mc-font-care);
+    font-size: 1.08em;
+    font-style: normal;
+    font-weight: 400;
+    letter-spacing: normal;
+    -webkit-text-stroke: .035em currentColor;
+}
+.mc-brand .mc-care-accent {
+    color: inherit;
+    letter-spacing: -.025em;
+    -webkit-text-stroke: .012em currentColor;
+}
 .mc-workspace { position: relative; background: var(--mc-canvas); color: var(--mc-text); }
 .mc-sidebar { background: var(--mc-surface); border-color: var(--mc-border); }
 .mc-sidebar .mc-brand { margin: 0 0 32px 4px; }

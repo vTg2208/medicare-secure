@@ -1,0 +1,75 @@
+.mc-public-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.mc-public-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 76px;
+    gap: 12px;
+}
+
+.mc-public-main {
+    flex: 1;
+    max-width: 760px;
+    padding-block: clamp(36px, 6vw, 84px);
+    overflow-wrap: anywhere;
+}
+
+.mc-public-heading {
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--mc-border);
+}
+
+.mc-public-heading h1 {
+    margin-block: 8px 14px;
+    font-size: clamp(32px, 6vw, 56px);
+    line-height: 1.1;
+    font-weight: 750;
+    letter-spacing: -0.04em;
+}
+
+.mc-public-heading > p:last-child {
+    font-size: 18px;
+    color: var(--mc-text-muted);
+}
+
+.mc-public-content {
+    color: var(--mc-text-muted);
+    line-height: 1.65;
+}
+
+.mc-public-content h2 {
+    margin-block: 28px 8px;
+    color: var(--mc-text);
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.mc-public-content p + p, .mc-public-content dt:not(:first-child) {
+    margin-top: 12px;
+}
+
+.mc-public-content ul {
+    list-style: disc;
+    padding-inline-start: 22px;
+}
+
+.mc-public-content dl {
+    margin-top: 16px;
+}
+
+.mc-public-content dt {
+    color: var(--mc-text);
+    font-weight: 700;
+}
+
+.mc-public-content a {
+    color: var(--mc-accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
