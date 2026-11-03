@@ -53,20 +53,27 @@ const authenticate = async (req, res, next) => {
             });
         }
 
-        // Check if session is active
-        const sessionQuery = `
-      SELECT id, is_active, expires_at, last_activity
-      FROM sessions
-      WHERE user_id = $1 AND token_hash = $2 AND is_active = true
-      ORDER BY created_at DESC
-      LIMIT 1
-    `;
+        const tokenHash = createHash('sha256').update(token).digest('hex');
+        const idleMinutes = config.session.autoLogoutEnabled ? config.session.timeoutMinutes : null;
+        // Update the matching active row atomically so a concurrent revocation wins
+        // if it commits before this statement can update the session.
+        const { rows: [session] } = await measurePhase('session_check', () => query(`
+            UPDATE sessions
+            SET (is_active, last_activity) = (
+                SELECT valid, CASE WHEN valid THEN GREATEST(last_activity, checked_at) ELSE last_activity END
+                FROM (VALUES (statement_timestamp()::timestamp)) AS check_time(checked_at)
+                CROSS JOIN LATERAL (VALUES (
+                    expires_at > checked_at AND (
+                        $3::integer IS NULL OR last_activity IS NULL OR
+                        last_activity > checked_at - $3 * INTERVAL '1 minute'
+                    )
+                )) AS session_status(valid)
+            )
+            WHERE user_id = $1 AND token_hash = $2 AND is_active = true
+            RETURNING id, is_active
+        `, [decoded.userId, tokenHash, idleMinutes]));
 
-        logger.debug(`Checking session for user ${decoded.userId}`);
-        const sessionResult = await measurePhase('session_lookup', () =>
-            query(sessionQuery, [decoded.userId, createHash('sha256').update(token).digest('hex')]));
-
-        if (sessionResult.rows.length === 0) {
+        if (!session) {
             logger.warn(`No active session found for user ${decoded.userId}`);
             return res.status(HTTP_STATUS.UNAUTHORIZED).json({
                 success: false,
@@ -74,23 +81,12 @@ const authenticate = async (req, res, next) => {
             });
         }
 
-        const session = sessionResult.rows[0];
-
-        // Check if session has expired
-        const idleExpired = config.session.autoLogoutEnabled && session.last_activity &&
-            Date.now() - new Date(session.last_activity).getTime() >= config.session.timeoutMinutes * 60000;
-        if (new Date() >= new Date(session.expires_at) || idleExpired) {
-            // Deactivate expired session
-            await query('UPDATE sessions SET is_active = false WHERE id = $1', [session.id]);
-
+        if (!session.is_active) {
             return res.status(HTTP_STATUS.UNAUTHORIZED).json({
                 success: false,
                 message: 'Session has expired. Please login again',
             });
         }
-
-        // Update last activity
-        await measurePhase('session_touch', () => query('UPDATE sessions SET last_activity = NOW() WHERE id = $1', [session.id]));
 
         // Capture device information
         const deviceInfo = captureDeviceInfo(req);

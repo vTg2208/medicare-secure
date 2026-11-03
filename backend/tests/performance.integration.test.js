@@ -8,7 +8,7 @@ test('performance queries preserve isolation, searchable pagination and bounded 
 }, async t => {
     assert.equal(process.env.NODE_ENV, 'test');
     assert.equal(process.env.DB_HOST, '127.0.0.1');
-    assert.equal(process.env.DB_NAME, 'healthcare_performance_test');
+    assert.ok(['healthcare_test', 'healthcare_performance_test'].includes(process.env.DB_NAME));
     assert.equal(process.env.DB_USER, 'postgres');
     assert.ok(Number(process.env.DB_PORT) >= 1024);
     // Match the UTC PostgreSQL container/production runtime for legacy TIMESTAMP sessions.
@@ -23,6 +23,8 @@ test('performance queries preserve isolation, searchable pagination and bounded 
     process.env.JWT_REFRESH_SECRET = crypto.randomBytes(48).toString('hex');
     process.env.ENCRYPTION_KEY = crypto.randomBytes(32).toString('hex');
     process.env.AI_ENABLED = 'false';
+    process.env.AUTO_LOGOUT_ENABLED = 'true';
+    process.env.SESSION_TIMEOUT_MINUTES = '30';
     let db;
     try {
         const migrator = new Client({ ...connection, database });
@@ -110,9 +112,10 @@ test('performance queries preserve isolation, searchable pagination and bounded 
                 assert.equal((await logs()).headers['server-timing'], undefined);
                 const traced = await logs().set('X-Performance-Trace', '1');
                 assert.equal(traced.status, 200);
-                for (const phase of ['session_lookup', 'audit_count', 'audit_page', 'audit_append', 'app']) {
+                for (const phase of ['session_check', 'audit_count', 'audit_page', 'audit_append', 'app']) {
                     assert.match(traced.headers['server-timing'], new RegExp(`\\b${phase};dur=[\\d.]+`));
                 }
+                assert.doesNotMatch(traced.headers['server-timing'], /session_(lookup|touch);/);
                 const denied = await request(app).get('/api/audit/logs')
                     .set('Authorization', `Bearer ${patientToken}`).set('X-Performance-Trace', '1');
                 assert.equal(denied.status, 403);
@@ -120,6 +123,57 @@ test('performance queries preserve isolation, searchable pagination and bounded 
                 const bad = await request(app).post('/api/auth/login').set('X-Performance-Trace', '1').send({ email, password: 'wrong' });
                 assert.equal(bad.status, 401);
                 assert.equal(bad.headers['server-timing'], undefined);
+            });
+            await http.test('session validation refreshes only active, unexpired tokens', async () => {
+                for (const [active, expiryMinutes, idleMinutes, expectedStatus] of [
+                    [true, 60, 10, 200],
+                    [true, 60, null, 200],
+                    [true, -1, 10, 401],
+                    [true, 60, 31, 401],
+                    [false, 60, 10, 401],
+                ]) {
+                    const token = generateAccessToken({ userId: administrator, roleName: 'hospital_admin' });
+                    const hash = crypto.createHash('sha256').update(token).digest('hex');
+                    const { rows: [original] } = await db.query(`INSERT INTO sessions(user_id,token_hash,is_active,expires_at,last_activity)
+                        VALUES($1,$2,$3,NOW()+$4*INTERVAL '1 minute',NOW()-$5*INTERVAL '1 minute') RETURNING last_activity`,
+                    [administrator, hash, active, expiryMinutes, idleMinutes]);
+                    const response = await request(app).get('/api/audit/logs').set('Authorization', `Bearer ${token}`);
+                    assert.equal(response.status, expectedStatus);
+                    const { rows: [current] } = await db.query('SELECT is_active,last_activity FROM sessions WHERE token_hash=$1', [hash]);
+                    assert.equal(current.is_active, expectedStatus === 200);
+                    if (expectedStatus === 200) {
+                        assert.ok(current.last_activity instanceof Date && current.last_activity > original.last_activity);
+                    } else {
+                        assert.deepEqual(current.last_activity, original.last_activity);
+                    }
+                }
+            });
+            await http.test('a request waiting on session revocation is rejected', async () => {
+                const token = await session(administrator, 'hospital_admin');
+                const hash = crypto.createHash('sha256').update(token).digest('hex');
+                const revoker = await db.pool.connect();
+                let pending;
+                let waiting = false;
+                try {
+                    await revoker.query('BEGIN');
+                    await revoker.query('UPDATE sessions SET is_active=false WHERE token_hash=$1', [hash]);
+                    pending = request(app).get('/api/audit/logs').set('Authorization', `Bearer ${token}`).then(response => response);
+                    const { setTimeout: delay } = require('node:timers/promises');
+                    const deadline = Date.now() + 5000;
+                    while (!waiting && Date.now() < deadline) {
+                        const { rows: [row] } = await revoker.query(`SELECT EXISTS (
+                            SELECT 1 FROM pg_stat_activity WHERE pg_backend_pid() = ANY(pg_blocking_pids(pid))
+                        ) AS waiting`);
+                        waiting = row.waiting;
+                        if (!waiting) await delay(20);
+                    }
+                } finally {
+                    try { await revoker.query('COMMIT'); }
+                    finally { revoker.release(); }
+                }
+                const response = await pending;
+                assert.ok(waiting, 'the request reached session validation before revocation committed');
+                assert.equal(response.status, 401);
             });
             await http.test('visit and audit searches reach beyond page one within their access scope', async () => {
                 const otherOrg = (await db.query("INSERT INTO organizations(name,type,license_number,hospital_code,status,verified) VALUES('Other fixture','hospital','OTHER-LIC','OTHER','active',true) RETURNING id")).rows[0].id;
