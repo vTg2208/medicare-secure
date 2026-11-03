@@ -1,5 +1,20 @@
 const pool = require('../config/db');
 const { v4: uuidv4 } = require('uuid');
+const { pagination, searchPattern } = require('../utils/pagination');
+
+const recordFilters = (patientId, { type, visitId, search } = {}) => {
+    const values = [patientId];
+    let sql = 'WHERE mr.patient_id = $1';
+    if (type) { values.push(type); sql += ` AND mr.type = $${values.length}`; }
+    if (visitId) { values.push(visitId); sql += ` AND mr.visit_id = $${values.length}`; }
+    const pattern = searchPattern(search);
+    if (pattern) {
+        values.push(pattern);
+        sql += ` AND (mr.title ILIKE $${values.length} OR mr.description ILIKE $${values.length}
+            OR mr.type ILIKE $${values.length} OR concat_ws(' ',u.first_name,u.last_name) ILIKE $${values.length})`;
+    }
+    return { sql, values };
+};
 
 class MedicalRecordModel {
     /**
@@ -66,11 +81,12 @@ class MedicalRecordModel {
      * @returns {Promise<Array>} Medical records
      */
     static async findByPatientId(patientId, options = {}) {
-        const { type, visitId, limit = 50, offset = 0 } = options;
+        const { limit, offset } = pagination(options);
+        const filters = recordFilters(patientId, options);
 
         let query = `
             SELECT 
-                mr.*,
+                ${options.summary ? 'mr.id,mr.type,mr.title,mr.description,mr.created_at' : 'mr.*'},
                 u.first_name || ' ' || u.last_name as created_by_name,
                 r.name as created_by_role,
                 patient_user.first_name AS patient_first_name,
@@ -81,21 +97,10 @@ class MedicalRecordModel {
             JOIN roles r ON u.role_id = r.id
             JOIN users patient_user ON mr.patient_id = patient_user.id
             LEFT JOIN patient_profiles patient_profile ON patient_profile.user_id = patient_user.id
-            WHERE mr.patient_id = $1
+            ${filters.sql}
         `;
-
-        const values = [patientId];
-
-        if (type) {
-            query += ` AND mr.type = $${values.length + 1}`;
-            values.push(type);
-        }
-        if (visitId) {
-            query += ` AND mr.visit_id = $${values.length + 1}`;
-            values.push(visitId);
-        }
-
-        query += ` ORDER BY mr.created_at DESC LIMIT $${values.length + 1} OFFSET $${values.length + 2}`;
+        const values = filters.values;
+        query += ` ORDER BY mr.created_at DESC,mr.id DESC LIMIT $${values.length + 1} OFFSET $${values.length + 2}`;
         values.push(limit, offset);
 
         const result = await pool.query(query, values);
@@ -141,7 +146,6 @@ class MedicalRecordModel {
             WHERE d.record_id = $1
             ORDER BY d.is_primary DESC, d.created_at DESC
         `;
-        const diagnosesResult = await pool.query(diagnosesQuery, [recordId]);
 
         // Get related prescriptions
         const prescriptionsQuery = `
@@ -151,7 +155,6 @@ class MedicalRecordModel {
             WHERE p.record_id = $1
             ORDER BY p.prescribed_at DESC
         `;
-        const prescriptionsResult = await pool.query(prescriptionsQuery, [recordId]);
 
         // Get related lab results
         const labResultsQuery = `
@@ -161,7 +164,6 @@ class MedicalRecordModel {
             WHERE l.record_id = $1
             ORDER BY l.uploaded_at DESC
         `;
-        const labResultsResult = await pool.query(labResultsQuery, [recordId]);
 
         // Get related imaging reports
         const imagingQuery = `
@@ -171,7 +173,10 @@ class MedicalRecordModel {
             WHERE i.record_id = $1
             ORDER BY i.uploaded_at DESC
         `;
-        const imagingResult = await pool.query(imagingQuery, [recordId]);
+        const [diagnosesResult, prescriptionsResult, labResultsResult, imagingResult] = await Promise.all([
+            pool.query(diagnosesQuery, [recordId]), pool.query(prescriptionsQuery, [recordId]),
+            pool.query(labResultsQuery, [recordId]), pool.query(imagingQuery, [recordId])
+        ]);
 
         return {
             ...record,
@@ -250,20 +255,9 @@ class MedicalRecordModel {
      * @param {string} type - Optional record type filter
      * @returns {Promise<number>} Count of records
      */
-    static async countByPatient(patientId, type = null, visitId = null) {
-        let query = 'SELECT COUNT(*) FROM medical_records WHERE patient_id = $1';
-        const values = [patientId];
-
-        if (type) {
-            query += ' AND type = $2';
-            values.push(type);
-        }
-        if (visitId) {
-            query += ` AND visit_id = $${values.length + 1}`;
-            values.push(visitId);
-        }
-
-        const result = await pool.query(query, values);
+    static async countByPatient(patientId, type = null, visitId = null, search = '') {
+        const { sql, values } = recordFilters(patientId, { type, visitId, search });
+        const result = await pool.query(`SELECT COUNT(*) FROM medical_records mr JOIN users u ON mr.created_by=u.id ${sql}`, values);
         return parseInt(result.rows[0].count);
     }
 }

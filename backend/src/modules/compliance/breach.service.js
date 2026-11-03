@@ -64,15 +64,26 @@ async function updateAssessment(req) {
 async function listBreaches(req) {
     const page = Number(req.query.page || 1);
     if (!Number.isSafeInteger(page) || page < 1 || page > 100000) fail(400,'Invalid page');
-    const rows = (await db.query(`SELECT incident_id FROM privacy_breaches ORDER BY created_at DESC,incident_id LIMIT 50 OFFSET $1`,[(page-1)*50])).rows;
-    const cases = [];
-    for (const row of rows) {
-        const current = await readCase(db,row.incident_id);
-        cases.push({id:current.id,status:current.status,severity:current.severity,version:current.version,
-            assessment:{discoveredAt:current.assessment.discoveredAt,regimes:current.assessment.regimes},
-            obligations:current.obligations.map(({regime,audience,status})=>({regime,audience,status}))});
+    const rows = (await db.query(`SELECT b.incident_id,b.assessment_version,b.assessment_ciphertext,e.status,e.severity
+        FROM privacy_breaches b JOIN security_events e ON e.id=b.incident_id
+        ORDER BY b.created_at DESC,b.incident_id LIMIT 51 OFFSET $1`,[(page-1)*50])).rows;
+    const visible = rows.slice(0,50);
+    const attempts = visible.length ? (await db.query(`SELECT incident_id,assessment_version,regime,audience,status
+        FROM breach_notification_log WHERE incident_id=ANY($1::uuid[])`,[visible.map(row=>row.incident_id)])).rows : [];
+    const byIncident = new Map();
+    for (const attempt of attempts) {
+        if (!byIncident.has(attempt.incident_id)) byIncident.set(attempt.incident_id,[]);
+        byIncident.get(attempt.incident_id).push(attempt);
     }
-    return { cases, page, hasMore: rows.length === 50 };
+    const cases = visible.map(row => {
+        const assessment = unseal(row.assessment_ciphertext,context(row.incident_id,row.assessment_version));
+        const currentAttempts = (byIncident.get(row.incident_id)||[]).filter(attempt=>attempt.assessment_version===row.assessment_version);
+        return {id:row.incident_id,status:row.status,severity:row.severity,version:row.assessment_version,
+            assessment:{discoveredAt:assessment.discoveredAt,regimes:assessment.regimes},
+            obligations:breachObligations(assessment).map(obligation=>({regime:obligation.regime,audience:obligation.audience,
+                status:obligationStatus(obligation,currentAttempts)}))};
+    });
+    return { cases, page, hasMore: rows.length > 50 };
 }
 
 async function getBreach(req) {

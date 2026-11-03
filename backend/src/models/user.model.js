@@ -2,6 +2,7 @@ const { query } = require('../config/db');
 const { hashPassword } = require('../services/encryption.service');
 const logger = require('../utils/logger');
 const { USER_STATUS } = require('../utils/constants');
+const { pagination, searchPattern } = require('../utils/pagination');
 
 /**
  * Create new user
@@ -344,54 +345,34 @@ const isAccountLocked = async (userId) => {
  * @param {Object} options - Query options
  * @returns {Promise<Array>} Users list
  */
+const userListScope = ({ role, status, organizationId, search } = {}) => {
+    const conditions = [], params = [];
+    const bind = value => { params.push(value); return `$${params.length}`; };
+    if (organizationId) conditions.push(`EXISTS (SELECT 1 FROM staff_org_mapping som WHERE som.user_id=u.id AND som.status='active' AND som.organization_id=${bind(organizationId)})`);
+    if (role) conditions.push(`r.name = ${bind(role)}`);
+    if (status) conditions.push(`u.status = ${bind(status)}`);
+    const pattern = searchPattern(search);
+    if (pattern) {
+        const parameter = bind(pattern);
+        conditions.push(`(concat_ws(' ',u.first_name,u.last_name) ILIKE ${parameter} OR u.email ILIKE ${parameter})`);
+    }
+    return { sql: `FROM users u LEFT JOIN roles r ON u.role_id = r.id ${conditions.length ? `WHERE ${conditions.join(' AND ')}` : ''}`, params };
+};
 const getAllUsers = async (options = {}) => {
     try {
-        const { limit = 50, offset = 0, role, status, organizationId } = options;
-
-        let conditions = [];
-        let params = [];
-        let paramIndex = 1;
-
-        let joinClause = 'LEFT JOIN roles r ON u.role_id = r.id';
-
-        if (organizationId) {
-            joinClause += ' JOIN staff_org_mapping som ON u.id = som.user_id AND som.status = \'active\'';
-            conditions.push(`som.organization_id = $${paramIndex}`);
-            params.push(organizationId);
-            paramIndex++;
-        }
-
-        if (role) {
-            conditions.push(`r.name = $${paramIndex}`);
-            params.push(role);
-            paramIndex++;
-        }
-
-        if (status) {
-            conditions.push(`u.status = $${paramIndex}`);
-            params.push(status);
-            paramIndex++;
-        }
-
-        const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
-
-        const selectQuery = `
-      SELECT u.id, u.email, u.phone, u.first_name, u.last_name, u.is_verified, u.status, u.created_at, r.name as role_name
-      FROM users u
-      ${joinClause}
-      ${whereClause}
-      ORDER BY u.created_at DESC
-      LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
-    `;
-
-        params.push(limit, offset);
-
-        const result = await query(selectQuery, params);
+        const { limit, offset } = pagination(options);
+        const { sql, params } = userListScope(options);
+        const result = await query(`SELECT u.id, u.email, u.phone, u.first_name, u.last_name, u.is_verified, u.status, u.created_at, r.name as role_name
+            ${sql} ORDER BY u.created_at DESC,u.id DESC LIMIT $${params.length+1} OFFSET $${params.length+2}`, [...params,limit,offset]);
         return result.rows;
     } catch (error) {
         logger.error('Failed to get all users:', error);
         throw error;
     }
+};
+const countAllUsers = async (options = {}) => {
+    const { sql, params } = userListScope(options);
+    return Number((await query(`SELECT COUNT(DISTINCT u.id) AS count ${sql}`,params)).rows[0].count);
 };
 
 /**
@@ -439,5 +420,6 @@ module.exports = {
     lockUserAccount,
     isAccountLocked,
     getAllUsers,
+    countAllUsers,
     updateUserProfile,
 };

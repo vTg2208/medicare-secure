@@ -164,7 +164,6 @@ class AdminController {
 
         // Total Staff (users mapped to this organization)
         const staffCountQuery = 'SELECT COUNT(*) FROM staff_org_mapping WHERE organization_id = $1';
-        const staffCount = await query(staffCountQuery, [orgId]);
 
         // Active Doctors (mapped to this org with status 'active' and role 'doctor')
         const doctorCountQuery = `
@@ -172,15 +171,16 @@ class AdminController {
             JOIN roles r ON som.role_id = r.id
             WHERE som.organization_id = $1 AND som.status = 'active' AND r.name = 'doctor'
         `;
-        const doctorCount = await query(doctorCountQuery, [orgId]);
 
         // Pending Visits for this organization
         const visitCountQuery = "SELECT COUNT(*) FROM visits WHERE organization_id = $1 AND status = 'pending'";
-        const visitCount = await query(visitCountQuery, [orgId]);
 
         // Total Patients (unique patients who have visited this organization)
         const patientCountQuery = 'SELECT COUNT(DISTINCT patient_id) FROM visits WHERE organization_id = $1';
-        const patientCount = await query(patientCountQuery, [orgId]);
+        const [staffCount, doctorCount, visitCount, patientCount] = await Promise.all([
+            query(staffCountQuery, [orgId]), query(doctorCountQuery, [orgId]),
+            query(visitCountQuery, [orgId]), query(patientCountQuery, [orgId])
+        ]);
 
         res.json({
             success: true,

@@ -54,3 +54,50 @@ test('handles transport errors and unauthenticated 401 without redirect', async 
     }
     expect(redirect).not.toHaveBeenCalled();
 });
+
+const deferred = () => {
+    let resolve, reject;
+    const promise = new Promise((yes, no) => { resolve = yes; reject = no; });
+    return { promise, resolve, reject };
+};
+test('shares identical in-flight GETs but fetches again after completion', async () => {
+    const pending = deferred();
+    const adapter = vi.fn(async config => ({ data: await pending.promise, status: 200, headers: {}, config }));
+    const first = apiClient.get('/records', { params: { limit: 20 }, adapter });
+    const second = apiClient.get('/records', { params: { limit: 20 }, adapter });
+    await vi.waitFor(() => expect(adapter).toHaveBeenCalledTimes(1));
+    pending.resolve({ records: [] });
+    expect((await first).data).toEqual((await second).data);
+    await apiClient.get('/records', { params: { limit: 20 }, adapter });
+    expect(adapter).toHaveBeenCalledTimes(2);
+});
+test('does not share requests across tokens, query parameters or independently cancellable calls', async () => {
+    const pending = deferred();
+    const adapter = vi.fn(async config => ({ data: await pending.promise, status: 200, headers: {}, config }));
+    setToken('first-user');
+    const first = apiClient.get('/records', { adapter });
+    await vi.waitFor(() => expect(adapter).toHaveBeenCalledTimes(1));
+    setToken('second-user');
+    const requests = [first, apiClient.get('/records', { adapter }), apiClient.get('/records', { adapter, params: { offset: 20 } }),
+        apiClient.get('/records', { adapter, signal: new AbortController().signal }), apiClient.get('/records', { adapter, signal: new AbortController().signal })];
+    await vi.waitFor(() => expect(adapter).toHaveBeenCalledTimes(5));
+    pending.resolve({});
+    await Promise.all(requests);
+});
+test('never reuses a failed GET', async () => {
+    const adapter = vi.fn().mockRejectedValueOnce(Error('offline')).mockImplementation(async config => ({ data: {}, status: 200, headers: {}, config }));
+    await expect(apiClient.get('/retry', { adapter })).rejects.toThrow('offline');
+    await apiClient.get('/retry', { adapter });
+    expect(adapter).toHaveBeenCalledTimes(2);
+});
+test('a completed mutation prevents sharing an older in-flight read', async () => {
+    const pending = deferred();
+    const adapter = vi.fn(async config => ({ data: config.method === 'get' ? await pending.promise : {}, status: 200, headers: {}, config }));
+    const first = apiClient.get('/records', { adapter });
+    await vi.waitFor(() => expect(adapter).toHaveBeenCalledTimes(1));
+    await apiClient.post('/records', {}, { adapter });
+    const second = apiClient.get('/records', { adapter });
+    await vi.waitFor(() => expect(adapter).toHaveBeenCalledTimes(3));
+    pending.resolve({});
+    await Promise.all([first, second]);
+});

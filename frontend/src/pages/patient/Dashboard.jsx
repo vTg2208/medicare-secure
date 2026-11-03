@@ -8,6 +8,7 @@ import { emrApi } from '../../api/emrApi';
 import { patientApi } from '../../api/patientApi';
 import { auditApi } from '../../api/auditApi';
 import ThemeToggle from '../../components/common/ThemeToggle';
+import LoadingSkeleton from '../../components/common/LoadingSkeleton';
 import './Dashboard.css';
 
 function PatientDashboard() {
@@ -22,6 +23,7 @@ function PatientDashboard() {
     const [patientDetails, setPatientDetails] = useState(null);
     const [healthFacts, setHealthFacts] = useState([]);
     const [activities, setActivities] = useState([]);
+    const [statsLoading, setStatsLoading] = useState(true);
     const [activityPage, setActivityPage] = useState(0);
     const ACTIVITIES_PER_PAGE = 3;
 
@@ -36,7 +38,7 @@ function PatientDashboard() {
             try {
                 const [consentsRes, recordsRes, visitsRes, profileRes, factsRes, activitiesRes, auditRes] = await Promise.allSettled([
                     consentApi.getActiveConsents(),
-                    emrApi.getPatientMedicalRecords(user.id),
+                    emrApi.getPatientMedicalRecords(user.id, { limit: 1, summary: true }),
                     visitApi.getMyVisits(),
                     patientApi.getProfile(),
                     patientApi.getHealthFacts(),
@@ -54,7 +56,7 @@ function PatientDashboard() {
                             ? consentsRes.value.length
                             : (Array.isArray(consentsRes.value?.data) ? consentsRes.value.data.length : 0))
                         : 0,
-                    medicalRecords: recordsRes.status === 'fulfilled' ? (recordsRes.value?.data?.records?.length || recordsRes.value?.data?.length || 0) : 0,
+                    medicalRecords: recordsRes.status === 'fulfilled' ? (recordsRes.value?.data?.pagination?.total ?? recordsRes.value?.data?.records?.length ?? 0) : 0,
                     scheduledVisits: visitsRes.status === 'fulfilled' ? (visitsRes.value?.filter(v => ['approved', 'pending', 'scheduled'].includes(v.status?.toLowerCase())).length || 0) : 0,
                     accessLogs: auditRes.status === 'fulfilled' ? (auditRes.value?.data?.pagination?.total || auditRes.value?.data?.logs?.length || auditRes.value?.data?.length || 0) : 0
                 });
@@ -73,6 +75,8 @@ function PatientDashboard() {
                     }
                 }
             } catch (error) {
+            } finally {
+                setStatsLoading(false);
             }
         };
 
@@ -254,6 +258,7 @@ function PatientDashboard() {
                             <h4 className="text-xl font-semibold text-slate-800 dark:text-slate-100">Health Facts</h4>
                         </div>
                         <div className="glass-card rounded-3xl p-6 space-y-6">
+                            {statsLoading && <LoadingSkeleton label="Loading health facts" rows={2} />}
                             {healthFacts.map((fact, index) => (
                                 <div key={index} className="flex gap-4 items-start">
                                     <div>
@@ -262,7 +267,7 @@ function PatientDashboard() {
                                     </div>
                                 </div>
                             ))}
-                            {healthFacts.length === 0 && (
+                            {!statsLoading && healthFacts.length === 0 && (
                                 <p className="text-sm text-slate-500 dark:text-slate-400 text-center py-4">No health facts available currently.</p>
                             )}
                         </div>
@@ -303,7 +308,8 @@ function PatientDashboard() {
                                         </div>
                                     </div>
                                 ))}
-                                {activities.length === 0 && (
+                                {statsLoading && <LoadingSkeleton label="Loading activity history" rows={3} />}
+                                {!statsLoading && activities.length === 0 && (
                                     <p className="text-sm text-slate-500 dark:text-slate-400 text-center py-4">No recent activity found.</p>
                                 )}
                             </div>

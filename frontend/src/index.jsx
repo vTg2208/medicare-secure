@@ -15,3 +15,10 @@ root.render(
   </React.StrictMode>
 );
 
+// Keep measurement code out of the initial rendering path.
+const monitorPerformance = () => {
+  import('./utils/performanceMonitoring').then(module => module.startPerformanceMonitoring()).catch(() => {});
+};
+if (document.readyState === 'complete') setTimeout(monitorPerformance, 0);
+else window.addEventListener('load', monitorPerformance, { once: true });
+

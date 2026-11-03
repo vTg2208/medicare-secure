@@ -1,8 +1,11 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { userApi } from '../../api/userApi';
 import { AdminSidebar } from './HospitalAdminDashboard';
 import ThemeToggle from '../../components/common/ThemeToggle';
+import LoadingSkeleton from '../../components/common/LoadingSkeleton';
+import Pagination from '../../components/common/Pagination';
+import useDebouncedValue from '../../hooks/useDebouncedValue';
 import '../patient/Dashboard.css';
 
 const ROLE_COLORS = {
@@ -21,44 +24,57 @@ function UserManagement() {
     const [searchTerm, setSearchTerm] = useState('');
     const [filterRole, setFilterRole] = useState('all');
     const [filterStatus, setFilterStatus] = useState('all');
+    const [total, setTotal] = useState(0);
+    const [error, setError] = useState('');
+    const [refresh, setRefresh] = useState(0);
+    const search = useDebouncedValue(searchTerm.trim());
+    const queryKey = JSON.stringify([search, filterRole, filterStatus]);
+    const [paging, setPaging] = useState({ key: '', page: 1 });
+    const page = paging.key === queryKey ? paging.page : 1;
+    const sequence = useRef(0);
+    const invalidateRequests = useCallback(() => { sequence.current++; }, []);
+    const pageSize = 20;
 
     const fetchUsers = useCallback(async () => {
+        const request = ++sequence.current;
         try {
             setLoading(true);
-            const data = await userApi.getAllUsers();
-            if (data && data.success) setUsers(data.data || []);
-            else undefined;
+            setError('');
+            const data = await userApi.getAllUsers(filterRole === 'all' ? null : filterRole, {
+                limit: pageSize, offset: (page - 1) * pageSize,
+                search: search || undefined, status: filterStatus === 'all' ? undefined : filterStatus
+            });
+            if (request !== sequence.current) return;
+            if (!data?.success) throw new Error('Unable to load users');
+            setUsers(data.data || []);
+            setTotal(data.pagination?.total ?? data.data?.length ?? 0);
         } catch (error) {
+            if (request !== sequence.current) return;
+            setError('Unable to load users. Please retry.');
             if (error.response && (error.response.status === 401 || error.response.status === 403)) {
                 alert('Session expired. Please log in again.');
                 navigate('/login');
             }
         } finally {
-            setLoading(false);
+            if (request === sequence.current) setLoading(false);
         }
-    }, [navigate]);
+    }, [navigate, page, search, filterRole, filterStatus]);
 
-    useEffect(() => { fetchUsers(); }, [fetchUsers]);
+    useEffect(() => { fetchUsers(); return invalidateRequests; }, [fetchUsers, invalidateRequests, refresh]);
 
     const handleDeactivate = async (userId) => {
         if (!window.confirm('Are you sure you want to deactivate this user?')) return;
         try {
             const data = await userApi.deactivateStaff(userId);
-            if (data.success) { alert('User deactivated successfully'); fetchUsers(); }
-            else alert('Failed to deactivate user: ' + data.message);
-        } catch (error) { undefined; alert('Error deactivating user'); }
+            if (!data.success) throw new Error(data.message);
+            alert('User deactivated successfully');
+            setRefresh(value => value + 1);
+        } catch (error) {
+            alert(error.response?.data?.message || error.message || 'Error deactivating user');
+        }
     };
 
-    const filteredUsers = users.filter(user => {
-        const matchesSearch = user.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            user.last_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            user.email?.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesRole = filterRole === 'all' || user.role === filterRole;
-        const matchesStatus = filterStatus === 'all' ||
-            (filterStatus === 'active' && user.is_active) ||
-            (filterStatus === 'inactive' && !user.is_active);
-        return matchesSearch && matchesRole && matchesStatus;
-    });
+    const filteredUsers = users;
 
     const selectCls = "px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-surface dark:bg-slate-800 text-slate-800 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-violet-400";
 
@@ -87,15 +103,15 @@ function UserManagement() {
                 <div className="grid grid-cols-3 gap-4 mb-6">
                     <div className="glass-card p-5 rounded-2xl border border-primary-100 dark:border-primary-900/30 bg-primary-50/50 dark:bg-primary-900/10">
                         <p className="text-3xl font-bold text-primary-600 dark:text-primary-400">{filteredUsers.length}</p>
-                        <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">Total Users</p>
+                        <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">Users on this page</p>
                     </div>
                     <div className="glass-card p-5 rounded-2xl border border-emerald-100 dark:border-emerald-900/30 bg-emerald-50/50 dark:bg-emerald-900/10">
                         <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">{filteredUsers.filter(u => u.is_active).length}</p>
-                        <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">Active</p>
+                        <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">Active on this page</p>
                     </div>
                     <div className="glass-card p-5 rounded-2xl border border-rose-100 dark:border-rose-900/30 bg-rose-50/50 dark:bg-rose-900/10">
                         <p className="text-3xl font-bold text-rose-600 dark:text-rose-400">{filteredUsers.filter(u => !u.is_active).length}</p>
-                        <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">Inactive</p>
+                        <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mt-1">Inactive on this page</p>
                     </div>
                 </div>
 
@@ -103,6 +119,7 @@ function UserManagement() {
                 <div className="flex flex-wrap gap-3 mb-6">
                     <input
                         type="text"
+                        aria-label="Search users"
                         placeholder="Search by name or email..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
@@ -127,10 +144,8 @@ function UserManagement() {
                 {/* Table */}
                 <div className="glass-card rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden">
                     {loading ? (
-                        <div className="flex items-center justify-center h-40 text-slate-400">
-                            <span className="material-symbols-outlined animate-spin text-3xl">progress_activity</span>
-                        </div>
-                    ) : filteredUsers.length === 0 ? (
+                        <LoadingSkeleton label="Loading users" />
+                    ) : error ? <div role="alert" className="p-6">{error} <button onClick={fetchUsers}>Retry</button></div> : filteredUsers.length === 0 ? (
                         <div className="flex flex-col items-center justify-center h-40 text-slate-400 gap-2">
                             <span className="material-symbols-outlined text-4xl">group_off</span>
                             <p className="text-sm">No users found</p>
@@ -182,6 +197,7 @@ function UserManagement() {
                         </div>
                     )}
                 </div>
+                <Pagination page={page} pageSize={pageSize} total={total} busy={loading || Boolean(error)} onPageChange={next => setPaging({ key: queryKey, page: next })} />
             </main>
         </div>
     );

@@ -14,16 +14,20 @@
     "qrcode.react": "^4.2.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
-    "react-router-dom": "^7.18.5"
+    "react-router-dom": "^7.18.5",
+    "web-vitals": "6.2.3"
   },
   "scripts": {
     "start": "vite --host 0.0.0.0 --port 3000",
-    "build": "npm run check:theme && vite build",
+    "build": "npm run check:theme && npm run check:fonts && vite build",
     "preview": "vite preview --host 0.0.0.0 --port 3000",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint src vite.config.mjs eslint.config.mjs",
-    "check:theme": "node scripts/check-theme.mjs"
+    "check:theme": "node scripts/check-theme.mjs",
+    "check:fonts": "node scripts/check-fonts.mjs",
+    "vendor:fonts": "node scripts/vendor-fonts.mjs",
+    "test:performance": "node scripts/performance-smoke.mjs"
   },
   "browserslist": {
     "production": [
@@ -51,7 +55,8 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/user-event": "^14.6.1"
+    "@testing-library/user-event": "^14.6.1",
+    "playwright": "1.64.1"
   },
   "engines": {
     "node": ">=24 <25"

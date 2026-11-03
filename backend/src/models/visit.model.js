@@ -3,6 +3,35 @@ const crypto = require('crypto');
 const logger = require('../utils/logger');
 const VisitConsentService = require('../services/visit-consent.service');
 const { organizationSql, assignmentSql } = require('../middleware/clinical-access.middleware');
+const { pagination, searchPattern } = require('../utils/pagination');
+
+function visitFilters(scopeId, filters, patientAlias) {
+    const values = [scopeId];
+    const conditions = [];
+    const statuses = typeof filters.status === 'string' && filters.status.trim()
+        ? filters.status.split(',').map(status => status.trim())
+        : [];
+    if (statuses.length) {
+        values.push(statuses);
+        conditions.push(`v.status = ANY($${values.length}::text[])`);
+    }
+    const pattern = searchPattern(filters.search);
+    if (pattern) {
+        values.push(pattern);
+        const parameter = `$${values.length}`;
+        conditions.push(`(concat_ws(' ', ${patientAlias}.first_name, ${patientAlias}.last_name) ILIKE ${parameter} OR v.visit_code ILIKE ${parameter})`);
+    }
+    return { values, suffix: conditions.map(condition => ` AND ${condition}`).join('') };
+}
+
+async function readVisitPage(columns, from, order, values, filters) {
+    const { limit, offset } = pagination(filters);
+    const rows = pool.query(`SELECT ${columns} ${from} ORDER BY ${order}
+        LIMIT $${values.length + 1} OFFSET $${values.length + 2}`, [...values, limit, offset]);
+    if (!filters.paged) return (await rows).rows;
+    const [result, count] = await Promise.all([rows, pool.query(`SELECT COUNT(*) AS total ${from}`, values)]);
+    return { visits: result.rows, pagination: { total: Number(count.rows[0].total), limit, offset } };
+}
 
 class VisitModel {
     /**
@@ -77,32 +106,17 @@ class VisitModel {
      * @returns {Promise<Array>}
      */
     static async findByOrganization(organizationId, filters = {}) {
-        const { status, limit = 50, offset = 0 } = filters;
-
-        let query = `
-            SELECT v.*, 
+        const { values, suffix } = visitFilters(organizationId, filters, 'u');
+        const columns = `v.*,
                    u.first_name as patient_first_name, 
                    u.last_name as patient_last_name,
                    d.first_name as doctor_first_name,
-                   d.last_name as doctor_last_name
-            FROM visits v
+                   d.last_name as doctor_last_name`;
+        const from = `FROM visits v
             JOIN users u ON v.patient_id = u.id
             LEFT JOIN users d ON v.assigned_doctor_id = d.id
-            WHERE v.organization_id = $1
-        `;
-
-        const values = [organizationId];
-
-        if (status) {
-            query += ` AND v.status = $${values.length + 1}`;
-            values.push(status);
-        }
-
-        query += ` ORDER BY v.created_at DESC LIMIT $${values.length + 1} OFFSET $${values.length + 2}`;
-        values.push(limit, offset);
-
-        const result = await pool.query(query, values);
-        return result.rows;
+            WHERE v.organization_id = $1${suffix}`;
+        return readVisitPage(columns, from, 'v.created_at DESC, v.id DESC', values, filters);
     }
 
     /**
@@ -372,7 +386,7 @@ class VisitModel {
      * @param {string} role - 'doctor' or 'nurse'
      * @returns {Promise<Array>}
      */
-    static async findByAssignedStaff(staffId, role) {
+    static async findByAssignedStaff(staffId, role, filters) {
         let roleColumn = '';
         if (role === 'doctor') {
             roleColumn = 'assigned_doctor_id';
@@ -382,20 +396,22 @@ class VisitModel {
             throw new Error('Invalid role for visit assignment');
         }
 
-        const query = `
-            SELECT v.*,
+        const columns = `v.*,
             p.first_name as patient_first_name,
             p.last_name as patient_last_name,
             pp.date_of_birth,
-            pp.gender
-            FROM visits v
+            pp.gender`;
+        const from = `FROM visits v
             LEFT JOIN users p ON v.patient_id = p.id
             LEFT JOIN patient_profiles pp ON v.patient_id = pp.user_id
             WHERE v.${roleColumn} = $1 AND ${organizationSql('v.organization_id','$1')} AND ${assignmentSql('v','$1')}
-            AND v.status IN ('pending', 'approved', 'checked_in', 'in_progress')
-            ORDER BY v.status DESC, v.created_at ASC
-            `;
-        const result = await pool.query(query, [staffId]);
+            AND v.status IN ('pending', 'approved', 'checked_in', 'in_progress')`;
+        const order = 'v.status DESC, v.created_at ASC, v.id ASC';
+        if (filters) {
+            const { values, suffix } = visitFilters(staffId, filters, 'p');
+            return readVisitPage(columns, from + suffix, order, values, filters);
+        }
+        const result = await pool.query(`SELECT ${columns} ${from} ORDER BY ${order}`, [staffId]);
         return result.rows;
     }
 

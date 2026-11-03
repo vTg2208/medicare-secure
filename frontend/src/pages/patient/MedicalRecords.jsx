@@ -6,6 +6,9 @@ import { emrApi } from '../../api/emrApi';
 import ThemeToggle from '../../components/common/ThemeToggle';
 import Toast from '../../components/common/Toast';
 import RelatedRecordDetails from '../../components/emr/RelatedRecordDetails';
+import LoadingSkeleton from '../../components/common/LoadingSkeleton';
+import Pagination from '../../components/common/Pagination';
+import useDebouncedValue from '../../hooks/useDebouncedValue';
 
 import '../patient/Dashboard.css';
 import './MedicalRecords.css';
@@ -18,14 +21,29 @@ function MedicalRecords() {
     const [filter, setFilter] = useState('all');
     const [expandedRecords, setExpandedRecords] = useState(new Set());
     const location = useLocation();
-    const [searchTerm, setSearchTerm] = useState('');
+    const [searchTerm, setSearchTerm] = useState(() => new URLSearchParams(location.search).get('search') || '');
     const [toast, setToast] = useState(null);
     const printableRef = useRef(null);
+    const sequence = useRef(0);
+    const invalidateRequests = React.useCallback(() => { sequence.current++; }, []);
+    const [error, setError] = useState('');
+    const [total, setTotal] = useState(0);
+    const search = useDebouncedValue(searchTerm.trim());
+    const queryKey = JSON.stringify([user?.id, filter, search]);
+    const [paging, setPaging] = useState({ key: '', page: 1 });
+    const page = paging.key === queryKey ? paging.page : 1;
+    const pageSize = 20;
 
     const fetchRecords = React.useCallback(async () => {
+        const request = ++sequence.current;
         setLoading(true);
+        setError('');
         try {
-            const response = await emrApi.getPatientMedicalRecords(user.id);
+            const response = await emrApi.getPatientMedicalRecords(user.id, {
+                limit: pageSize, offset: (page - 1) * pageSize, summary: true,
+                search: search || undefined, type: filter === 'all' ? undefined : filter
+            });
+            if (request !== sequence.current) return;
             const recordList = response.data?.records || response.data || [];
             const formattedRecords = recordList.map(record => ({
                 id: record.id,
@@ -37,45 +55,21 @@ function MedicalRecords() {
                 summary: record.description,
             }));
             setRecords(formattedRecords);
+            setTotal(response.data?.pagination?.total ?? recordList.length);
+            setExpandedRecords(new Set());
         } catch (error) {
+            if (request === sequence.current) setError('Unable to load medical records. Please retry.');
         } finally {
-            setLoading(false);
+            if (request === sequence.current) setLoading(false);
         }
-    }, [user.id]);
+    }, [user?.id, page, filter, search]);
 
     useEffect(() => {
-        if (user && user.id) fetchRecords();
-
-        // Check for search query in URL
-        const params = new URLSearchParams(location.search);
-        const searchQ = params.get('search');
-        if (searchQ) {
-            setSearchTerm(searchQ);
-        }
-    }, [user, fetchRecords, location.search]);
-
-    const filterRecords = () => {
-        let filtered = records;
-
-        // Apply type filter
-        if (filter !== 'all') {
-            filtered = filtered.filter(r => r.type === filter);
-        }
-
-        // Apply search term filter
-        if (searchTerm) {
-            const term = searchTerm.toLowerCase();
-            filtered = filtered.filter(r =>
-                (r.title && r.title.toLowerCase().includes(term)) ||
-                (r.summary && r.summary.toLowerCase().includes(term)) ||
-                (r.doctor && r.doctor.toLowerCase().includes(term)) ||
-                (r.type && r.type.toLowerCase().includes(term))
-            );
-        }
-
-        return filtered;
-    };
-    const filteredRecords = filterRecords();
+        if (user?.id) fetchRecords();
+        return invalidateRequests;
+    }, [user?.id, fetchRecords, invalidateRequests]);
+    useEffect(() => { setSearchTerm(new URLSearchParams(location.search).get('search') || ''); }, [location.search]);
+    const filteredRecords = records;
 
     const toggleExpand = (recordId) => {
         setExpandedRecords(prev => {
@@ -180,7 +174,8 @@ function MedicalRecords() {
                 {/* Print Header */}
                 <div className="mb-8 border-b-2 border-slate-200 pb-6 flex justify-between items-end">
                     <div>
-                        <h1 className="text-3xl font-bold text-black uppercase tracking-tight">Official Medical Record</h1>
+                        <h1 className="text-3xl font-bold text-black uppercase tracking-tight">Medical Record Summary</h1>
+                        <p className="text-sm">Filtered results · Page {page} · {records.length} of {total} records</p>
                         <p className="text-slate-500 mt-1">Generated on: {new Date().toLocaleDateString()} {new Date().toLocaleTimeString()}</p>
                     </div>
                     <div className="text-right">
@@ -297,6 +292,7 @@ function MedicalRecords() {
                             className="w-full glass-card border-line dark:border-slate-700/50 rounded-2xl py-3 pl-12 pr-4 text-sm focus:ring-2 focus:ring-primary-500 shadow-sm text-slate-800 dark:text-slate-100"
                             placeholder="Search in records (titles, summaries, doctors)..."
                             type="text"
+                            aria-label="Search medical records"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -330,11 +326,8 @@ function MedicalRecords() {
                 {/* Records list */}
                 <div className="space-y-3">
                     {loading ? (
-                        <div className="flex flex-col items-center justify-center py-16 text-slate-400">
-                            <div className="w-10 h-10 border-4 border-primary-200 border-t-primary-500 rounded-full animate-spin mb-4"></div>
-                            <p className="text-sm font-medium">Loading medical records...</p>
-                        </div>
-                    ) : filteredRecords.length === 0 ? (
+                        <LoadingSkeleton label="Loading medical records" />
+                    ) : error ? <div role="alert" className="p-6">{error} <button onClick={fetchRecords}>Retry</button></div> : filteredRecords.length === 0 ? (
                         <div className="glass-card rounded-2xl p-16 text-center border border-line dark:border-slate-700/50 flex flex-col items-center">
                             <div className="w-16 h-16 bg-slate-100 dark:bg-slate-700/50 rounded-2xl flex items-center justify-center mb-4">
                                 <span className="material-symbols-outlined text-3xl text-slate-400">content_paste_off</span>
@@ -391,6 +384,7 @@ function MedicalRecords() {
                         );
                     })}
                 </div>
+                <Pagination page={page} pageSize={pageSize} total={total} busy={loading || Boolean(error)} onPageChange={next => setPaging({ key: queryKey, page: next })} />
             </main>
 
             {/* ── Right Sidebar ── */}
@@ -421,9 +415,9 @@ function MedicalRecords() {
                         <p className="text-slate-400 text-xs mt-1">ID: HR-{user?.id?.toString().slice(0, 4) || '0001'}-KM0</p>
                     </div>
                     <div className="glass-card rounded-2xl p-4 border border-line dark:border-slate-700/50">
-                        <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">Total Records</p>
-                        <p className="text-3xl font-bold text-slate-800 dark:text-white">{records.length}</p>
-                        <p className="text-slate-400 text-xs mt-1">across {[...new Set(records.map(r => r.type))].length} categories</p>
+                        <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">Matching Records</p>
+                        <p className="text-3xl font-bold text-slate-800 dark:text-white">{total}</p>
+                        <p className="text-slate-400 text-xs mt-1">Showing {records.length} on this page</p>
                     </div>
                 </div>
 
@@ -437,6 +431,7 @@ function MedicalRecords() {
                     ].map(({ icon, label, action }) => (
                         <button
                             key={label}
+                            disabled={(label === 'Export PDF' || label === 'Print') && (loading || Boolean(error) || records.length === 0)}
                             onClick={action}
                             className="p-4 glass-card rounded-lg border border-line dark:border-slate-700/50 hover:bg-surface dark:hover:bg-surface transition-all flex flex-col items-center justify-center gap-2"
                         >

@@ -4,6 +4,10 @@ const pool = require('../../config/db');
 const logger = require('../../utils/logger');
 const { sendVisitApprovalEmail, sendVisitClosureEmail } = require('../../config/mail');
 
+function visitPageOptions({ status, search, limit, offset }) {
+    return { status, search, limit, offset, paged: [search, limit, offset].some(value => value !== undefined) };
+}
+
 const VisitController = {
     /**
      * Patient requests a visit using hospital code
@@ -81,33 +85,10 @@ const VisitController = {
      */
     async getHospitalVisits(req, res) {
         try {
-            const userId = req.user.id;
-            // Get organization from mapping
-            // Should be in req.user if updated middleware, but let's query to be safe
-            const mappingRes = await require('../../config/db').query(
-                'SELECT organization_id FROM staff_org_mapping WHERE user_id = $1 AND status = \'active\'',
-                [userId]
-            );
-
-            if (mappingRes.rows.length === 0) {
-                return res.status(403).json({ success: false, message: 'You are not linked to any active organization' });
-            }
-
-            const organizationId = mappingRes.rows[0].organization_id;
-            const tests = req.query.status;
-
-
-            const visits = await VisitModel.findByOrganization(organizationId, {
-                status: req.query.status,
-                limit: req.query.limit,
-                offset: req.query.offset
-            });
-
-
-            res.json({
-                success: true,
-                data: visits
-            });
+            const options = visitPageOptions(req.query);
+            const result = await VisitModel.findByOrganization(req.organizationId, options);
+            if (options.paged) return res.json({ success: true, data: result.visits, pagination: result.pagination });
+            res.json({ success: true, data: result });
 
         } catch (error) {
             logger.error('Get hospital visits failed:', error);
@@ -183,7 +164,10 @@ const VisitController = {
                 return res.status(403).json({ success: false, message: 'Only doctors and nurses can view assigned visits' });
             }
 
-            const visits = await VisitModel.findByAssignedStaff(userId, role);
+            const options = visitPageOptions(req.query);
+            const filtered = options.paged || options.status !== undefined;
+            const visits = await VisitModel.findByAssignedStaff(userId, role, filtered ? { ...options, paged: true } : undefined);
+            if (filtered) return res.json({ success: true, data: visits.visits, pagination: visits.pagination });
             logger.info(`Found ${visits.length} assigned visits`);
 
             res.json({

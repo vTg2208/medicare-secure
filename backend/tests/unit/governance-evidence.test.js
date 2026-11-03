@@ -43,7 +43,7 @@ test('unclassified retention and encrypted columns are rejected', () => {
 test('references cannot escape the repository through paths or links', () => {
     const input = fixture(); input.controls.controls[0].implementation.sources = ['../outside.js'];
     expect(() => check(input)).toThrow(/reference.*path/i);
-    fs.symlinkSync(os.tmpdir(), path.join(root, 'outside'));
+    fs.symlinkSync(os.tmpdir(), path.join(root, 'outside'), process.platform === 'win32' ? 'junction' : 'dir');
     input.controls.controls[0].implementation.sources = ['outside/anything.js'];
     expect(() => check(input)).toThrow(/reference.*path/i);
 });

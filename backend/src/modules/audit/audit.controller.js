@@ -26,9 +26,11 @@ class AuditController {
                 sortBy: req.query.sortBy || 'timestamp',
                 sortOrder: req.query.sortOrder || 'desc',
                 action: req.query.action,
+                search: req.query.search,
                 userId: req.query.userId,
                 startDate: req.query.startDate,
-                endDate: req.query.endDate
+                endDate: req.query.endDate,
+                endBefore: req.query.endBefore
             };
 
             const result = await auditService.getAllAuditLogs(options);

@@ -1,4 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import Pagination from '../../components/common/Pagination';
+import useDebouncedValue from '../../hooks/useDebouncedValue';
+import usePagedResults from '../../hooks/usePagedResults';
+import LoadingSkeleton from '../../components/common/LoadingSkeleton';
+import React, { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { visitApi } from '../../api/visitApi';
 import ThemeToggle from '../../components/common/ThemeToggle';
@@ -54,29 +58,14 @@ const badgeClass = (status) => {
 // ── Component ─────────────────────────────────────────────────────────────────
 function ActiveVisits() {
     const navigate = useNavigate();
-    const [visits, setVisits] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [refreshing, setRefreshing] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [status, setStatus] = useState('');
     const [successMessage, setSuccessMessage] = useState('');
-
-    useEffect(() => {
-        fetchVisits();
-        const interval = setInterval(fetchVisits, 30000);
-        return () => clearInterval(interval);
-    }, []);
-
-    const fetchVisits = async (manual = false) => {
-        if (manual) setRefreshing(true);
-        else setLoading(true);
-        try {
-            const data = await visitApi.getActiveVisits();
-            setVisits(data.data || []);
-        } catch (error) {
-        } finally {
-            setLoading(false);
-            setRefreshing(false);
-        }
-    };
+    const search = useDebouncedValue(searchTerm.trim());
+    const loadPage = useCallback((limit, offset) => visitApi.getActiveVisits({
+        limit, offset, search: search || undefined, status: status || undefined
+    }), [search, status]);
+    const { rows: visits, loading, error, refresh, pagination } = usePagedResults(loadPage, 30000);
 
     const handleAction = async (action, visitId) => {
         try {
@@ -86,7 +75,7 @@ function ActiveVisits() {
                 if (!window.confirm('Are you sure you want to mark this visit as completed?')) return;
                 await visitApi.closeVisit(visitId, 'completed');
                 setSuccessMessage('Visit marked as completed!');
-                fetchVisits();
+                refresh();
                 setTimeout(() => setSuccessMessage(''), 3000);
             }
         } catch (error) {
@@ -115,8 +104,8 @@ function ActiveVisits() {
                 </div>
                 <div className="aq-topbar-actions mc-page-actions">
                     <button
-                        className={`aq-btn-refresh${refreshing ? "spinning" : ''}`}
-                        onClick={() => fetchVisits(true)}
+                        className={`aq-btn-refresh${loading ? "spinning" : ''}`}
+                        onClick={refresh}
                     >
                         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
@@ -139,15 +128,15 @@ function ActiveVisits() {
                 {/* Stats row */}
                 <div className="aq-stats-row">
                     <div className="aq-stat-card">
-                        <div className="aq-stat-number">{visits.length}</div>
-                        <div className="aq-stat-label">Active Consultations</div>
+                        <div className="aq-stat-number">{pagination.total}</div>
+                        <div className="aq-stat-label">Matching Visits</div>
                     </div>
                     {visits.length > 0 && (
                         <div className="aq-stat-card" style={{ background: "var(--mc-brand)" }}>
                             <div className="aq-stat-number">
                                 {visits.filter(v => v.status?.toLowerCase() === 'in_progress').length}
                             </div>
-                            <div className="aq-stat-label">In Progress</div>
+                            <div className="aq-stat-label">In Progress on This Page</div>
                         </div>
                     )}
                 </div>
@@ -162,12 +151,26 @@ function ActiveVisits() {
                     </div>
                 )}
 
+                <input type="search" aria-label="Search visits" placeholder="Search by patient name or visit code"
+                    value={searchTerm} onChange={event => setSearchTerm(event.target.value)}
+                    className="my-4 w-full max-w-md rounded-xl border border-line bg-surface px-4 py-2" />
+                <select aria-label="Visit status" value={status} onChange={event => setStatus(event.target.value)}
+                    className="ml-2 rounded-xl border border-line bg-surface px-4 py-2">
+                    <option value="">All queue statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="checked_in">Checked in</option>
+                    <option value="in_progress">In progress</option>
+                </select>
+
                 {/* Content */}
                 {loading ? (
                     <div className="aq-loading">
-                        <div className="aq-spinner" />
+                        <LoadingSkeleton label="Loading active visits" rows={3} />
                         <p>Loading active visits…</p>
                     </div>
+                ) : error ? (
+                    <div role="alert" className="aq-empty-state aq-glass">{error} <button type="button" onClick={refresh}>Retry</button></div>
                 ) : visits.length === 0 ? (
                     <div className="aq-empty-state aq-glass">
                         <svg width="52" height="52" fill="none" stroke="var(--mc-accent)" strokeWidth="1.5" viewBox="0 0 24 24">
@@ -252,6 +255,7 @@ function ActiveVisits() {
                         </div>
                     </>
                 )}
+                <Pagination {...pagination} />
             </div>
         </div>
     );

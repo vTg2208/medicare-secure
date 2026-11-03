@@ -6,6 +6,7 @@ import { visitApi } from '../../api/visitApi';
 import { consentApi } from '../../api/consentApi';
 import EmergencyToggle from '../../components/emergency/EmergencyToggle';
 import ThemeToggle from '../../components/common/ThemeToggle';
+import { SkeletonLine } from '../../components/common/LoadingSkeleton';
 import './Dashboard.css';
 
 const NAV_CARDS = [
@@ -58,6 +59,7 @@ const COLOR_MAP = {
 function DoctorDashboard() {
     const navigate = useNavigate();
     const { user, logout } = useContext(AuthContext);
+    const [statsLoading, setStatsLoading] = useState(true);
     const [stats, setStats] = useState([
         { label: "Today's Patients", value: '0', icon: 'groups' },
         { label: 'Pending Consents', value: '0', icon: 'assignment' },
@@ -87,6 +89,8 @@ function DoctorDashboard() {
                     ]);
                 }
             } catch (error) {
+            } finally {
+                setStatsLoading(false);
             }
         };
         fetchStats();
@@ -223,7 +227,7 @@ function DoctorDashboard() {
                     {stats.map((stat, idx) => (
                         <div key={idx} className="doctor-glass-card rounded-2xl p-4 flex flex-col items-center gap-2 border-b-2 border-b-primary-500/20">
                             <span className="material-symbols-outlined text-primary-500 text-xl">{stat.icon}</span>
-                            <span className="text-2xl font-bold text-slate-800 dark:text-slate-100">{stat.value}</span>
+                            <span className="text-2xl font-bold text-slate-800 dark:text-slate-100" aria-busy={statsLoading}>{statsLoading ? <SkeletonLine /> : stat.value}</span>
                             <span className="text-[9px] font-bold text-slate-500 dark:text-slate-300 uppercase text-center leading-none tracking-wider">{stat.label}</span>
                         </div>
                     ))}
