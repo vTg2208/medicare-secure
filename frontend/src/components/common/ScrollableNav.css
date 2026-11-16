@@ -1,0 +1,9 @@
+.mc-overflow-navigation { flex: 1; width: 100%; min-width: 0; }
+.mc-navigation-controls { display: none; }
+@media (max-width: 760px) {
+    .mc-overflow-navigation nav { width: 100%; scroll-padding-inline: 4px; scroll-snap-type: x proximity; }
+    .mc-overflow-navigation nav > * { max-width: calc(100% - 40px); scroll-snap-align: start; }
+    .mc-navigation-controls { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 4px; color: var(--mc-text-muted); font-size: 12px; }
+    .mc-navigation-controls button { width: 44px; min-height: 44px; border: 1px solid var(--mc-border); border-radius: var(--mc-radius-control); color: var(--mc-accent); background: var(--mc-surface); font-size: 18px; }
+    .mc-navigation-controls button:disabled { opacity: .4; cursor: default; }
+}

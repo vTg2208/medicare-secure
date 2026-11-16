@@ -1,5 +1,6 @@
 import ThemeToggle from '../../components/common/ThemeToggle';
 import Brand from '../../components/common/Brand';
+import ScrollableNav from '../../components/common/ScrollableNav';
 // Patient Visits Page - Epic 3: Visit Management
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
@@ -100,7 +101,7 @@ function Visits() {
 
             <aside className="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800/50 p-6 flex flex-col h-full overflow-y-auto mc-sidebar">
                 <Brand to={'/patient/dashboard'} />
-                <nav className="space-y-2 flex-grow">
+                <ScrollableNav className="space-y-2 flex-grow">
                     <button onClick={() => navigate('/patient/dashboard')} className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-lg">
                         <span className="material-symbols-outlined text-[20px]">grid_view</span>
                         Dashboard
@@ -121,7 +122,7 @@ function Visits() {
                         <span className="material-symbols-outlined text-[20px]">verified_user</span>
                         Consents
                     </button>
-                </nav>
+                </ScrollableNav>
                 <div className="space-y-2 mt-auto pt-6 border-t border-slate-200 dark:border-slate-800/50">
                     <Link to="/patient/support" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
                         <span className="material-symbols-outlined text-[20px]">favorite_border</span>
@@ -140,12 +141,15 @@ function Visits() {
 
             {/* Main Content */}
             <main className="flex-grow p-8 overflow-y-auto">
-                <header className="mb-10">
-                    <div className="flex items-center justify-between mb-8">
+                <header className="mb-8">
+                    <div className="flex flex-wrap items-center justify-between gap-4">
                         <div>
                             <h2 className="text-3xl font-bold text-slate-900 dark:text-white">My Visits</h2>
                             <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Manage your appointments and check-ins</p>
                         </div>
+                        <button className="mc-visit-action mc-visit-action-primary" onClick={handleScheduleVisit}>
+                            Schedule a Visit
+                        </button>
                     </div>
                 </header>
 
@@ -156,36 +160,28 @@ function Visits() {
                     </div>
                 )}
 
-                {/* Check In Section */}
-                <div className="glass-card p-6 md:p-8 rounded-3xl mb-8 border border-line dark:border-slate-700/50 relative overflow-hidden group">
-
-                    <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <section className="mc-visit-arrival" aria-labelledby="visit-arrival-heading">
                         <div>
-                            <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">Schedule or Check In</h3>
-                            <p className="text-slate-500 dark:text-slate-400 text-sm max-w-md">Have a scheduled visit? Enter the code provided by your doctor or nurse to check in.</p>
+                            <h3 id="visit-arrival-heading">Arriving at the clinic?</h3>
+                            <p>Check in with your visit code, or request a walk-in visit.</p>
                         </div>
-                        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                        <div className="mc-visit-arrival-actions">
                             <button
-                                className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg text-sm font-semibold transition-all shadow-lg shadow-primary-600/30 whitespace-nowrap"
-                                onClick={handleScheduleVisit}
-                            >
-                                Schedule a Visit
-                            </button>
-                            <button
-                                className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg text-sm font-semibold transition-all shadow-lg shadow-primary-600/30 whitespace-nowrap"
+                                className="mc-visit-action"
                                 onClick={() => navigate('/patient/visits/new')}
                             >
                                 Walk-In Visit
                             </button>
                             <button
-                                className="bg-surface dark:bg-slate-800/80 hover:bg-surface dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 px-6 py-3 rounded-lg text-sm font-semibold transition-all whitespace-nowrap"
+                                className="mc-visit-action"
+                                aria-expanded={showCheckIn}
+                                aria-controls="visit-check-in"
                                 onClick={() => setShowCheckIn(!showCheckIn)}
                             >
                                 {showCheckIn ? 'Hide Check-In Form' : 'Check In with Code'}
                             </button>
                         </div>
-                    </div>
-                </div>
+                </section>
 
                 {showDoctorPopup && (
                     <DoctorSelectionPopup
@@ -196,7 +192,7 @@ function Visits() {
                 )}
 
                 {showCheckIn && (
-                    <div className="mb-8 p-6 glass-card rounded-3xl">
+                    <div id="visit-check-in" className="mb-8">
                         <CheckInForm onCheckIn={handleCheckIn} />
                     </div>
                 )}

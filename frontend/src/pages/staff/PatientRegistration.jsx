@@ -1,4 +1,5 @@
 import Brand from '../../components/common/Brand';
+import ScrollableNav from '../../components/common/ScrollableNav';
 import React, { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
@@ -71,7 +72,6 @@ function PatientRegistration() {
                 emergencyContactName: '', emergencyContactPhone: '', emergencyContactRelation: '',
                 insuranceProvider: '', insurancePolicyNumber: ''
             });
-
             // Automatically hide success message after 5 seconds
             setTimeout(() => setSuccessMessage(''), 5000);
 
@@ -99,7 +99,7 @@ function PatientRegistration() {
             {/* Sidebar */}
             <aside className="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800/50 p-6 flex flex-col h-full overflow-y-auto w-full md:w-64 z-20 mc-sidebar">
                 <Brand to={'/staff/dashboard'} />
-                <nav className="space-y-2 flex-grow">
+                <ScrollableNav className="space-y-2 flex-grow" label="Staff navigation">
                     <Link to="/staff/dashboard" className="w-full flex items-center justify-start gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
                         <span className="material-symbols-outlined text-[20px]">grid_view</span>
                         Overview
@@ -116,7 +116,7 @@ function PatientRegistration() {
                         <span className="material-symbols-outlined text-[20px]">health_and_safety</span>
                         Clinical Workflow
                     </Link>
-                </nav>
+                </ScrollableNav>
                 <div className="space-y-2 mt-auto pt-6 border-t border-slate-200 dark:border-slate-800/50">
                     <button onClick={logout} className="w-full flex items-center justify-start gap-3 px-4 py-3 text-rose-500 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition rounded-lg font-medium">
                         <span className="material-symbols-outlined text-[20px]">logout</span>
@@ -138,7 +138,7 @@ function PatientRegistration() {
                     </div>
                 </header>
 
-                <div className="glass-card rounded-3xl p-8 max-w-4xl mx-auto shadow-sm">
+                <div className="glass-card rounded-3xl p-4 sm:p-8 max-w-4xl mx-auto shadow-sm">
                     {successMessage && (
                         <div className="mb-6 p-4 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 rounded-xl flex items-center gap-3">
                             <span className="material-symbols-outlined">check_circle</span>
@@ -156,125 +156,138 @@ function PatientRegistration() {
 
                         {/* Section: Basic Details */}
                         <div>
-                            <h3 className="text-lg font-bold text-slate-800 dark:text-white border-b border-slate-200 dark:border-slate-700 pb-2 mb-4">Basic Information</h3>
+                            <h3 className="text-lg font-bold text-slate-800 dark:text-white border-b border-slate-200 dark:border-slate-700 pb-2 mb-3">Basic Information</h3>
+                            <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">Complete the six required fields marked *. You can add optional patient details below.</p>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 <div>
-                                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">First Name *</label>
-                                    <input required type="text" name="firstName" value={formData.firstName} onChange={handleChange} className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white" />
+                                    <label htmlFor="patient-firstName" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">First Name *</label>
+                                    <input required type="text" id="patient-firstName" name="firstName" value={formData.firstName} onChange={handleChange} className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white" />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Last Name *</label>
-                                    <input required type="text" name="lastName" value={formData.lastName} onChange={handleChange} className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white" />
+                                    <label htmlFor="patient-lastName" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Last Name *</label>
+                                    <input required type="text" id="patient-lastName" name="lastName" value={formData.lastName} onChange={handleChange} className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white" />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Email *</label>
-                                    <input required type="email" name="email" value={formData.email} onChange={handleChange} className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white" />
+                                    <label htmlFor="patient-email" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Email *</label>
+                                    <input required type="email" id="patient-email" name="email" value={formData.email} onChange={handleChange} className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white" />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Phone *</label>
-                                    <input required type="text" name="phone" value={formData.phone} onChange={handleChange} className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white" />
+                                    <label htmlFor="patient-phone" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Phone *</label>
+                                    <input required type="text" id="patient-phone" name="phone" value={formData.phone} onChange={handleChange} className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white" />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Date of Birth *</label>
-                                    <input required type="date" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange} className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white" />
+                                    <label htmlFor="patient-dateOfBirth" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Date of Birth *</label>
+                                    <input required type="date" id="patient-dateOfBirth" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange} className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white" />
                                 </div>
                                 <div>
                                     <div className="flex items-center justify-between mb-1">
-                                        <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">Initial Password *</label>
+                                        <label htmlFor="patient-password" className="block text-sm font-semibold text-slate-700 dark:text-slate-300">Initial Password *</label>
                                         <button type="button" onClick={generatePassword} className="text-xs text-primary-600 dark:text-primary-400 font-bold hover:underline">Generate</button>
                                     </div>
-                                    <input required type="text" name="password" value={formData.password} onChange={handleChange} placeholder="Secure password" className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white" />
+                                    <input required type="text" id="patient-password" name="password" value={formData.password} onChange={handleChange} placeholder="Secure password" className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white" />
                                 </div>
                             </div>
                         </div>
 
                         {/* Section: Demographics */}
-                        <div>
-                            <h3 className="text-lg font-bold text-slate-800 dark:text-white border-b border-slate-200 dark:border-slate-700 pb-2 mb-4">Demographics & Identity</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                                <div>
-                                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Gender</label>
-                                    <select name="gender" value={formData.gender} onChange={handleChange} className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white">
-                                        <option value="">Select</option>
-                                        <option value="Male">Male</option>
-                                        <option value="Female">Female</option>
-                                        <option value="Other">Other</option>
-                                    </select>
+                        <details className="rounded-2xl border border-slate-200 dark:border-slate-700">
+                            <summary className="cursor-pointer rounded-2xl p-4 font-semibold text-slate-800 dark:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+                                <span>Demographics & address</span>
+                                <span className="ml-2 text-sm font-normal text-slate-500 dark:text-slate-400">Optional</span>
+                            </summary>
+                            <div className="px-4 pb-5">
+                                <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">Add identity and address details when available. Entered details are kept when this section is closed.</p>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                                    <div>
+                                        <label htmlFor="patient-gender" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Gender</label>
+                                        <select id="patient-gender" name="gender" value={formData.gender} onChange={handleChange} className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white">
+                                            <option value="">Select</option>
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label htmlFor="patient-bloodGroup" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Blood Group</label>
+                                        <select id="patient-bloodGroup" name="bloodGroup" value={formData.bloodGroup} onChange={handleChange} className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white">
+                                            <option value="">Select</option>
+                                            {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map(bg => <option key={bg} value={bg}>{bg}</option>)}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label htmlFor="patient-govtId" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Government ID (Optional)</label>
+                                        <input type="text" id="patient-govtId" name="govtId" value={formData.govtId} onChange={handleChange} placeholder="e.g. SSN / Aadhar" className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white" />
+                                    </div>
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Blood Group</label>
-                                    <select name="bloodGroup" value={formData.bloodGroup} onChange={handleChange} className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white">
-                                        <option value="">Select</option>
-                                        {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map(bg => <option key={bg} value={bg}>{bg}</option>)}
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Government ID (Optional)</label>
-                                    <input type="text" name="govtId" value={formData.govtId} onChange={handleChange} placeholder="e.g. SSN / Aadhar" className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white" />
-                                </div>
-                            </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
-                                <div className="md:col-span-2">
-                                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Address</label>
-                                    <input type="text" name="address" value={formData.address} onChange={handleChange} className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white" />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">City</label>
-                                    <input type="text" name="city" value={formData.city} onChange={handleChange} className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white" />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">State / Region</label>
-                                    <input type="text" name="state" value={formData.state} onChange={handleChange} className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white" />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Country</label>
-                                    <input type="text" name="country" value={formData.country} onChange={handleChange} className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white" />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Postal Code</label>
-                                    <input type="text" name="postalCode" value={formData.postalCode} onChange={handleChange} className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white" />
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
+                                    <div className="md:col-span-2">
+                                        <label htmlFor="patient-address" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Address</label>
+                                        <input type="text" id="patient-address" name="address" value={formData.address} onChange={handleChange} className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white" />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="patient-city" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">City</label>
+                                        <input type="text" id="patient-city" name="city" value={formData.city} onChange={handleChange} className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white" />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="patient-state" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">State / Region</label>
+                                        <input type="text" id="patient-state" name="state" value={formData.state} onChange={handleChange} className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white" />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="patient-country" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Country</label>
+                                        <input type="text" id="patient-country" name="country" value={formData.country} onChange={handleChange} className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white" />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="patient-postalCode" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Postal Code</label>
+                                        <input type="text" id="patient-postalCode" name="postalCode" value={formData.postalCode} onChange={handleChange} className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white" />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </details>
 
                         {/* Emergency Contact & Insurance */}
-                        <div>
-                            <h3 className="text-lg font-bold text-slate-800 dark:text-white border-b border-slate-200 dark:border-slate-700 pb-2 mb-4">Contacts & Insurance</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                                <div>
-                                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Emergency Contact Name</label>
-                                    <input type="text" name="emergencyContactName" value={formData.emergencyContactName} onChange={handleChange} className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white" />
+                        <details className="rounded-2xl border border-slate-200 dark:border-slate-700">
+                            <summary className="cursor-pointer rounded-2xl p-4 font-semibold text-slate-800 dark:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500">
+                                <span>Contacts & insurance</span>
+                                <span className="ml-2 text-sm font-normal text-slate-500 dark:text-slate-400">Optional</span>
+                            </summary>
+                            <div className="px-4 pb-5">
+                                <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">Add an emergency contact or insurance details when available.</p>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                                    <div>
+                                        <label htmlFor="patient-emergencyContactName" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Emergency Contact Name</label>
+                                        <input type="text" id="patient-emergencyContactName" name="emergencyContactName" value={formData.emergencyContactName} onChange={handleChange} className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white" />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="patient-emergencyContactPhone" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Emergency Phone</label>
+                                        <input type="text" id="patient-emergencyContactPhone" name="emergencyContactPhone" value={formData.emergencyContactPhone} onChange={handleChange} className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white" />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="patient-emergencyContactRelation" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Relation</label>
+                                        <input type="text" id="patient-emergencyContactRelation" name="emergencyContactRelation" value={formData.emergencyContactRelation} onChange={handleChange} placeholder="e.g. Spouse, Parent" className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white" />
+                                    </div>
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Emergency Phone</label>
-                                    <input type="text" name="emergencyContactPhone" value={formData.emergencyContactPhone} onChange={handleChange} className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white" />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">Relation</label>
-                                    <input type="text" name="emergencyContactRelation" value={formData.emergencyContactRelation} onChange={handleChange} placeholder="e.g. Spouse, Parent" className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white" />
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5 bg-primary-50/50 dark:bg-primary-900/10 p-5 rounded-2xl border border-primary-100 dark:border-primary-800/30">
+                                    <div>
+                                        <label htmlFor="patient-insuranceProvider" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-2">
+                                            <span className="material-symbols-outlined text-[16px] text-primary-500">health_and_safety</span>
+                                            Insurance Provider
+                                        </label>
+                                        <input type="text" id="patient-insuranceProvider" name="insuranceProvider" value={formData.insuranceProvider} onChange={handleChange} placeholder="e.g. Medicare, Aetna" className="w-full px-4 py-2.5 bg-surface dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white" />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="patient-insurancePolicyNumber" className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-2">
+                                            <span className="material-symbols-outlined text-[16px] text-primary-500">numbers</span>
+                                            Policy / Member ID
+                                        </label>
+                                        <input type="text" id="patient-insurancePolicyNumber" name="insurancePolicyNumber" value={formData.insurancePolicyNumber} onChange={handleChange} placeholder="e.g. POL-123456789" className="w-full px-4 py-2.5 bg-surface dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white" />
+                                    </div>
                                 </div>
                             </div>
+                        </details>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5 bg-primary-50/50 dark:bg-primary-900/10 p-5 rounded-2xl border border-primary-100 dark:border-primary-800/30">
-                                <div>
-                                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-2">
-                                        <span className="material-symbols-outlined text-[16px] text-primary-500">health_and_safety</span>
-                                        Insurance Provider
-                                    </label>
-                                    <input type="text" name="insuranceProvider" value={formData.insuranceProvider} onChange={handleChange} placeholder="e.g. Medicare, Aetna" className="w-full px-4 py-2.5 bg-surface dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white" />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1 flex items-center gap-2">
-                                        <span className="material-symbols-outlined text-[16px] text-primary-500">numbers</span>
-                                        Policy / Member ID
-                                    </label>
-                                    <input type="text" name="insurancePolicyNumber" value={formData.insurancePolicyNumber} onChange={handleChange} placeholder="e.g. POL-123456789" className="w-full px-4 py-2.5 bg-surface dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-primary-500 text-slate-900 dark:text-white" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="pt-6 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-4">
+                        <div className="pt-6 border-t border-slate-200 dark:border-slate-700 flex flex-wrap justify-end gap-4">
                             <button type="button" onClick={() => navigate('/staff/dashboard')} className="px-6 py-3 rounded-lg font-bold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition-colors">
                                 Cancel
                             </button>

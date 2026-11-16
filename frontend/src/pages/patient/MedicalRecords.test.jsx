@@ -32,3 +32,17 @@ test('keeps failures visible and allows retry', async () => {
     fireEvent.click(screen.getByRole('button', { name: 'Retry' }));
     await screen.findAllByText('Routine visit');
 });
+
+test('keeps additional record types accessible and resets pagination when filtering', async () => {
+    display();
+    await screen.findAllByText('Routine visit');
+    fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
+    await waitFor(() => expect(emrApi.getPatientMedicalRecords).toHaveBeenLastCalledWith('patient', expect.objectContaining({ offset: 20 })));
+    fireEvent.change(screen.getByRole('combobox', { name: 'More record types' }), { target: { value: 'diagnosis' } });
+    await waitFor(() => expect(emrApi.getPatientMedicalRecords).toHaveBeenLastCalledWith('patient', expect.objectContaining({ type: 'diagnosis', offset: 0 })));
+    expect(screen.getByRole('combobox', { name: 'More record types' })).toHaveValue('diagnosis');
+    fireEvent.click(screen.getByRole('button', { name: 'Lab Result', exact: true }));
+    await waitFor(() => expect(emrApi.getPatientMedicalRecords).toHaveBeenLastCalledWith('patient', expect.objectContaining({ type: 'lab_result', offset: 0 })));
+    expect(screen.getByRole('button', { name: 'Lab Result', exact: true })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('combobox', { name: 'More record types' })).toHaveValue('');
+});

@@ -1,0 +1,32 @@
+.mc-booking-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(.75rem, 3vw, 2rem);
+    background: var(--mc-overlay);
+}
+.mc-booking-dialog {
+    width: 100%;
+    max-width: 42rem;
+    max-height: calc(100dvh - 2rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: clamp(1rem, 3vw, 2rem);
+    border: 1px solid var(--mc-border);
+    border-radius: 1.5rem;
+    background: var(--mc-surface);
+    color: var(--mc-text);
+    box-shadow: var(--mc-shadow-overlay);
+}
+.mc-booking-dialog-wide { max-width: 64rem; }
+.mc-booking-dialog .mc-provider-card { text-align: left; min-width: 0; }
+.mc-booking-dialog .mc-provider-card img { height: 9rem; width: 100%; object-fit: cover; border-radius: .75rem; }
+.mc-booking-dialog .mc-provider-card[aria-pressed="true"] { border-color: var(--mc-accent); background: var(--mc-brand-soft); }
+.mc-booking-summary { overflow-wrap: anywhere; }
+@media (max-width: 400px) {
+    .mc-booking-dialog { border-radius: 1rem; }
+    .mc-booking-dialog .mc-provider-card img { height: 7rem; }
+}

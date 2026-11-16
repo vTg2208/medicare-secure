@@ -2,11 +2,20 @@ import React, { useState, useEffect } from 'react';
 import Input from '../common/Input';
 import { consentApi } from '../../api/consentApi';
 import './ConsentForm.css';
+
+const durationPresets = {
+    '1-hour': { hours: 1, minutes: 0, seconds: 0 },
+    '24-hours': { hours: 24, minutes: 0, seconds: 0 },
+    '7-days': { hours: 168, minutes: 0, seconds: 0 },
+};
+
 function ConsentForm({ onSuccess, onCancel, initialData }) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [doctors, setDoctors] = useState([]);
     const [duration, setDuration] = useState({ hours: 0, minutes: 0, seconds: 0 });
+    const [durationChoice, setDurationChoice] = useState('unlimited');
+    const [timeRangeChanged, setTimeRangeChanged] = useState(false);
     const [formData, setFormData] = useState({
         recipientUserId: '',
         dataCategory: 'all_medical_data',
@@ -16,8 +25,9 @@ function ConsentForm({ onSuccess, onCancel, initialData }) {
         endTime: '',
     });
 
-    // Handle unlimited (all 0s)
-    const isUnlimited = duration.hours === 0 && duration.minutes === 0 && duration.seconds === 0;
+    const isUnlimited = durationChoice === 'unlimited';
+    const effectiveDuration = durationPresets[durationChoice] || duration;
+    const totalSeconds = effectiveDuration.hours * 3600 + effectiveDuration.minutes * 60 + effectiveDuration.seconds;
 
     // Load initial data if editing
     useEffect(() => {
@@ -30,44 +40,49 @@ function ConsentForm({ onSuccess, onCancel, initialData }) {
                 startTime: new Date(initialData.startTime).toISOString().split('T')[0],
                 endTime: initialData.endTime || '',
             });
+            setTimeRangeChanged(false);
 
             if (initialData.endTime) {
-                const total = new Date(initialData.endTime).getTime() - new Date(initialData.startTime).getTime();
-                // Convert total milliseconds to hours, minutes, seconds
-                // We ignore days and convert everything to hours if needed, or just standard H:M:S breakdown
-                // ensuring we capture meaningful time.
-                // However, user just wants to REMOVE the days input.
-                // Standard logic:
-                // Standard logic:
-                // Calculate total hours directly
-                const hours = Math.floor(total / (1000 * 60 * 60));
-                const minutes = Math.floor((total / 1000 / 60) % 60);
-                const seconds = Math.floor((total / 1000) % 60);
+                const total = Math.max(0, (new Date(initialData.endTime) - new Date(initialData.startTime)) / 1000);
+                const hours = Math.floor(total / 3600);
+                const minutes = Math.floor((total / 60) % 60);
+                const seconds = Math.floor(total % 60);
                 setDuration({ hours, minutes, seconds });
+                const preset = Object.keys(durationPresets).find(key => durationPresets[key].hours * 3600 === total);
+                setDurationChoice(preset || 'custom');
+            } else {
+                setDuration({ hours: 0, minutes: 0, seconds: 0 });
+                setDurationChoice('unlimited');
             }
         }
     }, [initialData]);
 
-    // Calculate Effective End Time for display
-    const calculateEffectiveEndTime = () => {
-        if (isUnlimited) return null;
+    // Keep an existing grant's exact timestamps until the patient changes its time range.
+    const calculateTimeRange = () => {
+        if (initialData && !timeRangeChanged) {
+            return { startTime: initialData.startTime, endTime: initialData.endTime || null };
+        }
+        if (isUnlimited) return { startTime: formData.startTime, endTime: null };
+        if (totalSeconds <= 0) return { startTime: formData.startTime, endTime: null };
 
         const now = new Date();
         const inputDate = new Date(formData.startTime);
+        if (Number.isNaN(inputDate.getTime())) return { startTime: formData.startTime, endTime: null };
         const todayDate = new Date(now.toISOString().split('T')[0]);
 
         const startDate = inputDate.getTime() <= todayDate.getTime() ? now : inputDate;
-        const totalSeconds = (parseInt(duration.hours || 0) * 3600) +
-            (parseInt(duration.minutes || 0) * 60) +
-            (parseInt(duration.seconds || 0));
-
-        return new Date(startDate.getTime() + totalSeconds * 1000);
+        return {
+            startTime: startDate === now ? now.toISOString() : formData.startTime,
+            endTime: new Date(startDate.getTime() + totalSeconds * 1000).toISOString(),
+        };
     };
 
-    const displayEndTime = calculateEffectiveEndTime();
+    const previewEndTime = !isUnlimited && totalSeconds > 0 ? calculateTimeRange().endTime : null;
+    const displayEndTime = previewEndTime ? new Date(previewEndTime) : null;
 
     const handleDurationChange = (e) => {
         const { name, value } = e.target;
+        setTimeRangeChanged(true);
         setDuration(prev => ({
             ...prev,
             [name]: Math.max(0, parseInt(value) || 0)
@@ -89,6 +104,7 @@ function ConsentForm({ onSuccess, onCancel, initialData }) {
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
+        if (name === 'startTime') setTimeRangeChanged(true);
         setFormData({
             ...formData,
             [name]: type === 'checkbox' ? checked : value,
@@ -97,27 +113,15 @@ function ConsentForm({ onSuccess, onCancel, initialData }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
         setError('');
+        if (!isUnlimited && totalSeconds <= 0) {
+            setError('Enter a custom duration greater than zero, or choose Unlimited.');
+            return;
+        }
+        setLoading(true);
 
         try {
-            const submitData = { ...formData };
-            const effectiveEnd = calculateEffectiveEndTime();
-
-            if (isUnlimited) {
-                submitData.endTime = null;
-            } else if (effectiveEnd) {
-                submitData.endTime = effectiveEnd.toISOString();
-
-                // If the start date was "today", the effective calculation used "now"
-                // which is exactly what we want to send to the backend.
-                const now = new Date();
-                const inputDate = new Date(submitData.startTime);
-                const todayDate = new Date(now.toISOString().split('T')[0]);
-                if (inputDate.getTime() <= todayDate.getTime()) {
-                    submitData.startTime = now.toISOString();
-                }
-            }
+            const submitData = { ...formData, ...calculateTimeRange() };
 
             if (initialData) {
                 await consentApi.updateConsent(initialData.id, submitData);
@@ -224,64 +228,62 @@ function ConsentForm({ onSuccess, onCancel, initialData }) {
                     />
 
                     <div className="form-group" style={{ flex: 2 }}>
-                        <label className="dark:text-gray-300">Duration</label>
-                        <div className="duration-container gap-2">
-                            <div className="duration-field">
-                                <input
-                                    type="number"
-                                    name="hours"
-                                    placeholder="0"
-                                    value={duration.hours || ''}
-                                    onChange={handleDurationChange}
-                                    min="0"
-                                    className="dark:bg-slate-700 dark:text-white dark:border-slate-600 rounded-md border"
-                                />
-                                <label className="text-xs text-center dark:text-gray-400 mt-1">Hours</label>
+                        <label htmlFor="consentDuration" className="dark:text-gray-300">Duration</label>
+                        <select
+                            id="consentDuration"
+                            value={durationChoice}
+                            onChange={e => {
+                                setDurationChoice(e.target.value);
+                                setTimeRangeChanged(true);
+                            }}
+                            className="form-select dark:bg-slate-700 dark:text-white dark:border-slate-600"
+                        >
+                            <option value="1-hour">1 hour</option>
+                            <option value="24-hours">24 hours</option>
+                            <option value="7-days">7 days</option>
+                            <option value="unlimited">Unlimited</option>
+                            <option value="custom">Custom duration</option>
+                        </select>
+                        {durationChoice === 'custom' && (
+                            <div className="duration-container consent-duration-fields" role="group" aria-label="Custom duration">
+                                {['hours', 'minutes', 'seconds'].map(unit => (
+                                    <div className="duration-field" key={unit}>
+                                        <input
+                                            id={`consent-duration-${unit}`}
+                                            type="number"
+                                            name={unit}
+                                            placeholder="0"
+                                            value={duration[unit] || ''}
+                                            onChange={handleDurationChange}
+                                            min="0"
+                                            max={unit === 'hours' ? undefined : 59}
+                                            className="dark:bg-slate-700 dark:text-white dark:border-slate-600 rounded-md border"
+                                        />
+                                        <label htmlFor={`consent-duration-${unit}`} className="text-xs text-center dark:text-gray-400 mt-1">
+                                            {unit.charAt(0).toUpperCase() + unit.slice(1)}
+                                        </label>
+                                    </div>
+                                ))}
                             </div>
-                            <div className="duration-field">
-                                <input
-                                    type="number"
-                                    name="minutes"
-                                    placeholder="0"
-                                    value={duration.minutes || ''}
-                                    onChange={handleDurationChange}
-                                    min="0" max="59"
-                                    className="dark:bg-slate-700 dark:text-white dark:border-slate-600 rounded-md border"
-                                />
-                                <label className="text-xs text-center dark:text-gray-400 mt-1">Mins</label>
-                            </div>
-                            <div className="duration-field">
-                                <input
-                                    type="number"
-                                    name="seconds"
-                                    placeholder="0"
-                                    value={duration.seconds || ''}
-                                    onChange={handleDurationChange}
-                                    min="0" max="59"
-                                    className="dark:bg-slate-700 dark:text-white dark:border-slate-600 rounded-md border"
-                                />
-                                <label className="text-xs text-center dark:text-gray-400 mt-1">Secs</label>
-                            </div>
-                        </div>
-                        <small className="text-muted dark:text-gray-400 mt-2 block">Set all to 0 for unlimited access.</small>
+                        )}
                     </div>
                 </div>
 
                 {/* Expiry Message */}
-                <div className="info-alert" style={{ marginTop: '-10px', marginBottom: '15px' }}>
+                <div className="info-alert consent-duration-summary" aria-live="polite" style={{ marginTop: '-10px', marginBottom: '15px' }}>
                     {isUnlimited ? (
                         <strong>♾️ Access will be valid indefinitely (Unlimited)</strong>
+                    ) : displayEndTime ? (
+                        <>
+                            📅 Access will expire on: <strong>{displayEndTime.toLocaleString()}</strong>
+                            <br />
+                            ⏳ Access duration: <strong>{effectiveDuration.hours}h {effectiveDuration.minutes}m {effectiveDuration.seconds}s</strong>
+                        </>
                     ) : (
-                        displayEndTime && (
-                            <>
-                                📅 Access will expire on: <strong>{displayEndTime.toLocaleString()}</strong>
-                                <br />
-                                ⏳ Expires in: <strong>{duration.hours}h {duration.minutes}m {duration.seconds}s</strong>
-                            </>
-                        )
+                        <span>{totalSeconds > 0 ? 'Choose a start date to see the expiry.' : 'Enter a duration greater than zero to set an expiry.'}</span>
                     )}
                 </div>
-                {error && <div className="error-alert bg-red-50 text-red-600 p-3 rounded-lg border border-red-200 mt-4 mb-4">{error}</div>}
+                {error && <div role="alert" className="error-alert bg-red-50 text-red-600 p-3 rounded-lg border border-red-200 mt-4 mb-4">{error}</div>}
                 <div className="form-actions mt-6 flex gap-4">
                     <button
                         type="button"
