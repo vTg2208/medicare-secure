@@ -1,0 +1,13 @@
+erDiagram
+ ORGANIZATION ||--o{ STAFF_MEMBERSHIP : scopes
+ USER ||--o{ STAFF_MEMBERSHIP : holds
+ USER ||--o| PATIENT_PROFILE : may_have
+ PATIENT_PROFILE ||--o{ VISIT : attends
+ VISIT ||--o{ RECORD_OR_ORDER : contextualizes
+ PATIENT_PROFILE ||--o{ CONSENT : grants
+ PATIENT_PROFILE ||--o{ PROCESSING_CONTROL : restricts
+ RECORD_OR_ORDER ||--o{ FILE_REFERENCE : may_reference
+ PATIENT_PROFILE ||--o{ CARE_THREAD : participates
+ PATIENT_PROFILE ||--o{ RIGHTS_REQUEST : requests
+ USER ||--o{ AUDIT_EVENT : acts
+ RIGHTS_REQUEST ||--o{ FULFILLMENT_EVIDENCE : retains

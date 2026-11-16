@@ -240,6 +240,7 @@ For self-managed infrastructure, [docker-compose.prod.yaml](docker-compose.prod.
 
 | Guide | Use it for |
 | --- | --- |
+| [Product documentation](docs/product/README.md) | PRD, information architecture, technical requirements, diagrams and traceability. |
 | [Problem statement](docs/problem-statement.md) | Project objectives and required scope. |
 | [Operations runbook](DEVOPS.md) | Local Docker setup, environment validation, and service operations. |
 | [AI service guide](ai-service/README.md) | Optional provider setup, retrieval, and offline verification. |

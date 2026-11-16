@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg
+  PUBLIC '-//W3C//DTD SVG 1.0//EN'
+  'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg width="510" height="345" preserveAspectRatio="xMinYMin meet" viewBox="0 0 510 345" xmlns="http://www.w3.org/2000/svg" version="1.0" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<title>...</title>
+	<desc>...</desc>
+	<clipPath id="clip">
+		<rect x="0" y="0" width="510" height="345"/>
+	</clipPath>
+	<g id="group" transform="scale(1,-1) translate(0,-345)" style="clip-path: url(#clip)">
+		<g transform="">
+			<rect x="10" y="270" width="140" height="48" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="53.06787109375" y="291.15" style="font-family: Arial; font-size: 9.5px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,582) scale(1,-1)">Organization</text>
+			<rect x="185" y="270" width="140" height="48" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="226.486083984375" y="291.15" style="font-family: Arial; font-size: 9.5px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,582) scale(1,-1)">User and role</text>
+			<rect x="360" y="270" width="140" height="48" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="400.9549560546875" y="291.15" style="font-family: Arial; font-size: 9.5px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,582) scale(1,-1)">Patient profile</text>
+			<rect x="10" y="158" width="140" height="52" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="52.80810546875" y="187.4" style="font-family: Arial; font-size: 9.5px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,374) scale(1,-1)">Assignments</text>
+			<text x="50.159423828125" y="174.9" style="font-family: Arial; font-size: 9.5px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,349) scale(1,-1)">and calendars</text>
+			<rect x="185" y="158" width="140" height="52" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(3%,49%,50%); fill-rule: evenodd;"/>
+			<text x="244.9688720703125" y="181.15" style="font-family: Arial-Bold; font-size: 9.5px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,362) scale(1,-1)">Visit</text>
+			<rect x="360" y="158" width="140" height="52" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="412.30810546875" y="187.4" style="font-family: Arial; font-size: 9.5px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,374) scale(1,-1)">Consent</text>
+			<text x="379.832763671875" y="174.9" style="font-family: Arial; font-size: 9.5px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,349) scale(1,-1)">and processing controls</text>
+			<rect x="10" y="40" width="140" height="57" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="38.284423828125" y="71.9" style="font-family: Arial; font-size: 9.5px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,143) scale(1,-1)">Records and orders</text>
+			<text x="42.5172119140625" y="59.4" style="font-family: Arial; font-size: 9.5px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,118) scale(1,-1)">Notes, Rx, results</text>
+			<rect x="185" y="40" width="140" height="57" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="230.4498291015625" y="71.9" style="font-family: Arial; font-size: 9.5px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,143) scale(1,-1)">Private files</text>
+			<text x="213.5465087890625" y="59.4" style="font-family: Arial; font-size: 9.5px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,118) scale(1,-1)">and care messages</text>
+			<rect x="360" y="40" width="140" height="57" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="383.78955078125" y="71.9" style="font-family: Arial; font-size: 9.5px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,143) scale(1,-1)">Governance evidence</text>
+			<text x="383.794189453125" y="59.4" style="font-family: Arial; font-size: 9.5px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,118) scale(1,-1)">Audit, rights, retention</text>
+			<path d="M 150,294 L 185,294 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="185 294, 179.7345 296.8766, 179.7345 291.1234" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<path d="M 325,294 L 360,294 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="360 294, 354.7345 296.8766, 354.7345 291.1234" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<path d="M 80,270 L 80,210 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="80 210, 82.87655 215.2655, 77.12345 215.2655" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<path d="M 255,270 L 255,210 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="255 210, 257.8766 215.2655, 252.1234 215.2655" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<path d="M 430,270 L 430,210 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="430 210, 432.8766 215.2655, 427.1234 215.2655" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<path d="M 150,184 L 185,184 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="185 184, 179.7345 186.8766, 179.7345 181.1234" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<path d="M 360,184 L 325,184 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="325 184, 330.2655 181.1234, 330.2655 186.8766" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<path d="M 255,158 L 80,97 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="80 97, 85.91891 96.01686, 84.02528 101.4494" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<path d="M 255,158 L 255,97 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="255 97, 257.8766 102.2655, 252.1234 102.2655" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<path d="M 430,158 L 430,97 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="430 97, 432.8766 102.2655, 427.1234 102.2655" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+		</g>
+	</g>
+</svg>

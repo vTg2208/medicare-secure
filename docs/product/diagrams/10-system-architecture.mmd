@@ -1,0 +1,11 @@
+flowchart TD
+ U[Browser] -->|HTTPS| F[Vercel React and same-origin API proxy]
+ F -->|HTTPS| A[Render Express API]
+ F --> T[Turnstile browser challenge]
+ A -->|Server verification| T
+ A -->|Certificate-verified TLS| D[(Private PostgreSQL healthcare schema)]
+ A --> S[ClamAV before encrypted persistence]
+ A --> E[Secure SMTP]
+ A -->|Service token| AI[Optional FastAPI and Groq]
+ D --> B[Coordinated encrypted off-host backup]
+ K[Separate recovery key custody] -.-> B

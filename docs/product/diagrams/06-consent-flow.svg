@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg
+  PUBLIC '-//W3C//DTD SVG 1.0//EN'
+  'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg width="510" height="340" preserveAspectRatio="xMinYMin meet" viewBox="0 0 510 340" xmlns="http://www.w3.org/2000/svg" version="1.0" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<title>...</title>
+	<desc>...</desc>
+	<clipPath id="clip">
+		<rect x="0" y="0" width="510" height="340"/>
+	</clipPath>
+	<g id="group" transform="scale(1,-1) translate(0,-340)" style="clip-path: url(#clip)">
+		<g transform="">
+			<rect x="10" y="276" width="130" height="52" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(3%,49%,50%); fill-rule: evenodd;"/>
+			<text x="21.761132812499994" y="305.35999999999996" style="font-family: Arial-Bold; font-size: 9.3px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,610) scale(1,-1)">Patient selects recipient</text>
+			<text x="46.0578369140625" y="293.05999999999995" style="font-family: Arial-Bold; font-size: 9.3px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,586) scale(1,-1)">and category</text>
+			<rect x="190" y="276" width="130" height="52" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="204.8558349609375" y="305.35999999999996" style="font-family: Arial; font-size: 9.3px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,610) scale(1,-1)">Purpose permission and</text>
+			<text x="220.887890625" y="293.05999999999995" style="font-family: Arial; font-size: 9.3px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,586) scale(1,-1)">expiry confirmed</text>
+			<rect x="370" y="276" width="130" height="52" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="384.853564453125" y="305.35999999999996" style="font-family: Arial; font-size: 9.3px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,610) scale(1,-1)">API validates owner and</text>
+			<text x="390.5411865234375" y="293.05999999999995" style="font-family: Arial; font-size: 9.3px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,586) scale(1,-1)">persists audited grant</text>
+			<polygon points="370 196, 435 229, 500 196, 435 163" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(100%,96%,86%); fill-rule: evenodd;"/>
+			<text x="400.1566162109375" y="199.0" style="font-family: Arial; font-size: 9.5px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,398) scale(1,-1)">Access currently</text>
+			<text x="412.55810546875" y="187.0" style="font-family: Arial; font-size: 9.5px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,374) scale(1,-1)">permitted?</text>
+			<rect x="190" y="170" width="130" height="52" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="203.037158203125" y="199.36" style="font-family: Arial; font-size: 9.3px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,398) scale(1,-1)">Authorized operation and</text>
+			<text x="218.0338623046875" y="187.06" style="font-family: Arial; font-size: 9.3px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,374) scale(1,-1)">required evidence</text>
+			<rect x="10" y="170" width="130" height="52" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="26.408862304687496" y="199.36" style="font-family: Arial; font-size: 9.3px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,398) scale(1,-1)">Patient edits or revokes</text>
+			<text x="64.40126953125" y="187.06" style="font-family: Arial; font-size: 9.3px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,374) scale(1,-1)">grant</text>
+			<rect x="270" y="43" width="230" height="51" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="280.83818359375" y="71.86" style="font-family: Arial; font-size: 9.3px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,143) scale(1,-1)">Deny expired revoked wrong-purpose or otherwise</text>
+			<text x="342.3485107421875" y="59.56000000000001" style="font-family: Arial; font-size: 9.3px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,119) scale(1,-1)">unauthorized access</text>
+			<path d="M 140,302 L 190,302 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="190 302, 184.7345 304.8766, 184.7345 299.1234" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<path d="M 320,302 L 370,302 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="370 302, 364.7345 304.8766, 364.7345 299.1234" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<path d="M 435,276 L 435,229 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="435 229, 437.8766 234.2655, 432.1234 234.2655" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<path d="M 370,196 L 320,196 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="320 196, 325.2655 193.1234, 325.2655 198.8766" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<text x="349.0" y="201.0" style="font-family: Arial; font-size: 8px;fill: rgb(31%,39%,41%); stroke:none;" transform="translate(0,402) scale(1,-1)">Yes</text>
+			<path d="M 190,196 L 140,196 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="140 196, 145.2655 193.1234, 145.2655 198.8766" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<path d="M 435,163 L 435,94 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="435 94, 437.8766 99.2655, 432.1234 99.2655" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<text x="439.0" y="133.5" style="font-family: Arial; font-size: 8px;fill: rgb(31%,39%,41%); stroke:none;" transform="translate(0,267) scale(1,-1)">No</text>
+			<path d="M 75,170 L 75,130 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="75 130, 77.87655 135.2655, 72.12345 135.2655" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<path d="M 75,130 L 348,130 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="348 130, 342.7345 132.8766, 342.7345 127.1234" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<path d="M 348,130 L 348,245 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="348 245, 345.1234 239.7345, 350.8766 239.7345" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<path d="M 348,245 L 435,245 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="435 245, 429.7345 247.8766, 429.7345 242.1234" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<path d="M 435,245 L 435,229 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="435 229, 437.8766 234.2655, 432.1234 234.2655" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<text x="12" y="19" style="font-family: Arial; font-size: 9px;fill: rgb(31%,39%,41%); stroke:none;" transform="translate(0,38) scale(1,-1)">Consent withdrawal governs future operations; it cannot recall previously received copies.</text>
+		</g>
+	</g>
+</svg>

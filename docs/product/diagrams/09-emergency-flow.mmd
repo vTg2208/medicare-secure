@@ -1,0 +1,8 @@
+flowchart LR
+ A[Authorized care role] --> B[Patient and justification] --> C{Eligible and auditable?}
+ C -->|No| D[Deny]
+ C -->|Yes| E[Finite read-only grant]
+ E --> F[Audit incident and patient notification]
+ F --> G[Scoped record access]
+ G --> H[Expiry or revocation]
+ H --> I[Officer review]

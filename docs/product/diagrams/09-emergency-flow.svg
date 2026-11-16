@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg
+  PUBLIC '-//W3C//DTD SVG 1.0//EN'
+  'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg width="510" height="340" preserveAspectRatio="xMinYMin meet" viewBox="0 0 510 340" xmlns="http://www.w3.org/2000/svg" version="1.0" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<title>...</title>
+	<desc>...</desc>
+	<clipPath id="clip">
+		<rect x="0" y="0" width="510" height="340"/>
+	</clipPath>
+	<g id="group" transform="scale(1,-1) translate(0,-340)" style="clip-path: url(#clip)">
+		<g transform="">
+			<rect x="10" y="276" width="130" height="52" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(3%,49%,50%); fill-rule: evenodd;"/>
+			<text x="16.080322265624993" y="305.35999999999996" style="font-family: Arial-Bold; font-size: 9.3px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,610) scale(1,-1)">Eligible care role identifies</text>
+			<text x="50.199243164062494" y="293.05999999999995" style="font-family: Arial-Bold; font-size: 9.3px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,586) scale(1,-1)">one patient</text>
+			<rect x="190" y="276" width="130" height="52" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="202.26064453125" y="305.35999999999996" style="font-family: Arial; font-size: 9.3px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,610) scale(1,-1)">Justification and bounded</text>
+			<text x="238.1959716796875" y="293.05999999999995" style="font-family: Arial; font-size: 9.3px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,586) scale(1,-1)">duration</text>
+			<polygon points="370 301, 435 334, 500 301, 435 268" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(100%,96%,86%); fill-rule: evenodd;"/>
+			<text x="410.4405517578125" y="304.0" style="font-family: Arial; font-size: 9.5px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,608) scale(1,-1)">Eligible and</text>
+			<text x="413.07763671875" y="292.0" style="font-family: Arial; font-size: 9.5px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,584) scale(1,-1)">auditable?</text>
+			<rect x="370" y="154" width="130" height="56" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="381.5000244140625" y="185.36" style="font-family: Arial; font-size: 9.3px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,370) scale(1,-1)">Finite read-only grant with</text>
+			<text x="398.5469970703125" y="173.06" style="font-family: Arial; font-size: 9.3px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,346) scale(1,-1)">audit and incident</text>
+			<rect x="190" y="154" width="130" height="56" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="202.2697265625" y="185.36" style="font-family: Arial; font-size: 9.3px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,370) scale(1,-1)">Patient notified; permitted</text>
+			<text x="226.05556640625" y="173.06" style="font-family: Arial; font-size: 9.3px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,346) scale(1,-1)">record access</text>
+			<rect x="10" y="154" width="130" height="56" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="18.661889648437494" y="185.36" style="font-family: Arial; font-size: 9.3px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,370) scale(1,-1)">Expiry or revocation; officer</text>
+			<text x="61.563134765624994" y="173.06" style="font-family: Arial; font-size: 9.3px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,346) scale(1,-1)">review</text>
+			<rect x="305" y="48" width="195" height="50" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="321.8674560546875" y="76.36" style="font-family: Arial; font-size: 9.3px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,152) scale(1,-1)">Deny wrong role missing justification or</text>
+			<text x="359.0674560546875" y="64.06" style="font-family: Arial; font-size: 9.3px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,128) scale(1,-1)">unavailable evidence</text>
+			<path d="M 140,302 L 190,302 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="190 302, 184.7345 304.8766, 184.7345 299.1234" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<path d="M 320,302 L 370,302 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="370 302, 364.7345 304.8766, 364.7345 299.1234" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<path d="M 435,268 L 435,210 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="435 210, 437.8766 215.2655, 432.1234 215.2655" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<text x="439.0" y="244.0" style="font-family: Arial; font-size: 8px;fill: rgb(31%,39%,41%); stroke:none;" transform="translate(0,488) scale(1,-1)">Yes</text>
+			<path d="M 370,182 L 320,182 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="320 182, 325.2655 179.1234, 325.2655 184.8766" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<path d="M 190,182 L 140,182 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="140 182, 145.2655 179.1234, 145.2655 184.8766" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<path d="M 500,301 L 506,301 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="506 301, 500.7345 303.8766, 500.7345 298.1234" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<path d="M 506,301 L 506,73 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="506 73, 508.8766 78.2655, 503.1234 78.2655" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<path d="M 506,73 L 500,73 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="500 73, 505.2655 70.12345, 505.2655 75.87655" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<text x="477" y="108" style="font-family: Arial; font-size: 8px;fill: rgb(31%,39%,41%); stroke:none;" transform="translate(0,216) scale(1,-1)">No</text>
+			<text x="12" y="22" style="font-family: Arial; font-size: 9px;fill: rgb(31%,39%,41%); stroke:none;" transform="translate(0,44) scale(1,-1)">An emergency grant authorizes neither editing nor bulk export and is rechecked per operation.</text>
+		</g>
+	</g>
+</svg>
