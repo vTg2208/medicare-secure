@@ -5,9 +5,35 @@ on:
     paths: ['ai-service/**', '.github/workflows/ai-ci.yml']
   pull_request:
     paths: ['ai-service/**', '.github/workflows/ai-ci.yml']
+  schedule:
+    - cron: '23 5 * * 1'
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
+  dependency-audit:
+    name: Audit Python dependencies (${{ matrix.requirements }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        requirements: [requirements-dev.txt, requirements-rag.txt, requirements-audit.txt]
+    defaults:
+      run:
+        working-directory: ai-service
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: ai-service/requirements*.txt
+      - name: Install pinned audit tooling
+        run: python -m pip install -r requirements-audit.txt
+      - name: Check resolved dependencies against vulnerability advisories
+        run: python -m pip_audit --strict --progress-spinner off --timeout 30 -r "${{ matrix.requirements }}"
+
   offline-tests:
     runs-on: ubuntu-latest
     strategy:

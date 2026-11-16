@@ -1,25 +1,26 @@
 import apiClient from './client';
 import { getAuthHeader } from '../utils/tokenManager';
 
+const publicConfig = (challengeToken, headers = {}) => {
+    if (challengeToken) headers['X-Bot-Token'] = challengeToken;
+    return Object.keys(headers).length ? { headers, skipAuth: true } : { skipAuth: true };
+};
+
 // Auth API functions
 export const authApi = {
     // Patient registration
-    registerPatient: async (data) => {
-        const response = await apiClient.post('/auth/register/patient', data, { skipAuth: true });
+    registerPatient: async (data, { challengeToken, authenticated = false } = {}) => {
+        const response = await apiClient.post('/auth/register/patient', data, publicConfig(challengeToken, authenticated ? getAuthHeader() : {}));
         return response.data;
     },
     // Doctor registration
-    registerDoctor: async (data) => {
-        const response = await apiClient.post('/auth/register/doctor', data, {
-            headers: { 'Content-Type': 'multipart/form-data' }, skipAuth: true,
-        });
+    registerDoctor: async (data, challengeToken) => {
+        const response = await apiClient.post('/auth/register/doctor', data, publicConfig(challengeToken, { 'Content-Type': 'multipart/form-data' }));
         return response.data;
     },
     // Organization registration
-    registerOrganization: async (data) => {
-        const response = await apiClient.post('/auth/register/organization', data, {
-            headers: { 'Content-Type': 'multipart/form-data' }, skipAuth: true,
-        });
+    registerOrganization: async (data, challengeToken) => {
+        const response = await apiClient.post('/auth/register/organization', data, publicConfig(challengeToken, { 'Content-Type': 'multipart/form-data' }));
         return response.data;
     },
     // Verify OTP
@@ -34,14 +35,14 @@ export const authApi = {
         return response.data;
     },
     // Resend registration OTP
-    resendOTP: async (email) => {
-        const response = await apiClient.post('/auth/resend-otp', { email }, { skipAuth: true });
+    resendOTP: async (email, challengeToken) => {
+        const response = await apiClient.post('/auth/resend-otp', { email }, publicConfig(challengeToken));
         return response.data;
     },
 
     // Login
-    login: async (email, password) => {
-        const response = await apiClient.post('/auth/login', { emailOrPhone: email, password }, { skipAuth: true });
+    login: async (email, password, challengeToken) => {
+        const response = await apiClient.post('/auth/login', { emailOrPhone: email, password }, publicConfig(challengeToken));
         return response.data;
     },
     // Logout

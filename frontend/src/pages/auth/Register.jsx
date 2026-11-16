@@ -6,6 +6,7 @@ import { authApi } from '../../api/authApi';
 import { startRegistration } from '@simplewebauthn/browser';
 import ThemeToggle from '../../components/common/ThemeToggle';
 import FlowSteps from '../../components/common/FlowSteps';
+import BotChallenge, { useBotChallenge } from '../../components/auth/BotChallenge';
 
 import '../patient/Dashboard.css';
 
@@ -16,6 +17,8 @@ function Register() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [successMsg, setSuccessMsg] = useState('');
+    const bot = useBotChallenge();
+    const [otpVerified, setOtpVerified] = useState(false);
 
     const [patientData, setPatientData] = useState({
         name: '',
@@ -53,26 +56,30 @@ function Register() {
 
     const handleSubmitPatient = async (e) => {
         e.preventDefault();
-        if (roleTab !== 'patient') return;
+        if (roleTab !== 'patient' || bot.blocked) return;
 
         setError('');
         const pwdError = validatePasswords(patientData.password, patientData.confirmPassword);
         if (pwdError) { setError(pwdError); return; }
         setLoading(true);
         try {
-            const res = await authApi.registerPatient(patientData);
+            const res = await authApi.registerPatient(patientData, ...(bot.token ? [{ challengeToken: bot.token }] : []));
+            setOtpVerified(false);
+            setOtp('');
             setStep(2);
             setSuccessMsg(res.message);
         } catch (err) {
+            bot.capture(err);
             setError(err.response?.data?.message || 'Registration failed');
         } finally {
+            bot.reset();
             setLoading(false);
         }
     };
 
     const handleSubmitDoctor = async (e) => {
         e.preventDefault();
-        if (roleTab !== 'doctor') return;
+        if (roleTab !== 'doctor' || bot.blocked) return;
 
         setError('');
         const pwdError = validatePasswords(doctorData.password, doctorData.confirmPassword);
@@ -90,22 +97,28 @@ function Register() {
             formData.append('degreeCertificate', doctorFiles.degreeCertificate);
             formData.append('medicalRegCertificate', doctorFiles.medicalRegCertificate);
 
-            const res = await authApi.registerDoctor(formData);
+            const res = await authApi.registerDoctor(formData, ...(bot.token ? [bot.token] : []));
             setStep(4); // Dedicated doctor success screen
             setSuccessMsg(res.message);
         } catch (err) {
+            bot.capture(err);
             setError(err.response?.data?.message || 'Doctor registration failed');
         } finally {
+            bot.reset();
             setLoading(false);
         }
     };
 
     const handleVerifyOTP = async (e) => {
         e.preventDefault();
+        if (patientData.password && bot.blocked) return;
         setError('');
         setLoading(true);
         try {
-            await authApi.verifyOTP(patientData.email, otp);
+            if (!otpVerified) {
+                await authApi.verifyOTP(patientData.email, otp);
+                setOtpVerified(true);
+            }
 
             if (!patientData.password) {
                 navigate('/login', { state: { message: 'Email verified. You can now sign in.' } });
@@ -114,7 +127,7 @@ function Register() {
 
             // Auto-login to get a token for passkey registration
             try {
-                const loginRes = await authApi.login(patientData.email, patientData.password);
+                const loginRes = await authApi.login(patientData.email, patientData.password, ...(bot.token ? [bot.token] : []));
                 const payload = loginRes.data || loginRes;
                 const token = payload.accessToken || payload.token || payload.data?.accessToken;
                 if (token) {
@@ -123,9 +136,14 @@ function Register() {
                 } else {
                     navigate('/login', { state: { message: 'Registration successful! Please login.' } });
                 }
-            } catch {
-                // If auto-login fails, just go to login page
-                navigate('/login', { state: { message: 'Registration successful! Please login.' } });
+            } catch (err) {
+                if (bot.capture(err)) {
+                    setError(err.response?.data?.message || 'Complete the security check to sign in.');
+                } else {
+                    navigate('/login', { state: { message: 'Registration successful! Please login.' } });
+                }
+            } finally {
+                bot.reset();
             }
         } catch (err) {
             setError(err.response?.data?.message || 'Invalid OTP');
@@ -134,6 +152,7 @@ function Register() {
         }
     };
     const handleResendOTP = async () => {
+        if (bot.blocked) return;
         setError('');
         setSuccessMsg('');
         if (!patientData.email) {
@@ -142,11 +161,13 @@ function Register() {
         }
         setLoading(true);
         try {
-            const res = await authApi.resendOTP(patientData.email);
+            const res = await authApi.resendOTP(patientData.email, ...(bot.token ? [bot.token] : []));
             setSuccessMsg(res.message || 'OTP resent successfully');
         } catch (err) {
+            bot.capture(err);
             setError(err.response?.data?.message || 'Failed to resend OTP');
         } finally {
+            bot.reset();
             setLoading(false);
         }
     };
@@ -186,6 +207,8 @@ function Register() {
                         ? [{ label: 'Account' }, { label: 'Review' }]
                         : [{ label: 'Account' }, { label: 'Verify email' }, { label: 'Passkey', optional: true }]}
                     currentStep={roleTab === 'doctor' ? (step === 4 ? 1 : 0) : Math.min(step - 1, 2)} />
+
+                {(step === 1 || step === 2) && <BotChallenge key={step} challenge={bot.challenge} onToken={token => { bot.setToken(token); if (token) setError(''); }} resetKey={bot.resetKey} />}
 
                 {step === 1 && (
                     <>
@@ -328,7 +351,7 @@ function Register() {
 
                                 <button
                                     type="submit"
-                                    disabled={loading}
+                                    disabled={loading || bot.blocked}
                                     className={`mt-6 w-full flex justify-center py-4 px-4 rounded-lg shadow-sm shadow-primary-500/20 text-sm font-bold text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-300 transform ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
                                 >
                                     {loading ? 'Processing...' : 'Register as Patient'}
@@ -388,7 +411,7 @@ function Register() {
 
                                 <button
                                     type="submit"
-                                    disabled={loading}
+                                    disabled={loading || bot.blocked}
                                     className={`mt-6 w-full flex justify-center py-4 px-4 rounded-lg shadow-sm shadow-primary-500/20 text-sm font-bold text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-300 transform ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
                                 >
                                     {loading ? 'Processing...' : 'Register and Upload Credentials'}
@@ -448,16 +471,16 @@ function Register() {
                             )}
                             <button
                                 type="submit"
-                                disabled={loading}
+                                disabled={loading || Boolean(patientData.password && bot.blocked)}
                                 className={`w-full flex justify-center py-4 px-4 rounded-lg shadow-sm shadow-primary-500/20 text-sm font-bold text-white bg-primary-600 hover:bg-primary-700 transition-all duration-300 transform ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
                             >
-                                {loading ? 'Verifying...' : 'Verify OTP'}
+                                {loading ? 'Verifying...' : otpVerified ? 'Continue sign in' : 'Verify OTP'}
                             </button>
                             <div className="flex flex-col gap-3 mt-4">
                                 <button
                                     type="button"
                                     onClick={handleResendOTP}
-                                    disabled={loading}
+                                    disabled={loading || bot.blocked}
                                     className="text-sm font-semibold text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 transition-colors"
                                 >
                                     Resend OTP

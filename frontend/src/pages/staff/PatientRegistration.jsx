@@ -60,7 +60,7 @@ function PatientRegistration() {
         }
 
         try {
-            await authApi.registerPatient(formData);
+            await authApi.registerPatient(formData, { authenticated: true });
 
             setSuccessMessage(`Patient ${formData.firstName} registered successfully!`);
 

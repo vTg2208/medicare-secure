@@ -17,7 +17,7 @@ const validateEnvironment = (env) => {
     if (env.JWT_SECRET && env.JWT_SECRET === env.JWT_REFRESH_SECRET) errors.push('JWT secrets must be different');
     if (env.ENCRYPTION_KEY && !/^[a-f\d]{64}$/i.test(env.ENCRYPTION_KEY)) errors.push('ENCRYPTION_KEY must be 64 hexadecimal characters (32 bytes)');
     if (env.ENCRYPTION_ALGORITHM && env.ENCRYPTION_ALGORITHM !== 'aes-256-gcm') errors.push('ENCRYPTION_ALGORITHM must be aes-256-gcm');
-    for (const key of ['DB_SSL', 'EMAIL_SECURE', 'AUTO_LOGOUT_ENABLED', 'AI_ENABLED']) {
+    for (const key of ['DB_SSL', 'EMAIL_SECURE', 'AUTO_LOGOUT_ENABLED', 'AI_ENABLED', 'TURNSTILE_ENABLED']) {
         if (env[key] && !['true', 'false'].includes(env[key])) errors.push(`${key} must be true or false`);
     }
     for (const key of ['PORT', 'DB_PORT', 'EMAIL_PORT', 'OTP_EXPIRY_MINUTES', 'OTP_MAX_ATTEMPTS', 'SESSION_TIMEOUT_MINUTES', 'RATE_LIMIT_MAX_REQUESTS', 'MAX_FILE_SIZE_MB']) {
@@ -25,6 +25,19 @@ const validateEnvironment = (env) => {
     }
     if (env.BCRYPT_ROUNDS && (!/^\d+$/.test(env.BCRYPT_ROUNDS) || +env.BCRYPT_ROUNDS < 10 || +env.BCRYPT_ROUNDS > 16)) errors.push('BCRYPT_ROUNDS must be between 10 and 16');
     if (env.OTP_LENGTH && !/^[6-8]$/.test(env.OTP_LENGTH)) errors.push('OTP_LENGTH must be between 6 and 8');
+    if (env.TURNSTILE_ENABLED === 'true') {
+        for (const key of ['TURNSTILE_SITE_KEY', 'TURNSTILE_SECRET_KEY']) {
+            if (!env[key] || !env[key].trim()) errors.push(`${key} is required when bot protection is enabled`);
+            else if (production && /^[123]x0{8,}/.test(env[key])) errors.push(`${key} must not use a testing key in production`);
+        }
+        let canonicalHostname = '';
+        try { canonicalHostname = new URL(env.FRONTEND_URL).hostname; } catch { /* reported below or by hostname validation */ }
+        const hostnames = (env.TURNSTILE_HOSTNAMES || canonicalHostname).split(',').map(value => value.trim());
+        if (!hostnames.length || hostnames.some(value => !value || !/^[a-z0-9]+(?:[a-z0-9.-]*[a-z0-9])?$/i.test(value))) {
+            errors.push('TURNSTILE_HOSTNAMES must contain explicit hostnames without protocols, ports or wildcards');
+        }
+        if (production && canonicalHostname && !hostnames.includes(canonicalHostname)) errors.push('TURNSTILE_HOSTNAMES must include the frontend hostname');
+    }
     if (production) {
         if (env.DB_SSL !== 'true') errors.push('DB_SSL must be true in production');
         for (const key of ['FRONTEND_URL', 'WEBAUTHN_ORIGIN']) {

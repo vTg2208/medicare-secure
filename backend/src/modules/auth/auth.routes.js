@@ -6,6 +6,11 @@ const { auditActions } = require('../../middleware/audit.middleware');
 const { loginLimiter, otpLimiter, registrationLimiter } = require('../../middleware/rateLimit.middleware');
 const { asyncHandler } = require('../../middleware/error.middleware');
 const { assertEmailAvailable } = require('../../config/mail');
+const { createBotProtection } = require('../../middleware/bot-protection.middleware');
+const botSettings = require('../../config/env').botProtection;
+const consumedChallengeTokens = new Map();
+const publicChallenge = createBotProtection({ settings: botSettings, consumedTokens: consumedChallengeTokens });
+const registrationChallenge = createBotProtection({ settings: botSettings, allowStaff: true, consumedTokens: consumedChallengeTokens });
 
 // Verification needs a working delivery configuration before creating an
 // account or accepting credentials. Existing-account login stays independent.
@@ -28,6 +33,7 @@ const upload = require('../../middleware/upload.middleware');
 router.post(
     '/register/patient',
     registrationLimiter,
+    registrationChallenge,
     requireEmailDelivery,
     asyncHandler(authController.registerPatient)
 );
@@ -40,6 +46,7 @@ router.post(
 router.post(
     '/register/doctor',
     registrationLimiter,
+    publicChallenge,
     requireEmailDelivery,
     upload.fields([
         { name: 'degreeCertificate', maxCount: 1 },
@@ -56,6 +63,7 @@ router.post(
 router.post(
     '/register/organization',
     registrationLimiter,
+    publicChallenge,
     requireEmailDelivery,
     upload.single('licenseDocument'),
     asyncHandler(authController.registerOrganization)
@@ -91,6 +99,7 @@ router.post(
 router.post(
     '/resend-otp',
     otpLimiter,
+    publicChallenge,
     requireEmailDelivery,
     asyncHandler(authController.resendOTP)
 );
@@ -103,6 +112,7 @@ router.post(
 router.post(
     '/login',
     loginLimiter,
+    publicChallenge,
     asyncHandler(async (req, res) => {
         // Intercept the response to ensure frontend compatibility tokens are there
         const originalJson = res.json.bind(res);

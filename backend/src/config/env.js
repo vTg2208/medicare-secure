@@ -42,6 +42,15 @@ const config = {
     },
 
     // Rate Limiting
+    botProtection: {
+        enabled: process.env.TURNSTILE_ENABLED === 'true',
+        siteKey: process.env.TURNSTILE_SITE_KEY || '',
+        secretKey: process.env.TURNSTILE_SECRET_KEY || '',
+        hostnames: (process.env.TURNSTILE_HOSTNAMES || (() => {
+            try { return new URL(process.env.FRONTEND_URL || 'http://localhost:3000').hostname; }
+            catch { return ''; }
+        })()).split(',').map(value => value.trim()).filter(Boolean),
+    },
     rateLimit: {
         windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 900000, // 15 minutes
         maxRequests: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 1000,

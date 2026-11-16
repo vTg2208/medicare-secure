@@ -15,11 +15,11 @@ function source(directory) {
 }
 const files = source(path.join(root, 'src')).map(file => [file, fs.readFileSync(file, 'utf8')]);
 const text = files.map(([, contents]) => contents).join('\n');
-// A stylesheet can supply an icon via generated content. Its other property
-// values (such as text wrapping) cannot invoke a font ligature.
+// Only font-bearing markup/icon data and CSS generated content can supply a
+// ligature. Ordinary loader code (for example createElement('script')) cannot.
 const ligatures = files.map(([file, contents]) => file.endsWith('.css')
     ? (contents.match(/\bcontent\s*:[^;}]+/g) || []).join(' ')
-    : contents).join('\n');
+    : /material-symbols|\bicon\s*[:=]/.test(contents) ? contents : '').join('\n');
 const missing = [...new Set(ligatures.match(/[a-z][a-z0-9_]+/g))].filter(word => known.has(word) && !included.has(word));
 if (missing.length) throw Error(`Refresh the self-hosted icon subset with npm run vendor:fonts: ${missing.join(', ')}`);
 if (/fonts\.(googleapis|gstatic)\.com/.test(text + fs.readFileSync(path.join(root, 'index.html'), 'utf8'))) throw Error('Runtime font loading must remain self-hosted');

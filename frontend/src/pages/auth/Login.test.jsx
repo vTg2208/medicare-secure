@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
@@ -17,6 +17,7 @@ function setup() {
     return { user: userEvent.setup(), login };
 }
 beforeEach(() => { vi.clearAllMocks(); });
+afterEach(() => { delete window.turnstile; });
 
 test('signs in through labelled fields and routes to the patient dashboard', async () => {
     authApi.login.mockResolvedValue({ data: { user: { role: 'PATIENT' }, accessToken: 'test-token' } });
@@ -59,7 +60,36 @@ test('only exposes the active form and preserves passkey sign in', async () => {
 
 test('offers account creation and explains role-based access', () => {
     setup();
+    expect(screen.queryByRole('region', { name: 'Security check' })).not.toBeInTheDocument();
+    expect(document.querySelector('script[src*="challenges.cloudflare.com"]')).toBeNull();
     expect(screen.getByText('Your records are available according to your role and sharing permissions.')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Create a patient account' })).toHaveAttribute('href', '/register');
     expect(screen.getByRole('link', { name: 'Read privacy notice' })).toHaveAttribute('href', '/privacy-notice');
+});
+
+test.each([428, 400, 503])('reveals a security check for status %s and consumes each token before another attempt', async (status) => {
+    let options;
+    window.turnstile = { render: vi.fn((element, config) => { options = config; return 'login-widget'; }), reset: vi.fn(), remove: vi.fn() };
+    authApi.login.mockRejectedValueOnce({ response: { status, data: { message: 'Complete the security check and try again.', code: 'BOT_CHALLENGE_REQUIRED', challenge: { siteKey: 'public-site-key', action: 'public_auth' } } } })
+        .mockRejectedValue({ response: { status: 401, data: { message: 'Invalid credentials' } } });
+    const { user } = setup();
+    await user.type(screen.getByLabelText('Email or phone'), 'patient@demo.invalid');
+    await user.type(screen.getByLabelText('Password', { exact: true }), 'password');
+    await user.click(screen.getByRole('button', { name: 'Sign in', exact: true }));
+    await waitFor(() => expect(window.turnstile.render).toHaveBeenCalled());
+    expect(screen.getByRole('button', { name: 'Sign in', exact: true })).toBeDisabled();
+    act(() => options.callback('first-token'));
+    await user.click(screen.getByRole('button', { name: 'Sign in', exact: true }));
+    expect(authApi.login).toHaveBeenLastCalledWith('patient@demo.invalid', 'password', 'first-token');
+    expect(await screen.findByRole('alert')).toHaveTextContent('Invalid credentials');
+    expect(screen.getByRole('button', { name: 'Sign in', exact: true })).toBeDisabled();
+    expect(window.turnstile.reset).toHaveBeenCalledWith('login-widget');
+    act(() => options.callback('fresh-token'));
+    expect(screen.getByRole('button', { name: 'Sign in', exact: true })).toBeEnabled();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    act(() => options['expired-callback']());
+    expect(screen.getByRole('button', { name: 'Sign in', exact: true })).toBeDisabled();
+    await user.click(screen.getByRole('button', { name: 'Passkey', exact: true }));
+    expect(window.turnstile.remove).toHaveBeenCalledWith('login-widget');
+    expect(screen.getByRole('button', { name: 'Sign in with passkey' })).toBeEnabled();
 });

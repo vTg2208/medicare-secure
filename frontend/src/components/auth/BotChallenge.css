@@ -1,0 +1,13 @@
+.bot-challenge {
+    color: var(--mc-text-muted);
+    background: var(--mc-surface);
+    border: 1px solid var(--mc-border);
+    border-radius: 12px;
+    padding: 12px;
+    margin-block: 16px;
+    min-width: 0;
+    text-align: left;
+}
+.bot-challenge p { margin: 8px 0 0; font-size: 0.875rem; }
+.bot-challenge button { margin-top: 8px; color: var(--mc-accent); text-decoration: underline; }
+.bot-challenge button:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }

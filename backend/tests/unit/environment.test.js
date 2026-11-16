@@ -36,3 +36,19 @@ it.each([
 it.each([undefined, 'false'])('requires verified database TLS in production (%s)', DB_SSL => {
     expect(validateEnvironment({...safe(), DB_SSL})).toContain('DB_SSL must be true in production');
 });
+
+it('requires complete bot protection configuration when enabled', () => {
+    expect(validateEnvironment({ ...safe(), TURNSTILE_ENABLED: 'true' })).toEqual(expect.arrayContaining([
+        'TURNSTILE_SITE_KEY is required when bot protection is enabled',
+        'TURNSTILE_SECRET_KEY is required when bot protection is enabled',
+    ]));
+});
+it('accepts a configured widget for the canonical frontend hostname', () => {
+    expect(validateEnvironment({ ...safe(), TURNSTILE_ENABLED: 'true', TURNSTILE_SITE_KEY: 'public-fixture-key', TURNSTILE_SECRET_KEY: 'private-fixture-key' })).toEqual([]);
+});
+it.each(['https://health.example.test', '*.example.test', 'health.example.test:443', 'other.example.test'])('rejects invalid or unrelated production challenge hostnames (%s)', TURNSTILE_HOSTNAMES => {
+    expect(validateEnvironment({ ...safe(), TURNSTILE_ENABLED: 'true', TURNSTILE_SITE_KEY: 'public-fixture-key', TURNSTILE_SECRET_KEY: 'private-fixture-key', TURNSTILE_HOSTNAMES }).length).toBeGreaterThan(0);
+});
+it('rejects always-pass testing keys in production', () => {
+    expect(validateEnvironment({ ...safe(), TURNSTILE_ENABLED: 'true', TURNSTILE_SITE_KEY: '1x00000000000000000000AA', TURNSTILE_SECRET_KEY: '1x0000000000000000000000000000000AA' }).length).toBeGreaterThan(0);
+});
