@@ -1,0 +1,12 @@
+flowchart TD
+ APP[Medicare] --> PUB[Public pages]
+ APP --> AUTH[Account access]
+ APP --> PROT[Protected workspaces]
+ PROT --> PAT[Patient]
+ PROT --> CARE[Care teams]
+ PROT --> OPS[Operations and governance]
+ PUB --> POL[Privacy notice / terms / support / accessibility / cookies]
+ AUTH --> ACC[Login / registration / invitation]
+ PAT --> PAGES[Records / visits / consent / messages / privacy / audit]
+ CARE --> CLIN[Doctor / nurse / lab / radiology / pharmacy]
+ OPS --> ADM[Administration / compliance / insurance / research]

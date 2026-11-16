@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg
+  PUBLIC '-//W3C//DTD SVG 1.0//EN'
+  'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg width="510" height="328" preserveAspectRatio="xMinYMin meet" viewBox="0 0 510 328" xmlns="http://www.w3.org/2000/svg" version="1.0" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<title>...</title>
+	<desc>...</desc>
+	<clipPath id="clip">
+		<rect x="0" y="0" width="510" height="328"/>
+	</clipPath>
+	<g id="group" transform="scale(1,-1) translate(0,-328)" style="clip-path: url(#clip)">
+		<g transform="">
+			<rect x="182" y="274" width="146" height="44" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(3%,49%,50%); fill-rule: evenodd;"/>
+			<text x="223.0419921875" y="293.0" style="font-family: Arial-Bold; font-size: 10px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,586) scale(1,-1)">User browser</text>
+			<rect x="182" y="195" width="146" height="48" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="240.82763671875" y="222.5" style="font-family: Arial; font-size: 10px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,445) scale(1,-1)">Vercel</text>
+			<text x="209.14306640625" y="209.5" style="font-family: Arial; font-size: 10px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,419) scale(1,-1)">React and API proxy</text>
+			<rect x="182" y="111" width="146" height="48" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="238.60107421875" y="138.5" style="font-family: Arial; font-size: 10px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,277) scale(1,-1)">Render</text>
+			<text x="227.490234375" y="125.5" style="font-family: Arial; font-size: 10px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,251) scale(1,-1)">Express API</text>
+			<rect x="182" y="22" width="146" height="49" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="203.85498046875" y="50.0" style="font-family: Arial; font-size: 10px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,100) scale(1,-1)">Supabase PostgreSQL</text>
+			<text x="195.80322265625" y="37.0" style="font-family: Arial; font-size: 10px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,74) scale(1,-1)">Private healthcare schema</text>
+			<path d="M 255,274 L 255,243 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="255 243, 257.8766 248.2655, 252.1234 248.2655" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<text x="259.0" y="263.5" style="font-family: Arial; font-size: 8px;fill: rgb(31%,39%,41%); stroke:none;" transform="translate(0,527) scale(1,-1)">HTTPS</text>
+			<path d="M 255,195 L 255,159 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="255 159, 257.8766 164.2655, 252.1234 164.2655" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<text x="259.0" y="182.0" style="font-family: Arial; font-size: 8px;fill: rgb(31%,39%,41%); stroke:none;" transform="translate(0,364) scale(1,-1)">HTTPS</text>
+			<path d="M 255,111 L 255,71 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="255 71, 257.8766 76.2655, 252.1234 76.2655" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<text x="259.0" y="96.0" style="font-family: Arial; font-size: 8px;fill: rgb(31%,39%,41%); stroke:none;" transform="translate(0,192) scale(1,-1)">Verified TLS</text>
+			<rect x="3" y="215" width="140" height="49" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="53.82763671875" y="243.0" style="font-family: Arial; font-size: 10px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,486) scale(1,-1)">Turnstile</text>
+			<text x="36.58642578125" y="230.0" style="font-family: Arial; font-size: 10px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,460) scale(1,-1)">Public challenge</text>
+			<rect x="3" y="111" width="140" height="48" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="30.2021484375" y="138.5" style="font-family: Arial; font-size: 10px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,277) scale(1,-1)">SMTP and scanner</text>
+			<text x="27.13818359375" y="125.5" style="font-family: Arial; font-size: 10px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,251) scale(1,-1)">Required per feature</text>
+			<rect x="363" y="111" width="144" height="48" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="397.20458984375" y="138.5" style="font-family: Arial; font-size: 10px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,277) scale(1,-1)">Optional FastAPI</text>
+			<text x="404.7021484375" y="125.5" style="font-family: Arial; font-size: 10px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,251) scale(1,-1)">Internal token</text>
+			<rect x="363" y="22" width="144" height="49" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="392.4755859375" y="50.0" style="font-family: Arial; font-size: 10px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,100) scale(1,-1)">Encrypted backups</text>
+			<text x="396.6552734375" y="37.0" style="font-family: Arial; font-size: 10px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,74) scale(1,-1)">Off-host recovery</text>
+			<path d="M 182,218 L 143,239 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="143 239, 146.2723 233.9709, 148.9999 239.0364" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<path d="M 182,135 L 143,135 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="143 135, 148.2655 132.1234, 148.2655 137.8766" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<path d="M 328,135 L 363,135 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="363 135, 357.7345 137.8766, 357.7345 132.1234" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<path d="M 328,46 L 363,46 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="363 46, 357.7345 48.87655, 357.7345 43.12345" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+		</g>
+	</g>
+</svg>

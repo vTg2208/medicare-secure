@@ -1,0 +1,12 @@
+flowchart TD
+ A[Patient privacy request] --> B[Officer review]
+ B --> C{Request type}
+ C -->|Access or portability| D[Owned export and receipt]
+ D --> E[Patient confirms receipt]
+ E --> F[Evidence-backed completion]
+ C -->|Correction| G[Attributed correction or clinical addendum] --> F
+ C -->|Restriction or objection| H[Enforce purpose control] --> F
+ C -->|Erasure| I{Retention or hold?}
+ I -->|Yes| J[Reasoned denial or partial outcome]
+ I -->|No| K[Separate approved privileged disposal]
+ K --> L[Link disposal evidence] --> F

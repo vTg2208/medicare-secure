@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg
+  PUBLIC '-//W3C//DTD SVG 1.0//EN'
+  'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg width="510" height="350" preserveAspectRatio="xMinYMin meet" viewBox="0 0 510 350" xmlns="http://www.w3.org/2000/svg" version="1.0" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<title>...</title>
+	<desc>...</desc>
+	<clipPath id="clip">
+		<rect x="0" y="0" width="510" height="350"/>
+	</clipPath>
+	<g id="group" transform="scale(1,-1) translate(0,-350)" style="clip-path: url(#clip)">
+		<g transform="">
+			<rect x="184" y="147" width="142" height="56" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(3%,49%,50%); fill-rule: evenodd;"/>
+			<text x="231.155029296875" y="178.7" style="font-family: Arial-Bold; font-size: 11px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,357) scale(1,-1)">Medicare</text>
+			<text x="208.236572265625" y="164.7" style="font-family: Arial-Bold; font-size: 11px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,329) scale(1,-1)">People and needs</text>
+			<rect x="5" y="280" width="150" height="62" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="65.2119140625" y="320.65" style="font-family: Arial; font-size: 9.5px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,641) scale(1,-1)">Patient</text>
+			<text x="13.462890625" y="308.15" style="font-family: Arial; font-size: 9.5px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,616) scale(1,-1)">Understand records and control</text>
+			<text x="64.4210205078125" y="295.65" style="font-family: Arial; font-size: 9.5px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,591) scale(1,-1)">sharing</text>
+			<path d="M 184,175 L 155,311 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="155 311, 153.2848 305.2504, 158.9114 306.4502" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<rect x="5" y="148" width="150" height="62" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="52.8104248046875" y="188.65" style="font-family: Arial; font-size: 9.5px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,377) scale(1,-1)">Clinical team</text>
+			<text x="36.697998046875" y="176.15" style="font-family: Arial; font-size: 9.5px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,352) scale(1,-1)">Find authorized care</text>
+			<text x="56.5028076171875" y="163.65" style="font-family: Arial; font-size: 9.5px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,327) scale(1,-1)">information</text>
+			<path d="M 184,175 L 155,179 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="155 179, 159.8231 175.431, 160.6092 181.1301" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<rect x="5" y="16" width="150" height="62" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="14.5228271484375" y="56.65" style="font-family: Arial; font-size: 9.5px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,113) scale(1,-1)">Diagnostic and pharmacy team</text>
+			<text x="24.553955078125" y="44.15" style="font-family: Arial; font-size: 9.5px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,88) scale(1,-1)">Complete assigned orders</text>
+			<text x="67.591552734375" y="31.65" style="font-family: Arial; font-size: 9.5px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,63) scale(1,-1)">safely</text>
+			<path d="M 184,175 L 155,47 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="155 47, 158.9689 51.49973, 153.358 52.77095" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<rect x="355" y="280" width="150" height="62" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="367.4266357421875" y="320.65" style="font-family: Arial; font-size: 9.5px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,641) scale(1,-1)">Front desk and administration</text>
+			<text x="364.51123046875" y="308.15" style="font-family: Arial; font-size: 9.5px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,616) scale(1,-1)">Coordinate access, people and</text>
+			<text x="419.4447021484375" y="295.65" style="font-family: Arial; font-size: 9.5px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,591) scale(1,-1)">visits</text>
+			<path d="M 326,175 L 355,311 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="355 311, 351.0886 306.4502, 356.7152 305.2504" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<rect x="355" y="148" width="150" height="62" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="370.8685302734375" y="182.4" style="font-family: Arial; font-size: 9.5px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,364) scale(1,-1)">Privacy and security officers</text>
+			<text x="364.246826171875" y="169.9" style="font-family: Arial; font-size: 9.5px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,339) scale(1,-1)">Investigate and retain evidence</text>
+			<path d="M 326,175 L 355,179 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="355 179, 349.3908 181.1301, 350.1769 175.431" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<rect x="355" y="16" width="150" height="62" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="380.0948486328125" y="50.4" style="font-family: Arial; font-size: 9.5px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,100) scale(1,-1)">Insurance and research</text>
+			<text x="362.943359375" y="37.9" style="font-family: Arial; font-size: 9.5px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,75) scale(1,-1)">Use purpose-limited information</text>
+			<path d="M 326,175 L 355,47 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="355 47, 356.642 52.77095, 351.0311 51.49973" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+		</g>
+	</g>
+</svg>

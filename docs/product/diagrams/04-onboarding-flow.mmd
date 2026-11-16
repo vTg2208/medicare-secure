@@ -1,0 +1,10 @@
+flowchart LR
+ A[Visitor] --> B[Account details and bot check] --> C[Server validates and sends OTP]
+ C --> D{Valid OTP?}
+ D -->|No| E[Correct code or resend with fresh challenge]
+ E --> D
+ D -->|Yes| F[Verified account]
+ F --> G[Sign in with fresh challenge]
+ G --> H[Patient workspace]
+ H --> I[Optional authenticated passkey enrollment]
+ J[Existing passkey] --> K[Server challenge and WebAuthn verification] --> H

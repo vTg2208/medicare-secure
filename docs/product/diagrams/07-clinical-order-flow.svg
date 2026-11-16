@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg
+  PUBLIC '-//W3C//DTD SVG 1.0//EN'
+  'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg width="510" height="340" preserveAspectRatio="xMinYMin meet" viewBox="0 0 510 340" xmlns="http://www.w3.org/2000/svg" version="1.0" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<title>...</title>
+	<desc>...</desc>
+	<clipPath id="clip">
+		<rect x="0" y="0" width="510" height="340"/>
+	</clipPath>
+	<g id="group" transform="scale(1,-1) translate(0,-340)" style="clip-path: url(#clip)">
+		<g transform="">
+			<rect x="10" y="279" width="130" height="48" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(3%,49%,50%); fill-rule: evenodd;"/>
+			<text x="25.1546875" y="306.34000000000003" style="font-family: Arial-Bold; font-size: 9.2px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,612) scale(1,-1)">Assigned clinician and</text>
+			<text x="42.28564453125" y="294.14000000000004" style="font-family: Arial-Bold; font-size: 9.2px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,588) scale(1,-1)">patient context</text>
+			<polygon points="190 303, 255 334, 320 303, 255 272" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(100%,96%,86%); fill-rule: evenodd;"/>
+			<text x="219.620849609375" y="300.0" style="font-family: Arial; font-size: 9.5px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,600) scale(1,-1)">Access allowed?</text>
+			<rect x="370" y="279" width="130" height="48" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="384.11923828125" y="306.34000000000003" style="font-family: Arial; font-size: 9.2px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,612) scale(1,-1)">Note diagnosis or clinical</text>
+			<text x="424.26142578125" y="294.14000000000004" style="font-family: Arial; font-size: 9.2px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,588) scale(1,-1)">order</text>
+			<rect x="20" y="160" width="200" height="56" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="36.3869140625" y="191.34" style="font-family: Arial; font-size: 9.2px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,382) scale(1,-1)">Lab or imaging order: assigned specialist</text>
+			<text x="89.318359375" y="179.14000000000001" style="font-family: Arial; font-size: 9.2px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,358) scale(1,-1)">validates result</text>
+			<rect x="290" y="160" width="200" height="56" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="298.4671875" y="191.34" style="font-family: Arial; font-size: 9.2px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,382) scale(1,-1)">Prescription: authorized pharmacist validates</text>
+			<text x="380.02734375" y="179.14000000000001" style="font-family: Arial; font-size: 9.2px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,358) scale(1,-1)">state</text>
+			<rect x="20" y="61" width="200" height="53" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="38.437597656250006" y="90.83999999999999" style="font-family: Arial; font-size: 9.2px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,181) scale(1,-1)">Persist result and evidence; file requires</text>
+			<text x="67.06855468750001" y="78.63999999999999" style="font-family: Arial; font-size: 9.2px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,157) scale(1,-1)">validation scan encryption</text>
+			<rect x="290" y="61" width="200" height="53" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="302.033984375" y="90.83999999999999" style="font-family: Arial; font-size: 9.2px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,181) scale(1,-1)">Atomic dispensing; cancelled and duplicate</text>
+			<text x="352.92822265625" y="78.63999999999999" style="font-family: Arial; font-size: 9.2px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,157) scale(1,-1)">fulfillment rejected</text>
+			<path d="M 140,303 L 190,303 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="190 303, 184.7345 305.8766, 184.7345 300.1234" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<path d="M 320,303 L 370,303 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="370 303, 364.7345 305.8766, 364.7345 300.1234" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<text x="349.0" y="308.0" style="font-family: Arial; font-size: 8px;fill: rgb(31%,39%,41%); stroke:none;" transform="translate(0,616) scale(1,-1)">Yes</text>
+			<path d="M 435,279 L 120,216 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="120 216, 125.7274 214.212, 124.5991 219.8533" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<path d="M 435,279 L 390,216 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="390 216, 395.4013 218.6127, 390.7198 221.9567" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<path d="M 120,160 L 120,114 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="120 114, 122.8766 119.2655, 117.1234 119.2655" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<path d="M 390,160 L 390,114 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="390 114, 392.8766 119.2655, 387.1234 119.2655" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<text x="150" y="249" style="font-family: Arial; font-size: 9px;fill: rgb(31%,39%,41%); stroke:none;" transform="translate(0,498) scale(1,-1)">No: deny without clinical content</text>
+			<text x="80.39868164062497" y="24" style="font-family: Arial; font-size: 9px;fill: rgb(31%,39%,41%); stroke:none;" transform="translate(0,48) scale(1,-1)">Both branches update the permitted patient record. They are independent workstreams.</text>
+		</g>
+	</g>
+</svg>

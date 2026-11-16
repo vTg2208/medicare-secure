@@ -1,0 +1,7 @@
+flowchart LR
+ A[Open consent] --> B[Select recipient and category] --> C[Purpose level and expiry]
+ C --> D[Validate and persist with audit]
+ D --> E{Current access permitted?}
+ E -->|Yes| F[Authorized operation with evidence]
+ E -->|No| G[Deny without revealing content]
+ H[Edit or revoke] --> E

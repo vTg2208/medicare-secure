@@ -1,0 +1,14 @@
+flowchart TD
+ A[Assigned clinician] --> B{Server permits access?}
+ B -->|No| X[Deny]
+ B -->|Yes| C[Note diagnosis prescription or diagnostic order]
+ C --> L[Assigned lab or imaging queue]
+ L --> V[Validate order and result]
+ V --> S{File supplied?}
+ S -->|Yes| M[Validate bytes scan encrypt persist]
+ S -->|No| R[Persist structured result and audit]
+ M --> R
+ C --> P[Pharmacy prescription queue]
+ P --> Q[Validate state and atomically dispense]
+ R --> PAT[Patient authorized record view]
+ Q --> PAT

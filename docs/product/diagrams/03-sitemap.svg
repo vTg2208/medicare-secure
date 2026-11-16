@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg
+  PUBLIC '-//W3C//DTD SVG 1.0//EN'
+  'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg width="510" height="335" preserveAspectRatio="xMinYMin meet" viewBox="0 0 510 335" xmlns="http://www.w3.org/2000/svg" version="1.0" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<title>...</title>
+	<desc>...</desc>
+	<clipPath id="clip">
+		<rect x="0" y="0" width="510" height="335"/>
+	</clipPath>
+	<g id="group" transform="scale(1,-1) translate(0,-335)" style="clip-path: url(#clip)">
+		<g transform="">
+			<rect x="174" y="270" width="162" height="50" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(3%,49%,50%); fill-rule: evenodd;"/>
+			<text x="194.4287109375" y="292.0" style="font-family: Arial-Bold; font-size: 10px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,584) scale(1,-1)">Medicare web application</text>
+			<path d="M 255,270 L 81,226 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="81 226, 86.81002 224.5021, 85.3996 230.0796" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<rect x="3" y="176" width="156" height="50" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="41.2587890625" y="204.5" style="font-family: Arial; font-size: 10px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,409) scale(1,-1)">Public information</text>
+			<text x="28.74658203125" y="191.5" style="font-family: Arial; font-size: 10px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,383) scale(1,-1)">Home and policy pages</text>
+			<path d="M 255,270 L 255,226 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="255 226, 257.8766 231.2655, 252.1234 231.2655" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<rect x="177" y="176" width="156" height="50" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="219.98291015625" y="204.5" style="font-family: Arial; font-size: 10px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,409) scale(1,-1)">Account access</text>
+			<text x="206.91162109375" y="191.5" style="font-family: Arial; font-size: 10px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,383) scale(1,-1)">Login and registration</text>
+			<path d="M 255,270 L 429,226 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="429 226, 424.6004 230.0796, 423.19 224.5021" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<rect x="351" y="176" width="156" height="50" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="379.810546875" y="204.5" style="font-family: Arial; font-size: 10px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,409) scale(1,-1)">Protected workspaces</text>
+			<text x="376.74169921875" y="191.5" style="font-family: Arial; font-size: 10px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,383) scale(1,-1)">Role and object scoped</text>
+			<rect x="3" y="82" width="156" height="56" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="65.43359375" y="113.5" style="font-family: Arial; font-size: 10px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,227) scale(1,-1)">Patient</text>
+			<text x="28.2021484375" y="100.5" style="font-family: Arial; font-size: 10px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,201) scale(1,-1)">Records, visits, consent</text>
+			<rect x="177" y="82" width="156" height="56" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="229.15771484375" y="113.5" style="font-family: Arial; font-size: 10px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,227) scale(1,-1)">Care teams</text>
+			<text x="198.29833984375" y="100.5" style="font-family: Arial; font-size: 10px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,201) scale(1,-1)">Clinical and order queues</text>
+			<rect x="351" y="82" width="156" height="56" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="404.5419921875" y="113.5" style="font-family: Arial; font-size: 10px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,227) scale(1,-1)">Operations</text>
+			<text x="371.744140625" y="100.5" style="font-family: Arial; font-size: 10px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,201) scale(1,-1)">Admin, governance, other</text>
+			<path d="M 429,176 L 81,138 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="81 138, 86.54663 135.712, 85.92213 141.4311" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<path d="M 429,176 L 255,138 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="255 138, 260.758 136.3131, 259.5305 141.9338" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<path d="M 429,176 L 429,138 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="429 138, 431.8766 143.2655, 426.1234 143.2655" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<text x="102.40869140624997" y="30" style="font-family: Arial; font-size: 9px;fill: rgb(31%,39%,41%); stroke:none;" transform="translate(0,60) scale(1,-1)">Role-gated routes are navigation boundaries. The API enforces data access.</text>
+		</g>
+	</g>
+</svg>

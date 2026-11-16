@@ -1,0 +1,9 @@
+flowchart LR
+ A[Select clinic and doctor] --> B[Fetch calendar availability] --> C[Submit selected instant]
+ C --> D{Reservation succeeds?}
+ D -->|409| B
+ D -->|Yes| E[Pending staff review]
+ E --> F[Organization-scoped approval and assignment]
+ F --> G[Patient check-in]
+ G --> H[Care and closure]
+ F -. separate .-> I[Applicable consent evaluated at clinical access]

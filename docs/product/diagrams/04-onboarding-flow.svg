@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE svg
+  PUBLIC '-//W3C//DTD SVG 1.0//EN'
+  'http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd'>
+<svg width="510" height="340" preserveAspectRatio="xMinYMin meet" viewBox="0 0 510 340" xmlns="http://www.w3.org/2000/svg" version="1.0" fill-rule="evenodd" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<title>...</title>
+	<desc>...</desc>
+	<clipPath id="clip">
+		<rect x="0" y="0" width="510" height="340"/>
+	</clipPath>
+	<g id="group" transform="scale(1,-1) translate(0,-340)" style="clip-path: url(#clip)">
+		<g transform="">
+			<rect x="10" y="276" width="130" height="53" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(3%,49%,50%); fill-rule: evenodd;"/>
+			<text x="19.701782226562493" y="299.71" style="font-family: Arial-Bold; font-size: 9.3px;fill: rgb(100%,100%,100%); stroke:none;" transform="translate(0,599) scale(1,-1)">Visitor starts registration</text>
+			<rect x="190" y="276" width="130" height="53" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="206.6586181640625" y="305.85999999999996" style="font-family: Arial; font-size: 9.3px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,611) scale(1,-1)">Account details and bot</text>
+			<text x="242.852783203125" y="293.55999999999995" style="font-family: Arial; font-size: 9.3px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,587) scale(1,-1)">check</text>
+			<rect x="370" y="276" width="130" height="53" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="385.1101318359375" y="305.85999999999996" style="font-family: Arial; font-size: 9.3px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,611) scale(1,-1)">API validates and sends</text>
+			<text x="425.441162109375" y="293.55999999999995" style="font-family: Arial; font-size: 9.3px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,587) scale(1,-1)">OTP</text>
+			<rect x="190" y="163" width="130" height="53" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="200.975537109375" y="192.86" style="font-family: Arial; font-size: 9.3px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,385) scale(1,-1)">Verified account and fresh</text>
+			<text x="220.102294921875" y="180.56" style="font-family: Arial; font-size: 9.3px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,361) scale(1,-1)">sign-in challenge</text>
+			<rect x="10" y="163" width="130" height="53" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="22.533105468749994" y="192.86" style="font-family: Arial; font-size: 9.3px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,385) scale(1,-1)">Permitted workspace and</text>
+			<text x="40.361132812499996" y="180.56" style="font-family: Arial; font-size: 9.3px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,361) scale(1,-1)">optional passkey</text>
+			<rect x="331" y="37" width="130" height="53" rx="7" ry="7" style="stroke: rgb(3%,49%,50%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(93%,96%,96%); fill-rule: evenodd;"/>
+			<text x="338.88310546875" y="66.86" style="font-family: Arial; font-size: 9.3px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,133) scale(1,-1)">Correct code or resend with</text>
+			<text x="364.462646484375" y="54.56000000000001" style="font-family: Arial; font-size: 9.3px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,109) scale(1,-1)">fresh challenge</text>
+			<polygon points="370 191, 435 224, 500 191, 435 158" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 0.8; fill: rgb(100%,96%,86%); fill-rule: evenodd;"/>
+			<text x="410.7119140625" y="188.0" style="font-family: Arial; font-size: 9.5px;fill: rgb(7%,17%,21%); stroke:none;" transform="translate(0,376) scale(1,-1)">Valid OTP?</text>
+			<path d="M 140,302 L 190,302 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="190 302, 184.7345 304.8766, 184.7345 299.1234" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<path d="M 320,302 L 370,302 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="370 302, 364.7345 304.8766, 364.7345 299.1234" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<path d="M 435,276 L 435,224 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="435 224, 437.8766 229.2655, 432.1234 229.2655" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<path d="M 370,191 L 320,191 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="320 191, 325.2655 188.1234, 325.2655 193.8766" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<text x="349.0" y="196.0" style="font-family: Arial; font-size: 8px;fill: rgb(31%,39%,41%); stroke:none;" transform="translate(0,392) scale(1,-1)">Yes</text>
+			<path d="M 190,190 L 140,190 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="140 190, 145.2655 187.1234, 145.2655 192.8766" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<path d="M 435,158 L 435,90 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="435 90, 437.8766 95.2655, 432.1234 95.2655" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<text x="439.0" y="129.0" style="font-family: Arial; font-size: 8px;fill: rgb(31%,39%,41%); stroke:none;" transform="translate(0,258) scale(1,-1)">No</text>
+			<path d="M 461,64 L 506,64 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="506 64, 500.7345 66.87655, 500.7345 61.12345" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<path d="M 506,64 L 506,191 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="506 191, 503.1234 185.7345, 508.8766 185.7345" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<path d="M 506,191 L 500,191 Z" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1;"/>
+			<polygon points="500 191, 505.2655 188.1234, 505.2655 193.8766" style="stroke: rgb(31%,39%,41%); stroke-linecap: butt; stroke-width: 1; fill: rgb(31%,39%,41%); fill-rule: evenodd;"/>
+			<text x="12" y="124" style="font-family: Arial; font-size: 9px;fill: rgb(31%,39%,41%); stroke:none;" transform="translate(0,248) scale(1,-1)">Invalid details, failed delivery or bot rejection remain recoverable failures.</text>
+			<text x="12" y="19" style="font-family: Arial; font-size: 9px;fill: rgb(31%,39%,41%); stroke:none;" transform="translate(0,38) scale(1,-1)">Existing passkey: server challenge and authenticator verification precede session issuance.</text>
+		</g>
+	</g>
+</svg>
