@@ -50,5 +50,5 @@ test('optional registration details stay editable and submit after their section
     fireEvent.click(demographics.querySelector('summary'));
     fireEvent.click(screen.getByRole('button', { name: 'Register Patient' }));
 
-    await waitFor(() => expect(authApi.registerPatient).toHaveBeenLastCalledWith({ ...payload, address: '12 Updated Lane' }));
+    await waitFor(() => expect(authApi.registerPatient).toHaveBeenLastCalledWith({ ...payload, address: '12 Updated Lane' }, { authenticated: true }));
 });

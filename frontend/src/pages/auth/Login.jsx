@@ -5,6 +5,7 @@ import { authApi } from '../../api/authApi';
 import { startAuthentication } from '@simplewebauthn/browser';
 import ThemeToggle from '../../components/common/ThemeToggle';
 import Brand from '../../components/common/Brand';
+import BotChallenge, { useBotChallenge } from '../../components/auth/BotChallenge';
 import './Login.css';
 
 function Login() {
@@ -22,6 +23,7 @@ function Login() {
     const [error, setError] = useState('');
     const [activeTab, setActiveTab] = useState('password'); // 'password' or 'passkey'
     const successMessage = location.state?.message;
+    const bot = useBotChallenge();
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -51,11 +53,12 @@ function Login() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (bot.blocked) return;
         setError('');
         setLoading(true);
 
         try {
-            const response = await authApi.login(formData.email, formData.password);
+            const response = await authApi.login(formData.email, formData.password, ...(bot.token ? [bot.token] : []));
 
             const payload = response.data || response;
             const user = payload.user || payload.data?.user;
@@ -68,6 +71,7 @@ function Login() {
             login(user, accessToken);
             navigateByRole(user.role || user.roleName);
         } catch (err) {
+            bot.capture(err);
             if (err.response?.status === 403 && err.response?.data?.message?.includes('not verified')) {
                 setError('Your account is awaiting verification. Patients can choose Verify email below and enter the code sent to them.');
             } else {
@@ -75,6 +79,7 @@ function Login() {
                 setError(errorMsg);
             }
         } finally {
+            bot.reset();
             setLoading(false);
         }
     };
@@ -170,7 +175,8 @@ function Login() {
                                     <button type="button" className="login-password-toggle" aria-label={showPassword ? 'Hide password' : 'Show password'} aria-pressed={showPassword} onClick={() => setShowPassword(!showPassword)}><span className="material-symbols-outlined" aria-hidden="true">{showPassword ? 'visibility_off' : 'visibility'}</span></button>
                                 </div>
                             </div>
-                            <button type="submit" className="login-submit" disabled={busy}>{loading ? 'Signing in…' : 'Sign in'}<span className="material-symbols-outlined" aria-hidden="true">arrow_forward</span></button>
+                            <BotChallenge challenge={bot.challenge} onToken={token => { bot.setToken(token); if (token) setError(''); }} resetKey={bot.resetKey} />
+                            <button type="submit" className="login-submit" disabled={busy || bot.blocked}>{loading ? 'Signing in…' : 'Sign in'}<span className="material-symbols-outlined" aria-hidden="true">arrow_forward</span></button>
                         </form>
                     ) : (
                         <form className="login-fields" aria-busy={passkeyLoading} onSubmit={(e) => { e.preventDefault(); handlePasskeyLogin(); }}>

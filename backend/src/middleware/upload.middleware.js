@@ -5,6 +5,7 @@ const config = require('../config/env');
 const crypto = require('crypto');
 const { secureCredential } = require('../services/credential-file.service');
 const encryptedStorage = require('../services/encrypted-file-store');
+const { validateCredentialMetadata, validateCredentialDocument } = require('../services/credential-validation');
 
 // Ensure upload directories exist
 const uploadDir = path.resolve(config.upload.uploadPath, 'documents');
@@ -23,15 +24,20 @@ const storage = {
         file.stream.once('end', async () => {
             const filename = `${Date.now()}-${crypto.randomBytes(16).toString('hex')}${path.extname(file.originalname).toLowerCase()}`;
             const filePath = path.join(uploadDir, filename);
+            let validated = false;
+            let durable = false;
             try {
                 if (file.stream.truncated) return cb(Object.assign(new Error('Credential file exceeds the size limit'), { statusCode: 400 }));
-                const durable = encryptedStorage.isPostgresStorage();
-                const prepared = await secureCredential({ path: filePath, originalname: file.originalname, mimetype: file.mimetype, buffer: Buffer.concat(chunks) }, { persist: !durable });
+                const buffer = Buffer.concat(chunks);
+                validateCredentialDocument(file.originalname, file.mimetype, buffer);
+                validated = true;
+                durable = encryptedStorage.isPostgresStorage();
+                const prepared = await secureCredential({ path: filePath, originalname: file.originalname, mimetype: file.mimetype, buffer }, { persist: !durable });
                 // An incomplete/aborted multipart request cannot permanently
                 // allocate durable objects before its controller validates it.
                 cb(null, { destination: uploadDir, filename, path: filePath, size, ...(durable && { buffer: prepared }) });
             } catch (error) {
-                await encryptedStorage.removeEncrypted(filePath).catch(() => {});
+                if (validated && !durable) await encryptedStorage.removeEncrypted(filePath).catch(() => {});
                 cb(error);
             }
         });
@@ -42,14 +48,11 @@ const storage = {
 };
 
 const fileFilter = (req, file, cb) => {
-    // Accept images and PDFs
-    const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf'];
-    if (allowedTypes.includes(file.mimetype)) {
+    try {
+        validateCredentialMetadata(file.originalname, file.mimetype);
         cb(null, true);
-    } else {
-        const err = new Error('Invalid file type. Only JPEG, PNG and PDF are allowed.');
-        err.statusCode = 400;
-        cb(err, false);
+    } catch (error) {
+        cb(error, false);
     }
 };
 

@@ -2,7 +2,7 @@ const fs = require('fs/promises');
 const path = require('path');
 const crypto = require('node:crypto');
 const { encryptBuffer, decryptBuffer } = require('./file.crypto');
-const Scanner = require('./malware.scanner.service');
+const { validateCredentialMetadata, validateCredentialDocument } = require('./credential-validation');
 const { scanBuffer } = require('./antivirus.service');
 const config = require('../config/env');
 const { withFileMutation } = require('./file-coordination');
@@ -13,14 +13,15 @@ function credentialContext(file) {
     return relative.split(path.sep).join('/');
 }
 async function secureCredential(file, { persist = true } = {}) {
+    const filename = file.originalname || (!file.buffer && file.path);
+    validateCredentialMetadata(filename, file.mimetype);
     const stored = file.buffer || await storage.readEncrypted(file.path);
     const magic = stored.subarray(0, 8).toString();
     // Legacy encryption is accepted only by this explicit migration path, never
     // by the download path. Scan before replacing it with identity-bound data.
     const bytes = magic === 'SHMSENC2' ? decryptBuffer(stored, credentialContext(file.path))
         : magic === 'SHMSENC1' ? decryptBuffer(stored) : stored;
-    const valid = await Scanner.validateMagicNumber(bytes, file.originalname || file.path);
-    if (!valid.passed || !['application/pdf', 'image/png', 'image/jpeg'].includes(file.mimetype)) throw Object.assign(new Error('Invalid credential document'), { statusCode: 400 });
+    validateCredentialDocument(filename, file.mimetype, bytes);
     await scanBuffer(bytes);
     const encrypted = magic === 'SHMSENC2' ? stored : encryptBuffer(bytes, credentialContext(file.path));
     if (!persist) return encrypted;
