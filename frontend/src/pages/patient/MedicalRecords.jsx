@@ -4,6 +4,7 @@ import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { emrApi } from '../../api/emrApi';
 import ThemeToggle from '../../components/common/ThemeToggle';
+import ScrollableNav from '../../components/common/ScrollableNav';
 import Toast from '../../components/common/Toast';
 import RelatedRecordDetails from '../../components/emr/RelatedRecordDetails';
 import LoadingSkeleton from '../../components/common/LoadingSkeleton';
@@ -223,7 +224,7 @@ function MedicalRecords() {
             {/* ── Left Sidebar ── */}
             <aside className="print:hidden w-64 glass-card border-r border-line dark:border-line flex flex-col items-center py-8 z-10 mc-sidebar">
                 <Brand to={'/patient/dashboard'} />
-                <nav className="space-y-2 flex-grow">
+                <ScrollableNav className="space-y-2 flex-grow">
                     <Link to="/patient/dashboard" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
                         <span className="material-symbols-outlined text-[20px]">grid_view</span>
                         Dashboard
@@ -248,7 +249,7 @@ function MedicalRecords() {
                         <span className="material-symbols-outlined text-[20px]">history</span>
                         Audit Trail
                     </Link>
-                </nav>
+                </ScrollableNav>
                 <div className="space-y-2 mt-auto pt-6 border-t border-slate-200 dark:border-slate-800/50">
                     <Link to="/patient/support" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
                         <span className="material-symbols-outlined text-[20px]">favorite_border</span>
@@ -308,10 +309,14 @@ function MedicalRecords() {
                     </div>
                 </div>
 
-                <div className="print:hidden flex gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar">
-                    {['all', 'consultation', 'diagnosis', 'prescription', 'lab_result', 'imaging', 'procedure', 'note'].map((type) => (
+                <div className="print:hidden mb-6" role="group" aria-label="Filter by record type">
+                    <p className="mb-2 text-sm font-semibold">Record type</p>
+                    <div className="flex flex-wrap items-center gap-2">
+                    {['all', 'consultation', 'prescription', 'lab_result'].map((type) => (
                         <button
                             key={type}
+                            type="button"
+                            aria-pressed={filter === type}
                             onClick={() => setFilter(type)}
                             className={`px-5 py-2 rounded-full text-sm font-semibold transition-colors whitespace-nowrap ${filter === type
                                 ? "bg-primary-600 text-white shadow-lg shadow-primary-500/30"
@@ -321,6 +326,15 @@ function MedicalRecords() {
                             {type === 'all' ? 'All Records' : formatRecordType(type)}
                         </button>
                     ))}
+                    <label className="sr-only" htmlFor="more-record-types">More record types</label>
+                    <select id="more-record-types"
+                        className="min-h-11 max-w-full rounded-lg border border-line px-3 py-2 text-sm"
+                        value={['diagnosis', 'imaging', 'procedure', 'note'].includes(filter) ? filter : ''}
+                        onChange={event => { if (event.target.value) setFilter(event.target.value); }}>
+                        <option value="" disabled>More record types</option>
+                        {['diagnosis', 'imaging', 'procedure', 'note'].map(type => <option key={type} value={type}>{formatRecordType(type)}</option>)}
+                    </select>
+                    </div>
                 </div>
 
                 {/* Records list */}

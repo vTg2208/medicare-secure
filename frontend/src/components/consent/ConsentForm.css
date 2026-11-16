@@ -162,6 +162,26 @@
     margin-top: 8px;
 }
 
+.consent-duration-fields {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.consent-duration-fields .duration-field,
+.consent-duration-fields input {
+    min-width: 0;
+}
+
+.consent-duration-fields .duration-field label {
+    letter-spacing: 0;
+}
+
+.consent-duration-summary {
+    overflow-wrap: anywhere;
+}
+
 .duration-field {
     flex: 1;
     display: flex;

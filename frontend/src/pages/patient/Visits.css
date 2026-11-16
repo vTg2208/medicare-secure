@@ -1,4 +1,12 @@
-/* ========================================
-   VISITS PAGE - Solid Theme
-   Styles fully replaced by Tailwind CSS directly.
-   ======================================== */
+.mc-visit-action { min-height: 44px; padding: 10px 16px; border-radius: var(--mc-radius-control); border: 1px solid var(--mc-border-strong); background: var(--mc-surface); color: var(--mc-text); font-size: 13px; font-weight: 600; }
+.mc-visit-action:hover { background: var(--mc-surface-hover); }
+.mc-visit-action-primary { background: var(--mc-brand); border-color: var(--mc-brand); color: var(--mc-on-brand); }
+.mc-visit-action-primary:hover { background: var(--mc-brand-hover); }
+.mc-visit-arrival { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding-block: 16px; margin-bottom: 24px; border-top: 1px solid var(--mc-border); border-bottom: 1px solid var(--mc-border); }
+.mc-visit-arrival h3 { margin: 0 0 4px; font-size: 15px; }
+.mc-visit-arrival p { margin: 0; font-size: 13px; color: var(--mc-text-muted); }
+.mc-visit-arrival-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+@media (max-width: 480px) {
+    .mc-visit-arrival-actions { width: 100%; }
+    .mc-visit-arrival-actions > button { flex: 1; }
+}

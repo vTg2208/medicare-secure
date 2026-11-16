@@ -1,11 +1,13 @@
 import ThemeToggle from '../../components/common/ThemeToggle';
 import Brand from '../../components/common/Brand';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { visitApi } from '../../api/visitApi'; // Ensure correct import path
 import { userApi } from '../../api/userApi'; // Added to fetch doctors
 import DoctorSelectionPopup from '../../components/visit/DoctorSelectionPopup';
 import DoctorProfilePopup from '../../components/visit/DoctorProfilePopup';
+import FlowSteps from '../../components/common/FlowSteps';
+import ScrollableNav from '../../components/common/ScrollableNav';
 
 const ScheduleNewVisit = () => {
     const navigate = useNavigate();
@@ -26,6 +28,10 @@ const ScheduleNewVisit = () => {
     const [showDoctorSelection, setShowDoctorSelection] = useState(false);
     const [showDoctorProfile, setShowDoctorProfile] = useState(false);
     const [selectedDoctor, setSelectedDoctor] = useState(null);
+    const [appointment, setAppointment] = useState(null);
+    const [draftAppointment, setDraftAppointment] = useState(null);
+    const pickerRef = useRef(null);
+    const bookedDoctor = doctors.find(doctor => doctor.id === formData.doctorId);
 
     useEffect(() => {
         const fetchDoctorsList = async () => {
@@ -79,7 +85,7 @@ return (
                 {/* Left Sidebar */}
                 <aside className="w-64 border-r border-line dark:border-slate-800/50 p-6 flex flex-col mc-sidebar">
                     <Brand to={'/patient/dashboard'} />
-                    <nav className="space-y-2 flex-grow">
+                    <ScrollableNav className="space-y-2 flex-grow">
                         <button onClick={() => navigate('/patient/dashboard')} className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-lg">
                             <span className="material-symbols-outlined text-[20px]">grid_view</span>
                             Dashboard
@@ -100,7 +106,7 @@ return (
                             <span className="material-symbols-outlined text-[20px]">verified_user</span>
                             Consents
                         </button>
-                    </nav>
+                    </ScrollableNav>
                     <div className="space-y-2 mt-auto pt-6 border-t border-line dark:border-slate-800/50">
                         <button onClick={() => navigate('/patient/support')} className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-lg">
                             <span className="material-symbols-outlined text-[20px]">favorite_border</span>
@@ -111,16 +117,16 @@ return (
                 </aside>
 
                 {/* Main Content */}
-                <main className="flex-grow p-4 md:p-8 flex items-center justify-center relative overflow-y-auto">
+                <main className="flex-grow min-w-0 p-4 md:p-8 flex flex-col items-center gap-6 overflow-y-auto">
                     <button
                         onClick={() => navigate('/patient/visits')}
-                        className="absolute top-8 left-8 flex items-center gap-2 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition"
+                        className="self-start flex items-center gap-2 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition"
                     >
                         <span className="material-symbols-outlined text-sm">arrow_back</span>
                         Back to Visits
                     </button>
 
-                    <div className="w-full max-w-lg glass-card rounded-3xl p-8 border border-line dark:border-slate-700/50 shadow-sm relative overflow-hidden group">
+                    <div className="w-full max-w-lg glass-card rounded-3xl p-4 sm:p-8 border border-line dark:border-slate-700/50 shadow-sm relative overflow-hidden group">
 
 
 
@@ -130,8 +136,9 @@ return (
                                     <span className="material-symbols-outlined text-3xl">add_circle</span>
                                 </div>
                                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2 text-center">Request a New Visit</h2>
-                                <p className="text-slate-500 dark:text-slate-400 text-sm text-center">Fill out the details below to schedule an appointment with your preferred doctor.</p>
+                                <p className="text-slate-500 dark:text-slate-400 text-sm text-center">Request a visit with any available doctor, or optionally choose a doctor and clinic appointment.</p>
                             </div>
+                            <FlowSteps label="Booking progress" steps={appointment ? [{ label: 'Doctor' }, { label: 'Appointment' }, { label: 'Request' }] : [{ label: 'Request' }]} currentStep={appointment ? 2 : 0} />
 
                             {error && (
                                 <div className="bg-rose-50 text-rose-600 dark:bg-rose-900/20 dark:text-rose-400 border border-rose-200 dark:border-rose-900/50 p-4 rounded-xl mb-6 text-sm flex items-center gap-3">
@@ -149,10 +156,11 @@ return (
 
                             <form onSubmit={handleSubmit} className="space-y-5">
                                 <div>
-                                    <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wide mb-2">Hospital Code</label>
+                                    <label htmlFor="visit-hospital" className="block text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wide mb-2">Hospital Code</label>
                                     <div className="relative">
                                         <input
                                             type="text"
+                                            id="visit-hospital"
                                             name="hospitalCode"
                                             value={formData.hospitalCode}
                                             onChange={handleChange}
@@ -166,8 +174,13 @@ return (
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wide mb-2">Select Doctor (Optional)</label>
-                                    <div
+                                    <label htmlFor="visit-doctor" className="block text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wide mb-2">Select Doctor (Optional)</label>
+                                    <button
+                                        id="visit-doctor"
+                                        aria-label={`Select doctor (optional): ${fetchingDoctors ? 'Loading doctors' : bookedDoctor ? `Dr. ${bookedDoctor.firstName} ${bookedDoctor.lastName}` : 'Any Available Doctor'}`}
+                                        ref={pickerRef}
+                                        type="button"
+                                        disabled={fetchingDoctors}
                                         onClick={() => !fetchingDoctors && setShowDoctorSelection(true)}
                                         className={`relative w-full py-3 px-4 bg-surface dark:bg-slate-800/50 border border-slate-200 dark:border-slate-600/50 rounded-xl transition-all shadow-sm flex items-center justify-between cursor-pointer hover:bg-surface dark:hover:bg-slate-800 ${fetchingDoctors ? 'opacity-70 cursor-not-allowed' : ''}`}
                                     >
@@ -176,18 +189,24 @@ return (
                                                 <span className="material-symbols-outlined text-sm">stethoscope</span>
                                             </div>
                                             <span className="text-slate-900 dark:text-white font-medium">
-                                                {fetchingDoctors ? 'Loading doctors...' : (selectedDoctor ? `Dr. ${selectedDoctor.firstName} ${selectedDoctor.lastName}` : 'Any Available Doctor')}
+                                                {fetchingDoctors ? 'Loading doctors...' : (bookedDoctor ? `Dr. ${bookedDoctor.firstName} ${bookedDoctor.lastName}` : 'Any Available Doctor')}
                                             </span>
                                         </div>
                                         <span className="material-symbols-outlined text-slate-400">chevron_right</span>
-                                    </div>
+                                    </button>
+                                    {appointment ? <div className="mt-3 text-sm mc-booking-summary">
+                                        <p className="font-semibold">Selected appointment: {new Intl.DateTimeFormat('en', { dateStyle: 'medium', timeStyle: 'short', timeZone: appointment.timeZone || 'UTC' }).format(new Date(appointment.scheduledTime))} ({appointment.timeZone || 'UTC'})</p>
+                                        <p className="mt-1">Reserved when you submit this request.</p>
+                                        <button type="button" className="mt-2 underline" onClick={() => { setAppointment(null); setDraftAppointment(null); setSelectedDoctor(null); setFormData(current => ({ ...current, doctorId: '', scheduledTime: undefined })); }}>Use any available doctor instead</button>
+                                    </div> : <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Choosing a doctor and appointment is optional.</p>}
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wide mb-2">Reason for Visit</label>
+                                    <label htmlFor="visit-reason" className="block text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wide mb-2">Reason for Visit</label>
                                     <div className="relative">
                                         <input
                                             type="text"
+                                            id="visit-reason"
                                             name="reason"
                                             value={formData.reason}
                                             onChange={handleChange}
@@ -200,9 +219,10 @@ return (
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wide mb-2">Symptoms</label>
+                                    <label htmlFor="visit-symptoms" className="block text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wide mb-2">Symptoms</label>
                                     <div className="relative">
                                         <textarea
+                                            id="visit-symptoms"
                                             name="symptoms"
                                             value={formData.symptoms}
                                             onChange={handleChange}
@@ -243,8 +263,11 @@ return (
             {showDoctorSelection && (
                 <DoctorSelectionPopup
                     doctors={doctors}
+                    initialDoctorId={selectedDoctor?.id}
+                    returnFocusRef={pickerRef}
                     onClose={() => setShowDoctorSelection(false)}
                     onSelect={(doctor) => {
+                        if (doctor.id !== selectedDoctor?.id) setDraftAppointment(null);
                         setSelectedDoctor(doctor);
                         setShowDoctorSelection(false);
                         setShowDoctorProfile(true);
@@ -254,12 +277,18 @@ return (
 
             {showDoctorProfile && (
                 <DoctorProfilePopup
+                    key={selectedDoctor.id}
                     doctor={selectedDoctor}
-                    onBack={() => {
+                    initialAppointment={draftAppointment || appointment}
+                    returnFocusRef={pickerRef}
+                    onBack={(draft) => {
+                        setDraftAppointment(draft);
                         setShowDoctorProfile(false);
                         setShowDoctorSelection(true);
                     }}
                     onBook={(bookingDetails) => {
+                        setAppointment(bookingDetails);
+                        setDraftAppointment(bookingDetails);
                         setFormData({
                             ...formData,
                             doctorId: bookingDetails.doctorId,

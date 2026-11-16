@@ -8,6 +8,7 @@ import { emrApi } from '../../api/emrApi';
 import { patientApi } from '../../api/patientApi';
 import { auditApi } from '../../api/auditApi';
 import ThemeToggle from '../../components/common/ThemeToggle';
+import ScrollableNav from '../../components/common/ScrollableNav';
 import LoadingSkeleton from '../../components/common/LoadingSkeleton';
 import './Dashboard.css';
 
@@ -119,7 +120,7 @@ function PatientDashboard() {
 
             <aside className="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-800/50 p-6 flex flex-col h-full overflow-y-auto mc-sidebar">
                 <Brand to={'/patient/dashboard'} />
-                <nav className="space-y-2 flex-grow">
+                <ScrollableNav className="space-y-2 flex-grow">
                     <Link to="/patient/dashboard" className="flex items-center gap-3 px-4 py-3 sidebar-item-active rounded-xl font-medium text-slate-800 dark:text-slate-800">
                         <span className="material-symbols-outlined text-[20px]">grid_view</span>
                         Dashboard
@@ -145,7 +146,7 @@ function PatientDashboard() {
                         Consents
                     </Link>
                     <Link to="/patient/privacy" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface transition rounded-xl"><span className="material-symbols-outlined text-[20px]">policy</span>Privacy Center</Link>
-                </nav>
+                </ScrollableNav>
                 <div className="space-y-2 mt-auto pt-6 border-t border-line dark:border-slate-800/50">
                     <Link to="/patient/support" className="flex items-center gap-3 px-4 py-3 text-slate-500 dark:text-slate-400 hover:bg-surface dark:hover:bg-surface transition rounded-xl">
                         <span className="material-symbols-outlined text-[20px]">favorite_border</span>

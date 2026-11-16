@@ -5,6 +5,7 @@ import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { authApi } from '../../api/authApi';
 import { startRegistration } from '@simplewebauthn/browser';
 import ThemeToggle from '../../components/common/ThemeToggle';
+import FlowSteps from '../../components/common/FlowSteps';
 
 import '../patient/Dashboard.css';
 
@@ -179,6 +180,12 @@ function Register() {
             </div>
 
             <div className="w-full max-w-xl glass-card rounded-3xl shadow-sm p-8 sm:p-10 z-10 animate-fade-in relative mt-16 sm:mt-0 border border-line dark:border-line">
+
+                <FlowSteps label="Registration progress"
+                    steps={roleTab === 'doctor'
+                        ? [{ label: 'Account' }, { label: 'Review' }]
+                        : [{ label: 'Account' }, { label: 'Verify email' }, { label: 'Passkey', optional: true }]}
+                    currentStep={roleTab === 'doctor' ? (step === 4 ? 1 : 0) : Math.min(step - 1, 2)} />
 
                 {step === 1 && (
                     <>

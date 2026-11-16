@@ -1,0 +1,11 @@
+.mc-flow-steps { width: 100%; margin-bottom: 24px; }
+.mc-flow-steps ol { display: flex; list-style: none; padding: 0; margin: 0; gap: 0; }
+.mc-flow-steps li { position: relative; flex: 1; min-width: 0; display: flex; align-items: center; flex-direction: column; gap: 8px; text-align: center; font-size: 12px; color: var(--mc-text-muted); }
+.mc-flow-steps li:not(:last-child)::after { content: ''; position: absolute; top: 16px; left: calc(50% + 20px); width: calc(100% - 40px); height: 2px; background: var(--mc-border-strong); }
+.mc-flow-steps li[data-state='complete']::after { background: var(--mc-brand); }
+.mc-flow-marker { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; flex: none; border: 1px solid var(--mc-border-strong); border-radius: 50%; background: var(--mc-surface); font-weight: 600; }
+.mc-flow-steps li[data-state='current'] { color: var(--mc-accent); font-weight: 700; }
+.mc-flow-steps li[data-state='current'] .mc-flow-marker { border: 2px solid var(--mc-brand); background: var(--mc-brand-soft); }
+.mc-flow-steps li[data-state='complete'] .mc-flow-marker { background: var(--mc-brand); border-color: var(--mc-brand); color: var(--mc-on-brand); }
+.mc-flow-label { padding-inline: 4px; overflow-wrap: anywhere; line-height: 1.4; }
+.mc-flow-label small { display: block; font-size: 11px; font-weight: 400; color: var(--mc-text-muted); margin-top: 3px; }
