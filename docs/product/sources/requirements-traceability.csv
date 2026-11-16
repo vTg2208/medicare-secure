@@ -1,0 +1,20 @@
+﻿Product requirement,IA flow or inventory,Technical controls,Minimum verification
+FR-01,UF-01; role route inventory,TR-SEC-01 to TR-SEC-08,Auth and object denial; OTP/challenge expiry; WebAuthn validation; session revocation
+FR-02,UF-01; role route inventory,TR-SEC-01 to TR-SEC-08,Auth and object denial; OTP/challenge expiry; WebAuthn validation; session revocation
+FR-03,UF-01; role route inventory,TR-SEC-01 to TR-SEC-08,Auth and object denial; OTP/challenge expiry; WebAuthn validation; session revocation
+FR-04,UF-04; UF-05,TR-DATA-01/02; TR-NFR-06/07,Wrong-patient late responses; correction provenance; audit failure
+FR-05,UF-04; UF-05,TR-DATA-01/02; TR-NFR-06/07,Wrong-patient late responses; correction provenance; audit failure
+FR-08,UF-04; UF-05,TR-DATA-01/02; TR-NFR-06/07,Wrong-patient late responses; correction provenance; audit failure
+FR-06,UF-02,TR-API-01/02; TR-NFR-06,Reservation concurrency; clinic boundaries; time zones; cancellation; atomic reassignment
+FR-07,UF-02,TR-API-01/02; TR-NFR-06,Reservation concurrency; clinic boundaries; time zones; cancellation; atomic reassignment
+FR-09,UF-04,TR-SEC-07/10/13; TR-DATA-02,Scan and tamper denial; wrong-file scope; cancelled order; concurrent fulfillment
+FR-10,UF-04,TR-SEC-07/10/13; TR-DATA-02,Scan and tamper denial; wrong-file scope; cancelled order; concurrent fulfillment
+FR-11,UF-03; UF-06,TR-SEC-03/07/09,Consent scope and revoke/expiry; wrong purpose; emergency read-only evidence
+FR-12,UF-03; UF-06,TR-SEC-03/07/09,Consent scope and revoke/expiry; wrong purpose; emergency read-only evidence
+FR-13,UF-05; UF-06,TR-DATA-03/04; TR-OPS-03/04,Owned receipts; holds; attributed review; disposal and restore reconciliation
+FR-14,UF-05; UF-06,TR-DATA-03/04; TR-OPS-03/04,Owned receipts; holds; attributed review; disposal and restore reconciliation
+FR-15,UF-05; UF-06,TR-DATA-03/04; TR-OPS-03/04,Owned receipts; holds; attributed review; disposal and restore reconciliation
+FR-16,Operations route inventory,TR-SEC-02/03/07/09/11,Cross-organization administration denial; research threshold; insurance purpose
+FR-17,Operations route inventory,TR-SEC-02/03/07/09/11,Cross-organization administration denial; research threshold; insurance purpose
+FR-18,UF-01; UF-04; UX contract,TR-API integration gates; TR-NFR-01/02/08,Offline provider error tests; accessible complete flows; theme compatibility
+FR-19,UF-01; UF-04; UX contract,TR-API integration gates; TR-NFR-01/02/08,Offline provider error tests; accessible complete flows; theme compatibility

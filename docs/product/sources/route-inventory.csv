@@ -1,0 +1,87 @@
+﻿Route,Frontend role gate
+/login,Public or redirect
+/register,Public or redirect
+/privacy-notice/:versionId?,Public or redirect
+/about,Public or redirect
+/support,Public or redirect
+/accessibility,Public or redirect
+/terms,Public or redirect
+/cookies,Public or redirect
+/compliance/notices,compliance_officer
+/staff/invitation/:token,Public or redirect
+/patient/privacy,patient
+/compliance/privacy,compliance_officer
+/compliance/retention,compliance_officer
+/messages,"patient, doctor, nurse"
+/admin/appointment-calendars,"hospital_admin, system_admin"
+/doctor/messages,doctor
+/nurse/messages,nurse
+/patient/dashboard,patient
+/patient/chatbot,patient
+/doctor/dashboard,doctor
+/doctor/triage-sessions,doctor
+/patient/consent,patient
+/patient/consent/grant,patient
+/patient/visits,patient
+/patient/messages,patient
+/patient/support,patient
+/patient/medical-records-view,patient
+/staff/registration,"receptionist, nurse, staff"
+/staff/visit-queue,staff
+/doctor/patients,doctor
+/doctor/patients/:id/records,doctor
+/doctor/consent,doctor
+/doctor/notes,doctor
+/doctor/active-visits,doctor
+/patient/medical-records,patient
+/nurse/dashboard,nurse
+/nurse/patients,nurse
+/nurse/patients/:id/records,nurse
+/nurse/medications,nurse
+/nurse/profile,nurse
+/nurse/vitals,nurse
+/nurse/schedule,nurse
+/dashboard/lab,"lab_tech, lab_technician"
+/radiology/dashboard,radiologist
+/radiology/queue,radiologist
+/radiology/upload,radiologist
+/admin/dashboard,"admin, hospital_admin, system_admin"
+/patient/visits/new,patient
+/patient/visits/schedule,patient
+/patient/visits/verify-otp,patient
+/patient/audit-trail,patient
+/admin/visits,"admin, hospital_admin, system_admin"
+/admin/staff,"admin, hospital_admin, system_admin"
+/admin/users,"admin, hospital_admin, system_admin"
+/admin/audit-logs,"admin, hospital_admin, system_admin"
+/admin/doctor-registration,"admin, hospital_admin, system_admin"
+/admin/doctor-verification,"admin, hospital_admin, system_admin"
+/receptionist/visits,receptionist
+/staff/dashboard,"staff, nurse, receptionist, pharmacist, insurance_provider, researcher, compliance_officer, admin, hospital_admin, system_admin"
+/staff/workflow,"staff, nurse, doctor, admin, hospital_admin, system_admin, receptionist"
+/patient/profile,"patient, doctor, staff, nurse, lab_tech, lab_technician, radiologist, admin, hospital_admin, system_admin"
+/profile,"patient, doctor, staff, nurse, lab_tech, lab_technician, radiologist, admin, hospital_admin, system_admin, pharmacist, receptionist"
+/radiology/profile,radiologist
+/radiology/audit-logs,radiologist
+/pharmacist/dashboard,pharmacist
+/pharmacist/prescriptions,pharmacist
+/pharmacist/inventory,pharmacist
+/pharmacist/profile,pharmacist
+/pharmacist/audit-logs,pharmacist
+/compliance/dashboard,compliance_officer
+/compliance/global-audits,compliance_officer
+/compliance/incidents,compliance_officer
+/compliance/consent-overrides,compliance_officer
+/compliance/profile,compliance_officer
+/insurance/dashboard,"insurance, insurance_provider"
+/insurance/claims,"insurance, insurance_provider"
+/insurance/coverage,"insurance, insurance_provider"
+/insurance/policyholders,"insurance, insurance_provider"
+/insurance/profile,"insurance, insurance_provider"
+/researcher/dashboard,researcher
+/researcher/explorer,researcher
+/researcher/profile,researcher
+/lab/dashboard,Public or redirect
+/unauthorized,Public or redirect
+*,Public or redirect
+/,Public or redirect
