@@ -10,7 +10,9 @@
 - The audit job uses `--strict`, has no ignored advisories or suppressed failures, and fails on reported vulnerabilities or dependency collection failures. Requests have a 30-second timeout; each matrix job has a 30-minute limit. External package indexes and the advisory service must be reachable.
 - AI CI runs on relevant pull requests, pushes to `main`, a Monday 05:23 UTC schedule, and manual dispatch. The schedule checks for new advisories even when application requirements have not changed. Offline test requests remain prohibited by the existing test fixture; the separate audit job intentionally uses the network.
 
-The audit tool version was checked against the [official PyPI package page](https://pypi.org/project/pip-audit/) on 2026-11-16. Its separate pin lets Dependabot propose tool updates without adding tooling to the production environment. This change does not upgrade application dependencies or assert that any package is vulnerable.
+The audit tool version was checked against the [official PyPI package page](https://pypi.org/project/pip-audit/) on 2026-11-16. Its separate pin lets Dependabot propose tool updates without adding tooling to the production environment.
+
+The first PR audit passed for runtime/development and audit-tool requirements, and identified five advisory entries for optional `chromadb==1.5.9` (including a duplicated identifier). The [published advisory](https://osv.dev/vulnerability/PYSEC-2026-311) describes pre-authentication code injection and includes 1.5.9 in its affected range. The [official package page](https://pypi.org/project/chromadb/) still listed 1.5.9 as its latest release on 2026-11-16. Do not ignore these results or claim that a current version is necessarily safe. The remediation replaces the optional Chroma storage adapter with a local standard-library vector index while retaining document retrieval; its requirements must pass a fresh audit before merge.
 
 ## Activation and response
 
