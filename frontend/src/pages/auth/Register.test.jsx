@@ -60,6 +60,7 @@ test('requires a fresh challenge after registration and resend before signing in
     await screen.findByRole('heading', { name: 'Verify OTP' });
     expect(authApi.registerPatient.mock.lastCall[1]).toEqual({ challengeToken: 'registration-token' });
     expect(screen.getByRole('button', { name: 'Verify OTP' })).toBeDisabled();
+        await waitFor(() => expect(window.turnstile.render).toHaveBeenCalledTimes(2));
     act(() => options.callback('resend-token'));
     fireEvent.click(screen.getByRole('button', { name: 'Resend OTP' }));
     await screen.findByText('Code resent');
