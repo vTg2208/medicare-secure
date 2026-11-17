@@ -14,13 +14,21 @@ const u32 = size => { const value = Buffer.alloc(4); value.writeUInt32BE(size); 
 const sha256 = () => crypto.createHash('sha256');
 
 function encryptionKey(env) {
-    const applicationKey = /^[a-f\d]{64}$/i.test(env.ENCRYPTION_KEY || '') ? Buffer.from(env.ENCRYPTION_KEY, 'hex') : null;
-    const fingerprint = applicationKey ? sha256().update(applicationKey).digest('hex') : env.BACKUP_APPLICATION_KEY_SHA256;
-    if (!/^[a-f\d]{64}$/i.test(env.BACKUP_ENCRYPTION_KEY || '') || !/^[a-f\d]{64}$/i.test(fingerprint || '')) {
+    let fingerprints;
+    if (env.ENCRYPTION_KEY || env.APPLICATION_ENCRYPTION_KEYS !== undefined) {
+        try {
+            fingerprints = require('../src/services/application-keys').getApplicationKeys({ ...env, BACKUP_ENCRYPTION_KEY: undefined })
+                .keys.map(({ key }) => sha256().update(key).digest('hex'));
+        } catch { fail('Application encryption keys must be separately configured valid keys'); }
+    } else if (env.BACKUP_APPLICATION_KEY_SHA256S) {
+        try { fingerprints = JSON.parse(env.BACKUP_APPLICATION_KEY_SHA256S); } catch { fail('Invalid application key fingerprints'); }
+    } else fingerprints = [env.BACKUP_APPLICATION_KEY_SHA256];
+    if (!/^[a-f\d]{64}$/i.test(env.BACKUP_ENCRYPTION_KEY || '') || !Array.isArray(fingerprints) || !fingerprints.length
+        || fingerprints.length > 5 || fingerprints.some(value => !/^[a-f\d]{64}$/i.test(value || ''))) {
         fail('BACKUP_ENCRYPTION_KEY and ENCRYPTION_KEY must be separately configured 32-byte hexadecimal keys');
     }
     const key = Buffer.from(env.BACKUP_ENCRYPTION_KEY, 'hex');
-    if (crypto.timingSafeEqual(sha256().update(key).digest(), Buffer.from(fingerprint, 'hex'))) fail('The backup key must differ from the application encryption key');
+    if (fingerprints.some(fingerprint => crypto.timingSafeEqual(sha256().update(key).digest(), Buffer.from(fingerprint, 'hex')))) fail('The backup key must differ from every application encryption key');
     return key;
 }
 

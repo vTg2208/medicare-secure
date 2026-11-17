@@ -1,6 +1,7 @@
--- Apply as the existing schema owner after guarded migrations through 034.
+-- Apply as the existing schema owner after guarded migrations through 036.
 -- Existing API principal only; no login changes or schema exposure.
 BEGIN;
+GRANT SELECT,INSERT,UPDATE,DELETE ON healthcare.user_mfa,healthcare.auth_challenges,healthcare.auth_mfa_throttles TO healthcare_api;
 GRANT SELECT,INSERT ON healthcare.care_message_threads,healthcare.care_messages,healthcare.medical_record_corrections TO healthcare_api;
 -- UPSERT and FOR UPDATE need UPDATE on at least one thread column.
 GRANT UPDATE(patient_id) ON healthcare.care_message_threads TO healthcare_api;
