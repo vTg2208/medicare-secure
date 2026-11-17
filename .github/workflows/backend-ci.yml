@@ -75,6 +75,9 @@ jobs:
       - run: npm run test:integration
         env:
           RUN_PERFORMANCE_DB_TESTS: 'true'
+          # Existing authorization fixtures synthesize sessions. The dedicated
+          # MFA suite removes this test-only option and proves factor enforcement.
+          MFA_ALLOW_LEGACY_TEST_SESSIONS: 'true'
       - name: Verify migrations are repeatable
         run: npm run db:migrate
       - name: Build production image
