@@ -1,8 +1,8 @@
 import apiClient from './client';
 
 export const complianceApi = {
-    getDashboardStats: async () => {
-        const response = await apiClient.get('/compliance/dashboard');
+    getDashboardStats: async ({ signal } = {}) => {
+        const response = await apiClient.get('/compliance/dashboard', { signal });
         return response.data;
     },
 

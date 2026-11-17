@@ -1,8 +1,8 @@
 import Brand from '../../components/common/Brand';
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { complianceApi } from '../../api/complianceApi';
+import { useSecurityDashboard } from './useSecurityDashboard';
 import ThemeToggle from '../../components/common/ThemeToggle';
 import '../../pages/patient/Dashboard.css';
 
@@ -11,38 +11,16 @@ const ComplianceDashboard = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const [stats, setStats] = useState({
-        authAnomalies: 0,
-        openIncidents: 0,
-        activeOverrides: 0,
-        pendingReviews: 0
-    });
-
-    const [incidents, setIncidents] = useState([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchDashboardData = async () => {
-            try {
-                setLoading(true);
-                const [statsRes, incidentsRes] = await Promise.all([
-                    complianceApi.getDashboardStats(),
-                    complianceApi.getIncidents()
-                ]);
-
-                if (statsRes.success) setStats(statsRes.data);
-                if (incidentsRes.success) {
-                    // Just show the most recent/relevant incidents
-                    setIncidents(incidentsRes.data.slice(0, 3));
-                }
-            } catch (error) {
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchDashboardData();
-    }, []);
+    const { snapshot, error, refreshing, refresh } = useSecurityDashboard();
+    const stats = snapshot || {};
+    const incidents = stats.recentIncidents || [];
+    const loading = !snapshot && refreshing;
+    const status = error ? 'unavailable' : snapshot ? stats.securityStatus : 'loading';
+    const statusLabels = { critical: 'Critical incidents open', attention: 'Review required', clear: 'No open alerts',
+        unavailable: 'Status unavailable', loading: 'Checking status…' };
+    const statusColors = { critical: 'bg-rose-500', attention: 'bg-amber-500', clear: 'bg-emerald-500',
+        unavailable: 'bg-slate-400', loading: 'bg-slate-400' };
+    const count = key => snapshot ? stats[key] : loading ? '…' : 'Unavailable';
 
     const handleLogout = () => {
         logout();
@@ -61,7 +39,7 @@ const ComplianceDashboard = () => {
     // Format date nicely
     const formatDate = (dateString) => {
         const d = new Date(dateString);
-        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+        return d.toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
     };
 
     return (
@@ -130,12 +108,20 @@ const ComplianceDashboard = () => {
                         </div>
                         <div className="flex items-center gap-3 bg-surface dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-800/80 px-4 py-2 rounded-2xl shadow-sm">
                             <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-900/50 flex items-center justify-center">
-                                <div className="w-2 h-2 rounded-full bg-slate-500"></div>
+                                <div className={`w-2 h-2 rounded-full ${statusColors[status]}`}></div>
                             </div>
-                            <span className="text-sm font-semibold text-slate-800 dark:text-slate-100">System Secure</span>
+                            <span role="status" className="text-sm font-semibold text-slate-800 dark:text-slate-100">{statusLabels[status]}</span>
                         </div>
                     </div>
 
+                    <div className="flex flex-wrap items-center justify-between gap-3 mb-5 text-sm text-slate-500 dark:text-slate-400">
+                        <p>{snapshot ? `Last updated ${formatDate(stats.generatedAt)}${error ? ' · stale snapshot' : ''}` : 'Waiting for security data.'} Refreshes every 30 seconds.</p>
+                        <button type="button" onClick={refresh} disabled={refreshing} aria-label="Refresh dashboard"
+                            className="px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 disabled:opacity-50">
+                            {refreshing ? 'Refreshing…' : 'Refresh'}
+                        </button>
+                    </div>
+                    {error && <p role="alert" className="mb-5 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900 dark:bg-amber-950 dark:text-amber-100">{error}</p>}
                     {/* Stats Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <div className="bg-surface dark:bg-slate-900/80 p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 shadow-sm transition hover:shadow-md group">
@@ -144,7 +130,7 @@ const ComplianceDashboard = () => {
                                     <span className="material-symbols-outlined">warning</span>
                                 </div>
                             </div>
-                            <h4 className="text-3xl font-bold mb-1 text-slate-800 dark:text-slate-100">{loading ? '...' : stats.authAnomalies}</h4>
+                            <h4 className="text-3xl font-bold mb-1 text-slate-800 dark:text-slate-100">{count('authAnomalies')}</h4>
                             <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">Auth Anomalies (24h)</p>
                         </div>
 
@@ -154,7 +140,7 @@ const ComplianceDashboard = () => {
                                     <span className="material-symbols-outlined">gavel</span>
                                 </div>
                             </div>
-                            <h4 className="text-3xl font-bold mb-1 text-slate-800 dark:text-slate-100">{loading ? '...' : stats.openIncidents}</h4>
+                            <h4 className="text-3xl font-bold mb-1 text-slate-800 dark:text-slate-100">{count('openIncidents')}</h4>
                             <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">Open Incidents</p>
                         </div>
 
@@ -164,7 +150,7 @@ const ComplianceDashboard = () => {
                                     <span className="material-symbols-outlined">key_off</span>
                                 </div>
                             </div>
-                            <h4 className="text-3xl font-bold mb-1 text-slate-800 dark:text-slate-100">{loading ? '...' : stats.activeOverrides}</h4>
+                            <h4 className="text-3xl font-bold mb-1 text-slate-800 dark:text-slate-100">{count('activeOverrides')}</h4>
                             <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">Active Overrides</p>
                         </div>
 
@@ -174,8 +160,9 @@ const ComplianceDashboard = () => {
                                     <span className="material-symbols-outlined">checklist</span>
                                 </div>
                             </div>
-                            <h4 className="text-3xl font-bold mb-1 text-slate-800 dark:text-slate-100">{loading ? '...' : stats.pendingReviews}</h4>
+                            <h4 className="text-3xl font-bold mb-1 text-slate-800 dark:text-slate-100">{count('pendingReviews')}</h4>
                             <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">Pending Reviews</p>
+                            <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">Unreviewed open cases; {count('investigatingIncidents')} investigating.</p>
                         </div>
                     </div>
                 </header>
@@ -197,7 +184,7 @@ const ComplianceDashboard = () => {
                         </div>
 
                         <div className="space-y-4 overflow-y-auto pr-2 scrollbar-thin flex-1">
-                            {incidents.length === 0 && !loading ? (
+                            {!snapshot ? <p className="text-sm text-slate-500 dark:text-slate-400">{loading ? 'Loading incidents…' : 'Incident data unavailable.'}</p> : incidents.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center h-full text-slate-500 dark:text-slate-400">
                                     <span className="material-symbols-outlined text-4xl mb-2 opacity-50">verified_user</span>
                                     <p>No active incidents reported.</p>
@@ -261,10 +248,11 @@ const ComplianceDashboard = () => {
                 <div className="bg-surface dark:bg-slate-800/80 rounded-2xl p-5 shadow-sm border border-slate-200/80 dark:border-slate-800/80 mt-auto">
                     <div className="flex items-center gap-3 mb-3 text-slate-800 dark:text-slate-200 font-bold text-sm">
                         <span className="material-symbols-outlined text-slate-400">info</span>
-                        Compliance Status
+                        Monitoring Scope
                     </div>
                     <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                        Currently tracking {stats.openIncidents} open incidents and monitoring {stats.pendingReviews} pending action reviews. System stability is categorized as Secure.
+                        {snapshot ? `Tracking ${stats.openIncidents} unresolved incidents, including ${stats.criticalIncidents} critical and ${stats.highIncidents} high severity cases.` : 'Security data is not yet available.'}
+                        {' '}Status reflects recorded incidents, active overrides and authentication anomalies in the last 24 hours. It does not establish overall system security or external alert delivery.
                     </p>
                 </div>
             </aside>

@@ -1,43 +1,12 @@
 const pool = require('../../config/db');
 const auditService = require('../../services/audit.service');
 const logger = require('../../utils/logger');
+const { getSecuritySnapshot } = require('./security-dashboard.service');
 
 const getDashboardStats = async (req, res, next) => {
     try {
-        // 1. Auth Anomalies (Failed logins/Access denied in last 24h)
-        const anomalyStats = await pool.query(`
-            SELECT COUNT(*) as count 
-            FROM audit_logs 
-            WHERE LOWER(action) IN ('user_login_failed', 'failed_login', 'access_denied')
-            AND timestamp > NOW() - INTERVAL '24 hours'
-        `);
-
-        // 2. Active Overrides (Emergency consents)
-        const overrideStats = await pool.query(`
-            SELECT COUNT(*) as count 
-            FROM emergency_access_grants
-            WHERE status = 'active' AND expires_at > NOW()
-        `);
-
-        // 3. Open Incidents (From security_events table)
-        const incidentStats = await pool.query(`
-            SELECT COUNT(*) as count 
-            FROM security_events 
-            WHERE status != 'Resolved'
-        `);
-
-        const openIncidentsCount = parseInt(incidentStats.rows[0].count);
-
-        res.json({
-            success: true,
-            data: {
-                authAnomalies: parseInt(anomalyStats.rows[0].count),
-                openIncidents: openIncidentsCount,
-                activeOverrides: parseInt(overrideStats.rows[0].count),
-                pendingReviews: openIncidentsCount,
-                complianceScore: null,
-            }
-        });
+        res.set?.('Cache-Control', 'no-store');
+        res.json({ success: true, data: await getSecuritySnapshot() });
     } catch (err) {
         next(err);
     }

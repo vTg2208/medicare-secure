@@ -78,6 +78,9 @@ function DataExplorer() {
                             <p className="text-slate-500 dark:text-slate-400 text-sm mt-1.5 font-medium tracking-wide">
                                 Analyze macro-trends across aggregated health datasets
                             </p>
+                            <p className="text-slate-500 dark:text-slate-400 text-xs mt-2 max-w-xl">
+                                Research processing uses researcher-scoped pseudonyms and current patient consent. Only aggregates from groups of at least five participants are shown; patient identities and individual records are never exported here.
+                            </p>
                         </div>
                         <div className="flex items-center gap-4">
                             <ThemeToggle />

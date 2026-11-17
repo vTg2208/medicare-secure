@@ -49,7 +49,7 @@ The project implements the **Secure Healthcare Information & Patient Management 
 | Emergency access | Patient-specific, time-limited, read-only access with audit evidence, an incident record, and patient notification. |
 | Patient rights | Subject exports, correction requests, processing restrictions and objections, attributed clinical addenda, and decision histories. |
 | Retention governance | Versioned retention policies, legal holds, reviewed disposal approvals, and separate owner-operated disposal tooling. |
-| Research | Consent-scoped aggregate analysis with small-cohort suppression and no row-level research export. |
+| Research | Consent-scoped analysis using researcher-scoped keyed pseudonyms before aggregation, small-cohort suppression, and no row-level research export. |
 
 AI-assisted intake is an optional integration. It requires a separately configured service and explicit enablement; clinical review remains necessary.
 

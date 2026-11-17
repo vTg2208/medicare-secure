@@ -4,12 +4,13 @@ const complianceController = require('./compliance.controller');
 const { authenticate, authorize } = require('../../middleware/auth.middleware');
 const breach = require('./breach.service');
 const { asyncHandler } = require('../../middleware/error.middleware');
+const { auditLog } = require('../../middleware/audit.middleware');
 
 // Protect all routes
 router.use(authenticate);
 router.use(authorize(['compliance_officer', 'system_admin']));
 
-router.get('/dashboard', complianceController.getDashboardStats);
+router.get('/dashboard', auditLog('view_security_dashboard', 'compliance'), complianceController.getDashboardStats);
 router.get('/global-audits', complianceController.getGlobalAudits);
 router.get('/incidents', complianceController.getIncidents);
 router.put('/incidents/:id', asyncHandler(async (req,res) => res.json({success:true,data:await breach.updateIncidentStatus(req)})));

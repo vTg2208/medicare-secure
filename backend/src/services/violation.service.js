@@ -168,7 +168,7 @@ const detectRepeatedViolations = async (userId, timeWindowHours = 24) => {
 /**
  * Detect suspicious access patterns
  */
-const detectSuspiciousPatterns = async (userId) => {
+const detectSuspiciousPatterns = async (userId, now = new Date()) => {
     try {
         const patterns = [];
 
@@ -214,7 +214,6 @@ const detectSuspiciousPatterns = async (userId) => {
         }
 
         // Pattern 3: After-hours access
-        const now = new Date();
         const hour = now.getHours();
         const isAfterHours = hour < 6 || hour > 22;
 
@@ -224,6 +223,12 @@ const detectSuspiciousPatterns = async (userId) => {
                 FROM audit_logs
                 WHERE user_id = $1
                     AND timestamp > NOW() - INTERVAL '1 hour'
+                    -- Routine successful dashboard refreshes remain audited,
+                    -- but must not manufacture after-hours activity alerts.
+                    -- Failed reads and every other access still count.
+                    AND NOT COALESCE((action='view_security_dashboard'
+                        AND entity_type='compliance' AND request_method='GET'
+                        AND status_code BETWEEN 200 AND 299),false)
             `;
 
             const afterHoursResult = await query(afterHoursQuery, [userId]);

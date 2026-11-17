@@ -1,41 +1,22 @@
-const crypto = require('crypto');
-const logger = require('../utils/logger');
+const crypto = require('node:crypto');
+const config = require('../config/env');
+const { getApplicationKeys } = require('./application-keys');
+const UUID = /^[a-f\d]{8}(?:-[a-f\d]{4}){3}-[a-f\d]{12}$/i;
 
-/**
- * Anonymization Service
- * Provides methods to anonymize healthcare data for research and analytics
- */
-
-/**
- * Hash a value using SHA-256
- * @param {String} value - Value to hash
- * @param {String} salt - Optional salt
- * @returns {String} Hashed value
- */
-const hashValue = (value, salt = '') => {
-    if (!value) return null;
-    return crypto
-        .createHash('sha256')
-        .update(value + salt)
-        .digest('hex');
+// Pseudonymization is not anonymization. Keys are separated from file encryption
+// and other researchers. No identity mapping, key or participant is logged.
+const derivePseudonymKey = scope => {
+    if (typeof scope !== 'string' || !scope.trim() || scope.length > 200) throw new Error('An explicit research scope is required');
+    const { activeKey } = getApplicationKeys({ ...process.env, ENCRYPTION_KEY: config.security.encryptionKey });
+    return Buffer.from(crypto.hkdfSync('sha256', activeKey,
+        Buffer.from('medicare-pseudonymization-v1'), Buffer.from(scope), 32));
 };
-
-/**
- * Generate a pseudonymous ID for a patient
- * @param {String} patientId - Original patient ID
- * @param {String} studyId - Study/research ID for consistent pseudonyms within a study
- * @returns {String} Pseudonymous ID
- */
-const generatePseudonym = (patientId, studyId = 'default') => {
-    return hashValue(patientId, studyId).substring(0, 16);
+const generatePseudonym = (patientId, scope) => {
+    if (!UUID.test(patientId || '')) throw new Error('A valid participant identity is required');
+    return `psn_v1_${crypto.createHmac('sha256', derivePseudonymKey(scope)).update(patientId.toLowerCase()).digest('hex')}`;
 };
-
-/**
- * Generalize age into age ranges for k-anonymity
- * @param {Number} age - Exact age
- * @returns {String} Age range
- */
-const generalizeAge = (age) => {
+const generalizeAge = age => {
+    if (!Number.isFinite(age) || age < 0 || age > 130) return 'Unknown';
     if (age < 18) return '0-17';
     if (age < 30) return '18-29';
     if (age < 40) return '30-39';
@@ -44,189 +25,38 @@ const generalizeAge = (age) => {
     if (age < 70) return '60-69';
     return '70+';
 };
-
-/**
- * Generalize date to year only
- * @param {Date|String} date - Date to generalize
- * @returns {String} Year only
- */
-const generalizeDate = (date) => {
-    if (!date) return null;
-    const dateObj = new Date(date);
-    return dateObj.getFullYear().toString();
+const generalizeDate = value => {
+    if (!value) return null;
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? null : String(date.getUTCFullYear());
 };
 
-/**
- * Generalize location to city/state only (remove street address)
- * @param {Object} location - Location object with address, city, state
- * @returns {Object} Generalized location
- */
-const generalizeLocation = (location) => {
-    if (!location) return null;
-
-    return {
-        city: location.city || null,
-        state: location.state || null,
-        country: location.country || null,
-        // Remove: address, postal_code
-    };
+// Legacy function names retained. An allowlist excludes nested, camelCase and
+// unknown identity/clinical fields instead of attempting to enumerate every PII.
+const anonymizePatientData = (patient, scope) => {
+    const birth = new Date(patient.date_of_birth);
+    const now = new Date();
+    const birthdayPending = now.getUTCMonth() < birth.getUTCMonth() ||
+        (now.getUTCMonth() === birth.getUTCMonth() && now.getUTCDate() < birth.getUTCDate());
+    const age = patient.date_of_birth ? now.getUTCFullYear() - birth.getUTCFullYear() - Number(birthdayPending) : NaN;
+    const result = { pseudonym_id: generatePseudonym(patient.user_id || patient.id, scope), age_range: generalizeAge(age),
+        gender: ['male', 'female', 'other'].includes(patient.gender) ? patient.gender : 'Unknown' };
+    const year = generalizeDate(patient.created_at);
+    if (year) result.registration_year = year;
+    return result;
 };
-
-/**
- * Remove direct identifiers from patient data
- * @param {Object} patientData - Patient data object
- * @returns {Object} Anonymized patient data
- */
-const removeDirectIdentifiers = (patientData) => {
-    const anonymized = { ...patientData };
-
-    // Remove direct identifiers
-    const directIdentifiers = [
-        'id',
-        'user_id',
-        'email',
-        'phone',
-        'first_name',
-        'last_name',
-        'govt_id_hash',
-        'unique_health_id',
-        'emergency_contact_name',
-        'emergency_contact_phone',
-        'address',
-        'postal_code',
-    ];
-
-    directIdentifiers.forEach(field => {
-        delete anonymized[field];
-    });
-
-    return anonymized;
-};
-
-/**
- * Anonymize patient data for research
- * @param {Object} patientData - Patient data object
- * @param {String} studyId - Study ID for consistent pseudonyms
- * @param {Number} kValue - K-anonymity value (minimum group size)
- * @returns {Object} Anonymized data
- */
-const anonymizePatientData = (patientData, studyId = 'default', kValue = 5) => {
-    try {
-        // Generate pseudonymous ID
-        const pseudonymId = generatePseudonym(patientData.id || patientData.user_id, studyId);
-
-        // Remove direct identifiers
-        let anonymized = removeDirectIdentifiers(patientData);
-
-        // Add pseudonymous ID
-        anonymized.pseudonym_id = pseudonymId;
-
-        // Generalize quasi-identifiers
-        if (anonymized.date_of_birth) {
-            const age = new Date().getFullYear() - new Date(anonymized.date_of_birth).getFullYear();
-            anonymized.age_range = generalizeAge(age);
-            delete anonymized.date_of_birth;
-        }
-
-        // Generalize location
-        if (anonymized.city || anonymized.state) {
-            anonymized.location = generalizeLocation({
-                city: anonymized.city,
-                state: anonymized.state,
-                country: anonymized.country,
-            });
-            delete anonymized.city;
-            delete anonymized.state;
-            delete anonymized.country;
-        }
-
-        // Generalize dates to year only
-        if (anonymized.created_at) {
-            anonymized.registration_year = generalizeDate(anonymized.created_at);
-            delete anonymized.created_at;
-        }
-
-        if (anonymized.updated_at) {
-            delete anonymized.updated_at;
-        }
-
-        logger.info(`Anonymized patient data for study ${studyId}`);
-        return anonymized;
-
-    } catch (error) {
-        logger.error('Anonymization error:', error);
-        throw new Error('Failed to anonymize patient data');
+const anonymizeDataset = (dataset, scope, kValue = 5) => {
+    if (!Number.isSafeInteger(kValue) || kValue < 5) throw new Error('The minimum distinct-participant group size is five');
+    if (!Array.isArray(dataset)) throw new Error('A participant dataset is required');
+    const projected = dataset.map(row => anonymizePatientData(row, scope));
+    const groupKey = row => JSON.stringify([row.age_range, row.gender, row.registration_year || null]);
+    const groups = new Map();
+    for (const row of projected) {
+        const key = groupKey(row);
+        if (!groups.has(key)) groups.set(key, new Set());
+        groups.get(key).add(row.pseudonym_id);
     }
+    return projected.filter(row => groups.get(groupKey(row)).size >= kValue);
 };
 
-/**
- * Anonymize a dataset (array of records) with k-anonymity
- * @param {Array} dataset - Array of patient records
- * @param {String} studyId - Study ID
- * @param {Number} kValue - Minimum group size for k-anonymity
- * @returns {Array} Anonymized dataset
- */
-const anonymizeDataset = (dataset, studyId = 'default', kValue = 5) => {
-    if (!Array.isArray(dataset) || dataset.length === 0) {
-        return [];
-    }
-
-    // Anonymize each record
-    const anonymized = dataset.map(record =>
-        anonymizePatientData(record, studyId, kValue)
-    );
-
-    // TODO: Implement k-anonymity verification
-    // For now, just return anonymized data
-    // In production, you would verify that each combination of quasi-identifiers
-    // appears at least k times in the dataset
-
-    logger.info(`Anonymized dataset with ${anonymized.length} records for study ${studyId}`);
-    return anonymized;
-};
-
-/**
- * Aggregate data for statistical analysis
- * @param {Array} dataset - Dataset to aggregate
- * @param {String} groupBy - Field to group by
- * @returns {Object} Aggregated statistics
- */
-const aggregateData = (dataset, groupBy = 'age_range') => {
-    if (!Array.isArray(dataset) || dataset.length === 0) {
-        return {};
-    }
-
-    const groups = {};
-
-    dataset.forEach(record => {
-        const key = record[groupBy] || 'unknown';
-
-        if (!groups[key]) {
-            groups[key] = {
-                count: 0,
-                records: [],
-            };
-        }
-
-        groups[key].count++;
-        groups[key].records.push(record);
-    });
-
-    // Remove individual records, keep only counts
-    Object.keys(groups).forEach(key => {
-        delete groups[key].records;
-    });
-
-    return groups;
-};
-
-module.exports = {
-    anonymizePatientData,
-    anonymizeDataset,
-    aggregateData,
-    generatePseudonym,
-    generalizeAge,
-    generalizeDate,
-    generalizeLocation,
-    hashValue,
-};
+module.exports = { derivePseudonymKey, generatePseudonym, anonymizePatientData, anonymizeDataset, generalizeAge, generalizeDate };
