@@ -10,6 +10,12 @@ const migrations = readOrderedMigrations();
 const base = migrations.slice(0, 17);
 const hash = sql => crypto.createHash('sha256').update(sql).digest('hex');
 
+test('incremental export accepts the declared 035 reservation while rejecting other gaps and hash drift', () => {
+    assert.doesNotThrow(() => buildBrowserUpgradeSql({ from: '034' }));
+    assert.throws(() => buildBrowserUpgradeSql({ from: '017', migrations: migrations.filter(item => !item.id.startsWith('033_')) }), /contiguous/);
+    assert.throws(() => buildBrowserUpgradeSql({ from: '017', migrations: migrations.map(item => item.id.startsWith('036_') ? { ...item, hash: '0'.repeat(64) } : item) }), /exact SQL hashes/);
+});
+
 test('incremental export requires an explicit known contiguous prefix and unchanged SQL hashes', () => {
     assert.throws(() => buildBrowserUpgradeSql(), /explicit/);
     assert.throws(() => buildBrowserUpgradeSql({ from: '999' }), /unknown/);
@@ -129,7 +135,7 @@ test('unknown, drifted, missing and partial/wrong ledgers reject before any sche
 test('a late pending migration failure rolls the entire incremental batch and ledger back to 017', { skip: !enabled, timeout: 120000 }, async () => disposable(async client => {
     const sql = 'CREATE TABLE healthcare.upgrade_failure_probe(id integer); SELECT nonexistent_incremental_upgrade_fixture();';
     const before = await snapshot(client);
-    const nextId = `${String(migrations.length+1).padStart(3,'0')}_fixture_failure`;
+    const nextId = `${String(Number(migrations.at(-1).id.slice(0,3))+1).padStart(3,'0')}_fixture_failure`;
     await assert.rejects(client.query(buildBrowserUpgradeSql({ from: '017', migrations: [...migrations, { id: nextId, sql, hash: hash(sql) }] })), /nonexistent_incremental_upgrade_fixture/);
     await client.query('ROLLBACK');
     assert.deepEqual(await snapshot(client), before);
