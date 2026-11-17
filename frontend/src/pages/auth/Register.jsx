@@ -1,17 +1,20 @@
 import { brandName } from '../../config/brand';
 import Brand from '../../components/common/Brand';
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { authApi } from '../../api/authApi';
 import { startRegistration } from '@simplewebauthn/browser';
 import ThemeToggle from '../../components/common/ThemeToggle';
 import FlowSteps from '../../components/common/FlowSteps';
 import BotChallenge, { useBotChallenge } from '../../components/auth/BotChallenge';
+import MfaChallenge from '../../components/auth/MfaChallenge';
+import { AuthContext } from '../../context/AuthContext';
 
 import '../patient/Dashboard.css';
 
 function Register() {
     const navigate = useNavigate();
+    const { login } = useContext(AuthContext);
     const [searchParams] = useSearchParams();
     const [step, setStep] = useState(() => searchParams.get('verify') === '1' ? 2 : 1);
     const [loading, setLoading] = useState(false);
@@ -40,7 +43,9 @@ function Register() {
 
     const [otp, setOtp] = useState('');
     const [passkeyLoading, setPasskeyLoading] = useState(false);
-    const [passkeyToken, setPasskeyToken] = useState(null);
+    const [passkeyStepUpTicket, setPasskeyStepUpTicket] = useState(null);
+    const [passkeyVerificationCode, setPasskeyVerificationCode] = useState('');
+    const [mfa, setMfa] = useState(null);
 
     const appName = brandName;
 
@@ -125,14 +130,14 @@ function Register() {
                 return;
             }
 
-            // Auto-login to get a token for passkey registration
+            // Account verification starts restricted MFA enrollment before a full session.
             try {
                 const loginRes = await authApi.login(patientData.email, patientData.password, ...(bot.token ? [bot.token] : []));
                 const payload = loginRes.data || loginRes;
-                const token = payload.accessToken || payload.token || payload.data?.accessToken;
-                if (token) {
-                    setPasskeyToken(token);
-                    setStep(3); // Go to passkey setup
+                if (payload.ticket && ['enroll', 'verify'].includes(payload.nextStep)) {
+                    setMfa(payload);
+                    setPatientData(previous => ({ ...previous, password: '', confirmPassword: '' }));
+                    setStep(5);
                 } else {
                     navigate('/login', { state: { message: 'Registration successful! Please login.' } });
                 }
@@ -175,12 +180,21 @@ function Register() {
         setError('');
         setPasskeyLoading(true);
         try {
-            const optionsRes = await authApi.passkeyRegisterOptions(passkeyToken);
+            let proof = passkeyStepUpTicket;
+            if (!proof) {
+                if (!/^[0-9]{6}$/.test(passkeyVerificationCode)) throw new Error('Enter a fresh six-digit authenticator code to try again.');
+                const verified = await authApi.mfaStepUp(passkeyVerificationCode);
+                proof = (verified.data || verified).stepUpTicket;
+            }
+            setPasskeyStepUpTicket(null);
+            setPasskeyVerificationCode('');
+            const optionsRes = await authApi.passkeyRegisterOptions(proof);
             if (!optionsRes.success) throw new Error(optionsRes.message || 'Failed to get passkey options');
-            const credential = await startRegistration({ optionsJSON: optionsRes.data });
-            const verifyRes = await authApi.passkeyRegisterVerify(credential, 'My Passkey', passkeyToken);
+            const { challengeId, ...options } = optionsRes.data;
+            const credential = await startRegistration({ optionsJSON: options });
+            const verifyRes = await authApi.passkeyRegisterVerify(credential, 'My Passkey', challengeId);
             if (!verifyRes.success) throw new Error(verifyRes.message || 'Passkey registration failed');
-            navigate('/login', { state: { message: 'Registration successful! Passkey set up. You can now sign in with your passkey.' } });
+            navigate('/patient/dashboard');
         } catch (err) {
             if (err.name === 'NotAllowedError') setError('Passkey setup was cancelled. You can set it up later.');
             else setError(err.response?.data?.message || err.message || 'Passkey setup failed');
@@ -205,8 +219,8 @@ function Register() {
                 <FlowSteps label="Registration progress"
                     steps={roleTab === 'doctor'
                         ? [{ label: 'Account' }, { label: 'Review' }]
-                        : [{ label: 'Account' }, { label: 'Verify email' }, { label: 'Passkey', optional: true }]}
-                    currentStep={roleTab === 'doctor' ? (step === 4 ? 1 : 0) : Math.min(step - 1, 2)} />
+                        : [{ label: 'Account' }, { label: 'Verify email' }, { label: 'Authenticator' }, { label: 'Passkey', optional: true }]}
+                    currentStep={roleTab === 'doctor' ? (step === 4 ? 1 : 0) : step === 5 ? 2 : step === 3 ? 3 : Math.min(step - 1, 1)} />
 
                 {(step === 1 || step === 2) && <BotChallenge key={step} challenge={bot.challenge} onToken={token => { bot.setToken(token); if (token) setError(''); }} resetKey={bot.resetKey} />}
 
@@ -493,6 +507,9 @@ function Register() {
                     </div>
                 )}
 
+                {step === 5 && mfa && <MfaChallenge challenge={mfa} onComplete={data => {
+                    login(data.user); setPasskeyStepUpTicket(data.stepUpTicket || null); setMfa(null); setStep(3);
+                }} onCancel={() => navigate('/login', { state: { message: 'Email verified. Sign in to finish securing your account.' } })} />}
                 {step === 3 && (
                     <div className="text-center animate-fade-in">
                         <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
@@ -523,6 +540,12 @@ function Register() {
                         )}
 
                         <div className="space-y-4">
+                            {!passkeyStepUpTicket && <div className="mfa-form">
+                                <label htmlFor="passkey-reverify">Authenticator code</label>
+                                <input id="passkey-reverify" value={passkeyVerificationCode} onChange={event => setPasskeyVerificationCode(event.target.value)}
+                                    inputMode="numeric" autoComplete="one-time-code" maxLength={6} disabled={passkeyLoading} />
+                                <p>Use a fresh code to authorize another setup attempt.</p>
+                            </div>}
                             <button
                                 onClick={handlePasskeySetup}
                                 disabled={passkeyLoading}
@@ -532,7 +555,7 @@ function Register() {
                                 {passkeyLoading ? 'Setting up...' : 'Set Up Passkey'}
                             </button>
                             <button
-                                onClick={() => navigate('/login', { state: { message: 'Registration successful! Please login.' } })}
+                                onClick={() => navigate('/patient/dashboard')}
                                 className="w-full text-sm font-semibold text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors"
                             >
                                 Skip for now
