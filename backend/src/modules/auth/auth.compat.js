@@ -20,7 +20,7 @@ const loginCompat = async (req, res) => {
     const originalJson = res.json.bind(res);
     res.json = function (data) {
         // Transform response for frontend compatibility
-        if (data.success && data.data) {
+        if (data.success && data.data?.user) {
             const transformed = {
                 success: data.success,
                 message: data.message,
@@ -28,9 +28,9 @@ const loginCompat = async (req, res) => {
                     ...data.data.user,
                     role: data.data.user.role.toUpperCase(), // Convert role to uppercase
                 },
-                token: data.data.accessToken, // Add 'token' field for frontend
-                accessToken: data.data.accessToken,
-                refreshToken: data.data.refreshToken,
+                ...(require('../../services/auth-transport').isBearerClient(req) ? {
+                    token: data.data.accessToken, accessToken: data.data.accessToken, refreshToken: data.data.refreshToken,
+                } : {}),
             };
             return originalJson(transformed);
         }

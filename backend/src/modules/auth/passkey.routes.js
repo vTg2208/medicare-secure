@@ -4,6 +4,7 @@ const passkeyController = require('./passkey.controller');
 const { authenticate } = require('../../middleware/auth.middleware');
 const { asyncHandler } = require('../../middleware/error.middleware');
 const { loginLimiter } = require('../../middleware/rateLimit.middleware');
+const { requireAuthenticationOrigin } = require('../../services/auth-transport');
 
 /**
  * @route   POST /api/auth/passkey/register/options
@@ -34,6 +35,7 @@ router.post(
  */
 router.post(
     '/login/options',
+    requireAuthenticationOrigin,
     loginLimiter,
     asyncHandler(passkeyController.loginOptions)
 );
@@ -45,6 +47,7 @@ router.post(
  */
 router.post(
     '/login/verify',
+    requireAuthenticationOrigin,
     loginLimiter,
     asyncHandler(async (req, res) => {
         // Intercept response for frontend compatibility (same as password login)
@@ -64,4 +67,6 @@ router.post(
     })
 );
 
+router.post('/step-up/options', authenticate, loginLimiter, asyncHandler(passkeyController.loginOptions));
+router.post('/step-up/verify', authenticate, loginLimiter, asyncHandler(passkeyController.loginVerify));
 module.exports = router;

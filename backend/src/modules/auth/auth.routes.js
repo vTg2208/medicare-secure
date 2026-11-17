@@ -1,4 +1,5 @@
 const express = require('express');
+const { requireAuthenticationOrigin } = require('../../services/auth-transport');
 const router = express.Router();
 const authController = require('./auth.controller');
 const { authenticate } = require('../../middleware/auth.middleware');
@@ -111,6 +112,7 @@ router.post(
  */
 router.post(
     '/login',
+    requireAuthenticationOrigin,
     loginLimiter,
     publicChallenge,
     asyncHandler(async (req, res) => {
@@ -167,6 +169,7 @@ router.post(
 );
 
 // ---- Passkey (WebAuthn) Routes ----
+router.use('/mfa', require('./mfa.routes'));
 const passkeyRoutes = require('./passkey.routes');
 router.use('/passkey', passkeyRoutes);
 
