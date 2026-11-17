@@ -17,7 +17,9 @@
         "status": "implemented",
         "sources": [
           "backend/src/middleware/auth.middleware.js",
-          "backend/src/middleware/clinical-access.middleware.js"
+          "backend/src/middleware/clinical-access.middleware.js",
+          "backend/src/services/mfa.service.js",
+          "backend/src/services/auth-transport.js"
         ],
         "limitations": [
           "Application compromise/database-owner authority are separate threats. Shift-based policy helpers are not the active clinical authorization contract."
@@ -28,6 +30,10 @@
           {
             "file": "backend/tests/access.integration.test.js",
             "title": "clinical workflows enforce patient, role, care and tenant boundaries"
+          },
+          {
+            "file": "backend/tests/mfa.integration.test.js",
+            "title": "MFA enrollment, recovery, throttling and security evidence are transactional"
           }
         ],
         "observations": [
@@ -207,10 +213,13 @@
         "sources": [
           "backend/src/services/file.crypto.js",
           "backend/src/services/encrypted-file-store.js",
-          "backend/src/config/db.js"
+          "backend/src/config/db.js",
+          "backend/src/services/application-keys.js",
+          "backend/src/services/encryption.service.js",
+          "docs/security/mfa-sessions-and-encryption.md"
         ],
         "limitations": [
-          "Application encryption covers selected fields/payloads, not every ordinary database column. Key rotation and provider storage assurances remain separate."
+          "Application encryption covers selected fields/payloads, not every ordinary database column. Retained keys preserve immutable history; key retirement, independent custody and provider storage assurances require operator evidence."
         ]
       },
       "verification": {
@@ -218,6 +227,10 @@
           {
             "file": "backend/tests/postgres-upload.integration.test.js",
             "title": "durable encrypted uploads survive ephemeral filesystem loss and enforce clinical access"
+          },
+          {
+            "file": "backend/tests/unit/application-encryption.test.js",
+            "title": "retains mixed-key encrypted files without changing the SHMSENC2 backup format"
           }
         ],
         "observations": [
@@ -234,7 +247,7 @@
           "id": "provider_storage_encryption",
           "status": "pending",
           "ownerRole": "responsible_organization",
-          "evidence": []
+          "evidence": ["docs/releases/2026-11-17-mfa-session-encryption.md"]
         },
         {
           "id": "key_custody_and_rotation",
@@ -345,7 +358,9 @@
         "status": "implemented",
         "sources": [
           "backend/scripts/coordinated-backup.js",
-          "backend/scripts/scheduled-backup.js"
+          "backend/scripts/scheduled-backup.js",
+          "backend/scripts/backup-helper.js",
+          "backend/scripts/verify-recovery-encryption.js"
         ],
         "limitations": [
           "Two manual main-branch cloud/recovery drills passed; a future timed execution is not claimed as observed. Free-host availability, operator alerts and recovery promotion remain separate."
@@ -356,6 +371,14 @@
           {
             "file": "backend/tests/postgres-upload.integration.test.js",
             "title": "a remote coordinated worker captures durable bytes without the source filesystem or application key"
+          },
+          {
+            "file": "backend/tests/unit/key-operations.test.js",
+            "title": "backup encryption refuses every retained application key and accepts independent keys"
+          },
+          {
+            "file": "backend/tests/mixed-key-recovery.integration.test.js",
+            "title": "custody-side recovery decrypts restored mixed-key seeds, privacy payloads and files"
           }
         ],
         "observations": [

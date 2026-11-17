@@ -196,6 +196,67 @@
       }
     },
     {
+      "name": "auth_challenges",
+      "columns": [
+        "id",
+        "user_id",
+        "token_hash",
+        "purpose",
+        "payload",
+        "factor_version",
+        "attempts",
+        "created_at",
+        "expires_at"
+      ],
+      "classification": "security",
+      "purposes": [
+        "authentication, factor enrollment, replay prevention and abuse controls"
+      ],
+      "ownerRole": "platform_operator",
+      "audience": [
+        "application_runtime",
+        "authorized_security_administration"
+      ],
+      "applicationEncryption": "selected_fields",
+      "encryptedColumns": [
+        "payload"
+      ],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Expired authentication challenges and throttle windows are removed by hourly session cleanup.",
+      "columnOverrides": {
+        "payload": {
+          "classification": "security",
+          "protection": "Pending MFA seed uses purpose/user-bound authenticated encryption; WebAuthn challenges, step-up scopes and recovery-code hashes are verification metadata, not encrypted clinical data."
+        },
+        "token_hash": {
+          "classification": "security",
+          "protection": "SHA-256 of a five-minute random ticket; raw tickets remain only in transient client memory."
+        }
+      }
+    },
+    {
+      "name": "auth_mfa_throttles",
+      "columns": [
+        "scope_hash",
+        "failures",
+        "expires_at"
+      ],
+      "classification": "security",
+      "purposes": [
+        "authentication, factor enrollment, replay prevention and abuse controls"
+      ],
+      "ownerRole": "platform_operator",
+      "audience": [
+        "application_runtime",
+        "authorized_security_administration"
+      ],
+      "applicationEncryption": "none",
+      "encryptedColumns": [],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Expired authentication challenges and throttle windows are removed by hourly session cleanup.",
+      "columnOverrides": {}
+    },
+    {
       "name": "bed_allocations",
       "columns": [
         "id",
@@ -1807,7 +1868,10 @@
         "last_activity",
         "expires_at",
         "is_active",
-        "created_at"
+        "created_at",
+        "mfa_method",
+        "mfa_verified_at",
+        "csrf_hash"
       ],
       "classification": "security",
       "purposes": [
@@ -1830,6 +1894,10 @@
         "refresh_token_hash": {
           "classification": "security",
           "protection": "Token/OTP verifier hash; expiration and replay checks remain necessary."
+        },
+        "csrf_hash": {
+          "classification": "security",
+          "protection": "SHA-256 of the session-bound CSRF verifier; compared with the readable host-only cookie and custom request header."
         }
       }
     },
@@ -1935,6 +2003,33 @@
       "encryptedColumns": [],
       "providerEncryption": "requires_provider_evidence",
       "retention": "Completed intake only: versioned triage_session policy and legal holds; active sessions cannot be disposed.",
+      "columnOverrides": {}
+    },
+    {
+      "name": "user_mfa",
+      "columns": [
+        "user_id",
+        "secret_cipher",
+        "enabled_at",
+        "last_totp_step",
+        "recovery_hashes",
+        "factor_version"
+      ],
+      "classification": "security",
+      "purposes": [
+        "authentication, factor enrollment, replay prevention and abuse controls"
+      ],
+      "ownerRole": "platform_operator",
+      "audience": [
+        "application_runtime",
+        "authorized_security_administration"
+      ],
+      "applicationEncryption": "selected_fields",
+      "encryptedColumns": [
+        "secret_cipher"
+      ],
+      "providerEncryption": "requires_provider_evidence",
+      "retention": "Retained for the account lifetime; recovery codes are single-use hash verifiers and factor replacement invalidates previous state.",
       "columnOverrides": {}
     },
     {
@@ -2210,8 +2305,8 @@
       "id": "recovery_key_custody",
       "classification": "security",
       "purpose": "Decrypt application fields and independently encrypted archives",
-      "protection": "Keys remain separate from B2 payloads; backup worker has only the application-key fingerprint",
-      "retention": "Preserve original keys for retained ciphertext; rotation/re-encryption is an outstanding operational engineering concern",
+      "protection": "Keys remain separate from B2 payloads; backup worker receives fingerprints for all retained application keys, while the separately invoked custody verifier receives keys",
+      "retention": "Preserve every key needed by immutable ciphertext and retained archives; active-key changes, filesystem migration and synthetic mixed-key recovery are supported, with live retirement requiring an approved dependency inventory",
       "assurance": "Protected off-host key custody and recovery/rotation evidence require the operator"
     }
   ]
