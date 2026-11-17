@@ -1,0 +1,75 @@
+# MFA, browser sessions and encryption operations
+
+Status: implementation branch; application activation requires the coordinated rollout below. Owner: platform operator. Last reviewed: 17 November 2026.
+
+## Authentication contract
+
+Password verification returns a five-minute restricted ticket. It never grants clinical access. Existing password users enroll an authenticator on their next sign-in; returning users provide a six-digit RFC 6238 code. A WebAuthn passkey with verified user presence and user verification is an alternative to password plus authenticator. Email verification and organization approval remain required where they already applied.
+
+Enrollment progresses from pending seed to verified code to recovery-code acknowledgment. Only acknowledgment activates the factor and issues a full session. Seeds use context-bound AES-256-GCM encryption; tickets and the ten random, single-use recovery codes are stored as hashes. QR codes render locally. Secrets remain in browser component memory and are cleared when the flow ends.
+
+Password plus an unused recovery code authorizes replacement setup only. Access resumes after the replacement is verified and its new recovery codes are acknowledged. Until then the previous authenticator remains valid. Losing both the authenticator and recovery codes requires an owner-operated identity recovery procedure; there is no password-only or email-only bypass. A verified existing passkey remains usable.
+
+Failed factor attempts are limited across tickets to five per account and twenty per IP in fifteen minutes; each ticket also permits at most five failures. The same accepted authenticator counter cannot be reused concurrently or subsequently. Challenges expire after five minutes and are bounded to four per account. Session issuance, factor changes, consumed challenges and security audit evidence commit together. Failure of the transaction withholds credentials.
+
+Public passkey options and failed assertions use independent limits of twenty per account and one hundred per IP in fifteen minutes. Successful public options consume that budget too. Public requests can replace only public login challenges; they cannot evict password-authorized recovery, enrollment or session-bound step-up. Proven operations evict public challenges first. The overall four-challenge bound remains in place.
+
+Adding a passkey requires a recent, operation-bound, single-use proof from the authenticator or an existing verified passkey, bound to the current active session. Merely possessing a session is insufficient. Passkey challenges and signature counters are stored in PostgreSQL rather than process memory.
+
+Derived registration tickets inherit the absolute factor-proof deadline; moving to the next phase cannot extend freshness. If a recovery or confirmation response is interrupted, use **Resume authenticator setup** on the same live ticket. This prepares a fresh seed and recovery set without spending another recovery code. Reloading or abandoning the ticket still discards this transient authorization.
+
+## Browser and API sessions
+
+Production uses a host-only `__Host-medicare_session` cookie with Secure, HttpOnly, SameSite=Lax and Path=/. A separate readable `__Host-medicare_csrf` cookie supplies the request header; its hash is bound to the stored session. No Domain attribute is used. Development uses non-prefixed names without Secure for local HTTP only.
+
+Serve the UI and its `/api` proxy on the same origin. Cross-site API deployment is incompatible with this cookie contract. Preserve trusted Origin and fetch metadata through the proxy. Configure explicit `CORS_ORIGIN`, `FRONTEND_URL`, `WEBAUTHN_RP_ID` and `WEBAUTHN_ORIGIN`; production validation requires HTTPS. Unsafe cookie requests require the exact trusted Origin and matching CSRF proof. Authentication operations also check Origin. Public authentication and protected requests reject mixed cookie/bearer credentials and duplicate authentication cookies; public authentication does not require an already valid session. Cross-site session requests are rejected.
+
+The browser clears the old `healthcare_token` from local and session storage. It restores identity only by server verification and never receives bearer credentials in a successful browser authentication response. A non-secret sign-out intent marker hides protected UI offline and retries server revocation after reconnection. Browser logout revokes the presented session; unrelated devices remain signed in. Explicit non-browser bearer logout retains the prior all-session behavior. Cookies expire with the access JWT (default one hour); the existing configurable inactivity timeout remains active. No browser refresh bearer is persisted.
+
+Logout and unauthorized responses deliberately do not expire the shared authentication cookies: an old response could otherwise clear a newer sign-in. Revoked cookies grant no access and expire naturally. Same-tab cookie-issuing transitions and logout are serialized. Pending revocation is bound to the original readable CSRF verifier; if a later sign-in has replaced it, a retry cannot revoke that newer session. A superseded old server session can remain until its normal expiry if its cookie is no longer available.
+
+Public patient registration sends `X-Registration-Context: public`, which always selects the bot-verified public path and ignores stale cookies for the staff exemption. This header grants no trusted role or bot exemption. Authenticated staff registration still requires the active server session, role and CSRF proof.
+
+The sign-out marker has a non-secret cookie fallback when web storage is full, and bootstrap fails closed if neither persistence mechanism works. A successful sign-in broadcasts an identity-change signal through storage/BroadcastChannel. Other tabs hide the old account and verify the new cookie before restoring UI. Protected requests and responses are bound to the tab's accepted session generation and CSRF verifier; a stale form cannot silently submit as another account. Profile saves update only an already matching current identity and never authenticate it again.
+
+Non-browser clients must explicitly request `X-Auth-Transport: bearer` without Origin, fetch metadata or cookies when authenticating, and complete the same MFA flow. Protected bearer requests must have no browser Origin or fetch metadata. Restricted tickets use `X-Auth-Challenge`; fresh passkey-registration authorization uses `X-MFA-Step-Up`. Existing password-only clients must implement the challenge contract before this release is activated.
+
+## Encryption boundaries and key custody
+
+Application encryption covers uploaded files, selected privacy payloads and authenticator seeds. Ordinary clinical database columns still rely on provider storage encryption and authorization. Supabase's [security assurance](https://supabase.com/security) states AES-256 encryption at rest and TLS in transit; this provider statement does not establish customer-managed keys or independent custody for this project.
+
+The legacy `ENCRYPTION_KEY` remains supported as key ID `legacy`. For rotation, configure `APPLICATION_ENCRYPTION_KEYS` as a JSON object of stable IDs to independently generated 64-character hexadecimal keys, and `ENCRYPTION_ACTIVE_KEY_ID` to one entry. At most five distinct keys, including legacy, are permitted. Never reuse a key ID for different bytes. Malformed, duplicate, missing-active and zero application keys fail startup validation. Errors do not print key material.
+
+New MFA envelopes record their key ID and authenticate it with the purpose and user ID. Existing unlabelled database envelopes and SHMSENC1/SHMSENC2 file envelopes authenticate against the bounded retained key set. New writes use the active key. Existing formats remain readable; selecting a new active key does not rewrite historical data.
+
+Keep application and backup keys in access-controlled platform secret stores, separate from the encrypted archives and source repository. Maintain a separately controlled recovery copy with named custodians, access review, recovery instructions and a tested restore. Custody and retirement approval remain organization responsibilities; this implementation did not generate, disclose or rotate live encryption keys.
+
+## Rotation and recovery procedure
+
+1. Inventory all live encrypted objects, MFA seeds, immutable privacy/history payloads, retained archives and separately held key copies. Record their key dependencies without recording key values in the inventory.
+2. Add the new key while retaining every key required by that inventory. Validate the same ring on every API/worker replica before selecting the new active ID. Keep retained IDs and bytes stable across rollbacks and restores.
+3. Supply the backup worker `BACKUP_APPLICATION_KEY_SHA256S`, a JSON array of SHA-256 fingerprints for **all** active and retained application keys. The existing singular `BACKUP_APPLICATION_KEY_SHA256` remains a fallback only for a single-key deployment. Fingerprints hash the decoded 32-byte key, not its hexadecimal text. Backup encryption refuses reuse of any listed application key. The backup worker need not receive application key values.
+4. For filesystem uploads, run `node scripts/migrate-file-encryption.js --dry-run --rotate-keys` first. Review the inventory and authenticate every file. Applying requires stopped writers, the existing file-coordination lock, a separate protected original-ciphertext backup directory and `--apply --rotate-keys --backup-dir <directory>`. Follow [the file migration procedure](../file-encryption-migration.md). Never point this tool at PostgreSQL durable upload storage.
+5. PostgreSQL upload objects and retained privacy/audit evidence are intentionally immutable. Do not disable triggers, rewrite retained evidence or delete/reinsert objects to force rotation. Keep historical keys available while immutable data or retained archives depend on them. MFA seeds are read with their recorded ID; their renewal follows normal factor replacement. There is no automatic bulk seed/history rewrite.
+6. Perform an isolated restore drill with synthetic or explicitly approved data, all required historical application keys and the independent backup key. Verify mixed-key files, privacy payloads and factor decryption before approving retirement. Restore procedures are in [backup recovery](../backup-recovery.md).
+7. Retire a key only after the inventory and restore evidence prove that no retained object or backup needs it. The standalone keyring can then omit `ENCRYPTION_KEY`. The five-key bound is an operational capacity limit, not permission to discard the oldest key; archive retention and immutable history can require keeping it indefinitely.
+
+`backend/tests/mixed-key-recovery.integration.test.js` performs an actual synthetic PostgreSQL dump/archive/restore, then authenticates old- and new-key MFA seeds, privacy payloads and upload bytes with their original contexts. The archive worker receives only application-key fingerprints. The separately invoked custody-side `verifyRecoverySamples(samples, env)` in `backend/scripts/verify-recovery-encryption.js` receives retained keys and bounded ciphertext samples plus expected plaintext SHA-256 digests; it returns counts only and clears recovered buffers. Missing historical keys and wrong contexts fail the drill. It is not called by scheduled backup workers and does not establish live key custody or production restore readiness.
+
+## Coordinated application activation
+
+1. Build and test this exact source with the committed lockfiles in CI. Offline verification used available local packages; see [release evidence](../releases/2026-11-17-mfa-session-encryption.md) for the version limitation.
+2. Confirm protected backups and recovery-key availability. Plan a maintenance interval and inform users that existing sessions will be invalidated and password users must enroll MFA. Keep the existing legacy encryption key configured; key rotation is a separate operation.
+
+   Initial enrollment trusts possession of the verified account's current password. Anyone who has compromised that password before enrollment can claim the first authenticator. Confirm account ownership and review suspected compromise before activation; password verification is the approved bootstrap boundary, not proof of a previously enrolled second factor. Users perform enrollment themselves. After enrollment, replacement requires an existing verified factor or an unused recovery code; losing all factors and codes requires the operator's identity-recovery process.
+3. Stop API traffic and **all old API workers before applying migration 036**. An old worker could otherwise continue issuing password-only sessions. Verify the private migration ledger and exact SQL hashes. Prefix 035 is explicitly reserved for separately owned work; reconcile that migration before integrating if it has since been published. Do not edit an already applied migration or substitute a public ledger.
+4. Apply the ordered private-schema migration and runtime grants as the authorized migration owner. Migration 036 adds MFA tables and session assurance/CSRF columns, then invalidates existing active sessions. Runtime roles receive data privileges only; PUBLIC, anon and authenticated roles receive none on the new private tables.
+5. Deploy the MFA-aware API and cookie-aware UI together. Verify every API replica has the new source and trusted-origin/WebAuthn settings. Keep maintenance in place until the new API is ready; no old password-only worker may be restarted.
+6. Check readiness, a synthetic password enrollment with recovery acknowledgment, subsequent authenticator sign-in, verified passkey sign-in, failed/replayed code denial, cookie flags, CSRF denial and logout. Confirm clinical role/consent checks and encrypted file downloads with approved synthetic fixtures. Real users perform their own authenticator/passkey enrollment; operators must not copy their secrets.
+7. Resume traffic and monitor authentication failures, database errors and audit append failures. Recovery enrollment must remain possible without a password-only fallback.
+
+Rollback must preserve assurance. Stop traffic or deploy a corrected MFA-aware build. Reverting to the old password-only API weakens authentication even if the additive schema is compatible, so it is not an acceptable automatic rollback. Preserve retained decryption keys and recovery evidence during incident handling.
+
+## Provider transport verification
+
+On 17 November 2026, the project's SSL-enforcement switch was enabled through the owner's Chrome session after explicit approval of the database restart. Render already had `DB_SSL=true` and a configured CA setting. The final project health and application readiness observations are recorded in the release evidence; do not infer application rollout from the provider setting change. See [database transport](../database-transport.md) and Supabase's [SSL enforcement documentation](https://supabase.com/docs/guides/platform/ssl-enforcement).
