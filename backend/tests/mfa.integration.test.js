@@ -6,13 +6,16 @@ test('MFA enrollment, recovery, throttling and security evidence are transaction
     const name = `mfa_fixture_${process.pid}`;
     delete process.env.MFA_ALLOW_LEGACY_TEST_SESSIONS;
     process.env.DB_NAME = name;
-    let mfa = {};
-    try { mfa = require('../src/services/mfa.service'); } catch (error) { if (error.code !== 'MODULE_NOT_FOUND') throw error; }
-    assert.equal(typeof mfa.beginPasswordAuthentication, 'function', 'restricted password authentication must exist');
     assert.equal(process.env.RUN_DB_TESTS, 'true');
     assert.equal(process.env.NODE_ENV, 'test');
     assert.equal(process.env.DB_HOST, '127.0.0.1');
     assert.notEqual(process.env.DB_PORT, '5432');
+    // This isolated suite exercises the durable account/IP factor budgets.
+    // Keep the shared HTTP limiter from combining unrelated subtest failures.
+    process.env.LOGIN_RATE_LIMIT_MAX_ATTEMPTS = '1000';
+    process.env.RATE_LIMIT_MAX_REQUESTS = '1000';
+    const mfa = require('../src/services/mfa.service');
+    assert.equal(typeof mfa.beginPasswordAuthentication, 'function', 'restricted password authentication must exist');
     const admin = new Client({ host: process.env.DB_HOST, port: Number(process.env.DB_PORT), database: 'postgres', user: process.env.DB_USER, password: process.env.DB_PASSWORD, ssl: false });
     await admin.connect();
     await admin.query(`CREATE DATABASE ${name}`);
