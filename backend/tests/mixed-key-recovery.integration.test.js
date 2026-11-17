@@ -6,10 +6,8 @@ const path=require('node:path');
 const os=require('node:os');
 const {Client}=require('pg');
 const {createBackup,restoreBackup}=require('../scripts/backup-helper');
-let verifier={};try{verifier=require('../scripts/verify-recovery-encryption');}catch(error){if(error.code!=='MODULE_NOT_FOUND')throw error;}
 
 test('custody-side recovery decrypts restored mixed-key seeds, privacy payloads and files',{skip:process.env.RUN_DB_TESTS!=='true',timeout:60000},async()=>{
-    assert.equal(typeof verifier.verifyRecoverySamples,'function');
     assert.equal(process.env.NODE_ENV,'test');assert.equal(process.env.DB_HOST,'127.0.0.1');
     const root=await fs.mkdtemp(path.join(os.tmpdir(),'mixed-recovery-'));
     const sourceName=`healthcare_backup_test_mixed_${process.pid}`,targetName=`healthcare_restore_test_mixed_${process.pid}`;
@@ -24,6 +22,10 @@ test('custody-side recovery decrypts restored mixed-key seeds, privacy payloads 
         source=new Client({...connection,database:sourceName});await source.connect();
         await source.query('CREATE TABLE recovery_fixture(id text PRIMARY KEY,seed jsonb,privacy text,context text,relative text); CREATE TABLE verification_documents(id text PRIMARY KEY,file_path text NOT NULL)');
         Object.assign(process.env,ring);
+        // Configure the synthetic legacy key before loading modules that capture
+        // startup configuration; the CI process has its own unrelated test key.
+        const verifier=require('../scripts/verify-recovery-encryption');
+        assert.equal(typeof verifier.verifyRecoverySamples,'function');
         const {encryptSecret}=require('../src/services/encryption.service');
         const {seal}=require('../src/modules/privacy/privacy-crypto');
         const {encryptBuffer}=require('../src/services/file.crypto');

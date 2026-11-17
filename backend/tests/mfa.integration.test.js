@@ -13,14 +13,14 @@ test('MFA enrollment, recovery, throttling and security evidence are transaction
     assert.equal(process.env.NODE_ENV, 'test');
     assert.equal(process.env.DB_HOST, '127.0.0.1');
     assert.notEqual(process.env.DB_PORT, '5432');
-    const admin = new Client({ host: process.env.DB_HOST, port: Number(process.env.DB_PORT), database: 'postgres', user: process.env.DB_USER, ssl: false });
+    const admin = new Client({ host: process.env.DB_HOST, port: Number(process.env.DB_PORT), database: 'postgres', user: process.env.DB_USER, password: process.env.DB_PASSWORD, ssl: false });
     await admin.connect();
     await admin.query(`CREATE DATABASE ${name}`);
     let db;
     const req = { ip: '127.0.0.1', headers: { origin: 'http://localhost:3000', 'user-agent': 'Synthetic MFA fixture' }, method: 'POST', path: '/api/auth/mfa' };
     const { generateTotp } = require('../src/services/totp.service');
     try {
-        const migrationClient = new Client({ host: process.env.DB_HOST, port: Number(process.env.DB_PORT), database: name, user: process.env.DB_USER, ssl: false });
+        const migrationClient = new Client({ host: process.env.DB_HOST, port: Number(process.env.DB_PORT), database: name, user: process.env.DB_USER, password: process.env.DB_PASSWORD, ssl: false });
         await migrationClient.connect();
         try { await require('../src/database/migrate').migrate(migrationClient, { log: () => {} }); } finally { await migrationClient.end(); }
         db = require('../src/config/db');
