@@ -1,6 +1,6 @@
 # MFA, browser sessions and encryption operations
 
-Status: implementation branch; application activation requires the coordinated rollout below. Owner: platform operator. Last reviewed: 17 November 2026.
+Status: activated on 17 November 2026; see [activation evidence](../releases/2026-11-17-security-activation.md) for deployed source and verification limits. Owner: platform operator. Last reviewed: 17 November 2026.
 
 ## Authentication contract
 
