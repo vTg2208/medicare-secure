@@ -16,6 +16,8 @@ const cleanupExpiredSessions = async () => {
     `;
 
         const result = await query(deleteQuery);
+        await query('DELETE FROM auth_challenges WHERE expires_at<NOW()');
+        await query('DELETE FROM auth_mfa_throttles WHERE expires_at<NOW()');
         logger.info(`Cleaned up ${result.rowCount} expired sessions`);
     } catch (error) {
         logger.error('Session cleanup failed:', error);

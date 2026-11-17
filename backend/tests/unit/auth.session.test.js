@@ -26,3 +26,14 @@ it('looks up the presented token, so a different active session cannot revive a 
     expect(res.status).toHaveBeenCalledWith(401);
     expect(next).not.toHaveBeenCalled();
 });
+
+it('never clears cookies from an obsolete rejected request after a later sign-in', async () => {
+    query.mockResolvedValue({ rows: [] });
+    const { cookieNames } = require('../../src/services/auth-transport');
+    const names = cookieNames();
+    const cleared = [];
+    const res = { status: vi.fn().mockReturnThis(), json: vi.fn(), clearCookie: name => cleared.push(name) };
+    await authenticate({ headers: { cookie: `${names.session}=${token}` }, method: 'GET' }, res, () => { throw new Error('Rejected session was accepted'); });
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(cleared).toEqual([]);
+});

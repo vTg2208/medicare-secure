@@ -6,6 +6,7 @@ import { startAuthentication } from '@simplewebauthn/browser';
 import ThemeToggle from '../../components/common/ThemeToggle';
 import Brand from '../../components/common/Brand';
 import BotChallenge, { useBotChallenge } from '../../components/auth/BotChallenge';
+import MfaChallenge from '../../components/auth/MfaChallenge';
 import './Login.css';
 
 function Login() {
@@ -22,6 +23,7 @@ function Login() {
     const [passkeyLoading, setPasskeyLoading] = useState(false);
     const [error, setError] = useState('');
     const [activeTab, setActiveTab] = useState('password'); // 'password' or 'passkey'
+    const [mfa, setMfa] = useState(null);
     const successMessage = location.state?.message;
     const bot = useBotChallenge();
 
@@ -61,15 +63,12 @@ function Login() {
             const response = await authApi.login(formData.email, formData.password, ...(bot.token ? [bot.token] : []));
 
             const payload = response.data || response;
-            const user = payload.user || payload.data?.user;
-            const accessToken = payload.accessToken || payload.token || payload.data?.accessToken;
-
-            if (!user || !accessToken) {
-                throw new Error('Invalid server response: Missing user/token');
+            if (payload.ticket && ['enroll', 'verify'].includes(payload.nextStep)) {
+                setMfa(payload);
+                setFormData(previous => ({ ...previous, password: '' }));
+                return;
             }
-
-            login(user, accessToken);
-            navigateByRole(user.role || user.roleName);
+            completeSignIn(payload);
         } catch (err) {
             bot.capture(err);
             if (err.response?.status === 403 && err.response?.data?.message?.includes('not verified')) {
@@ -101,21 +100,12 @@ function Login() {
             }
 
             // Step 2: Trigger browser's WebAuthn prompt (fingerprint, face, PIN, etc.)
-            const credential = await startAuthentication({ optionsJSON: optionsRes.data });
+            const { challengeId, ...options } = optionsRes.data;
+            const credential = await startAuthentication({ optionsJSON: options });
 
             // Step 3: Verify with server
-            const verifyRes = await authApi.passkeyLoginVerify(formData.email, credential);
-
-            const payload = verifyRes.data || verifyRes;
-            const user = payload.user || payload.data?.user;
-            const accessToken = payload.accessToken || payload.token || payload.data?.accessToken;
-
-            if (!user || !accessToken) {
-                throw new Error('Invalid server response');
-            }
-
-            login(user, accessToken);
-            navigateByRole(user.role || user.roleName);
+            const verifyRes = await authApi.passkeyLoginVerify(formData.email, credential, challengeId);
+            completeSignIn(verifyRes.data || verifyRes);
         } catch (err) {
             if (err.name === 'NotAllowedError') {
                 setError('Passkey authentication was cancelled');
@@ -129,6 +119,13 @@ function Login() {
     };
 
     const busy = loading || passkeyLoading;
+    const completeSignIn = payload => {
+        const user = payload.user || payload.data?.user;
+        if (!user) throw new Error('The server did not confirm your session. Please sign in again.');
+        setMfa(null);
+        login(user);
+        navigateByRole(user.role || user.roleName);
+    };
 
     return (
         <main className="medicare-login">
@@ -155,14 +152,14 @@ function Login() {
                 </div>
                 <div className="login-form-content">
                     <Brand className="login-brand login-mobile-brand" />
-                    <div className="login-form-heading"><h2>Welcome back</h2><p>Sign in to your Medicare account.</p></div>
+                    <div className="login-form-heading"><h2>{mfa ? 'One more security step' : 'Welcome back'}</h2><p>Sign in to your Medicare account.</p></div>
                     {successMessage && <div role="status" className="login-notice login-success">{successMessage}</div>}
                     {error && <div id="login-error" role="alert" className="login-notice login-error">{error}</div>}
-                    <div className="login-methods" role="group" aria-label="Sign-in method">
+                    {!mfa && <div className="login-methods" role="group" aria-label="Sign-in method">
                         <button type="button" disabled={busy} aria-pressed={activeTab === 'password'} onClick={() => { setActiveTab('password'); setError(''); }}>Password</button>
                         <button type="button" disabled={busy} aria-pressed={activeTab === 'passkey'} onClick={() => { setActiveTab('passkey'); setError(''); }}><span className="material-symbols-outlined" aria-hidden="true">fingerprint</span>Passkey</button>
-                    </div>
-                    {activeTab === 'password' ? (
+                    </div>}
+                    {mfa ? <MfaChallenge challenge={mfa} onComplete={completeSignIn} onCancel={() => { setMfa(null); setError(''); setActiveTab('password'); }} /> : activeTab === 'password' ? (
                         <form onSubmit={handleSubmit} className="login-fields" aria-busy={loading}>
                             <div className="login-field">
                                 <label htmlFor="login-email">Email or phone</label>

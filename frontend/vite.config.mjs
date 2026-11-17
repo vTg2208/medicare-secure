@@ -13,7 +13,7 @@ export default defineConfig(({ mode }) => {
     server: { proxy: { '/api': process.env.API_PROXY_TARGET || 'http://localhost:5000', '/readyz': process.env.API_PROXY_TARGET || 'http://localhost:5000' } },
     // Keep font resources external and fingerprinted; CSP does not allow data: fonts.
     build: { outDir: 'build', sourcemap: false, assetsInlineLimit: 0 },
-    test: { globals: true, environment: 'jsdom', setupFiles: ['./src/setupTests.js'], clearMocks: true },
+    test: { globals: true, environment: 'jsdom', setupFiles: ['./src/setupTests.js'], clearMocks: true, maxWorkers: 2, testTimeout: 15000 },
   };
 });
 

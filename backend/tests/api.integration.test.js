@@ -38,6 +38,9 @@ test('real API: registration, sessions, patient boundaries, administration, and 
         const { generateAccessToken } = require('../src/config/jwt');
         const hash = value => crypto.createHash('sha256').update(value).digest('hex');
         const send = (method, url, token, body) => {
+            if (method === 'post' && url === '/api/auth/login') {
+                return require('./helpers/mfa-login').loginWithMfa(app, db, body.email, body.password).then(result => result.sessionResponse);
+            }
             const req = request(app)[method](url);
             if (token) req.set('Authorization', `Bearer ${token}`);
             return body === undefined ? req : req.send(body);
@@ -99,14 +102,14 @@ test('real API: registration, sessions, patient boundaries, administration, and 
                 const first = await send('post', '/api/auth/login', null, { email, password });
                 const second = await send('post', '/api/auth/login', null, { email, password });
                 expectStatus(first, 200); expectStatus(second, 200);
-                assert.notEqual(first.body.token, second.body.token);
-                expectStatus(await send('get', '/api/auth/verify', first.body.token), 200);
-                expectStatus(await send('post', '/api/auth/logout', first.body.token), 200);
-                expectStatus(await send('get', '/api/auth/verify', first.body.token), 401);
+                assert.notEqual(first.body.data.accessToken, second.body.data.accessToken);
+                expectStatus(await send('get', '/api/auth/verify', first.body.data.accessToken), 200);
+                expectStatus(await send('post', '/api/auth/logout', first.body.data.accessToken), 200);
+                expectStatus(await send('get', '/api/auth/verify', first.body.data.accessToken), 401);
                 const fresh = await send('post', '/api/auth/login', null, { email, password });
                 expectStatus(fresh, 200);
-                expectStatus(await send('get', '/api/auth/verify', first.body.token), 401);
-                expectStatus(await send('get', '/api/auth/verify', second.body.token), 401);
+                expectStatus(await send('get', '/api/auth/verify', first.body.data.accessToken), 401);
+                expectStatus(await send('get', '/api/auth/verify', second.body.data.accessToken), 401);
             } finally { transporter.sendMail = original; }
         });
 
@@ -119,6 +122,8 @@ test('real API: registration, sessions, patient boundaries, administration, and 
                 recipientUserId: users.doctor, dataCategory: 'all_medical_data', purpose: 'treatment', accessLevel: 'write',
             });
             expectStatus(granted, 201);
+            assert.equal(granted.body.data.access_level, 'write');
+            assert.ok(await require('../src/models/consent.model').findMatchingConsent(users.patient, users.doctor, 'clinical_notes', 'write'), 'the persisted write grant must be active before the clinical request');
             expectStatus(await send('get', `/api/emr/medical-records/${record}`, tokens.doctor), 200);
             const created = await send('post', '/api/emr/medical-records', tokens.doctor, {
                 patientId: users.patient, visitId: visit, type: 'consultation', title: 'Clinical workflow fixture', description: 'Fixture only',
@@ -276,11 +281,11 @@ test('real API: registration, sessions, patient boundaries, administration, and 
             const nextLogin = await send('post','/api/auth/login',null,{email:'replacement@example.invalid',password});
             expectStatus(nextLogin,200);
             expectStatus(await send('patch',`/api/visits/${visit}/assign`,tokens.hospital_admin,{assignedDoctorId:nextDoctor}),200);
-            expectStatus(await send('get',`/api/emr/medical-records/${record}`,nextLogin.body.token),403);
+            expectStatus(await send('get',`/api/emr/medical-records/${record}`,nextLogin.body.data.accessToken),403);
             const code = await send('post',`/api/visits/${visit}/access-code`,tokens.patient,{});
             expectStatus(code,200);
             expectStatus(await send('post',`/api/visits/${visit}/verify-otp`,tokens.patient,{otp:code.body.data.accessCode,accessLevel:'read'}),200);
-            expectStatus(await send('get',`/api/emr/medical-records/${record}`,nextLogin.body.token),200);
+            expectStatus(await send('get',`/api/emr/medical-records/${record}`,nextLogin.body.data.accessToken),200);
             assert.deepEqual((await db.query('SELECT started_at FROM visits WHERE id=$1',[visit])).rows[0].started_at,originalStart);
         });
 

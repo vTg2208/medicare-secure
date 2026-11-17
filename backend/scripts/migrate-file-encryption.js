@@ -16,15 +16,18 @@ function contextForFile(uploadRoot, file) {
     return relative.split(path.sep).join('/');
 }
 
-function decrypt(bytes, key, context) {
+function decrypt(bytes, ring, context) {
     const version = bytes.subarray(0, 8).toString();
     if (bytes.length < 36 || !['SHMSENC1', 'SHMSENC2'].includes(version)) throw fault('PLAINTEXT_REFUSED', 'Plaintext or unknown encryption formats cannot be migrated');
-    try {
-        const decipher = crypto.createDecipheriv('aes-256-gcm', key, bytes.subarray(8, 20));
-        if (version === 'SHMSENC2') decipher.setAAD(Buffer.from(context, 'utf8'));
-        decipher.setAuthTag(bytes.subarray(20, 36));
-        return { version, plaintext: Buffer.concat([decipher.update(bytes.subarray(36)), decipher.final()]) };
-    } catch { throw fault('AUTHENTICATION_FAILED', 'An encrypted file failed key, integrity or identity verification'); }
+    for (const { id, key } of ring.keys) {
+        try {
+            const decipher = crypto.createDecipheriv('aes-256-gcm', key, bytes.subarray(8, 20));
+            if (version === 'SHMSENC2') decipher.setAAD(Buffer.from(context, 'utf8'));
+            decipher.setAuthTag(bytes.subarray(20, 36));
+            return { version, keyId: id, plaintext: Buffer.concat([decipher.update(bytes.subarray(36)), decipher.final()]) };
+        } catch { /* Authenticate against the bounded retained key set. */ }
+    }
+    throw fault('AUTHENTICATION_FAILED', 'An encrypted file failed key, integrity or identity verification');
 }
 
 function encrypt(bytes, key, context) {
@@ -106,9 +109,10 @@ async function backupLocation(uploadRoot, requested) {
     return backup;
 }
 
-async function migrateFileEncryptionUnlocked({ uploads, apply = false, backupDirectory, env = process.env } = {}) {
-    if (!/^[a-f\d]{64}$/i.test(env.ENCRYPTION_KEY || '')) throw fault('KEY_REQUIRED', 'A valid existing application encryption key is required');
-    const key = Buffer.from(env.ENCRYPTION_KEY, 'hex');
+async function migrateFileEncryptionUnlocked({ uploads, apply = false, rotateKeys = false, backupDirectory, env = process.env } = {}) {
+    let ring;
+    try { ring = require('../src/services/application-keys').getApplicationKeys(env); }
+    catch { throw fault('KEY_REQUIRED', 'Valid existing application encryption keys are required'); }
     const requested = uploads || env.UPLOAD_PATH;
     if (!requested || !path.isAbsolute(requested)) throw fault('UPLOAD_REQUIRED', 'An explicit absolute upload directory is required');
     const root = path.resolve(requested);
@@ -121,22 +125,24 @@ async function migrateFileEncryptionUnlocked({ uploads, apply = false, backupDir
     }
     const files = await filesUnder(root);
     const summary = { scanned: files.length, legacy: 0, upToDate: 0, migrated: 0, dryRun: !apply };
+    if (rotateKeys) summary.rotation = 0;
     // Authenticate the complete input set before creating backups or replacing any file.
     for (const file of files) {
         const bytes = await readRegular(file.file);
-        const verified = decrypt(bytes, key, contextForFile(root, file.file));
-        file.version = verified.version; file.hash = digest(bytes);
+        const verified = decrypt(bytes, ring, contextForFile(root, file.file));
+        file.version = verified.version; file.keyId = verified.keyId; file.hash = digest(bytes);
         verified.plaintext.fill(0);
         if (file.version === 'SHMSENC1') summary.legacy++; else summary.upToDate++;
+        if (rotateKeys && file.keyId !== ring.activeId) summary.rotation++;
     }
-    if (!apply || !summary.legacy) return summary;
+    if (!apply || (!summary.legacy && !summary.rotation)) return summary;
     await fs.mkdir(backup, { mode: 0o700 }).catch(error => { if (error.code !== 'EEXIST') throw error; });
     if ((await fs.lstat(backup)).isSymbolicLink() || await fs.realpath(backup) !== backup) throw fault('UNSAFE_BACKUP', 'The backup directory changed during migration');
-    for (const file of files.filter(item => item.version === 'SHMSENC1')) {
+    for (const file of files.filter(item => item.version === 'SHMSENC1' || (rotateKeys && item.keyId !== ring.activeId))) {
         const bytes = await readRegular(file.file);
         if (digest(bytes) !== file.hash) throw fault('FILE_CHANGED', 'An upload changed after migration preflight');
         const context = contextForFile(root, file.file);
-        const verified = decrypt(bytes, key, context);
+        const verified = decrypt(bytes, ring, context);
         const original = contained(backup, file.relative);
         await safeDirectory(backup, file.relative.split('/').slice(0, -1).join('/'));
         try { await exclusiveFile(original, bytes); }
@@ -148,7 +154,7 @@ async function migrateFileEncryptionUnlocked({ uploads, apply = false, backupDir
         }
         const temporary = path.join(path.dirname(file.file), `.${path.basename(file.file)}.migration-${crypto.randomUUID()}`);
         try {
-            await exclusiveFile(temporary, encrypt(verified.plaintext, key, context));
+            await exclusiveFile(temporary, encrypt(verified.plaintext, ring.activeKey, context));
             if (digest(await readRegular(file.file)) !== file.hash) throw fault('FILE_CHANGED', 'An upload changed before atomic replacement');
             await fs.rename(temporary, file.file);
             summary.migrated++;
@@ -171,10 +177,11 @@ function argumentsFor(argv) {
     const options = {}; let dry = false;
     for (let index = 0; index < argv.length; index++) {
         if (argv[index] === '--apply') options.apply = true;
+        else if (argv[index] === '--rotate-keys') options.rotateKeys = true;
         else if (argv[index] === '--dry-run') dry = true;
         else if (argv[index] === '--uploads' && argv[index + 1]) options.uploads = argv[++index];
         else if (argv[index] === '--backup-dir' && argv[index + 1]) options.backupDirectory = argv[++index];
-        else throw fault('ARGUMENTS', 'Use --dry-run or --apply, --uploads and --backup-dir');
+        else throw fault('ARGUMENTS', 'Use --dry-run or --apply, optional --rotate-keys, --uploads and --backup-dir');
     }
     if (dry && options.apply) throw fault('ARGUMENTS', 'Choose either dry-run or apply');
     return options;

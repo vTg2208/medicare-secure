@@ -5,6 +5,7 @@ const crypto = require('node:crypto');
 const OUTPUT_DIRECTORY = path.resolve(__dirname, '../../.local');
 const MIGRATION_DIRECTORY = path.resolve(__dirname, '../src/database/ordered');
 const LOCK_KEY = 731405921;
+const reservedPrefixes = new Set(Object.keys(require('../src/database/migration-reservations.json')));
 const literal = value => `'${String(value).replaceAll("'", "''")}'`;
 const hash = sql => crypto.createHash('sha256').update(sql).digest('hex');
 
@@ -27,11 +28,16 @@ function dollarQuote(body, name) {
 function buildBrowserUpgradeSql({ from, migrations = readOrderedMigrations() } = {}) {
     if (!/^\d{3}$/.test(from || '')) throw new Error('An explicit three-digit --from migration prefix is required');
     if (!migrations.length) throw new Error('No ordered migrations found');
-    migrations.forEach((migration, index) => {
-        const prefix = String(index + 1).padStart(3, '0');
+    let nextPrefix = 1;
+    migrations.forEach((migration) => {
+        let prefix = String(nextPrefix).padStart(3, '0');
+        // A declared reservation may be absent; every other missing migration,
+        // duplicate prefix and modified SQL hash still fails closed.
+        while (reservedPrefixes.has(prefix) && !migration.id.startsWith(`${prefix}_`)) prefix = String(++nextPrefix).padStart(3, '0');
         if (!new RegExp(`^${prefix}_[a-z0-9_]+$`).test(migration.id) || typeof migration.sql !== 'string' || migration.hash !== hash(migration.sql)) {
             throw new Error('Ordered migrations must be contiguous and match their exact SQL hashes');
         }
+        nextPrefix++;
     });
     const prefixCount = migrations.findIndex(migration => migration.id.startsWith(`${from}_`)) + 1;
     if (!prefixCount) throw new Error('The requested migration prefix is unknown');

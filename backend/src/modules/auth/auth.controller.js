@@ -1,15 +1,12 @@
 const crypto = require('crypto');
-const { createUser, findUserByEmailOrPhone, userExists, updateUserVerification, updateLastLogin, incrementFailedLoginAttempts, isAccountLocked } = require('../../models/user.model');
+const { createUser, findUserByEmailOrPhone, userExists, updateUserVerification, incrementFailedLoginAttempts, isAccountLocked } = require('../../models/user.model');
 const { measurePhase } = require('../../services/request-timing');
-const { createPatientProfile, findPatientByUserId } = require('../../models/patient.model');
+const { createPatientProfile } = require('../../models/patient.model');
 const { createOrganization } = require('../../models/organization.model');
 const { getRoleByName } = require('../../models/role.model');
 const { generateAndSendOTP, verifyOTP } = require('../../services/otp.service');
 const { comparePassword, hashPassword, hashGovtId } = require('../../services/encryption.service');
-const { generateAccessToken, generateRefreshToken } = require('../../config/jwt');
-const { hashToken } = require('../../services/encryption.service');
 const { createAuditLog } = require('../../services/audit.service');
-const { captureDeviceInfo } = require('../../services/device.service');
 const { query, transaction } = require('../../config/db');
 const { HTTP_STATUS, SUCCESS_MESSAGES, ERROR_MESSAGES, ROLES, OTP_PURPOSE, AUDIT_ACTIONS } = require('../../utils/constants');
 const { isValidEmail, isValidPhone, validatePassword, validateRequiredFields } = require('../../utils/validators');
@@ -679,89 +676,11 @@ const login = async (req, res) => {
             });
         }
 
-        // Fetch additional role-specific data
-        let uniqueHealthId = null;
-        if (user.role_name === ROLES.PATIENT) {
-            const patientProfile = await findPatientByUserId(user.id);
-            if (patientProfile) {
-                uniqueHealthId = patientProfile.unique_health_id;
-            }
-        }
-
-        // Generate tokens
-        const tokenPayload = {
-            userId: user.id,
-            email: user.email,
-            phone: user.phone,
-            roleId: user.role_id,
-            roleName: user.role_name,
-            firstName: user.first_name,
-            lastName: user.last_name,
-            uniqueHealthId,
-        };
-
-        const accessToken = generateAccessToken(tokenPayload);
-        const refreshToken = generateRefreshToken(tokenPayload);
-
-        // Store session with device information
-        const tokenHash = hashToken(accessToken);
-        const refreshTokenHash = hashToken(refreshToken);
-        const deviceInfo = captureDeviceInfo(req);
-
-        const sessionQuery = `
-      INSERT INTO sessions (
-        user_id, token_hash, refresh_token_hash, ip_address, user_agent,
-        device_info, expires_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7)
-      RETURNING id
-    `;
-
-        await measurePhase('login_session', () => query(sessionQuery, [
-            user.id,
-            tokenHash,
-            refreshTokenHash,
-            req.ip,
-            req.headers['user-agent'],
-            JSON.stringify(deviceInfo),
-            new Date(require('jsonwebtoken').decode(accessToken).exp * 1000),
-        ]));
-
-        // Update last login
-        await measurePhase('login_last_login', () => updateLastLogin(user.id));
-
-        // Audit log
-        await measurePhase('login_audit', () => createAuditLog({
-            userId: user.id,
-            action: AUDIT_ACTIONS.USER_LOGIN,
-            purpose: 'User login',
-            ipAddress: req.ip,
-            userAgent: req.headers['user-agent'],
-            requestMethod: req.method,
-            requestPath: req.path,
-            statusCode: HTTP_STATUS.OK,
-        }));
-
-        logger.info('User logged in successfully:', { userId: user.id, role: user.role_name });
-
-        res.status(HTTP_STATUS.OK).json({
-            success: true,
-            message: SUCCESS_MESSAGES.LOGIN_SUCCESS,
-            data: {
-                user: {
-                    id: user.id,
-                    email: user.email,
-                    phone: user.phone,
-                    role: user.role_name,
-                    firstName: user.first_name,
-                    lastName: user.last_name,
-                    uniqueHealthId,
-                },
-                accessToken,
-                refreshToken,
-            },
-        });
+        const challenge = await require('../../services/mfa.service').beginPasswordAuthentication(user, req);
+        return res.status(HTTP_STATUS.OK).json({ success: true, message: 'Complete verification to sign in', data: challenge });
     } catch (error) {
         logger.error('Login failed:', error);
+        if ([401, 403, 429].includes(error.status)) return res.status(error.status).json({ success: false, message: error.message });
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: ERROR_MESSAGES.INTERNAL_ERROR,
@@ -778,20 +697,16 @@ const logout = async (req, res) => {
     try {
         const userId = req.user.id;
 
-        // Deactivate all active sessions for user
-        await query('UPDATE sessions SET is_active = false WHERE user_id = $1', [userId]);
-
-        // Audit log
-        await createAuditLog({
-            userId,
-            action: AUDIT_ACTIONS.USER_LOGOUT,
-            purpose: 'User logout',
-            ipAddress: req.ip,
-            userAgent: req.headers['user-agent'],
-            requestMethod: req.method,
-            requestPath: req.path,
-            statusCode: HTTP_STATUS.OK,
+        await transaction(async client => {
+            await client.query('SELECT id FROM users WHERE id=$1 FOR UPDATE', [userId]);
+            if (req.session.transport === 'cookie') {
+                await client.query('UPDATE sessions SET is_active=false WHERE user_id=$1 AND id=$2', [userId, req.session.id]);
+            } else await client.query('UPDATE sessions SET is_active=false WHERE user_id=$1', [userId]);
+            await require('../../services/auth-session.service').auditAuthentication(client, userId, AUDIT_ACTIONS.USER_LOGOUT, req,
+                { scope: req.session.transport === 'cookie' ? 'current_session' : 'all_sessions' });
         });
+        // Revocation is authoritative. Expiring the shared cookie here could
+        // overwrite a newer sign-in when this response is delivered late.
 
         logger.info('User logged out successfully:', { userId });
 

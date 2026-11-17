@@ -1,8 +1,9 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useId } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { authApi } from '../../api/authApi';
-import { startRegistration } from '@simplewebauthn/browser';
+import { startRegistration, startAuthentication } from '@simplewebauthn/browser';
 import './Button.css';
+import '../auth/MfaChallenge.css';
 
 /**
  * PasskeySetupCard - Inline collapsible passkey registration, designed to sit inside a user info bar.
@@ -14,6 +15,9 @@ function PasskeySetupCard() {
     const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState(null); // 'success' | 'error'
     const [message, setMessage] = useState('');
+    const [proofMethod, setProofMethod] = useState('authenticator');
+    const [code, setCode] = useState('');
+    const formId = useId();
 
     if (!user) return null;
 
@@ -23,12 +27,25 @@ function PasskeySetupCard() {
         setMessage('');
 
         try {
-            const optionsRes = await authApi.passkeyRegisterOptions();
+            let proof;
+            if (proofMethod === 'authenticator') {
+                if (!/^[0-9]{6}$/.test(code)) throw new Error('Enter a fresh six-digit authenticator code.');
+                const verified = await authApi.mfaStepUp(code);
+                proof = (verified.data || verified).stepUpTicket;
+            } else {
+                const challenge = await authApi.passkeyStepUpOptions();
+                const { challengeId, ...options } = challenge.data;
+                const response = await startAuthentication({ optionsJSON: options });
+                const verified = await authApi.passkeyStepUpVerify(response, challengeId);
+                proof = (verified.data || verified).stepUpTicket;
+            }
+            const optionsRes = await authApi.passkeyRegisterOptions(proof);
             if (!optionsRes.success) throw new Error(optionsRes.message || 'Failed to get passkey options');
 
-            const credential = await startRegistration({ optionsJSON: optionsRes.data });
+            const { challengeId, ...options } = optionsRes.data;
+            const credential = await startRegistration({ optionsJSON: options });
 
-            const verifyRes = await authApi.passkeyRegisterVerify(credential, 'My Passkey');
+            const verifyRes = await authApi.passkeyRegisterVerify(credential, 'My Passkey', challengeId);
             if (!verifyRes.success) throw new Error(verifyRes.message || 'Passkey registration failed');
 
             setStatus('success');
@@ -41,6 +58,7 @@ function PasskeySetupCard() {
                 setMessage(err.response?.data?.message || err.message || 'Failed to set up passkey');
             }
         } finally {
+            setCode('');
             setLoading(false);
         }
     };
@@ -49,6 +67,9 @@ function PasskeySetupCard() {
         <div style={{ borderTop: '1px solid var(--mc-border)', marginTop: '12px', paddingTop: '8px' }}>
             {/* Toggle Button */}
             <button
+                type="button"
+                aria-expanded={expanded}
+                aria-controls={`${formId}-panel`}
                 onClick={() => setExpanded(!expanded)}
                 style={{
                     display: 'flex',
@@ -77,8 +98,8 @@ function PasskeySetupCard() {
             </button>
 
             {/* Expandable content */}
-            <div style={{
-                maxHeight: expanded ? '300px' : '0',
+            <div id={`${formId}-panel`} hidden={!expanded} style={{
+                maxHeight: expanded ? 'none' : '0',
                 overflow: 'hidden',
                 transition: 'max-height 0.3s ease, opacity 0.3s ease',
                 opacity: expanded ? 1 : 0,
@@ -115,15 +136,29 @@ function PasskeySetupCard() {
                         ))}
                     </div>
 
+                    {status !== 'success' && <div className="mfa-form" style={{ marginBottom: '12px' }}>
+                        <fieldset disabled={loading}>
+                            <legend>Verify before adding a passkey</legend>
+                            <label><input type="radio" name={`${formId}-method`} checked={proofMethod === 'authenticator'} onChange={() => setProofMethod('authenticator')} /> Authenticator app</label>
+                            <label><input type="radio" name={`${formId}-method`} checked={proofMethod === 'passkey'} onChange={() => setProofMethod('passkey')} /> Existing passkey</label>
+                        </fieldset>
+                        {proofMethod === 'authenticator' && <>
+                            <label htmlFor={`${formId}-code`}>Authenticator code</label>
+                            <input id={`${formId}-code`} value={code} onChange={event => setCode(event.target.value)} inputMode="numeric"
+                                autoComplete="one-time-code" maxLength={6} disabled={loading} />
+                            <p>Use a fresh code. If you just signed in, wait for the next one.</p>
+                        </>}
+                    </div>}
+
                     {/* Status */}
                     {status === 'success' && (
-                        <div style={{ padding: '8px 10px', borderRadius: 'var(--mc-radius-control)', background: 'var(--mc-success-bg)', border: '1px solid var(--mc-success-border)', color: 'var(--mc-success)', fontSize: '12px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <div role="status" style={{ padding: '8px 10px', borderRadius: 'var(--mc-radius-control)', background: 'var(--mc-success-bg)', border: '1px solid var(--mc-success-border)', color: 'var(--mc-success)', fontSize: '12px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
                             {message}
                         </div>
                     )}
                     {status === 'error' && (
-                        <div style={{ padding: '8px 10px', borderRadius: 'var(--mc-radius-control)', background: 'var(--mc-danger-bg)', border: '1px solid var(--mc-danger-border)', color: 'var(--mc-danger)', fontSize: '12px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <div role="alert" style={{ padding: '8px 10px', borderRadius: 'var(--mc-radius-control)', background: 'var(--mc-danger-bg)', border: '1px solid var(--mc-danger-border)', color: 'var(--mc-danger)', fontSize: '12px', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" /><line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg>
                             {message}
                         </div>

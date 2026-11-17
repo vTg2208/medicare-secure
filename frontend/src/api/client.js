@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { getAuthHeader, removeToken } from '../utils/tokenManager';
+import { getAuthHeader, clearLegacyCredentials, setSignOutState } from '../utils/tokenManager';
+import { assertBoundSession,isCurrentSession,snapshotSession,sessionChangedError,unbindSession } from '../utils/sessionBinding';
 
 // Accept both an origin and an API URL. Use the same-origin production proxy by default.
 export function normalizeApiUrl(value = '') {
@@ -16,6 +17,7 @@ const apiClient = axios.create({
     baseURL: API_BASE_URL,
     timeout: normalizeApiTimeout(process.env.REACT_APP_API_TIMEOUT_MS),
     headers: { 'Content-Type': 'application/json' },
+    withCredentials: true,
 });
 // Share only pending JSON reads. Completed responses (including patient data)
 // are never cached, and mutations create a new generation of reads.
@@ -37,7 +39,11 @@ function deduplicateAdapter(adapter) {
     return wrapped;
 }
 apiClient.interceptors.request.use((config) => {
-    if (!config.skipAuth) Object.assign(config.headers, getAuthHeader());
+    if (!config.skipAuth || config.sessionBound) {
+        if(!config.sessionBootstrap) assertBoundSession();
+        config.sessionSnapshot=snapshotSession();
+        Object.assign(config.headers, getAuthHeader());
+    }
     const isRead = ['get', 'head', 'options'].includes(config.method);
     if (!isRead) readGeneration++;
     // A caller with cancellation owns its transport; sharing would let one
@@ -51,8 +57,10 @@ apiClient.interceptors.request.use((config) => {
 export function handleUnauthorized(error, redirect = () => window.location.assign('/login')) {
     // Public login, OTP, invitation and passkey failures belong to their forms.
     const config = error.config;
-    if (error.response?.status === 401 && config && !config.skipAuth && config.headers?.Authorization) {
-        removeToken();
+    if (error.response?.status === 401 && config && isCurrentSession(config.sessionSnapshot) && !config.skipAuth && !config.skipUnauthorizedRedirect) {
+        clearLegacyCredentials();
+        setSignOutState('signed-out');
+        unbindSession();
         redirect();
     }
     return Promise.reject(error);
@@ -62,6 +70,7 @@ const invalidateAfterWrite = config => {
 };
 apiClient.interceptors.response.use((response) => {
     invalidateAfterWrite(response.config);
+    if(!isCurrentSession(response.config?.sessionSnapshot)) return Promise.reject(sessionChangedError());
     return response;
 }, error => {
     invalidateAfterWrite(error.config);

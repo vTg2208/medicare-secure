@@ -5,7 +5,8 @@ const timings = new AsyncLocalStorage();
 const adminRoles = new Set(['hospital_admin', 'system_admin']);
 
 function requestTiming(apiVersion) {
-    const login = new Set(['/api/auth/login', `/api/${apiVersion}/auth/login`]);
+    const login = new Set(['login', 'mfa/verify', 'mfa/setup/acknowledge', 'passkey/login/verify']
+        .flatMap(path => [`/api/auth/${path}`, `/api/${apiVersion}/auth/${path}`]));
     const audit = new Set(['/api/audit/logs', `/api/${apiVersion}/audit/logs`]);
     return (req, res, next) => {
         if (req.get('X-Performance-Trace') !== '1') return next();

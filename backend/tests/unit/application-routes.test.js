@@ -24,7 +24,7 @@ beforeEach(() => {
 describe.each(['/api', '/api/v1'])('application routes at %s', prefix => {
     it('runs public registration validation and keeps verification validation available', async () => {
         for (const path of ['/auth/register/patient', '/auth/login', '/auth/verify-otp', '/auth/otp/verify']) {
-            expect((await request(app).post(prefix + path).send({})).status).toBe(400);
+            expect((await request(app).post(prefix + path).set('Origin', 'http://localhost:3000').send({})).status).toBe(400);
         }
     });
     it.each([

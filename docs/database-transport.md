@@ -1,5 +1,7 @@
 # Database transport and responder delivery
 
+On 17 November 2026, Supabase incoming SSL enforcement was enabled with the owner's approval. The project returned Healthy and the existing Render API readiness endpoint responded successfully over HTTPS. See [the recorded observation and limits](releases/2026-11-17-mfa-session-encryption.md) and [MFA/key operations](security/mfa-sessions-and-encryption.md). This provider change does not activate the new application authentication release.
+
 Production startup now requires `DB_SSL=true`. Clients verify the issuing CA and hostname with TLS 1.2 or newer. `DB_SSL_CA_FILE` loads a mounted public CA; existing escaped `DB_SSL_CA` remains supported. Missing configured CA files fail closed. Development and disposable integration fixtures may use plaintext.
 
 The production Compose template requires operator-supplied `POSTGRES_TLS_CERT_FILE`, `POSTGRES_TLS_KEY_FILE` and `POSTGRES_TLS_CA_FILE`. The PEM server chain must have SAN `DNS:postgres` and an appropriate validity period. Keep private keys outside this repository. The wrapper copies the key to a postgres-owned 0600 tmpfs file, enables TLS and rejects **all plaintext TCP** connections. Local Unix-socket trust is restricted to the database container for official initialization tooling; do not grant untrusted workloads container access. The API and migration service receive only the public CA. Rotate certificates through an operator-reviewed database restart and verify readiness. No private network connection is exempt from this template's TCP policy.

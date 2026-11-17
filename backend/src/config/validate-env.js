@@ -4,7 +4,10 @@ const validateEnvironment = (env) => {
     if (env.FILE_STORAGE_BACKEND && !['filesystem','postgres'].includes(env.FILE_STORAGE_BACKEND)) errors.push('FILE_STORAGE_BACKEND must be filesystem or postgres');
     const production = env.NODE_ENV === 'production';
     const required = ['DB_PASSWORD', 'JWT_SECRET', 'JWT_REFRESH_SECRET'];
-    if (production) required.push('ENCRYPTION_KEY', 'CORS_ORIGIN', 'FRONTEND_URL', 'WEBAUTHN_RP_ID', 'WEBAUTHN_ORIGIN');
+    if (production) {
+        if (!env.APPLICATION_ENCRYPTION_KEYS) required.push('ENCRYPTION_KEY');
+        required.push('CORS_ORIGIN', 'FRONTEND_URL', 'WEBAUTHN_RP_ID', 'WEBAUTHN_ORIGIN');
+    }
     // SMTP is an optional integration. A configured transport needs both values;
     // missing delivery returns an explicit service error without blocking login.
     if (env.EMAIL_HOST || env.EMAIL_FROM) required.push('EMAIL_HOST', 'EMAIL_FROM');
@@ -16,6 +19,10 @@ const validateEnvironment = (env) => {
     }
     if (env.JWT_SECRET && env.JWT_SECRET === env.JWT_REFRESH_SECRET) errors.push('JWT secrets must be different');
     if (env.ENCRYPTION_KEY && !/^[a-f\d]{64}$/i.test(env.ENCRYPTION_KEY)) errors.push('ENCRYPTION_KEY must be 64 hexadecimal characters (32 bytes)');
+    if (env.ENCRYPTION_KEY || env.APPLICATION_ENCRYPTION_KEYS !== undefined || env.ENCRYPTION_ACTIVE_KEY_ID !== undefined) {
+        try { require('../services/application-keys').getApplicationKeys(env); }
+        catch { errors.push('Invalid application encryption key configuration'); }
+    }
     if (env.ENCRYPTION_ALGORITHM && env.ENCRYPTION_ALGORITHM !== 'aes-256-gcm') errors.push('ENCRYPTION_ALGORITHM must be aes-256-gcm');
     for (const key of ['DB_SSL', 'EMAIL_SECURE', 'AUTO_LOGOUT_ENABLED', 'AI_ENABLED', 'TURNSTILE_ENABLED']) {
         if (env[key] && !['true', 'false'].includes(env[key])) errors.push(`${key} must be true or false`);

@@ -82,7 +82,7 @@ test('performance queries preserve isolation, searchable pagination and bounded 
                 await db.query("INSERT INTO sessions(user_id,token_hash,expires_at) VALUES($1,$2,NOW()+INTERVAL '1 hour')", [id, crypto.createHash('sha256').update(token).digest('hex')]);
                 return token;
             };
-            const adminToken = await session(administrator, 'hospital_admin');
+            let adminToken = await session(administrator, 'hospital_admin');
             const patientToken = await session(patient, 'patient');
             const listed = await request(app).get('/api/users?role=doctor&search=Beyond&limit=10000&offset=-4').set('Authorization', `Bearer ${adminToken}`);
             assert.equal(listed.status, 200, JSON.stringify(listed.body));
@@ -101,13 +101,15 @@ test('performance queries preserve isolation, searchable pagination and bounded 
                 const password = 'Synthetic-Timing-Only-8a';
                 const email = 'trace-owner@example.invalid';
                 await db.query('UPDATE users SET email=$1,password_hash=$2 WHERE id=$3', [email, await bcrypt.hash(password, 4), administrator]);
-                const login = await request(app).post('/api/auth/login').set('X-Performance-Trace', '1').send({ email, password });
+                const { passwordResponse, sessionResponse: login } = await require('./helpers/mfa-login').loginWithMfa(app, db, email, password, { trace: true });
                 assert.equal(login.status, 200, JSON.stringify({ status: login.status, success: login.body.success }));
+                assert.equal(passwordResponse.headers['server-timing'], undefined, 'password-only responses cannot reveal privileged timing');
                 const loginTiming = login.headers['server-timing'];
-                assert.match(loginTiming, /login_password;dur=[\d.]+/);
+                assert.match(loginTiming, /login_session;dur=[\d.]+/);
                 assert.match(loginTiming, /login_audit;dur=[\d.]+/);
                 assert.match(loginTiming, /db_protocol;dur=[\d.]+/);
                 assert.ok(!loginTiming.includes(email));
+                adminToken = login.body.data.accessToken;
                 const logs = () => request(app).get('/api/audit/logs').set('Authorization', `Bearer ${login.body.data.accessToken}`);
                 assert.equal((await logs()).headers['server-timing'], undefined);
                 const traced = await logs().set('X-Performance-Trace', '1');
@@ -120,7 +122,7 @@ test('performance queries preserve isolation, searchable pagination and bounded 
                     .set('Authorization', `Bearer ${patientToken}`).set('X-Performance-Trace', '1');
                 assert.equal(denied.status, 403);
                 assert.equal(denied.headers['server-timing'], undefined);
-                const bad = await request(app).post('/api/auth/login').set('X-Performance-Trace', '1').send({ email, password: 'wrong' });
+                const bad = await request(app).post('/api/auth/login').set('X-Auth-Transport', 'bearer').set('X-Performance-Trace', '1').send({ email, password: 'wrong' });
                 assert.equal(bad.status, 401);
                 assert.equal(bad.headers['server-timing'], undefined);
             });
