@@ -9,7 +9,7 @@ import '../patient/Dashboard.css';
 import './Profile.css';
 
 function Profile() {
-    const { user, logout, login } = useContext(AuthContext);
+    const { user, logout, updateUser } = useContext(AuthContext);
     const [formData, setFormData] = useState({ firstName: '', lastName: '', phone: '' });
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
@@ -53,8 +53,7 @@ function Profile() {
             if (response.success) {
                 setSuccess('Profile updated successfully');
                 const u = response.data;
-                const token = localStorage.getItem('token');
-                login({ ...user, firstName: u.firstName || u.first_name, lastName: u.lastName || u.last_name, phone: u.phone }, token);
+                updateUser({ firstName: u.firstName || u.first_name, lastName: u.lastName || u.last_name, phone: u.phone }, user.id);
             }
         } catch (err) {
             setError(err.response?.data?.message || 'Failed to update profile');
