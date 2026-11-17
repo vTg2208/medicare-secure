@@ -76,6 +76,26 @@ test('authenticated patients still need a public-form challenge', async () => {
     expect(handle).not.toHaveBeenCalled();
 });
 
+test('staff registration recognizes a verified cookie session and rejects a forged cookie', async () => {
+    const authenticateRequest = (req, res, next) => {
+        if (req.get('Cookie') !== 'medicare_session=verified-fixture') return res.status(401).json({ success: false });
+        req.user = { id: 'synthetic-staff', roleName: 'nurse' }; return next();
+    };
+    const { app } = build({ allowStaff: true, authenticateRequest });
+    expect((await request(app).post('/submit').set('Cookie', 'medicare_session=verified-fixture').send({})).status).toBe(200);
+    expect((await request(app).post('/submit').set('Cookie', 'medicare_session=forged-fixture').send({})).status).toBe(401);
+});
+
+test('public patient registration ignores stale cookies while still requiring a verified bot challenge', async () => {
+    const authenticateRequest=vi.fn((req,res)=>res.status(401).json({success:false}));
+    const verifyToken=vi.fn().mockResolvedValue(true);
+    const {app,handle}=build({allowStaff:true,authenticateRequest,verifyToken});
+    const post=()=>request(app).post('/submit').set('Cookie','medicare_session=expired-fixture').set('X-Registration-Context','public');
+    expect((await post().set('X-Bot-Token','valid-public-fixture').send({})).status).toBe(200);
+    expect((await post().send({})).status).toBe(428);
+    expect(authenticateRequest).not.toHaveBeenCalled();expect(handle).toHaveBeenCalledOnce();
+});
+
 test('leaves explicitly unconfigured development flows unchanged', async () => {
     const { app, handle } = build({ settings: { enabled: false } });
     expect((await request(app).post('/submit').send({})).status).toBe(200);
