@@ -10,6 +10,7 @@ const { createHash } = require('crypto');
 const config = require('../config/env');
 const { bindAuthenticatedActor } = require('../services/request-context');
 const { measurePhase, outsideRequestTiming } = require('../services/request-timing');
+const { readAuthentication, assertSessionRequest } = require('../services/auth-transport');
 
 /**
  * Authenticate JWT token
@@ -17,17 +18,17 @@ const { measurePhase, outsideRequestTiming } = require('../services/request-timi
  */
 const authenticate = async (req, res, next) => {
     try {
-        // Extract token from Authorization header
-        const authHeader = req.headers.authorization;
-
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            return res.status(HTTP_STATUS.UNAUTHORIZED).json({
+        const { token, transport } = readAuthentication(req);
+        const unauthorized = body => {
+            // A late response must not expire cookies issued by a newer sign-in.
+            return res.status(HTTP_STATUS.UNAUTHORIZED).json(body);
+        };
+        if (!token) {
+            return unauthorized({
                 success: false,
                 message: ERROR_MESSAGES.TOKEN_REQUIRED,
             });
         }
-
-        const token = authHeader.substring(7); // Remove 'Bearer ' prefix
 
         // Verify token
         let decoded;
@@ -47,7 +48,7 @@ const authenticate = async (req, res, next) => {
                 statusCode: HTTP_STATUS.UNAUTHORIZED,
             });
 
-            return res.status(HTTP_STATUS.UNAUTHORIZED).json({
+            return unauthorized({
                 success: false,
                 message: ERROR_MESSAGES.INVALID_TOKEN,
             });
@@ -64,29 +65,33 @@ const authenticate = async (req, res, next) => {
                 FROM (VALUES (statement_timestamp()::timestamp)) AS check_time(checked_at)
                 CROSS JOIN LATERAL (VALUES (
                     expires_at > checked_at AND (
+                        (mfa_method IS NOT NULL AND mfa_verified_at IS NOT NULL) OR $4::boolean
+                    ) AND (
                         $3::integer IS NULL OR last_activity IS NULL OR
                         last_activity > checked_at - $3 * INTERVAL '1 minute'
                     )
                 )) AS session_status(valid)
             )
             WHERE user_id = $1 AND token_hash = $2 AND is_active = true
-            RETURNING id, is_active
-        `, [decoded.userId, tokenHash, idleMinutes]));
+            RETURNING id, is_active, csrf_hash, mfa_method, mfa_verified_at
+        `, [decoded.userId, tokenHash, idleMinutes,
+            process.env.NODE_ENV === 'test' && process.env.MFA_ALLOW_LEGACY_TEST_SESSIONS === 'true']));
 
         if (!session) {
             logger.warn(`No active session found for user ${decoded.userId}`);
-            return res.status(HTTP_STATUS.UNAUTHORIZED).json({
+            return unauthorized({
                 success: false,
                 message: 'Session not found or expired',
             });
         }
 
         if (!session.is_active) {
-            return res.status(HTTP_STATUS.UNAUTHORIZED).json({
+            return unauthorized({
                 success: false,
                 message: 'Session has expired. Please login again',
             });
         }
+        assertSessionRequest(req, session, transport);
 
         // Capture device information
         const deviceInfo = captureDeviceInfo(req);
@@ -118,7 +123,7 @@ const authenticate = async (req, res, next) => {
         const user = await measurePhase('account_lookup', () => findUserById(decoded.userId));
 
         if (!user) {
-            return res.status(HTTP_STATUS.UNAUTHORIZED).json({
+            return unauthorized({
                 success: false,
                 message: ERROR_MESSAGES.USER_NOT_FOUND,
             });
@@ -187,12 +192,16 @@ const authenticate = async (req, res, next) => {
         req.session = {
             id: session.id,
             deviceInfo,
+            transport,
+            mfaMethod: session.mfa_method,
+            mfaVerifiedAt: session.mfa_verified_at,
         };
 
         bindAuthenticatedActor(user.id);
 
         next();
     } catch (error) {
+        if (error.status === 403) return res.status(403).json({ success: false, message: error.message });
         logger.error('Authentication middleware error:', error);
         return res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
             success: false,
@@ -206,14 +215,8 @@ const authenticate = async (req, res, next) => {
  * Authenticates if token is present, but doesn't require it
  */
 const optionalAuth = async (req, res, next) => {
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return next();
-    }
-
-    // If token is present, authenticate
-    return authenticate(req, res, next);
+    try { return readAuthentication(req).token ? authenticate(req, res, next) : next(); }
+    catch (error) { return res.status(403).json({ success: false, message: error.message }); }
 };
 
 /**

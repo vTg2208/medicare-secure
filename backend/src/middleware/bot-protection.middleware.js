@@ -56,7 +56,14 @@ function createBotProtection({ settings, allowStaff = false, verifyToken = verif
     };
     return (req, res, next) => {
         if (!settings?.enabled) return next();
-        if (allowStaff && req.get('Authorization')) {
+        let hasAuthentication = false;
+        // Selecting the public path never grants an exemption: it always
+        // requires bot verification, even if a revoked cookie remains present.
+        if (allowStaff && req.get('X-Registration-Context') !== 'public') {
+            try { hasAuthentication = !!require('../services/auth-transport').readAuthentication(req).token; }
+            catch { return res.status(403).json({ success: false, message: 'Invalid authentication credentials' }); }
+        }
+        if (allowStaff && hasAuthentication) {
             const authenticate = authenticateRequest || require('./auth.middleware').authenticate;
             return authenticate(req, res, () => {
                 const role = (req.user?.roleName || req.user?.role || '').toLowerCase();
