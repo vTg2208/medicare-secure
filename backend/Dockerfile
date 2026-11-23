@@ -1,4 +1,4 @@
-FROM node:24-alpine AS base
+FROM node:26-alpine AS base
 WORKDIR /app
 RUN apk add --no-cache dumb-init
 COPY package.json package-lock.json ./
@@ -14,7 +14,7 @@ CMD ["dumb-init", "npm", "run", "dev"]
 FROM base AS dependencies
 RUN npm ci --omit=dev && npm cache clean --force
 
-FROM node:24-alpine AS production
+FROM node:26-alpine AS production
 ENV NODE_ENV=production
 RUN apk add --no-cache dumb-init
 WORKDIR /app
