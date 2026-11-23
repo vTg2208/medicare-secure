@@ -12,7 +12,7 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Windows PowerShell credential directory regression
         shell: powershell
         run: ./backend/tests/b2-key-setup.windows.ps1
